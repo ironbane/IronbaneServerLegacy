@@ -1,4 +1,4 @@
-IronbaneServer
+Ironbane Server
 ==============
 
 The server for Ironbane, the open source MMO. 
