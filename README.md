@@ -11,7 +11,7 @@ Play the game at <http://www.ironbane.com/>.
 
 ## Getting started
 
-* Clone this repository someowhere on your system.
+* Clone this repository somewhere on your system. Don't put it inside your webserver directory, as anyone can then view your database password.
 ```
     git clone git@github.com:ironbane/IronbaneServer.git
 ```
