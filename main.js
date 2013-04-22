@@ -29,7 +29,7 @@ var clientDir = config.clientDir;
 var SERVER = true;
 var params = { log: 0 };
 
-// 
+//
 // For running locally, don't use for production
 params.log = 0;
 params['close timeout'] = 86400;
@@ -38,7 +38,7 @@ params['heartbeat interval'] = 86400;
 params['polling duration'] = 86400;
 //
 
-var io = require('socket.io').listen(8080, params);
+var io = require('socket.io').listen(config.server_port, params);
 var mmysql = require('mysql');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
