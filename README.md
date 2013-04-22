@@ -12,7 +12,9 @@ Play the game at <http://www.ironbane.com/>.
 ## Getting started
 
 * Clone this repository someowhere on your system.
+```
     git clone git@github.com:ironbane/IronbaneServer.git
+```
 
 * Next, you need to install a few npm packages:
 ```
