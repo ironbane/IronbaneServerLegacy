@@ -17,40 +17,27 @@
 
 // Config variables
 
-var running_local = process.platform == "win32";
-
-var basedir = '/var/www/vhosts/nickjanssen.com/ironbane/';
-
-if ( running_local ) {
-    basedir = '../Ironbane/';
-}
-
+var config = require('./config');
 
 // Mysql config
-var mysql_user = 'ironbane';
-var mysql_password = 'UlvxWeLfdY5951U';
-var mysql_database = 'ironbane';
-
-if ( running_local ) {
-    mysql_user = 'root';
-    mysql_password = 'next';
-}
-
-
-
-
+var mysql_user = config.mysql_user;
+var mysql_password = config.mysql_password;
+var mysql_database = config.mysql_database;
+var clientDir = config.clientDir;
 
 // System start
-
 var SERVER = true;
 var params = { log: 0 };
-if ( running_local ) {
-    params.log = 0;
-    params['close timeout'] = 86400;
-    params['heartbeat timeout'] = 86400;
-    params['heartbeat interval'] = 86400;
-    params['polling duration'] = 86400;
-}
+
+// 
+// For running locally, don't use for production
+params.log = 0;
+params['close timeout'] = 86400;
+params['heartbeat timeout'] = 86400;
+params['heartbeat interval'] = 86400;
+params['polling duration'] = 86400;
+//
+
 var io = require('socket.io').listen(8080, params);
 var mmysql = require('mysql');
 var fs = require('fs');
@@ -103,13 +90,13 @@ var includes = [
     './Init.js',
 
 
-    basedir+'plugins/game/js/External/Shared.js',
-    basedir+'plugins/game/js/External/Util.js',
-    basedir+'plugins/game/js/External/NodeHandler.js',
+    clientDir+'plugins/game/js/External/Shared.js',
+    clientDir+'plugins/game/js/External/Util.js',
+    clientDir+'plugins/game/js/External/NodeHandler.js',
 
     './External/perlin.js',
 
-    basedir+'plugins/game/js/External/ImprovedNoise.js',
+    clientDir+'plugins/game/js/External/ImprovedNoise.js',
 
 
     './Engine/ConsoleCommand.js',

@@ -56,7 +56,7 @@ var Server = Class.extend({
         // this.characterImageBounds = {};
 
         // var imageTypes = ["skin", "eyes", ""]
-     //        var dataPath = basedir+'plugins/game/images/characters/base/head';
+     //        var dataPath = clientDir+'plugins/game/images/characters/base/head';
 
      // walk(dataPath, function(err, results) {
      //     if (err) throw err;
