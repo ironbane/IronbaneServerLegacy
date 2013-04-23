@@ -19,7 +19,7 @@ Play the game at <http://www.ironbane.com/>.
 * Next, you need to install a few npm packages:
 ```
 	npm install socket.io@0.9.6 
-	npm install mysql@2.0.0-alpha2
+	npm install mysql@2.0.0-alpha7
 	npm install wrench@1.3.9
 ```
 * Change the variables inside ```config.js```
