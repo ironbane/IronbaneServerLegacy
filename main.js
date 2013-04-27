@@ -42,11 +42,6 @@ var io = require('socket.io').listen(config.server_port, params);
 var mmysql = require('mysql');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
-
-
-
-
-
 var window = {};
 
 // Custom
@@ -59,10 +54,8 @@ var check = require('./External/validator.js').check;
 var sanitize = require('./External/validator.js').sanitize
 var _ = require('./External/underscore-min.js');
 
-
 // Everything runs on one database, since the db is not hurt that bad by performance
 // We cut the middle man and only use mysql occasionally to save/load data
-
 
 // Start MySQL
 var mysql = mmysql.createConnection({
@@ -71,7 +64,6 @@ var mysql = mmysql.createConnection({
     database: mysql_database
     //insecureAuth:false
 });
-
 
 // Necessary to prevent 'Mysql has gone away' errors
 // Use it check for restarting on git push
@@ -85,7 +77,6 @@ function keepAlive() {
         if (err) throw err;
 
         if ( results.length ) {
-
             shuttingDown = true;
 
             chatHandler.Announce("&lt;Server&gt; New update available!", "red");
@@ -103,7 +94,6 @@ function keepAlive() {
     });
     return;
 }
-
 
 var includes = [
 
