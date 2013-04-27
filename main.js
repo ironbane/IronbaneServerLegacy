@@ -75,16 +75,21 @@ var mysql = mmysql.createConnection({
 
 // Necessary to prevent 'Mysql has gone away' errors
 // Use it check for restarting on git push
-setInterval(keepAlive, 600);
+setInterval(keepAlive, 10000);
+var shuttingDown = false;
 function keepAlive() {
     //mysql.query('SELECT 1');
+    if ( shuttingDown ) return;
+
     mysql.query('SELECT value FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
         if (err) throw err;
 
         if ( results.length ) {
 
-            chatHandler.Announce("<Server> New update available!", "red");
-            chatHandler.Announce("<Server> Auto-restarting in 10 seconds...", "red");
+            shuttingDown = true;
+
+            chatHandler.Announce("&lt;Server&gt; New update available!", "red");
+            chatHandler.Announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
 
             setTimeout(function() {
                 mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
