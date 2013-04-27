@@ -82,11 +82,17 @@ function keepAlive() {
         if (err) throw err;
 
         if ( results.length ) {
-            mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
-                if (err) throw err;
 
-                process.exit();
-            });
+            chatHandler.Announce("<Server> New update available!", "red");
+            chatHandler.Announce("<Server> Auto-restarting in 10 seconds...", "red");
+
+            setTimeout(function() {
+                mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
+                    if (err) throw err;
+
+                    process.exit();
+                });
+            }, 10000);
         }
 
     });
