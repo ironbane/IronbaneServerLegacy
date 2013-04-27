@@ -74,10 +74,22 @@ var mysql = mmysql.createConnection({
 
 
 // Necessary to prevent 'Mysql has gone away' errors
-setInterval(keepAlive, 60000);
+// Use it check for restarting on git push
+setInterval(keepAlive, 600);
 function keepAlive() {
-    mysql.query('SELECT 1');
-    //log("Fired DB Keep-Alive");
+    //mysql.query('SELECT 1');
+    mysql.query('SELECT value FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
+        if (err) throw err;
+
+        if ( results.length ) {
+            mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
+                if (err) throw err;
+
+                process.exit();
+            });
+        }
+
+    });
     return;
 }
 
