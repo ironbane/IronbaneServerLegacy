@@ -16,6 +16,8 @@ Play the game at <http://www.ironbane.com/>.
     git clone https://github.com/ironbane/IronbaneServer.git
 ```
 
+* Install <http://nodejs.org/download/>(Node.js version 0.8.5 or higher):
+
 * Next, you need to install a few npm packages:
 ```
 	npm install socket.io@0.9.6 
