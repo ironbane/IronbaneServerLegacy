@@ -16,7 +16,7 @@ Play the game at <http://www.ironbane.com/>.
     git clone https://github.com/ironbane/IronbaneServer.git
 ```
 
-* Install <http://nodejs.org/download/>(Node.js version 0.8.5 or higher):
+* Install (Node.js version 0.8.5 or higher)<http://nodejs.org/download/>:
 
 * Next, you need to install a few npm packages:
 ```
