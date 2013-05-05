@@ -12,15 +12,19 @@ Play the game at <http://www.ironbane.com/>.
 ## Getting started
 
 * Clone this repository somewhere on your system. Don't put it inside your webserver directory, as anyone can then view your database password.
+
 ```
     git clone https://github.com/ironbane/IronbaneServer.git
 ```
+
 * Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/) if you haven't yet
 
 * Next, run the following command from the root directory
+ 
 ```
-	npm install
+    npm install
 ```
+
 * Copy ```config_example.js``` from the ```/install/``` directory to the root directory
 
 * Rename your copied ```config_example.js``` to ```config.js```
