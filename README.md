@@ -18,11 +18,9 @@ Play the game at <http://www.ironbane.com/>.
 
 * Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/)
 
-* Next, you need to install a few npm packages:
+* Next, run the following command from your server directory
 ```
-	npm install socket.io@0.9.6 
-	npm install mysql@2.0.0-alpha7
-	npm install wrench@1.3.9
+	npm install
 ```
 * Change the variables inside ```config.js```
    **Note for Windows users**: do not use an absolute path for clientDir. There is a bug with Node.js that creates faulty absolute paths, only use relative paths.
