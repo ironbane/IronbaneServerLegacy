@@ -3,3 +3,6 @@ debug.bat
 workshop/
 tools/
 node_modules/
+*.sublime-project
+*.sublime-workspace
+thumbs.db
