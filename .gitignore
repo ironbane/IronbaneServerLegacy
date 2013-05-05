@@ -5,4 +5,5 @@ tools/
 node_modules/
 *.sublime-project
 *.sublime-workspace
+config.js
 thumbs.db
