@@ -1,0 +1,28 @@
+{
+  "name": "IronbaneServer",
+  "version": "0.1.7",
+  "description": "The server for Ironbane, the open source MMO.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ironbane/IronbaneServer.git"
+  },
+  "keywords": [
+    "javascript",
+    "mmo",
+    "retro",
+    "nodejs",
+    "rpg"
+  ],
+  "author": "Nick Janssen",
+  "license": "GPL",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "socket.io": "~0.9.14",
+    "mysql": "~2.0.0-alpha8",
+    "wrench": "~1.5.1"
+  }
+}
