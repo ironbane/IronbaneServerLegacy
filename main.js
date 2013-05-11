@@ -17,7 +17,8 @@
 
 // Config variables
 
-var config = require('./config');
+var config = require('./config'),
+    log = require('util').log; // built in timestampped logger
 
 // Mysql config
 var mysql_user = config.mysql_user;
@@ -27,7 +28,9 @@ var clientDir = config.clientDir;
 
 // System start
 var SERVER = true;
-var params = { log: 0 };
+var params = {
+    log: 0
+};
 
 //
 // For running locally, don't use for production
@@ -51,8 +54,8 @@ var util = require('util');
 
 var fsi = require('./External/fsi.js');
 var check = require('./External/validator.js').check;
-var sanitize = require('./External/validator.js').sanitize
-var _ = require('./External/underscore-min.js');
+var sanitize = require('./External/validator.js').sanitize;
+var _ = require('underscore');
 
 // Everything runs on one database, since the db is not hurt that bad by performance
 // We cut the middle man and only use mysql occasionally to save/load data
@@ -67,24 +70,30 @@ var mysql = mmysql.createConnection({
 
 // Necessary to prevent 'Mysql has gone away' errors
 // Use it check for restarting on git push
-setInterval(keepAlive, 10000);
 var shuttingDown = false;
+
 function keepAlive() {
     //mysql.query('SELECT 1');
-    if ( shuttingDown ) return;
+    if (shuttingDown) {
+        return;
+    }
 
-    mysql.query('SELECT value FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
-        if (err) throw err;
+    mysql.query('SELECT value FROM ib_config WHERE name = ?', ["restart"], function(err, results, fields) {
+        if (err) {
+            throw err;
+        }
 
-        if ( results.length ) {
+        if (results.length) {
             shuttingDown = true;
 
             chatHandler.Announce("&lt;Server&gt; New update available!", "red");
             chatHandler.Announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
 
             setTimeout(function() {
-                mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function (err, results, fields) {
-                    if (err) throw err;
+                mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function(err, results, fields) {
+                    if (err) {
+                        throw err;
+                    }
 
                     process.exit();
                 });
@@ -94,6 +103,7 @@ function keepAlive() {
     });
     return;
 }
+setInterval(keepAlive, 10000);
 
 var includes = [
 
@@ -103,13 +113,13 @@ var includes = [
     './Init.js',
 
 
-    clientDir+'plugins/game/js/External/Shared.js',
-    clientDir+'plugins/game/js/External/Util.js',
-    clientDir+'plugins/game/js/External/NodeHandler.js',
+clientDir + 'plugins/game/js/External/Shared.js',
+clientDir + 'plugins/game/js/External/Util.js',
+clientDir + 'plugins/game/js/External/NodeHandler.js',
 
     './External/perlin.js',
 
-    clientDir+'plugins/game/js/External/ImprovedNoise.js',
+clientDir + 'plugins/game/js/External/ImprovedNoise.js',
 
 
     './Engine/ConsoleCommand.js',
@@ -166,21 +176,25 @@ var includes = [
 
 ];
 
-for(var f=0;f<includes.length;f++){
-	log("Loading: "+includes[f]);
-    eval(fs.readFileSync(includes[f])+'');
+for (var f = 0; f < includes.length; f++) {
+    log("Loading: " + includes[f]);
+    eval(fs.readFileSync(includes[f]) + '');
 }
 
-function log(msg) {
-    console.log("["+(new Date()).toLocaleTimeString()+"] "+msg)    ;
-}
+
+// create http api server
+app = require('express')(); // purposefully global
+// load routes
+require('./src/api');
+// start api server
+app.listen(config.api_port);
 
 
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
 
-process.stdin.on('data', function (text) {
-	consoleHandler.Exec(text);
+process.stdin.on('data', function(text) {
+    consoleHandler.Exec(text);
 });
 
 
@@ -193,24 +207,26 @@ var endTime = 0;
 
 
 // Main loop
+
 function MainLoop() {
 
-    setTimeout(function(){
-        MainLoop()
+    setTimeout(function() {
+        MainLoop();
     }, 100);
 
     var now = (new Date()).getTime();
-    dTime = (now-oldTime)/1000.0;//time diff in seconds
-    if ( dTime > 0.3 ) dTime = 0.3;
-    oldTime=now;
+    dTime = (now - oldTime) / 1000.0; //time diff in seconds
+    if (dTime > 0.3) {
+        dTime = 0.3;
+    }
+    oldTime = now;
 
-	var startTime = (new Date()).getTime();
+    var startTime = (new Date()).getTime();
 
     //setTimeout(function(){log(NameGen(3, 8, "", ""))}, 1000);
     server.Tick(dTime);
 
-	endTime = (new Date()).getTime() - startTime;
+    endTime = (new Date()).getTime() - startTime;
 }
 
 MainLoop();
-
