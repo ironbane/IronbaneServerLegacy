@@ -183,9 +183,9 @@ for (var f = 0; f < includes.length; f++) {
 
 
 // create http api server
-app = require('express')(); // purposefully global
+var app = require('express')(); // purposefully global
 // load routes
-require('./src/api');
+require('./src/api')(app, mysql);
 // start api server
 app.listen(config.api_port);
 

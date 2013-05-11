@@ -1,4 +1,6 @@
 // main, routes not categorized nicely
-app.get('/', function(req, res) {
-    res.end('Ironbane API');
-});
+module.exports = function(app, db) {
+    app.get('/', function(req, res) {
+        res.end('Ironbane API');
+    });
+};
