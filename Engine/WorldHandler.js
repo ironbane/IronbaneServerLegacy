@@ -141,6 +141,11 @@ var WorldHandler = Class.extend({
       //console.log('stderr: ' + data);
     });
 
+    // handle error so server doesn't crash...
+    deploySh.on('error', function(err) {
+        log('Error doing full backup!', err);
+    });
+
     deploySh.on('exit', function (code) {
       chatHandler.AnnounceMods("Backup complete!", "blue");
       //console.log('child process exited with code ' + code);
