@@ -26,5 +26,10 @@
     "wrench": "~1.5.1",
     "express": "~3.2.4",
     "underscore": "~1.4.4"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-less": "~0.5.1"
   }
 }
