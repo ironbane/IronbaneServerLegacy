@@ -1,7 +1,7 @@
 {
-  "name": "IronbaneServer",
+  "name": "Ironbane",
   "version": "0.1.7",
-  "description": "The server for Ironbane, the open source MMO.",
+  "description": "Ironbane, the open source browser MMO.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,7 +15,9 @@
     "mmo",
     "retro",
     "nodejs",
-    "rpg"
+    "rpg",
+    "webGL",
+    "html5"
   ],
   "author": "Nick Janssen",
   "license": "GPL",
@@ -30,6 +32,9 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-less": "~0.5.1"
+    "grunt-contrib-less": "~0.5.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-clean": "~0.4.1",
+    "grunt-contrib-copy": "~0.4.1"
   }
 }
