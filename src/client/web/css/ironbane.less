@@ -1,7 +1,10 @@
 // ironbane.less
 
 // vars
-@primary1: #33cc99;
+@primary1: #33cc99; // text green
+@primary2: #66ff66; // link/heading green
+@primary3: #257541; // darker green dashed border on footer?
+
 @pageBackground: #051d1c;
 
 @baseFont:                      'Cabin', Arial, sans-serif;
@@ -21,7 +24,26 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-#pageWrapr {
+.clear {clear: both;}
+
+header.logo {
+    .left-pillar, .right-pillar {width: 125px;height:186px;}
+    .left-pillar {float: left;background-image: url(../images/top_left.png);}
+    .right-pillar {float: right;background-image: url(../images/top_right.png);}
+}
+
+footer .sock {
+    outline: 2px dashed @primary3;
+    background-color: @pageBackground;
+    width: 300px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    a {color: @primary2;}
+}
+
+#pageWrap {
     width: 960px;
     margin-left: auto;
     margin-right: auto;
@@ -33,4 +55,10 @@ body {
             &:hover {cursor:pointer;}
         }
     }
+}
+
+.pipe-list {
+    li a {margin: 0.5em;text-decoration: none;}
+    li:after {content: '|'};
+    li:last-child:after {content: ''};
 }

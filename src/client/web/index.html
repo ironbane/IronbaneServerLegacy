@@ -13,16 +13,21 @@
 </head>
 <body>
     <section id="pageWrap">
-        <header>
+        <header class="logo">
+            <div class="left-pillar"></div>
             <img src='images/logo_isolated.png' alt="Ironbane Logo" />
+            <div class="right-pillar"></div>
+            <br class="clear">
         </header>
         <ng-view></ng-view>
         <footer>
-            <p>&copy; Ironbane 2013</p>
-            <ul class="horizontal-list">
-                <li><a href="terms">Terms of Use</a></li>
-                <li><a href="privacy">Privacy Policy</a></li>
-            </ul>
+            <div class="sock">
+                <p>&copy; Ironbane 2013</p>
+                <ul class="horizontal-list pipe-list">
+                    <li><a href="terms">Terms of Use</a></li>
+                    <li><a href="privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
         </footer>
     </section>
 </body>
