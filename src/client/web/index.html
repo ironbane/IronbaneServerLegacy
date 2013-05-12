@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="IronbaneApp">
+<head>
+    <title>Ironbane!</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Cabin:400,600,400italic,600italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/ironbane.css">
+
+    <script src="lib/angular-1.1.4/angular.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <section id="pageWrap">
+        <header>
+            <img src='images/logo_isolated.png' alt="Ironbane Logo" />
+        </header>
+        <ng-view></ng-view>
+        <footer>
+            <p>&copy; Ironbane 2013</p>
+            <ul class="horizontal-list">
+                <li><a href="terms">Terms of Use</a></li>
+                <li><a href="privacy">Privacy Policy</a></li>
+            </ul>
+        </footer>
+    </section>
+</body>
+</html>

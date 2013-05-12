@@ -1,0 +1,36 @@
+// ironbane.less
+
+// vars
+@primary1: #33cc99;
+@pageBackground: #051d1c;
+
+@baseFont:                      'Cabin', Arial, sans-serif;
+@baseFontSize:                  14px;
+@baseFontColor:                 @primary1;
+@baseFontLineHeight:            1.231;
+
+html {height: 100%;}
+body {
+    background: @pageBackground;
+    background-image: url(../images/bg.png);
+    font-family: @baseFont;
+    font-size: @baseFontSize;
+    line-height: @baseFontLineHeight;
+    color: @baseFontColor;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+}
+
+#pageWrapr {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.horizontal-list {margin: 0; padding: 0; cursor: default; list-style-type: none; display: inline;
+    li {display: inline; float: none; list-style: none;
+        a{
+            &:hover {cursor:pointer;}
+        }
+    }
+}
