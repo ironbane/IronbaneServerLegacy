@@ -4,6 +4,7 @@
 @primary1: #33cc99; // text green
 @primary2: #66ff66; // link/heading green
 @primary3: #257541; // darker green dashed border on footer?
+@primary4: #103c32; // dark green background
 
 @pageBackground: #051d1c;
 
@@ -30,6 +31,32 @@ header.logo {
     .left-pillar, .right-pillar {width: 125px;height:186px;}
     .left-pillar {float: left;background-image: url(../images/top_left.png);}
     .right-pillar {float: right;background-image: url(../images/top_right.png);}
+}
+
+.content-wrap {
+    display: table;
+    width: 896px;
+    margin-left: auto;
+    margin-right: auto;
+    .middle-left-pillar,
+    .middle-right-pillar {display: table-cell;width: 44px;}
+    .middle-left-pillar {background: url(../images/pillarleftloop.png);}
+    .middle-right-pillar {background: url(../images/pillarrightloop.png);}
+    .content {
+        min-height: 214px;
+        border-top: 1px solid #7fae84;
+        padding-top: 10px;
+        background-color: @primary4;
+    }
+}
+
+.bottom-pillar {
+    margin-left: auto;
+    margin-right: auto;
+    width: 896px;
+    height: 64px;
+    background-image: url(../images/bottombg.png);
+    background-repeat: no-repeat;
 }
 
 footer .sock {

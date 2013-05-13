@@ -19,8 +19,15 @@
             <div class="right-pillar"></div>
             <br class="clear">
         </header>
-        <ng-view></ng-view>
+        <div class="content-wrap">
+            <div class="middle-left-pillar"></div>
+            <div class="content">
+                <ng-view></ng-view>
+            </div>
+            <div class="middle-right-pillar"></div>
+        </div>
         <footer>
+            <div class="bottom-pillar"></div>
             <div class="sock">
                 <p>&copy; Ironbane 2013</p>
                 <ul class="horizontal-list pipe-list">
