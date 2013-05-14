@@ -8,5 +8,9 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/home',
             controller: 'HomeCtrl'
         })
+        .when('/forum', {
+            templateUrl: '/views/forum',
+            controller: 'ForumCtrl'
+        })
         .otherwise({redirectTo: '/'});
 }]);

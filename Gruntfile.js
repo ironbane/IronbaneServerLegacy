@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         },
         concat: {
             web: {
-                src: [webScriptPath + '/app.js', webScriptPath + '/homeCtrl.js'],
+                src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
                 dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
@@ -53,7 +53,7 @@ module.exports = function(grunt) {
                     dest: 'deploy/web/',
                     cwd: 'src/client/web',
                     expand: true
-                }, {
+                }, { // TODO: setup lib to copy only certain files?
                     src: 'lib/**/*',
                     dest: 'deploy/web/',
                     expand: true,

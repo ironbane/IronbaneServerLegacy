@@ -7,9 +7,7 @@ module.exports = function(app, db) {
     app.use('/js', express.static('deploy/web/js'));
     app.use('/lib', express.static('deploy/web/lib'));
 
-    app.get('/', function(req, res) {
-        res.sendfile('deploy/web/index.html');
-    });
+    app.use(app.router);
 
     app.get('/views/:view', function(req, res) {
         // allow us to omit the file extension...
