@@ -10,7 +10,11 @@
         </thead>
         <tbody>
             <tr ng-repeat="board in boards">
-                <td><a ng-href="{{ board.url }}">{{ board.name }}</a></td>
+                <td>
+                    <a class="forum-link" ng-href="{{ board.url }}">{{ board.name }}</a>
+                    <br>
+                    <span class="board-descr">{{ board.description }}</span>
+                </td>
                 <td>0</td>
                 <td>0</td>
                 <td>blah</td>
