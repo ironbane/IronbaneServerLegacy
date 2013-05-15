@@ -27,7 +27,8 @@
     "mysql": "~2.0.0-alpha8",
     "wrench": "~1.5.1",
     "express": "~3.2.4",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "bbcode": "~0.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

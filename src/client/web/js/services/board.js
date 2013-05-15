@@ -51,8 +51,24 @@ angular.module('IronbaneApp')
         angular.copy(json || {}, this);
 
         // todo: fill these
+        this.url = '/forum/' + this.id;
+
         this.postCount = 0;
         this.topicCount = 0;
+    };
+
+    // get a single board
+    Board.get = function(id) {
+        var promise = $http.get('/api/forum/' + id)
+            .then(function(response) {
+                var board = new Board(response.data);
+
+                return board;
+            }, function(err) {
+                $log.error('Error getting board from server', err);
+            });
+
+        return promise;
     };
 
     Board.getAll = function() {
@@ -77,4 +93,27 @@ angular.module('IronbaneApp')
     };
 
     return Board;
+}])
+.factory('Post', ['$log', '$http', function($log, $http) {
+    var Post = function(json) {
+        angular.copy(json || {}, this);
+    };
+
+    // get just the topics for a board
+    Post.getTopics = function(boardId) {
+        var promise = $http.get('/api/forum/' + boardId + '/topics')
+            .then(function(response) {
+                var posts = response.data;
+
+                posts.forEach(function(post, i) {
+                    posts[i] = new Post(post);
+                });
+
+                return posts;
+            });
+
+        return promise;
+    };
+
+    return Post;
 }]);

@@ -12,5 +12,24 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/forum',
             controller: 'ForumCtrl'
         })
+        .when('/forum/:boardId', {
+            templateUrl: '/views/board',
+            controller: 'BoardCtrl',
+            resolve: {
+                ResolveData: ['Board', 'Post', '$q', '$route', function(Board, Post, $q, $route) {
+                    var deferred = $q.defer(),
+                        boardId = $route.current.params.boardId;
+
+                    $q.all([Board.get(boardId), Post.getTopics(boardId)])
+                        .then(function(results) {
+                            deferred.resolve({board: results[0], posts: results[1]});
+                        }, function(err) {
+                            deferred.reject(err);
+                        });
+
+                    return deferred.promise;
+                }]
+            }
+        })
         .otherwise({redirectTo: '/'});
 }]);

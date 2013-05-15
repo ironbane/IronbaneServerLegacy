@@ -1,5 +1,7 @@
 // forum.js
 module.exports = function(app, db) {
+    var bbcode = require('bbcode');
+
     // list boards
     app.get('/api/forum', function(req, res) {
         db.query('SELECT forum_boards.*, forum_cats.name as category FROM forum_boards left join forum_cats on forum_boards.forumcat=forum_cats.id order by forum_cats.order, forum_boards.order', function(err, results) {
@@ -25,11 +27,34 @@ module.exports = function(app, db) {
         });
     });
 
-    // get all topics for a board
+    // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
+        db.query('select * from forum_boards where id = ?', [req.params.boardId], function(err, results) {
+            if(err) {
+                res.end('error', err);
+                return;
+            }
+
+            if(results.length > 0) {
+                res.send(results[0]);
+            } else {
+                res.send("no board found with id" + req.params.boardId, 404);
+            }
+        });
+    });
+
+    // get all topics for a board
+    app.get('/api/forum/:boardId/topics', function(req, res) {
+        var posts = [];
+
         db.query('select * from forum_topics where board_id = ?', [req.params.boardId], function(err, results) {
             if (err) {
                 res.end('error', err);
+                return;
+            }
+
+            if(results.length === 0) {
+                res.send(posts);
                 return;
             }
 
@@ -40,11 +65,20 @@ module.exports = function(app, db) {
             }
 
             // better with a join?
-            db.query('select * from forum_posts where topic_id in (?) group by topic_id order by time', [topicIds], function(err, posts) {
+            db.query('select * from forum_posts where topic_id in (?) group by topic_id order by time', [topicIds], function(err, pResults) {
                 if(err) {
                     res.end('error', err);
                     return;
                 }
+
+                posts = pResults;
+
+                posts.forEach(function(post) {
+                    post.bbcontent = post.content;
+                    bbcode.parse(post.content, function(html) {
+                        post.content = html;
+                    });
+                });
 
                 // should add in any of the topic data? or not needed
                 res.send(posts);
@@ -53,17 +87,17 @@ module.exports = function(app, db) {
     });
 
     // start a new topic
-    app.post('/api/forum/:boardId', function(req, res) {
+    app.post('/api/forum/:boardId/topics', function(req, res) {
 
     });
 
     // get all posts for topic
-    app.get('/api/forum/:boardId/:topicId', function(req, res) {
+    app.get('/api/forum/:boardId/topics/:topicId/posts', function(req, res) {
 
     });
 
     // create a new post
-    app.post('/api/forum/:boardId/:topicId', function(req, res) {
+    app.post('/api/forum/:boardId/topics/:topicId/posts', function(req, res) {
         var post = {
             title: req.body.title,
             topic_id: req.params.topicId,

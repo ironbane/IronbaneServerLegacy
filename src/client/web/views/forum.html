@@ -5,7 +5,7 @@
             <li class="board" ng-repeat="board in cat.boards">
                 <div class="icon"></div>
                 <div class="details">
-                    <h3><a class="link" ng-href="{{ board.url }}">{{ board.name }}</a><h3>
+                    <h3><a class="link" ng-href="{{ board.url }}">{{ board.name }}</a></h3>
                     <div class="descr">{{ board.description }}</div>
                     <div class="stats">Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</div>
                 </div>
