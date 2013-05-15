@@ -71,17 +71,46 @@ module.exports = function(app, db) {
                     return;
                 }
 
+                // skip authors phase if there aren't any results
+                if(pResults.length === 0) {
+                    res.send([]);
+                    return;
+                }
+
+                var authors = [];
+
                 posts = pResults;
 
                 posts.forEach(function(post) {
+                    authors.push(post.user);
                     post.bbcontent = post.content;
                     bbcode.parse(post.content, function(html) {
                         post.content = html;
                     });
                 });
 
-                // should add in any of the topic data? or not needed
-                res.send(posts);
+                // grab author details to populate
+                db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
+                    if(err) {
+                        res.send('error loading users: ' + err, 500);
+                        return;
+                    }
+
+                    // loop through posts and nest author
+                    posts.forEach(function(post) {
+                        for(var i=0;i<users.length;i++) {
+                            if(post.user === users[i].id) {
+                                post.author = users[i];
+                                // don't send password or activationkey
+                                delete post.author.pass;
+                                delete post.author.activationkey;
+                                break;
+                            }
+                        }
+                    });
+
+                    res.send(posts);
+                });
             });
         });
     });

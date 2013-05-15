@@ -94,7 +94,7 @@ angular.module('IronbaneApp')
 
     return Board;
 }])
-.factory('Post', ['$log', '$http', function($log, $http) {
+.factory('Post', ['$log', '$http', 'User', function($log, $http, User) {
     var Post = function(json) {
         angular.copy(json || {}, this);
     };
@@ -105,7 +105,9 @@ angular.module('IronbaneApp')
             .then(function(response) {
                 var posts = response.data;
 
+                // upgrade objects
                 posts.forEach(function(post, i) {
+                    post.author = new User(post.author);
                     posts[i] = new Post(post);
                 });
 

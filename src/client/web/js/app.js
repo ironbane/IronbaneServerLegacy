@@ -1,5 +1,6 @@
 // app.js
 angular.module('IronbaneApp', [])
+.constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 
