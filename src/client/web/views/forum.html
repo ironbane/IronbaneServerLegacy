@@ -1,24 +1,15 @@
-<div>
-    <table>
-        <thead>
-            <tr>
-                <th>Board</th>
-                <th>Topics</th>
-                <th>Posts</th>
-                <th>Last Post</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="board in boards">
-                <td>
-                    <a class="forum-link" ng-href="{{ board.url }}">{{ board.name }}</a>
-                    <br>
-                    <span class="board-descr">{{ board.description }}</span>
-                </td>
-                <td>0</td>
-                <td>0</td>
-                <td>blah</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="forum-listing">
+    <div class="forum-group" ng-repeat="cat in cats">
+        <h2>{{ cat.name }}</h2>
+        <ul class="board-list">
+            <li class="board" ng-repeat="board in cat.boards">
+                <div class="icon"></div>
+                <div class="details">
+                    <h3><a class="link" ng-href="{{ board.url }}">{{ board.name }}</a><h3>
+                    <div class="descr">{{ board.description }}</div>
+                    <div class="stats">Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</div>
+                </div>
+            </li>
+        </ul>
+    </div>
 </div>

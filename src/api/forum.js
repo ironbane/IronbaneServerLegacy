@@ -2,7 +2,7 @@
 module.exports = function(app, db) {
     // list boards
     app.get('/api/forum', function(req, res) {
-        db.query('select * from forum_boards', function(err, results) {
+        db.query('SELECT forum_boards.*, forum_cats.name as category FROM forum_boards left join forum_cats on forum_boards.forumcat=forum_cats.id order by forum_cats.order, forum_boards.order', function(err, results) {
             if (err) {
                 res.end('error', err);
                 return;

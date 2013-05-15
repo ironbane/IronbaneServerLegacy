@@ -90,3 +90,22 @@ footer .sock {
     li:after {content: '|'};
     li:last-child:after {content: ''};
 }
+
+.forum-listing {
+    text-align: left;
+    margin: 8px;
+    .forum-group {
+        h2 {background-color: @primary3;}
+        .board-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            .board {
+                background-color: @pageBackground;
+                padding: 4px;
+                margin-bottom: 4px;
+                .link {color: @primary2;cursor: pointer;}
+            }
+        }
+    }
+}
