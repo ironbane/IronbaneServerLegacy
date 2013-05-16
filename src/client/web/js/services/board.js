@@ -59,7 +59,8 @@ angular.module('IronbaneApp')
 
     // get a single board
     Board.get = function(id) {
-        var promise = $http.get('/api/forum/' + id)
+        // cache this call, unlikely board will change during a session
+        var promise = $http.get('/api/forum/' + id, {cache: true})
             .then(function(response) {
                 var board = new Board(response.data);
 
@@ -97,6 +98,22 @@ angular.module('IronbaneApp')
 .factory('Post', ['$log', '$http', 'User', function($log, $http, User) {
     var Post = function(json) {
         angular.copy(json || {}, this);
+    };
+
+    Post.prototype.$save = function(boardId, topicId) {
+        var url = '/api/forum/' + boardId + '/topics';
+
+        // todo: topicId support
+
+        var promise = $http.post(url, this)
+            .then(function(response) {
+                // update post object with id, topic_id etc...
+                $log.log('success saving post!', response.data);
+            }, function(err) {
+                $log.error('error saving post', err);
+            });
+
+        return promise;
     };
 
     // get just the topics for a board

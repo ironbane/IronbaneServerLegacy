@@ -32,5 +32,14 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
+        .when('/forum/:boardId/post', {
+            templateUrl: '/views/postEdit',
+            controller: 'PostEditCtrl',
+            resolve: {
+                BoardData: ['Board', '$route', function(Board, $route) {
+                    return Board.get($route.current.params.boardId);
+                }]
+            }
+        })
         .otherwise({redirectTo: '/'});
 }]);

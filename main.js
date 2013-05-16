@@ -183,7 +183,11 @@ for (var f = 0; f < includes.length; f++) {
 
 
 // create http api server
-var app = require('express')(); // purposefully global
+var express = require('express');
+var app = express(); // purposefully global
+app.configure(function() {
+    app.use(express.bodyParser());
+});
 // load routes
 require('./src/api')(app, mysql);
 // start api server

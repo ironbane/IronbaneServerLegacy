@@ -1,0 +1,8 @@
+<div>
+    <h2>{{ board.name }}</h2>
+    <form name="postForm">
+        <input type="text" name="postTitle" ng-model="title" />
+        <mark-it-up ng-model="content"></mark-it-up>
+        <button ng-click="save()">Post</button>
+    </form>
+</div>

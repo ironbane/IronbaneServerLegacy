@@ -117,7 +117,29 @@ module.exports = function(app, db) {
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
+        db.query('insert into forum_topics set board_id = ?, time = ?', [req.params.boardId, req.body.time], function(err, topicResult) {
+            if(err) {
+                res.send('error creating topic', 500);
+                return;
+            }
 
+            var topicId = topicResult.insertId,
+                post = {
+                    topic_id: topicId,
+                    title: req.body.title,
+                    content: req.body.bbcontent,
+                    time: req.body.time,
+                    user: req.body.user
+                };
+
+            db.query('insert into forum_posts set ?', post, function(err, result) {
+                if(err) {
+                    res.send('error creating post', 500);
+                    return;
+                }
+                res.send(result);
+            });
+        });
     });
 
     // get all posts for topic
