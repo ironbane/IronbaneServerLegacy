@@ -16,14 +16,12 @@ module.exports = function(app, db) {
             }
             if (!user) {
                 req.session.messages = [info.message];
-                //return res.redirect('/login');
                 return res.send(req.session.messages);
             }
             req.logIn(user, function(err) {
                 if (err) {
                     return next(err);
                 }
-                //return res.redirect('/');
                 return res.send(user);
             });
         })(req, res, next);
@@ -37,6 +35,25 @@ module.exports = function(app, db) {
     // get currently signed in user object
     app.get('/api/session/user', function(req, res) {
         res.send(req.user);
+    });
+
+    // create new user registration
+    app.post('/api/user', function(req, res) {
+        var bcrypt = require('bcrypt-nodejs');
+        var user = {
+            username: req.body.username,
+            password: bcrypt.hashSync(req.body.password),
+            email: req.body.email
+        };
+
+        db.query('insert into bcs_users set ?', user, function(err, result) {
+            if(err) {
+                res.send(err, 500);
+                return;
+            }
+
+            res.send(result);
+        });
     });
 
     app.get('/views/:view', function(req, res) {

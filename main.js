@@ -206,6 +206,7 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new LocalStrategy(function(username, password, done) {
+    var bcrypt = require('bcrypt-nodejs');
     // asynchronous verification, for effect...
     process.nextTick(function() {
         // Find the user by username.  If there is no user with the given
@@ -223,8 +224,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
                 });
             }
 
-            // todo: encrypt this shit
-            if (results[0].password !== password) {
+            if (!bcrypt.compareSync(password, results[0].password)) {
                 return done(null, false, {
                     message: 'Invalid password'
                 });

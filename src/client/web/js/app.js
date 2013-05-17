@@ -9,6 +9,10 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/home',
             controller: 'HomeCtrl'
         })
+        .when('/register', {
+            templateUrl: '/views/register',
+            controller: 'RegisterCtrl'
+        })
         .when('/login', {
             templateUrl: '/views/login',
             controller: 'LoginCtrl'
