@@ -1,4 +1,5 @@
 // ironbane.less
+@import "mixins";
 
 // vars
 @primary1: #33cc99; // text green
@@ -33,6 +34,9 @@ header.logo {
     .right-pillar {float: right;background-image: url(../images/top_right.png);}
 }
 
+// all links...
+a {color: @primary2;}
+
 .content-wrap {
     display: table;
     width: 896px;
@@ -48,7 +52,6 @@ header.logo {
         padding-top: 10px;
         background-color: @primary4;
     }
-    .mainNav a {color: @primary2;}
 }
 
 .bottom-pillar {
@@ -109,5 +112,29 @@ footer .sock {
                 .link {color: @primary2;cursor: pointer;}
             }
         }
+    }
+}
+
+.loginForm {
+    input,
+    textarea { .placeholder(darken(@baseFontColor, 10%)); }
+
+    input[type=text],
+    button {
+        color: @baseFontColor;
+        background-color: @primary4;
+        border-color: @primary3;
+        font-weight: bold;
+        font-size: 20px;
+        padding: 10px;
+        height: 30px;
+        text-indent: 2px;
+        margin: 8px;
+    }
+
+    button {
+        font-weight: bold;
+        font-size: 16px;
+        padding: 5px;
     }
 }

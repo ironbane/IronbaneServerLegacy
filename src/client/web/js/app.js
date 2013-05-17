@@ -1,6 +1,13 @@
 // app.js
 angular.module('IronbaneApp', [])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
+.run(['User', '$rootScope', function(User, $rootScope) {
+    $rootScope.currentUser = {};
+    User.getCurrentUser()
+        .then(function(user) {
+            angular.copy(user, $rootScope.currentUser);
+        });
+}])
 .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
 

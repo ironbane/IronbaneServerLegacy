@@ -22,6 +22,8 @@ module.exports = function(app, db) {
                 if (err) {
                     return next(err);
                 }
+                // send flag for UI
+                user.authenticated = true;
                 return res.send(user);
             });
         })(req, res, next);
@@ -34,7 +36,11 @@ module.exports = function(app, db) {
 
     // get currently signed in user object
     app.get('/api/session/user', function(req, res) {
-        res.send(req.user);
+        if(req.user) {
+            res.send(req.user);
+        } else {
+            res.send('no user signed in', 404);
+        }
     });
 
     // create new user registration
@@ -43,7 +49,8 @@ module.exports = function(app, db) {
         var user = {
             username: req.body.username,
             password: bcrypt.hashSync(req.body.password),
-            email: req.body.email
+            email: req.body.email,
+            reg_date: (new Date()).valueOf / 1000
         };
 
         db.query('insert into bcs_users set ?', user, function(err, result) {

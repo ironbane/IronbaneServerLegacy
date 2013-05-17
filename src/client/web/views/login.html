@@ -1,9 +1,13 @@
 <div>
-    <form name="LoginForm">
-        username: <input type="text" name="username" ng-model="username" />
+    <h1>Login Form</h1>
+    <form class='loginForm' name="LoginForm">
+        <input type="text" name="username" ng-model="username" placeholder="username" />
         <br>
-        password: <input type="text" name="password" ng-model="password" />
+        <input type="text" name="password" ng-model="password" placeholder="password" />
         <br>
         <button ng-click="login()">Sign In</button>
     </form>
+    <a href="/passwordReset">Forgot your password?</a>
+    <br>
+    <a href="/register">Need an account?</a>
 </div>
