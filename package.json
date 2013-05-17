@@ -28,7 +28,9 @@
     "wrench": "~1.5.1",
     "express": "~3.2.4",
     "underscore": "~1.4.4",
-    "bbcode": "~0.1.2"
+    "bbcode": "~0.1.2",
+    "passport": "~0.1.17",
+    "passport-local": "~0.1.6"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

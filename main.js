@@ -184,9 +184,70 @@ for (var f = 0; f < includes.length; f++) {
 
 // create http api server
 var express = require('express');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+    mysql.query('select * from bcs_users where id = ?', [id], function(err, results) {
+        if(err) {
+            done(err, null);
+            return;
+        }
+
+        if(results.length === 0) {
+            done("no user found", null);
+        } else {
+            done(null, results[0]);
+        }
+    });
+});
+
+passport.use(new LocalStrategy(function(username, password, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function() {
+        // Find the user by username.  If there is no user with the given
+        // username, or the password is not correct, set the user to `false` to
+        // indicate failure and set a flash message.  Otherwise, return the
+        // authenticated `user`.
+        mysql.query('select * from bcs_users where username = ?', [username], function(err, results) {
+            if (err) {
+                return done(err);
+            }
+
+            if (results.length < 1) {
+                return done(null, false, {
+                    message: 'Unknown user ' + username
+                });
+            }
+
+            // todo: encrypt this shit
+            if (results[0].password !== password) {
+                return done(null, false, {
+                    message: 'Invalid password'
+                });
+            }
+            return done(null, results[0]);
+        });
+    });
+}));
 var app = express(); // purposefully global
+app.passport = passport; // convienience
 app.configure(function() {
     app.use(express.bodyParser());
+    app.use(express.logger());
+    app.use(express.cookieParser());
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.session({
+        secret: 'horsehead bookends'
+    }));
+    // Initialize Passport!  Also use passport.session() middleware, to support
+    // persistent login sessions (recommended).
+    app.use(passport.initialize());
+    app.use(passport.session());
 });
 // load routes
 require('./src/api')(app, mysql);

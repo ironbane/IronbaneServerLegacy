@@ -9,6 +9,36 @@ module.exports = function(app, db) {
 
     app.use(app.router);
 
+    app.post('/login', function(req, res, next) {
+        app.passport.authenticate('local', function(err, user, info) {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                req.session.messages = [info.message];
+                //return res.redirect('/login');
+                return res.send(req.session.messages);
+            }
+            req.logIn(user, function(err) {
+                if (err) {
+                    return next(err);
+                }
+                //return res.redirect('/');
+                return res.send(user);
+            });
+        })(req, res, next);
+    });
+
+    app.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
+    });
+
+    // get currently signed in user object
+    app.get('/api/session/user', function(req, res) {
+        res.send(req.user);
+    });
+
     app.get('/views/:view', function(req, res) {
         // allow us to omit the file extension...
         var file = req.params.view;
@@ -17,4 +47,16 @@ module.exports = function(app, db) {
         }
         res.sendfile('deploy/web/views/' + file);
     });
+
+    // Simple route middleware to ensure user is authenticated.
+    //   Use this route middleware on any resource that needs to be protected.  If
+    //   the request is authenticated (typically via a persistent login session),
+    //   the request will proceed.  Otherwise, the user will be redirected to the
+    //   login page.
+    function ensureAuthenticated(req, res, next) {
+        if (req.isAuthenticated()) {
+            return next();
+        }
+        res.redirect('/login');
+    }
 };
