@@ -1,5 +1,6 @@
 // main, routes not categorized nicely
-var express = require('express');
+var express = require('express'),
+    util = require('util');
 
 module.exports = function(app, db) {
     app.use('/css', express.static('deploy/web/css'));
@@ -12,14 +13,16 @@ module.exports = function(app, db) {
     app.post('/login', function(req, res, next) {
         app.passport.authenticate('local', function(err, user, info) {
             if (err) {
+                util.log('error auth user', err);
                 return next(err);
             }
             if (!user) {
                 req.session.messages = [info.message];
-                return res.send(req.session.messages);
+                return res.send(req.session.messages, 404);
             }
             req.logIn(user, function(err) {
                 if (err) {
+                    util.log('error logging in user', err);
                     return next(err);
                 }
                 // send flag for UI
@@ -50,7 +53,7 @@ module.exports = function(app, db) {
             username: req.body.username,
             password: bcrypt.hashSync(req.body.password),
             email: req.body.email,
-            reg_date: (new Date()).valueOf / 1000
+            reg_date: (new Date()).valueOf() / 1000
         };
 
         db.query('insert into bcs_users set ?', user, function(err, result) {
