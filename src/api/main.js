@@ -18,7 +18,7 @@ module.exports = function(app, db) {
             }
             if (!user) {
                 req.session.messages = [info.message];
-                return res.send(req.session.messages, 404);
+                return res.send(info, 404);
             }
             req.logIn(user, function(err) {
                 if (err) {

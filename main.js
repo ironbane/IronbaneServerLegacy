@@ -200,7 +200,18 @@ passport.deserializeUser(function(id, done) {
         if(results.length === 0) {
             done("no user found", false);
         } else {
-            done(null, results[0]);
+            var user = results[0];
+            // add in security roles
+            mysql.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
+                if(err) {
+                    log('error getting roles!', err);
+                    user.roles = [];
+                } else {
+                    user.roles = results.map(function(r) { return r.name; });
+                }
+                // at this point still send the user, error isn't fatal
+                done(null, user);
+            });
         }
     });
 });

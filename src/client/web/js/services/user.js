@@ -2,11 +2,17 @@
 angular.module('IronbaneApp')
 .factory('User', ['DEFAULT_AVATAR', '$http', '$log', '$q', function(DEFAULT_AVATAR, $http, $log, $q) {
     var User = function(json) {
+        this.roles = []; // default
+
         angular.copy(json || {}, this);
     };
 
     // todo: make this a getter?
     User.prototype.$avatar = function() { return this.forum_avatar || DEFAULT_AVATAR; };
+
+    User.prototype.$hasRole = function(role) {
+        return this.roles.indexOf(role) >= 0;
+    };
 
     // get currently signed in user if exists or guest account
     User.getCurrentUser = function() {

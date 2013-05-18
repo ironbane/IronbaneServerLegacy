@@ -137,35 +137,34 @@ INSERT INTO `ib_unit_templates` VALUES (1,'an','Acid Zombie',20,10,0,0,0,0,0,0,1
 UNLOCK TABLES;
 
 --
--- Table structure for table `forum_posts`
+-- Table structure for table `ib_item_templates`
 --
 
-DROP TABLE IF EXISTS `forum_posts`;
+DROP TABLE IF EXISTS `ib_item_templates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `forum_posts` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `title` varchar(100) NOT NULL,
-  `content` text NOT NULL,
-  `user` int(10) NOT NULL DEFAULT '0',
-  `time` int(11) NOT NULL DEFAULT '0',
-  `topic_id` int(10) NOT NULL DEFAULT '0',
-  `lastedit_time` int(20) NOT NULL DEFAULT '0',
-  `lastedit_count` int(20) NOT NULL DEFAULT '0',
-  `lastedit_author` int(20) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `topic_id` (`topic_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+CREATE TABLE `ib_item_templates` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Leave blank if you''re making a new item and you''d like this to be set automatically',
+  `name` varchar(30) NOT NULL,
+  `image` smallint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'An image ID to be used for this item. See Uploads: Items.',
+  `type` varchar(10) NOT NULL COMMENT 'Can be one of the following values:<br><br>weapon<br>armor<br>tool',
+  `subtype` varchar(20) NOT NULL COMMENT 'Can be one of the following values:<br><br>For type <b>weapon</b>:<br>sword<br>axe<br>dagger<br>bow<br>staff<br><br>For type <b>armor</b>:<br>head<br>body<br>feet<br><br>For type <b>tool</b>:<br>key<br>book',
+  `attr1` smallint(4) NOT NULL DEFAULT '0' COMMENT 'For weapons and armor: The amount of damage/armor this item provides<br><br>For keys: the door ID this key will open<br><br>For books: the book ID this item refers to',
+  `delay` float(4,2) unsigned NOT NULL DEFAULT '1.00' COMMENT 'Seconds between attacks/uses',
+  `particle` varchar(20) NOT NULL COMMENT 'Leave blank and tell Nick what you want this item to look like/do when you use it',
+  `charimage` smallint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'UNUSED',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `forum_posts`
+-- Dumping data for table `ib_item_templates`
 --
 
-LOCK TABLES `forum_posts` WRITE;
-/*!40000 ALTER TABLE `forum_posts` DISABLE KEYS */;
-INSERT INTO `forum_posts` VALUES (1,'Testing','testing 123...',1,1368504912,1,0,0,0),(2,'Testing 2','testing [b]123...[/b]',1,1368505299,1,0,0,0),(3,'Testing 3','We\'ve decided to open source Ironbane, so now anyone can work on it easily! The source code is now live on [url=https://github.com/ironbane]GitHub[/url] and you can install and play around with it on your local machine! Be sure to read the Getting Started section on the repositories. If you need help setting things up, let me know!\r\n\r\nIn addition, there is now a reputation system in place for people who help out! Whether it\'s forum posts, bug reports, new content or pull requests you will get rewarded! Read more on the [url=http://ironbane.com/get-involved.php]Get Involved page[/url].',1,1368505505,2,0,0,0),(4,'q3rasd3','blah blah blah work darn it!!!\n\nmore and some [i]italics[/i]...',1,1368688398,9,0,0,0),(5,'Finally it works!','Not a radical release, but a major one due to the amount of bugfixes and editor additions for the team.\n\n[b]v0.1.6 Changelog[/b]\n[list][*]Fixed sprites showing black\n[*]Fixed some lighting artifacts on models\n[*]Fixed most transparency issues with models\n[*]Fixed guests not being able to play again after being killed\n[*]Changed weapon range of melee weapons\n[*]Editor: Added grid snapping (by default enabled)\n[*]Editor: Rotation of models now auto snap to 5 degrees\n[*]Editor: Added option to ignore the bounding box of the adjacent model\n[*]Editor: Fixed models snapping to bad angles when rotating backwards\n[*]Editor: Fixed models not being deleted sometimes\n[*]Editor: Fixed models still having an invisible collision box when deleted\n[*]Editor: Models now have a \'transparent\' field in the database[/list]',1,1368688676,10,0,0,0);
-/*!40000 ALTER TABLE `forum_posts` ENABLE KEYS */;
+LOCK TABLES `ib_item_templates` WRITE;
+/*!40000 ALTER TABLE `ib_item_templates` DISABLE KEYS */;
+INSERT INTO `ib_item_templates` VALUES (1,'Dull Sword',14,'weapon','sword',2,0.50,'',0),(18,'Iron Helmet',2,'armor','head',4,1.00,'',0),(5,'Wooden Helmet',1,'armor','head',2,1.00,'',1),(6,'Wooden Armor',1,'armor','body',6,1.00,'',1),(7,'Wooden Leggings',1,'armor','feet',4,1.00,'',1),(8,'Old Bow',5,'weapon','bow',2,1.25,'ARROW',0),(9,'Acid Staff',15,'weapon','staff',4,1.50,'ACIDBALL',0),(10,'Firewand',16,'weapon','staff',4,1.00,'FIREBALL',0),(11,'Book',8,'tool','book',2,1.00,'',0),(12,'Bone Thrower',0,'weapon','staff',2,1.00,'BONE',0),(13,'Meat on the Bones',9,'consumable','restorative',3,1.00,'',0),(14,'Bottle of Wine',10,'consumable','restorative',-1,1.00,'HEALSPARKS',0),(15,'Red Apple',11,'consumable','restorative',2,1.00,'',0),(16,'Health Potion',12,'consumable','restorative',20,1.00,'HEALSPARKS',0),(17,'Scroll',13,'tool','book',0,1.00,'',0),(19,'Iron Armor',2,'armor','body',12,1.00,'',0),(20,'Iron Leggings',2,'armor','feet',8,1.00,'',0),(21,'Plasma Gun',0,'weapon','staff',4,2.00,'PLASMABALL',0),(22,'Bone Sword',1,'weapon','sword',2,2.00,'',0),(23,'Alabaster Axe',25,'weapon','axe',16,2.00,'',0),(24,'Claymore',31,'weapon','sword',6,0.75,'',0),(25,'Long Bow',61,'weapon','bow',4,2.00,'ARROW',0),(26,'Dull Dagger',55,'weapon','dagger',1,0.25,'',0),(27,'Dull Axe',21,'weapon','axe',4,1.00,'',0),(28,'Healing Wand',6,'weapon','staff',-1,1.50,'PLASMABALL',0),(29,'Staff of Lesser Healing',62,'weapon','staff',-4,0.50,'PLASMABALL',0),(30,'Axe of Speed',25,'weapon','axe',2,0.50,'',0),(31,'Zombiefinger',27,'weapon','staff',1,0.30,'ACIDBALL',0),(32,'Honey',28,'consumable','restorative',5,1.00,'',0),(33,'Average Axe',17,'weapon','axe',8,1.00,'',0),(34,'White Tunic',3,'armor','body',1,1.00,'',0),(35,'Bloodmail',4,'armor','body',7,1.00,'',0),(36,'Map',13,'tool','map',0,1.00,'',0),(37,'Skullhead',10,'armor','head',5,1.00,'',0),(38,'Knight Helmet',3,'armor','head',3,1.00,'',0),(39,'Viking Helmet',9,'armor','head',3,1.00,'',0),(40,'Pear',71,'consumable','restorative',3,1.00,'',0),(41,'Strawberry',72,'consumable','restorative',2,1.00,'',0),(42,'Physalis',73,'consumable','restorative',3,1.00,'',0),(43,'Cherry',74,'consumable','restorative',2,1.00,'',0),(44,'Milk',75,'consumable','restorative',5,1.00,'',0),(45,'Rock',19,'weapon','bow',1,2.00,'ROCK',0),(46,'Bandit\'s Bow',61,'weapon','bow',3,0.75,'ARROW',0),(47,'Bandit\'s Hood',6,'armor','head',3,1.00,'',0),(48,'Slime Attack',0,'weapon','sword',1,2.00,'',0),(49,'Ironbane\'s Head',11,'armor','head',20,1.00,'',0),(50,'Castle Key 1',7,'tool','key',1720,1.00,'',0),(51,'AI: Demon Bunny Attack',0,'weapon','sword',1,0.25,'',0),(52,'Castle Key 2',7,'tool','key',1601,1.00,'',0),(53,'Ironbane\'s Chamber Key',77,'tool','key',1719,1.00,'',0),(54,'Double Axe',22,'weapon','axe',10,1.50,'',0),(55,'Superior Sword',32,'weapon','sword',6,0.50,'',0),(56,'AI: Slow Slime Attack',0,'weapon','staff',1,2.50,'SLIMEBALL',0),(57,'AI: Light Bash',0,'weapon','sword',1,1.50,'',0),(58,'AI: Medium Bash',0,'weapon','staff',2,2.00,'',0),(59,'Spellbook',8,'tool','book',4,1.00,'',0),(60,'Castle Gate Key',76,'tool','key',4,1.00,'',0),(61,'AI: Snuffles, the Destructor\'s',0,'weapon','sword',4,0.25,'',0),(62,'AI: Black Rabbit',0,'weapon','sword',2,0.50,'',0),(63,'Bass',20,'tool','restorative',3,1.00,'',0),(64,'Thiefdagger',64,'weapon','dagger',2,0.25,'',0),(65,'Kingsword',65,'weapon','sword',10,1.50,'',0);
+/*!40000 ALTER TABLE `ib_item_templates` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -260,32 +259,6 @@ INSERT INTO `forum_cats` VALUES (1,'General',3,0),(2,'Announcements',1,0),(4,'Ir
 UNLOCK TABLES;
 
 --
--- Table structure for table `bcs_pages`
---
-
-DROP TABLE IF EXISTS `bcs_pages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `bcs_pages` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL DEFAULT '',
-  `content` text NOT NULL,
-  `lastupdated` int(20) NOT NULL DEFAULT '0',
-  `madeby` varchar(255) NOT NULL DEFAULT '',
-  UNIQUE KEY `id` (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `bcs_pages`
---
-
-LOCK TABLES `bcs_pages` WRITE;
-/*!40000 ALTER TABLE `bcs_pages` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bcs_pages` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `ib_items`
 --
 
@@ -311,6 +284,80 @@ LOCK TABLES `ib_items` WRITE;
 /*!40000 ALTER TABLE `ib_items` DISABLE KEYS */;
 INSERT INTO `ib_items` VALUES (2,1,2,1,0,0),(2597,5,2,145,0,1),(17,1,2,3,0,0),(9,1,2,4,1,0),(11,1,2,5,1,0),(14,1,2,6,1,0),(16,1,2,7,1,0),(22,1,2,8,1,0),(21,1,2,9,1,0),(26,1,2,11,0,0),(28,1,2,12,1,0),(52,1,2,23,1,0),(146,1,2,52,1,0),(6584,1,2,15,1,0),(40,1,2,16,1,0),(43,1,2,18,1,0),(111,1,2,42,1,0),(47,1,2,20,1,0),(169,1,2,21,0,0),(104,1,2,39,1,0),(101,8,3,27,1,1),(100,1,2,27,0,0),(62,1,2,28,0,0),(64,1,2,29,1,0),(70,1,2,30,1,0),(74,1,2,31,1,0),(6204,1,2,32,1,0),(1916,1,2,139,1,0),(77,1,2,34,1,0),(4335,1,2,167,1,0),(6621,52,1601,162,0,2),(90,1,2,35,1,0),(91,5,2,35,1,2),(94,1,2,36,1,0),(99,1,2,38,1,0),(1558,16,5,136,0,4),(168,10,2,21,0,1),(167,21,3,21,1,2),(127,1,2,43,1,0),(129,1,2,44,1,0),(131,1,2,45,1,0),(133,1,2,46,1,0),(137,1,2,48,1,0),(3137,15,2,158,0,2),(141,1,2,50,1,0),(152,1,2,55,1,0),(155,1,2,56,1,0),(157,1,2,57,1,0),(1557,20,8,136,1,3),(160,1,2,59,0,0),(163,1,2,60,1,0),(171,1,2,61,1,0),(175,1,2,64,1,0),(201,1,2,65,0,0),(202,5,2,65,0,1),(203,1,2,65,1,2),(224,1,2,66,1,0),(226,1,2,67,1,0),(234,1,2,71,1,0),(246,1,2,77,0,0),(249,1,2,78,1,0),(3136,15,2,158,0,1),(349,1,2,83,1,0),(6605,52,1601,117,0,8),(264,1,2,81,1,0),(6620,1,2,162,1,1),(307,1,2,85,1,0),(351,1,2,96,1,0),(641,1,2,97,0,2),(322,1,2,92,1,0),(6270,8,3,125,1,1),(2714,23,4,133,1,6),(1064,20,8,134,0,1),(1063,19,12,134,0,0),(640,5,2,97,1,1),(1062,6,6,131,1,2),(6385,1,2,219,1,0),(388,1,2,101,1,0),(383,1,2,98,1,0),(1061,10,2,131,1,1),(478,1,2,115,1,0),(6269,1,2,125,0,0),(2596,1,2,145,1,0),(639,1,2,97,1,0),(6384,1,2,218,0,0),(6615,1,2,266,1,0),(6614,18,4,128,1,9),(4086,1,2,166,1,0),(6169,1,2,173,0,3),(5316,1,2,174,1,0),(6613,19,12,128,1,8),(6612,26,1,128,1,1),(656,1,2,127,1,0),(2606,14,0,147,0,0),(3135,1,2,158,1,0),(6386,1,2,220,0,0),(6361,6,6,187,1,3),(6611,33,8,128,0,0),(6168,5,2,173,1,1),(1653,1,2,138,1,0),(6604,23,16,117,0,1),(6603,11,2,117,0,3),(6602,27,5,117,0,0),(6601,55,6,117,0,9),(6600,65,10,117,0,4),(1065,25,2,134,0,2),(1060,1,2,131,0,0),(6610,7,4,128,1,2),(1300,15,2,135,0,2),(1299,19,12,135,1,1),(1298,10,2,135,1,0),(1117,1,2,137,1,0),(2713,19,12,133,1,0),(2712,25,2,133,0,1),(2711,16,5,133,0,4),(3494,21,3,132,0,0),(1556,19,12,136,1,2),(1555,8,1,136,1,0),(1554,15,2,136,0,1),(1297,20,8,135,0,4),(1296,25,2,135,0,3),(6599,64,2,117,1,2),(6598,49,20,117,1,5),(6081,1,2,181,0,0),(6271,18,4,125,1,2),(6571,29,-4,126,0,6),(6570,23,16,126,0,5),(1988,1,2,140,1,0),(6597,19,12,117,1,6),(1999,1,2,141,1,0),(6569,20,8,126,1,3),(6596,20,8,117,1,7),(2147,1,2,142,1,0),(2467,1,2,143,1,0),(2469,1,2,144,1,0),(2470,1,2,144,0,2),(2471,15,2,144,0,1),(2608,1,2,148,1,0),(6568,18,4,126,1,1),(2922,1,2,149,1,0),(2932,1,2,150,1,0),(2940,1,2,151,1,0),(2943,1,2,152,1,0),(2944,1,2,154,1,0),(3066,1,2,155,1,0),(6567,19,12,126,1,2),(6360,1,2,187,0,2),(6359,15,2,187,0,1),(3224,8,2,159,0,7),(3223,27,4,159,0,1),(3222,1,2,159,1,0),(6358,1,2,187,1,0),(4855,1,2,169,1,0),(4856,27,4,169,0,1),(4964,1,2,170,1,0),(5199,1,2,171,1,0),(5210,1,2,172,1,0),(6167,1,2,173,1,0),(5317,15,2,174,0,1),(5318,1,2,174,0,2),(5319,15,2,174,0,3),(5796,6,6,175,0,6),(5795,19,12,175,1,7),(5794,36,0,175,0,3),(5793,16,20,175,0,8),(5792,27,4,175,1,2),(5791,15,2,175,0,9),(5790,35,7,175,0,1),(5789,7,4,175,1,4),(5788,18,4,175,1,5),(6326,27,4,209,1,3),(6325,1,2,209,0,0),(6166,15,2,173,0,4),(6165,7,4,173,1,5),(6164,8,2,173,0,2),(6163,15,2,173,0,6),(6566,50,1,126,0,8),(6565,23,16,126,1,0),(6564,24,6,126,0,7),(6082,27,4,181,1,3),(6083,1,2,183,1,0),(6619,36,0,162,0,0),(6094,1,2,186,1,0),(6095,15,2,186,0,1),(6096,1,2,189,1,0),(6097,1,2,190,1,0),(6110,1,2,192,1,1),(6109,1,2,192,0,0),(6206,1,2,197,1,0),(6337,1,2,198,1,0),(6170,27,4,200,1,0),(6171,1,2,201,0,0),(6175,1,2,202,1,0),(6176,1,2,203,1,1),(6205,1,2,204,1,0),(6256,1,2,205,1,0),(6257,15,2,205,0,1),(6387,1,2,220,0,1),(6388,1,2,221,1,0),(6389,15,2,221,0,1),(6398,1,2,224,1,0),(6399,27,4,224,0,2),(6400,1,2,224,0,3),(6401,1,2,225,1,0),(6402,6,6,225,1,1),(6403,5,2,225,1,2),(6404,1,2,226,0,0),(6405,1,2,227,1,0),(6406,1,2,227,0,2),(6407,6,6,227,1,1),(6466,1,2,231,0,0),(6467,1,2,232,0,0),(6468,1,2,234,1,0),(6469,1,2,234,0,1),(6554,15,2,249,0,2),(6553,1,2,249,1,0),(6552,1,2,235,1,0),(6476,1,2,236,0,0),(6477,1,2,236,0,1),(6478,5,2,236,1,2),(6479,8,2,236,0,3),(6480,27,4,236,1,4),(6482,1,2,237,1,0),(6483,1,2,237,0,1),(6544,1,2,239,0,0),(6545,1,2,241,0,0),(6572,40,3,126,0,4),(6563,1,2,250,0,0),(6551,1,2,245,1,0),(6550,1,2,243,1,0),(6573,1,2,252,1,0),(6585,1,2,253,1,0),(6592,1,2,254,0,0),(6593,1,2,255,0,0),(6594,1,2,258,0,0),(6595,1,2,259,1,0),(6606,1,2,263,1,0),(6607,1,2,265,1,0),(6608,1,2,265,0,1),(6609,6,6,265,1,2),(6616,1,2,266,0,1),(6617,1,2,267,1,0),(6618,1,2,268,1,0);
 /*!40000 ALTER TABLE `ib_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bcs_user_roles`
+--
+
+DROP TABLE IF EXISTS `bcs_user_roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bcs_user_roles` (
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bcs_user_roles`
+--
+
+LOCK TABLES `bcs_user_roles` WRITE;
+/*!40000 ALTER TABLE `bcs_user_roles` DISABLE KEYS */;
+INSERT INTO `bcs_user_roles` VALUES (415,1),(415,2),(415,3),(415,4),(415,5);
+/*!40000 ALTER TABLE `bcs_user_roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bcs_roles`
+--
+
+DROP TABLE IF EXISTS `bcs_roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bcs_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bcs_roles`
+--
+
+LOCK TABLES `bcs_roles` WRITE;
+/*!40000 ALTER TABLE `bcs_roles` DISABLE KEYS */;
+INSERT INTO `bcs_roles` VALUES (1,'ADMIN'),(2,'MODERATOR'),(3,'EDITOR'),(4,'GM'),(5,'USER');
+/*!40000 ALTER TABLE `bcs_roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bcs_pages`
+--
+
+DROP TABLE IF EXISTS `bcs_pages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bcs_pages` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `content` text NOT NULL,
+  `lastupdated` int(20) NOT NULL DEFAULT '0',
+  `madeby` varchar(255) NOT NULL DEFAULT '',
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bcs_pages`
+--
+
+LOCK TABLES `bcs_pages` WRITE;
+/*!40000 ALTER TABLE `bcs_pages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bcs_pages` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -405,9 +452,6 @@ DROP TABLE IF EXISTS `bcs_users`;
 CREATE TABLE `bcs_users` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL DEFAULT '',
-  `admin` tinyint(1) NOT NULL DEFAULT '0',
-  `editor` tinyint(1) NOT NULL DEFAULT '0',
-  `moderator` tinyint(1) NOT NULL DEFAULT '0',
   `password` varchar(255) NOT NULL DEFAULT '',
   `email` varchar(30) NOT NULL DEFAULT '',
   `show_email` tinyint(1) NOT NULL DEFAULT '0',
@@ -436,7 +480,8 @@ CREATE TABLE `bcs_users` (
   `characterUsed` int(10) unsigned NOT NULL DEFAULT '0',
   `banned` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `rep` int(10) DEFAULT '1',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=MyISAM AUTO_INCREMENT=417 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -446,7 +491,7 @@ CREATE TABLE `bcs_users` (
 
 LOCK TABLES `bcs_users` WRITE;
 /*!40000 ALTER TABLE `bcs_users` DISABLE KEYS */;
-INSERT INTO `bcs_users` VALUES (416,'warspawn',0,0,0,'$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1);
+INSERT INTO `bcs_users` VALUES (415,'warspawn','$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1);
 /*!40000 ALTER TABLE `bcs_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -505,34 +550,35 @@ INSERT INTO `forum_topics` VALUES (1,1,1368504484,0,'',0,0,0,0),(2,1,1368505834,
 UNLOCK TABLES;
 
 --
--- Table structure for table `ib_item_templates`
+-- Table structure for table `forum_posts`
 --
 
-DROP TABLE IF EXISTS `ib_item_templates`;
+DROP TABLE IF EXISTS `forum_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ib_item_templates` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Leave blank if you''re making a new item and you''d like this to be set automatically',
-  `name` varchar(30) NOT NULL,
-  `image` smallint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'An image ID to be used for this item. See Uploads: Items.',
-  `type` varchar(10) NOT NULL COMMENT 'Can be one of the following values:<br><br>weapon<br>armor<br>tool',
-  `subtype` varchar(20) NOT NULL COMMENT 'Can be one of the following values:<br><br>For type <b>weapon</b>:<br>sword<br>axe<br>dagger<br>bow<br>staff<br><br>For type <b>armor</b>:<br>head<br>body<br>feet<br><br>For type <b>tool</b>:<br>key<br>book',
-  `attr1` smallint(4) NOT NULL DEFAULT '0' COMMENT 'For weapons and armor: The amount of damage/armor this item provides<br><br>For keys: the door ID this key will open<br><br>For books: the book ID this item refers to',
-  `delay` float(4,2) unsigned NOT NULL DEFAULT '1.00' COMMENT 'Seconds between attacks/uses',
-  `particle` varchar(20) NOT NULL COMMENT 'Leave blank and tell Nick what you want this item to look like/do when you use it',
-  `charimage` smallint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'UNUSED',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+CREATE TABLE `forum_posts` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) NOT NULL,
+  `content` text NOT NULL,
+  `user` int(10) NOT NULL DEFAULT '0',
+  `time` int(11) NOT NULL DEFAULT '0',
+  `topic_id` int(10) NOT NULL DEFAULT '0',
+  `lastedit_time` int(20) NOT NULL DEFAULT '0',
+  `lastedit_count` int(20) NOT NULL DEFAULT '0',
+  `lastedit_author` int(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `topic_id` (`topic_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ib_item_templates`
+-- Dumping data for table `forum_posts`
 --
 
-LOCK TABLES `ib_item_templates` WRITE;
-/*!40000 ALTER TABLE `ib_item_templates` DISABLE KEYS */;
-INSERT INTO `ib_item_templates` VALUES (1,'Dull Sword',14,'weapon','sword',2,0.50,'',0),(18,'Iron Helmet',2,'armor','head',4,1.00,'',0),(5,'Wooden Helmet',1,'armor','head',2,1.00,'',1),(6,'Wooden Armor',1,'armor','body',6,1.00,'',1),(7,'Wooden Leggings',1,'armor','feet',4,1.00,'',1),(8,'Old Bow',5,'weapon','bow',2,1.25,'ARROW',0),(9,'Acid Staff',15,'weapon','staff',4,1.50,'ACIDBALL',0),(10,'Firewand',16,'weapon','staff',4,1.00,'FIREBALL',0),(11,'Book',8,'tool','book',2,1.00,'',0),(12,'Bone Thrower',0,'weapon','staff',2,1.00,'BONE',0),(13,'Meat on the Bones',9,'consumable','restorative',3,1.00,'',0),(14,'Bottle of Wine',10,'consumable','restorative',-1,1.00,'HEALSPARKS',0),(15,'Red Apple',11,'consumable','restorative',2,1.00,'',0),(16,'Health Potion',12,'consumable','restorative',20,1.00,'HEALSPARKS',0),(17,'Scroll',13,'tool','book',0,1.00,'',0),(19,'Iron Armor',2,'armor','body',12,1.00,'',0),(20,'Iron Leggings',2,'armor','feet',8,1.00,'',0),(21,'Plasma Gun',0,'weapon','staff',4,2.00,'PLASMABALL',0),(22,'Bone Sword',1,'weapon','sword',2,2.00,'',0),(23,'Alabaster Axe',25,'weapon','axe',16,2.00,'',0),(24,'Claymore',31,'weapon','sword',6,0.75,'',0),(25,'Long Bow',61,'weapon','bow',4,2.00,'ARROW',0),(26,'Dull Dagger',55,'weapon','dagger',1,0.25,'',0),(27,'Dull Axe',21,'weapon','axe',4,1.00,'',0),(28,'Healing Wand',6,'weapon','staff',-1,1.50,'PLASMABALL',0),(29,'Staff of Lesser Healing',62,'weapon','staff',-4,0.50,'PLASMABALL',0),(30,'Axe of Speed',25,'weapon','axe',2,0.50,'',0),(31,'Zombiefinger',27,'weapon','staff',1,0.30,'ACIDBALL',0),(32,'Honey',28,'consumable','restorative',5,1.00,'',0),(33,'Average Axe',17,'weapon','axe',8,1.00,'',0),(34,'White Tunic',3,'armor','body',1,1.00,'',0),(35,'Bloodmail',4,'armor','body',7,1.00,'',0),(36,'Map',13,'tool','map',0,1.00,'',0),(37,'Skullhead',10,'armor','head',5,1.00,'',0),(38,'Knight Helmet',3,'armor','head',3,1.00,'',0),(39,'Viking Helmet',9,'armor','head',3,1.00,'',0),(40,'Pear',71,'consumable','restorative',3,1.00,'',0),(41,'Strawberry',72,'consumable','restorative',2,1.00,'',0),(42,'Physalis',73,'consumable','restorative',3,1.00,'',0),(43,'Cherry',74,'consumable','restorative',2,1.00,'',0),(44,'Milk',75,'consumable','restorative',5,1.00,'',0),(45,'Rock',19,'weapon','bow',1,2.00,'ROCK',0),(46,'Bandit\'s Bow',61,'weapon','bow',3,0.75,'ARROW',0),(47,'Bandit\'s Hood',6,'armor','head',3,1.00,'',0),(48,'Slime Attack',0,'weapon','sword',1,2.00,'',0),(49,'Ironbane\'s Head',11,'armor','head',20,1.00,'',0),(50,'Castle Key 1',7,'tool','key',1720,1.00,'',0),(51,'AI: Demon Bunny Attack',0,'weapon','sword',1,0.25,'',0),(52,'Castle Key 2',7,'tool','key',1601,1.00,'',0),(53,'Ironbane\'s Chamber Key',77,'tool','key',1719,1.00,'',0),(54,'Double Axe',22,'weapon','axe',10,1.50,'',0),(55,'Superior Sword',32,'weapon','sword',6,0.50,'',0),(56,'AI: Slow Slime Attack',0,'weapon','staff',1,2.50,'SLIMEBALL',0),(57,'AI: Light Bash',0,'weapon','sword',1,1.50,'',0),(58,'AI: Medium Bash',0,'weapon','staff',2,2.00,'',0),(59,'Spellbook',8,'tool','book',4,1.00,'',0),(60,'Castle Gate Key',76,'tool','key',4,1.00,'',0),(61,'AI: Snuffles, the Destructor\'s',0,'weapon','sword',4,0.25,'',0),(62,'AI: Black Rabbit',0,'weapon','sword',2,0.50,'',0),(63,'Bass',20,'tool','restorative',3,1.00,'',0),(64,'Thiefdagger',64,'weapon','dagger',2,0.25,'',0),(65,'Kingsword',65,'weapon','sword',10,1.50,'',0);
-/*!40000 ALTER TABLE `ib_item_templates` ENABLE KEYS */;
+LOCK TABLES `forum_posts` WRITE;
+/*!40000 ALTER TABLE `forum_posts` DISABLE KEYS */;
+INSERT INTO `forum_posts` VALUES (1,'Testing','testing 123...',1,1368504912,1,0,0,0),(2,'Testing 2','testing [b]123...[/b]',1,1368505299,1,0,0,0),(3,'Testing 3','We\'ve decided to open source Ironbane, so now anyone can work on it easily! The source code is now live on [url=https://github.com/ironbane]GitHub[/url] and you can install and play around with it on your local machine! Be sure to read the Getting Started section on the repositories. If you need help setting things up, let me know!\r\n\r\nIn addition, there is now a reputation system in place for people who help out! Whether it\'s forum posts, bug reports, new content or pull requests you will get rewarded! Read more on the [url=http://ironbane.com/get-involved.php]Get Involved page[/url].',1,1368505505,2,0,0,0),(4,'q3rasd3','blah blah blah work darn it!!!\n\nmore and some [i]italics[/i]...',1,1368688398,9,0,0,0),(5,'Finally it works!','Not a radical release, but a major one due to the amount of bugfixes and editor additions for the team.\n\n[b]v0.1.6 Changelog[/b]\n[list][*]Fixed sprites showing black\n[*]Fixed some lighting artifacts on models\n[*]Fixed most transparency issues with models\n[*]Fixed guests not being able to play again after being killed\n[*]Changed weapon range of melee weapons\n[*]Editor: Added grid snapping (by default enabled)\n[*]Editor: Rotation of models now auto snap to 5 degrees\n[*]Editor: Added option to ignore the bounding box of the adjacent model\n[*]Editor: Fixed models snapping to bad angles when rotating backwards\n[*]Editor: Fixed models not being deleted sometimes\n[*]Editor: Fixed models still having an invisible collision box when deleted\n[*]Editor: Models now have a \'transparent\' field in the database[/list]',1,1368688676,10,0,0,0);
+/*!40000 ALTER TABLE `forum_posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -683,4 +729,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-05-17 23:00:09
+-- Dump completed on 2013-05-17 23:47:48

@@ -40,6 +40,8 @@
                     <li><a target="_new" href="https://twitter.com/IronbaneMMO">Twitter</a></li>
                     <li><a href="/profile">Preferences</a></li>
                     <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
+                    <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
+                    <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
                 </ul>
                 <ng-view></ng-view>
             </div>
