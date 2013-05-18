@@ -6,6 +6,7 @@
 @primary2: #66ff66; // link/heading green
 @primary3: #257541; // darker green dashed border on footer?
 @primary4: #103c32; // dark green background
+@primary5: #33ff99; // bright green headers
 
 @pageBackground: #051d1c;
 
@@ -136,5 +137,17 @@ footer .sock {
         font-weight: bold;
         font-size: 16px;
         padding: 5px;
+    }
+}
+
+.article-wrap {
+    text-align: left;
+    margin: 16px;
+    .article-body {
+        h2 {color: @primary5;}
+        .centered {width: 100%;text-align: center;}
+    }
+    .article-author {
+        float: right;
     }
 }

@@ -24,6 +24,26 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/login',
             controller: 'LoginCtrl'
         })
+        .when('/article/:articleId', {
+            templateUrl: '/views/article',
+            controller: 'ArticleCtrl',
+            resolve: {
+                ArticleData: ['Article', '$q', '$log', '$route', function(Article, $q, $log, $route) {
+                    var deferred = $q.defer();
+
+                    Article.get($route.current.params.articleId)
+                        .then(function(article) {
+                            // should be processed already
+                            deferred.resolve(article);
+                        }, function(err) {
+                            // can't find such article, reject route change
+                            deferred.reject(err);
+                        });
+
+                    return deferred.promise;
+                }]
+            }
+        })
         .when('/forum', {
             templateUrl: '/views/forum',
             controller: 'ForumCtrl'
