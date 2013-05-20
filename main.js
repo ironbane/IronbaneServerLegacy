@@ -292,6 +292,7 @@ app.configure(function() {
         res.redirect('/login');
     };
 
+    // ALL roles must be present to access
     app.authorize = function(roles) {
         // array or single...
         if(typeof roles === 'string') {
@@ -311,6 +312,27 @@ app.configure(function() {
                 }
             }
             next();
+        };
+
+        return middle;
+    };
+
+    // ANY role may access
+    app.authorizeAny = function(roles) {
+        var middle = function(req, res, next) {
+            if(!req.user.roles || req.user.roles.length === 0) {
+                next('unauthorized', 403);
+                return;
+            }
+
+            for(var i=0;i<roles.length;i++) {
+                if(req.user.roles.indexOf(roles[i]) >= 0) {
+                    next();
+                    return;
+                }
+            }
+            next('unauthorized', 403);
+            return;
         };
 
         return middle;
