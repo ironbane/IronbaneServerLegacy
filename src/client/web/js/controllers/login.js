@@ -1,13 +1,19 @@
 angular.module('IronbaneApp')
-.controller('LoginCtrl', ['$scope', '$http', '$log', function($scope, $http, $log) {
+.controller('LoginCtrl', ['$scope', 'User', '$log', '$location', function($scope, User, $log, $location) {
+    $scope.loginError = false;
+
     $scope.login = function() {
-        $http.post('/login', {username: $scope.username, password: $scope.password})
-            .success(function(response) {
-                $log.log('login success', response);
-                angular.copy(response, $scope.currentUser);
-            })
-            .error(function(response) {
-                $log.warn('login error', response);
+        // clear for each attempt
+        $scope.loginError = false;
+
+        User.login($scope.username, $scope.password)
+            .then(function() {
+                $log.log('login success?');
+                $location.path('/');
+            }, function(err) {
+                $log.warn('login error!', err);
+                // greater detail?
+                $scope.loginError = true;
             });
     };
 }]);
