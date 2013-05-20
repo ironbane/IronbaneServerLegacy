@@ -242,7 +242,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
                     });
                 }
 
-                if (res) {
+                if (res === false) {
                     return done(null, false, {
                         message: 'Invalid password'
                     });
@@ -279,6 +279,42 @@ app.configure(function() {
     // persistent login sessions (recommended).
     app.use(passport.initialize());
     app.use(passport.session());
+
+    // Simple route middleware to ensure user is authenticated.
+    //   Use this route middleware on any resource that needs to be protected.  If
+    //   the request is authenticated (typically via a persistent login session),
+    //   the request will proceed.  Otherwise, the user will be redirected to the
+    //   login page.
+    app.ensureAuthenticated = function(req, res, next) {
+        if (req.isAuthenticated()) {
+            return next();
+        }
+        res.redirect('/login');
+    };
+
+    app.authorize = function(roles) {
+        // array or single...
+        if(typeof roles === 'string') {
+            roles = [roles];
+        }
+
+        var middle = function(req, res, next) {
+            if(!req.user.roles || req.user.roles.length === 0) {
+                next('unauthorized', 403);
+                return;
+            }
+
+            for(var i=0;i<roles.length;i++) {
+                if(req.user.roles.indexOf(roles[i]) < 0) {
+                    next('unauthorized', 403);
+                    return;
+                }
+            }
+            next();
+        };
+
+        return middle;
+    };
 });
 // load routes
 require('./src/api')(app, mysql);

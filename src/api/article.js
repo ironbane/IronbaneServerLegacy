@@ -3,6 +3,17 @@ var util = require('util'),
     marked = require('marked');
 
 module.exports = function(app, db) {
+    // get a list of articles, minus content
+    app.get('/api/article', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
+        db.query('select articleId, title, author, created, views from bcs_articles', function(err, results) {
+            if(err) {
+                res.send(err, 500);
+                return;
+            }
+
+            res.send(results);
+        });
+    });
 
     app.get('/api/article/:articleId', function(req, res) {
         db.query('select * from bcs_articles where articleId = ?', [req.params.articleId], function(err, result) {
