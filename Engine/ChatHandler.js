@@ -54,7 +54,7 @@ var ChatHandler = Class.extend({
 
         param = param.trim();
 
-        if ( param == '' ) continue;
+        if ( param === '' ) continue;
 
 
         if ( param.indexOf('"') === 0 ) {
@@ -82,7 +82,7 @@ var ChatHandler = Class.extend({
           var template = -1;
 
           // Try to convert to integer, if we passed an ID
-          var testConvert = parseInt(realparams[0]);
+          var testConvert = parseInt(realparams[0], 10);
 
 
 
@@ -109,7 +109,7 @@ var ChatHandler = Class.extend({
             break;
           }
 
-          console.log("template ID: "+template)
+          console.log("template ID: "+template);
 
           template = dataHandler.items[template];
 
@@ -143,7 +143,7 @@ var ChatHandler = Class.extend({
           break;
         case "givecoins":
 
-          unit.coins += parseInt(realparams[0]);
+          unit.coins += parseInt(realparams[0], 10);
           unit.socket.emit("setCoins", unit.coins);
 
           break;
@@ -164,7 +164,7 @@ var ChatHandler = Class.extend({
       //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);
       unit.Say(message);
 
-      var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">&lt;'+unit.name + '&gt;</div> ' +message;
+      message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">&lt;'+unit.name + '&gt;</div> ' +message;
 
       io.sockets.emit("chatMessage", {
         message: message
@@ -214,7 +214,7 @@ var ChatHandler = Class.extend({
 
     var killername = killer.id > 0 ? '<div style="display:inline;color:'+this.GetChatColor(killer)+'">'+killer.name + '</div>' : killer.template.prefix+" "+killer.template.name;
     var word = ChooseRandom(("slaughtered butchered crushed defeated destroyed exterminated finished massacred mutilated slayed vanquished killed").split(" "));
-    ;
+    
     var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">'+unit.name + '</div> was '+word+' by '+killername+'.';
 
     io.sockets.emit("chatMessage", {

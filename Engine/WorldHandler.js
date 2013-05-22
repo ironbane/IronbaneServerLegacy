@@ -44,7 +44,7 @@ var WorldHandler = Class.extend({
 
     // All units ready! Awaken!
     worldHandler.LoopUnits(function(u){
-      u.Awake()
+      u.Awake();
     });
 
     log("World has awaken!");
@@ -61,18 +61,22 @@ var WorldHandler = Class.extend({
       var subcount = 0;
 
       // Every zone has their own set of nodes
-      this.world[z]["allNodes"] = {};
+      this.world[z].allNodes = {};
 
       for(var cx in this.world[z]) {
         for(var cz in this.world[z][cx]) {
           if ( this.world[z][cx][cz] === undefined ) continue;
-          if ( this.world[z][cx][cz]['graph'] === undefined ) continue;
-          if ( this.world[z][cx][cz]['graph']['nodes'] === undefined ) continue;
+          if ( this.world[z][cx][cz].graph === undefined ) continue;
+          if ( this.world[z][cx][cz].graph.nodes === undefined ) continue;
 
           //this.allNodes = worldHandler.world[this.zone][cx][cz]['graph']['nodes'].concat(this.allNodes);
-          for(var x=0;x<this.world[z][cx][cz]['graph']['nodes'].length;x++){
-            var node = this.world[z][cx][cz]['graph']['nodes'][x];
-            this.world[z]["allNodes"][node['id']] = node;
+		  var len = this.world[z][cx][cz].graph.nodes.length;
+          for(var x=0;x<len;x++){
+            var node = this.world[z][cx][cz].graph.nodes[x];
+			//console.log(node);
+			//console.log(this.world[z].allNodes);
+            //this.world[z].allNodes.node['id'] = node;
+			this.world[z]["allNodes"][node['id']] = node;
             count++;
             subcount++;
           }
@@ -102,7 +106,11 @@ var WorldHandler = Class.extend({
       for(var z in this.world) {
         for(var cx in this.world[z]) {
           for(var cz in this.world[z][cx]) {
-            if ( !worldHandler.world[z][cx][cz]["hasLoadedUnits"] ) hasLoadedUnits = false;
+            if ( !worldHandler.world[z][cx][cz].hasLoadedUnits ) {
+				hasLoadedUnits = false;
+				//this.Awake();
+				//return;
+			}
           }
         }
       }
@@ -156,9 +164,9 @@ var WorldHandler = Class.extend({
     if ( ISDEF(cx) && !ISDEF(worldHandler.world[zone][cx]) ) return false;
     if ( ISDEF(cz) && !ISDEF(worldHandler.world[zone][cx][cz]) ) return false;
 
-    if ( ISDEF(checkterrain) && !ISDEF(worldHandler.world[zone][cx][cz]["terrain"]) ) return false;
-    if ( ISDEF(tx) && !ISDEF(worldHandler.world[zone][cx][cz]["terrain"][tx]) ) return false;
-    if ( ISDEF(tz) && !ISDEF(worldHandler.world[zone][cx][cz]["terrain"][tx][tz]) ) return false;
+    if ( ISDEF(checkterrain) && !ISDEF(worldHandler.world[zone][cx][cz].terrain) ) return false;
+    if ( ISDEF(tx) && !ISDEF(worldHandler.world[zone][cx][cz].terrain[tx]) ) return false;
+    if ( ISDEF(tz) && !ISDEF(worldHandler.world[zone][cx][cz].terrain[tx][tz]) ) return false;
     return true;
   },
   BuildWorldStructure: function(zone, cx, cz, checkterrain, tx, tz) {
@@ -204,7 +212,7 @@ var WorldHandler = Class.extend({
 
             if (stats.isFile()) {
 
-              worldHandler.world[zone][cx][cz]["graph"] = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
+              worldHandler.world[zone][cx][cz].graph = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
 
 
             }
@@ -218,10 +226,10 @@ var WorldHandler = Class.extend({
         if ( file != "terrain.dat" ) continue;
 
 
-        worldHandler.world[zone][cx][cz]["terrain"] = {};
-        worldHandler.world[zone][cx][cz]["objects"] = [];
-        worldHandler.world[zone][cx][cz]["units"] = [];
-        worldHandler.world[zone][cx][cz]["hasLoadedUnits"] = false;
+        worldHandler.world[zone][cx][cz].terrain = {};
+        worldHandler.world[zone][cx][cz].objects = [];
+        worldHandler.world[zone][cx][cz].units = [];
+        worldHandler.world[zone][cx][cz].hasLoadedUnits = false;
 
 
         log("Loaded cell ("+cx+","+cz+") in zone "+zone);
@@ -244,9 +252,9 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-            var units = worldHandler.world[z][cx][cz]["units"];
+            var units = worldHandler.world[z][cx][cz].units;
 
             for(var u=0;u<units.length;u++) {
 
@@ -311,7 +319,7 @@ var WorldHandler = Class.extend({
 
           }
 
-          worldHandler.world[zone][cellX][cellZ]["hasLoadedUnits"] = true;
+          worldHandler.world[zone][cellX][cellZ].hasLoadedUnits = true;
 
         });
     })(zone, cellX, cellZ);
@@ -321,11 +329,11 @@ var WorldHandler = Class.extend({
 
   },
   MakeUnitFromData: function(data) {
-    data["id"] = -data["id"];
+    data.id = -data.id;
 
 
 
-    if ( typeof data.data == "string" ) {
+    if ( typeof data.data === "string" ) {
       data.data = JSON.parse(data.data);
     }
 
@@ -447,12 +455,12 @@ var WorldHandler = Class.extend({
           var count = 0;
 
 
-          this.world[zone][cellX][cellZ]["terrain"] = {};
+          this.world[zone][cellX][cellZ].terrain = {};
           for(var x = offset_x-cellSizeHalf;x<offset_x+cellSizeHalf;x+=worldScale){
-            if ( !ISDEF(this.world[zone][cellX][cellZ]["terrain"][x]) ) this.world[zone][cellX][cellZ]["terrain"][x] = {};
+            if ( !ISDEF(this.world[zone][cellX][cellZ].terrain[x]) ) this.world[zone][cellX][cellZ].terrain[x] = {};
             for(var z = offset_z-cellSizeHalf;z<offset_z+cellSizeHalf;z+=worldScale){
               var info = ar[count].split(",");
-              this.world[zone][cellX][cellZ]["terrain"][x][z] = {
+              this.world[zone][cellX][cellZ].terrain[x][z] = {
                 t:info[0],
                 y:info[1]
               };
@@ -475,7 +483,7 @@ var WorldHandler = Class.extend({
         stats = fs.lstatSync(path+"/objects.json");
 
         if (stats.isFile()) {
-          this.world[zone][cellX][cellZ]["objects"] = JSON.parse(fs.readFileSync(path+"/objects.json", 'utf8'));
+          this.world[zone][cellX][cellZ].objects = JSON.parse(fs.readFileSync(path+"/objects.json", 'utf8'));
 
         }
       }
@@ -488,7 +496,7 @@ var WorldHandler = Class.extend({
         stats = fs.lstatSync(path+"/graph.json");
 
         if (stats.isFile()) {
-          this.world[zone][cellX][cellZ]["graph"] = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
+          this.world[zone][cellX][cellZ].graph = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
 
         }
       }
@@ -521,7 +529,7 @@ var WorldHandler = Class.extend({
     // NPC's should always have static cell positions, players however can change
     // We should check once in a while for players if they changed cell coordinates
 
-    this.world[zone][cellX][cellZ]["units"] = [];
+    this.world[zone][cellX][cellZ].units = [];
 
   },
   // <octaves>,<persistence> some discovered values:
@@ -540,8 +548,8 @@ var WorldHandler = Class.extend({
 
     var coordsToWorld = CellToWorldCoordinates(cellX, cellZ, cellSize);
 
-    var offset_x = coordsToWorld["x"];
-    var offset_z = coordsToWorld["z"];
+    var offset_x = coordsToWorld.x;
+    var offset_z = coordsToWorld.z;
 
     // Generate a cell inside a zone and save it
 
@@ -575,7 +583,7 @@ var WorldHandler = Class.extend({
         h += heightOffset;
         worldHandler.BuildWorldStructure(zone, cellX, cellZ, true, x, z);
 
-        this.world[zone][cellX][cellZ]["terrain"][x][z] = {
+        this.world[zone][cellX][cellZ].terrain[x][z] = {
           t: tile,
           y : h
         };
@@ -584,9 +592,9 @@ var WorldHandler = Class.extend({
 
     }
 
-    this.world[zone][cellX][cellZ]["units"] = [];
-    this.world[zone][cellX][cellZ]["objects"] = [];
-    this.world[zone][cellX][cellZ]["graph"] = {};
+    this.world[zone][cellX][cellZ].units = [];
+    this.world[zone][cellX][cellZ].objects = [];
+    this.world[zone][cellX][cellZ].graph = {};
 
 
     var endTime = (new Date()).getTime() - startTime;
@@ -606,46 +614,46 @@ var WorldHandler = Class.extend({
 
     // Instead of saving instantly, we load the cell, overwrite it with the terrain we have, and save it! And empty terrain!
 
-    var buffer_terrain = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ]["terrain"]));
-    var buffer_objects = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ]["objects"]));
-    var buffer_graph = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ]["graph"]));
+    var buffer_terrain = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].terrain));
+    var buffer_objects = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].objects));
+    var buffer_graph = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].graph));
     var buffer_units = this.world[zone][cellX][cellZ]["units"];
 
     this.LoadCell(zone, cellX, cellZ);
 
     if ( doClearObjects ) {
-      this.world[zone][cellX][cellZ]["objects"] = [];
+      this.world[zone][cellX][cellZ].objects = [];
       buffer_objects = [];
     }
 
-    this.world[zone][cellX][cellZ]["graph"] = buffer_graph;
-    this.world[zone][cellX][cellZ]["units"] = buffer_units;
+    this.world[zone][cellX][cellZ].graph = buffer_graph;
+    this.world[zone][cellX][cellZ].units = buffer_units;
 
 
     for(var xt in buffer_terrain) {
       for(var zt in buffer_terrain[xt]) {
-        if ( !ISDEF( this.world[zone][cellX][cellZ]["terrain"][xt]) ) log("terrain xt undefined");
+        if ( !ISDEF( this.world[zone][cellX][cellZ].terrain[xt]) ) log("terrain xt undefined");
 
 
         if ( ISDEF(buffer_terrain[xt][zt].t) ) {
-          this.world[zone][cellX][cellZ]["terrain"][xt][zt].t = buffer_terrain[xt][zt].t;
+          this.world[zone][cellX][cellZ].terrain[xt][zt].t = buffer_terrain[xt][zt].t;
         }
         if ( ISDEF(buffer_terrain[xt][zt].y) ) {
-          this.world[zone][cellX][cellZ]["terrain"][xt][zt].y = buffer_terrain[xt][zt].y;
+          this.world[zone][cellX][cellZ].terrain[xt][zt].y = buffer_terrain[xt][zt].y;
         }
       }
     }
 
 
     for(var o=0;o<buffer_objects.length;o++) {
-      this.world[zone][cellX][cellZ]["objects"].push(buffer_objects[o]);
+      this.world[zone][cellX][cellZ].objects.push(buffer_objects[o]);
     }
 
-    if ( ISDEF(worldHandler.world[zone][cellX][cellZ]["changeBuffer"]) ) {
+    if ( ISDEF(worldHandler.world[zone][cellX][cellZ].changeBuffer) ) {
 
-      for(var d=0;d<worldHandler.world[zone][cellX][cellZ]["changeBuffer"].length;d++) {
+      for(var d=0;d<worldHandler.world[zone][cellX][cellZ].changeBuffer.length;d++) {
 
-        var obj = worldHandler.world[zone][cellX][cellZ]["changeBuffer"][d];
+        var obj = worldHandler.world[zone][cellX][cellZ].changeBuffer[d];
 
 
         var pos = ConvertVector3(obj.pos);
@@ -654,23 +662,23 @@ var WorldHandler = Class.extend({
 
         var found = false;
 
-        for(var o=0;o<worldHandler.world[zone][cellX][cellZ]["objects"].length;o++) {
-          var loopObj = worldHandler.world[zone][cellX][cellZ]["objects"][o];
+        for(var o=0;o<worldHandler.world[zone][cellX][cellZ].objects.length;o++) {
+          var loopObj = worldHandler.world[zone][cellX][cellZ].objects[o];
 
-          if ( pos.x == loopObj.x && pos.y == loopObj.y && pos.z == loopObj.z ) {
+          if ( pos.x === loopObj.x && pos.y === loopObj.y && pos.z === loopObj.z ) {
 
 
 
             if ( _.isEmpty(obj.metadata) ) {
-              delete worldHandler.world[zone][cellX][cellZ]["objects"][o].metadata;
+              delete worldHandler.world[zone][cellX][cellZ].objects[o].metadata;
             }
             else {
 
-              if ( _.isUndefined(worldHandler.world[zone][cellX][cellZ]["objects"][o].metadata) ) {
-                worldHandler.world[zone][cellX][cellZ]["objects"][o].metadata = {};
+              if ( _.isUndefined(worldHandler.world[zone][cellX][cellZ].objects[o].metadata) ) {
+                worldHandler.world[zone][cellX][cellZ].objects[o].metadata = {};
               }
 
-              _.extend(worldHandler.world[zone][cellX][cellZ]["objects"][o].metadata, obj.metadata);
+              _.extend(worldHandler.world[zone][cellX][cellZ].objects[o].metadata, obj.metadata);
             }
 
             found = true;
@@ -692,13 +700,13 @@ var WorldHandler = Class.extend({
     }
 
     // Delete the things from the terrain in the deleteBuffer
-    if ( ISDEF(worldHandler.world[zone][cellX][cellZ]["deleteBuffer"]) ) {
+    if ( ISDEF(worldHandler.world[zone][cellX][cellZ].deleteBuffer) ) {
 
 
 
-      for(var d=0;d<worldHandler.world[zone][cellX][cellZ]["deleteBuffer"].length;d++) {
+      for(var d=0;d<worldHandler.world[zone][cellX][cellZ].deleteBuffer.length;d++) {
 
-        var data = worldHandler.world[zone][cellX][cellZ]["deleteBuffer"][d];
+        var data = worldHandler.world[zone][cellX][cellZ].deleteBuffer[d];
 
 
         data = ConvertVector3(data);
@@ -708,16 +716,16 @@ var WorldHandler = Class.extend({
 
         var found = false;
 
-        for(var o=0;o<worldHandler.world[zone][cellX][cellZ]["objects"].length;o++) {
-          var obj = worldHandler.world[zone][cellX][cellZ]["objects"][o];
+        for(var o=0;o<worldHandler.world[zone][cellX][cellZ].objects.length;o++) {
+          var obj = worldHandler.world[zone][cellX][cellZ].objects[o];
 
 
           obj = ConvertVector3(obj);
           obj = obj.Round(2);
 
-          if ( data.x == obj.x && data.y == obj.y && data.z == obj.z ) {
-            worldHandler.world[zone][cellX][cellZ]["objects"].splice(o--, 1);
-            worldHandler.world[zone][cellX][cellZ]["deleteBuffer"].splice(d--, 1);
+          if ( data.x === obj.x && data.y === obj.y && data.z === obj.z ) {
+            worldHandler.world[zone][cellX][cellZ].objects.splice(o--, 1);
+            worldHandler.world[zone][cellX][cellZ].deleteBuffer.splice(d--, 1);
             found = true;
             break;
           }
@@ -753,7 +761,7 @@ var WorldHandler = Class.extend({
     var ar = []
     for(var x = offset_x-cellSizeHalf;x<offset_x+cellSizeHalf;x+=worldScale){
       for(var z = offset_z-cellSizeHalf;z<offset_z+cellSizeHalf;z+=worldScale){
-        var info = this.world[zone][cellX][cellZ]["terrain"][x][z];
+        var info = this.world[zone][cellX][cellZ].terrain[x][z];
         ar.push(info.t+","+info.y);
       }
     }
@@ -761,17 +769,17 @@ var WorldHandler = Class.extend({
 
     fs.writeFileSync(path+"/terrain.dat", str);
 
-    str = JSON.stringify(this.world[zone][cellX][cellZ]["objects"]);
+    str = JSON.stringify(this.world[zone][cellX][cellZ].objects);
     fs.writeFileSync(path+"/objects.json", str);
 
 
     // Clean up the nodes first
-    astar.cleanUp(this.world[zone][cellX][cellZ]["graph"]);
+    astar.cleanUp(this.world[zone][cellX][cellZ].graph);
 
     // Rebuild the zone waypoints
     worldHandler.BuildZoneWaypoints();
 
-    str = JSON.stringify(this.world[zone][cellX][cellZ]["graph"]);
+    str = JSON.stringify(this.world[zone][cellX][cellZ].graph);
     fs.writeFileSync(path+"/graph.json", str);
 
     log("Saved cell ("+cellX+","+cellZ+") in zone "+zone+"");
@@ -781,8 +789,8 @@ var WorldHandler = Class.extend({
 
 
     // Clean up
-    this.world[zone][cellX][cellZ]["terrain"] = {};
-    this.world[zone][cellX][cellZ]["objects"] = [];
+    this.world[zone][cellX][cellZ].terrain = {};
+    this.world[zone][cellX][cellZ].objects = [];
 
 
   },
@@ -790,8 +798,8 @@ var WorldHandler = Class.extend({
     for(var x=cellX-1;x<=cellX+1;x++){
       for(var z=cellZ-1;z<=cellZ+1;z++){
         if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[zone][x][z]["units"].length;u++) {
-            worldHandler.world[zone][x][z]["units"][u].UpdateOtherUnitsList();
+          for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }
       }
@@ -803,11 +811,11 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-            var units = worldHandler.world[z][cx][cz]["units"];
+            var units = worldHandler.world[z][cx][cz].units;
             for(var u=0;u<units.length;u++) {
-              if ( units[u].id == id ) return units[u];
+              if ( units[u].id === id ) return units[u];
             }
           }
         }
@@ -822,15 +830,15 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-            var units = worldHandler.world[z][cx][cz]["units"];
+            var units = worldHandler.world[z][cx][cz].units;
 
             for(var u in units) {
 
               if ( units[u].id < 0 ) continue;
 
-              if ( units[u].name == name ) return units[u];
+              if ( units[u].name === name ) return units[u];
             }
           }
         }
@@ -849,12 +857,12 @@ var WorldHandler = Class.extend({
       for(var z=cz-1;z<=cz+1;z++){
         if ( !worldHandler.CheckWorldStructure(zone, x, z) ) continue;
 
-        if ( ISDEF(worldHandler.world[zone][x][z]["units"]) ) {
+        if ( ISDEF(worldHandler.world[zone][x][z].units) ) {
 
-          var units = worldHandler.world[zone][x][z]["units"];
+          var units = worldHandler.world[zone][x][z].units;
 
           for(var u=0;u<units.length;u++) {
-            if ( units[u].id == id ) return units[u];
+            if ( units[u].id === id ) return units[u];
           }
         }
       }
@@ -868,13 +876,13 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-            var units = worldHandler.world[z][cx][cz]["units"];
+            var units = worldHandler.world[z][cx][cz].units;
 
             for(var u=0;u<units.length;u++) {
-              if ( units[u].id == id ) {
-                worldHandler.world[z][cx][cz]["units"].splice(u, 1);
+              if ( units[u].id === id ) {
+                worldHandler.world[z][cx][cz].units.splice(u, 1);
                 return true;
               }
             }
@@ -889,9 +897,9 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-            var units = worldHandler.world[z][cx][cz]["units"];
+            var units = worldHandler.world[z][cx][cz].units;
 
             for(var u=0;u<units.length;u++) {
               if ( units[u].id == id ) {
@@ -925,8 +933,8 @@ var WorldHandler = Class.extend({
   },
   GetWaypointID: function(zone) {
     if ( worldHandler.world[zone] === undefined ) return -1;
-    if ( worldHandler.world[zone]["waypointIDCount"] === undefined || worldHandler.world[zone]["waypointIDCount"] < 100) {
-      worldHandler.world[zone]["waypointIDCount"] = 0;
+    if ( worldHandler.world[zone].waypointIDCount === undefined || worldHandler.world[zone].waypointIDCount < 100) {
+      worldHandler.world[zone].waypointIDCount = 0;
       for(var cx in worldHandler.world[zone]) {
         for(var cz in worldHandler.world[zone][cx]) {
           if ( worldHandler.world[zone][cx][cz]['graph'] !== undefined ) {

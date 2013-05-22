@@ -86,7 +86,7 @@ var Unit = Class.extend({
 
     if ( worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ) ) {
 
-      worldHandler.world[this.zone][this.cellX][this.cellZ]["units"].push(this);
+      worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
     }
     else {
       // We are in a bad cell??? Find a place to spawn! Or DC
@@ -100,7 +100,7 @@ var Unit = Class.extend({
 
     (function(unit){
       setTimeout(function(){
-        unit.UpdateNearbyUnitsOtherUnitsLists()
+        unit.UpdateNearbyUnitsOtherUnitsLists();
         }, 0);
     })(this);
 
@@ -122,7 +122,7 @@ var Unit = Class.extend({
     this.readyToReceiveUnits = false;
 
     if ( worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ) ) {
-      worldHandler.world[this.zone][this.cellX][this.cellZ]["units"] = _.without(worldHandler.world[this.zone][this.cellX][this.cellZ]["units"], this);
+      worldHandler.world[this.zone][this.cellX][this.cellZ].units = _.without(worldHandler.world[this.zone][this.cellX][this.cellZ].units, this);
     }
 
     this.UpdateNearbyUnitsOtherUnitsLists();
@@ -132,7 +132,7 @@ var Unit = Class.extend({
     this.UpdateCellPosition();
 
     if ( worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ) ) {
-      worldHandler.world[this.zone][this.cellX][this.cellZ]["units"].push(this);
+      worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
     }
 
     this.UpdateNearbyUnitsOtherUnitsLists();
@@ -223,13 +223,13 @@ var Unit = Class.extend({
       if ( unit.id < 0 ) {
         packet.template = unit.template.id;
 
-        if ( unit.template.type == UnitTypeEnum.MOVINGOBSTACLE || unit.template.type == UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
+        if ( unit.template.type === UnitTypeEnum.MOVINGOBSTACLE || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
           packet.rotX = unit.rotation.x.Round();
           packet.rotZ = unit.rotation.z.Round();
         }
 
-        if ( unit.template.type == UnitTypeEnum.LEVER || unit.template.type == UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
-          unit.data['on'] = unit.on;
+        if ( unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
+          unit.data.on = unit.on;
         }
 
         if ( unit.template.special ) {
@@ -284,12 +284,9 @@ var Unit = Class.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          _.each(worldHandler.world[this.zone][x][z]["units"], function(unit) {
-
-
-
-            if ( unit != this ) secondList.push(unit);
-          }, this);
+          for(var unit in worldHandler.world[this.zone][x][z].units) {
+			if ( unit !== this ) secondList.push(unit);
+          }
         }
       }
     }
@@ -316,8 +313,8 @@ var Unit = Class.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[this.zone][x][z]["units"].length;u++) {
-            var unit = worldHandler.world[this.zone][x][z]["units"][u];
+          for(var u=0;u<worldHandler.world[this.zone][x][z].units.length;u++) {
+            var unit = worldHandler.world[this.zone][x][z].units.u;
 
             if ( unit == this ) continue;
 
@@ -356,10 +353,10 @@ var Unit = Class.extend({
       // First, remove us from our world cell and add ourselves to the right cell
       // Remove the unit from the world cells
       if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
-        var units = worldHandler.world[zone][cx][cz]["units"];
+        var units = worldHandler.world[zone][cx][cz].units;
         for(var u=0;u<units.length;u++) {
           if ( units[u].id == this.id ) {
-            worldHandler.world[zone][cx][cz]["units"].splice(u, 1);
+            worldHandler.world[zone][cx][cz].units.splice(u, 1);
             break;
           }
         }
@@ -368,7 +365,7 @@ var Unit = Class.extend({
       // Add to the new cell
       // What if the cell doesn't exist? Don't add?
       if ( worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z) ) {
-        worldHandler.world[zone][cellPos.x][cellPos.z]["units"].push(this);
+        worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
       }
 
       var cellsToRecalculate = [];
@@ -407,9 +404,9 @@ var Unit = Class.extend({
         if ( secondList.indexOf(firstList[c]) == -1 ) {
           // Not found in the secondlist, so recalculate all units inside
           if ( !worldHandler.CheckWorldStructure(zone, firstList[c].x, firstList[c].z) ) continue;
-
-          for ( var u=0;u<worldHandler.world[zone][firstList[c].x][firstList[c].z]["units"].length;u++ ) {
-            var funit = worldHandler.world[zone][firstList[c].x][firstList[c].z]["units"][u];
+			var cl = worldHandler.world[zone][firstList[c].x][firstList[c].z].units.length;
+          for ( var u=0;u<cl;u++ ) {
+            var funit = worldHandler.world[zone][firstList[c].x][firstList[c].z].units[u];
             funit.UpdateOtherUnitsList();
           }
 
@@ -423,8 +420,8 @@ var Unit = Class.extend({
           // Not found in the firstlist, so recalculate all units inside
           if ( !worldHandler.CheckWorldStructure(zone, secondList[c].x, secondList[c].z) ) continue;
 
-          for ( var u=0;u<worldHandler.world[zone][secondList[c].x][secondList[c].z]["units"].length;u++ ) {
-            var funit = worldHandler.world[zone][secondList[c].x][secondList[c].z]["units"][u];
+          for ( var u=0;u<worldHandler.world[zone][secondList[c].x][secondList[c].z].units.length; u++ ) {
+            var funit = worldHandler.world[zone][secondList[c].x][secondList[c].z].units[u];
             funit.UpdateOtherUnitsList();
           }
 
@@ -460,13 +457,13 @@ var Unit = Class.extend({
     var cz = this.cellZ;
 
 
-    worldHandler.world[zone][cx][cz]["units"] = _.without(worldHandler.world[zone][cx][cz]["units"], this);
+    worldHandler.world[zone][cx][cz].units = _.without(worldHandler.world[zone][cx][cz].units, this);
 
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[zone][x][z]["units"].length;u++) {
-            worldHandler.world[zone][x][z]["units"][u].UpdateOtherUnitsList();
+          for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }
       }
@@ -487,9 +484,9 @@ var Unit = Class.extend({
       for(var z=cz-1;z<=cz+1;z++){
         if ( !worldHandler.CheckWorldStructure(zone, x, z) ) continue;
 
-        if ( ISDEF(worldHandler.world[zone][x][z]["units"]) ) {
+        if ( ISDEF(worldHandler.world[zone][x][z].units) ) {
 
-          var units = worldHandler.world[zone][x][z]["units"];
+          var units = worldHandler.world[zone][x][z].units;
 
           for(var u=0;u<units.length;u++) {
             if ( !(units[u] instanceof Player) ) continue;
@@ -521,7 +518,7 @@ var Unit = Class.extend({
     var distance = Math.pow(50, 2);
     for(var x in allNodes){
       //for(var x=0;x<allNodes.length;x++){
-      var measuredDistance = DistanceSq(allNodes[x]['pos'], this.position);
+      var measuredDistance = DistanceSq(allNodes[x].pos, this.position);
       if ( measuredDistance < distance ) {
         closestNode = allNodes[x];
         distance = measuredDistance;
@@ -538,7 +535,7 @@ var Unit = Class.extend({
     distance = Math.pow(50, 2);
     //for(var x=0;x<allNodes.length;x++){
     for(var x in allNodes){
-      var measuredDistance = DistanceSq(allNodes[x]['pos'], targetPosition);
+      var measuredDistance = DistanceSq(allNodes[x].pos, targetPosition);
       if ( measuredDistance < distance ) {
         farthestNode = allNodes[x];
         distance = measuredDistance;
@@ -555,7 +552,7 @@ var Unit = Class.extend({
 
 
     // If the path is empty, go straight for the target
-    if ( paths.length == 0 ) {
+    if ( paths.length === 0 ) {
       this.targetNodePosition = targetPosition.clone();
     //            log("[CalculatePath] No path found, going straight for the target! new targetNodePosition: "+this.targetNodePosition.ToString());
     }

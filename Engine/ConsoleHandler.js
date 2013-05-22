@@ -139,9 +139,9 @@ var ConsoleHandler = Class.extend({
       for(var z in worldHandler.world) {
         for(var cx in worldHandler.world[z]) {
           for(var cz in worldHandler.world[z][cx]) {
-            if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+            if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-              var units = worldHandler.world[z][cx][cz]["units"];
+              var units = worldHandler.world[z][cx][cz].units;
 
               for(var u=0;u<units.length;u++) {
 
@@ -185,7 +185,7 @@ var ConsoleHandler = Class.extend({
         };
 
         // Load negative ID's
-        unitdata["id"] = -unitdata["id"];
+        unitdata.id = -unitdata.id;
 
         //y
         //log(unitdata);
@@ -260,9 +260,9 @@ var ConsoleHandler = Class.extend({
         for(var cx in worldHandler.world[z]) {
           for(var cz in worldHandler.world[z][cx]) {
             cellsLoaded++;
-            if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+            if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-              var units = worldHandler.world[z][cx][cz]["units"];
+              var units = worldHandler.world[z][cx][cz].units;
 
               for(var u=0;u<units.length;u++) {
                 log("Unit found in zone "+cz+" ("+cx+", "+cz+")");
@@ -303,7 +303,7 @@ var ConsoleHandler = Class.extend({
 
       param = param.trim();
 
-      if ( param == '' ) continue;
+      if ( param === '' ) continue;
 
 
       if ( param.indexOf('"') === 0 ) {
@@ -319,7 +319,7 @@ var ConsoleHandler = Class.extend({
 
     realparams.shift();
 
-    if ( typeof this.commands[command] != "undefined" ) {
+    if ( typeof this.commands[command] !== "undefined" ) {
       this.commands[command].Exec(realparams);
     }
     else {

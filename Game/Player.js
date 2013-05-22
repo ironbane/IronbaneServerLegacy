@@ -19,7 +19,7 @@
 
 var KickReason = {
   CHEAT: "Cheating"
-}
+};
 
 var Player = Fighter.extend({
   Init: function(data) {
@@ -116,13 +116,13 @@ var Player = Fighter.extend({
 
     // Remove the unit from the world cells
     if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
-      var units = worldHandler.world[zone][cx][cz]["units"];
+      var units = worldHandler.world[zone][cx][cz].units;
       for(var u=0;u<units.length;u++) {
         if ( units[u].id == this.id ) {
 
           //worldHandler.world[zone][cx][cz]["units"].splice(u, 1);
-          worldHandler.world[zone][cx][cz]["units"] =
-          _.without(worldHandler.world[zone][cx][cz]["units"], units[u]);
+          worldHandler.world[zone][cx][cz].units =
+          _.without(worldHandler.world[zone][cx][cz].units, units[u]);
           log('found in units list!');
           break;
         }
@@ -133,8 +133,8 @@ var Player = Fighter.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[zone][x][z]["units"].length;u++) {
-            worldHandler.world[zone][x][z]["units"][u].UpdateOtherUnitsList();
+          for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }
       }

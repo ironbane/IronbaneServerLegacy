@@ -308,10 +308,10 @@ if ( !SERVER ) {
   }
 
   function FindUnit(id) {
-    if ( ironbane.player && ironbane.player.id == id ) return ironbane.player;
+    if ( ironbane.player && ironbane.player.id === id ) return ironbane.player;
 
     for (i = 0; i < ironbane.unitList.length; i++) {
-      if ( ironbane.unitList[i].id == id ) return ironbane.unitList[i];
+      if ( ironbane.unitList[i].id === id ) return ironbane.unitList[i];
     }
     return null;
   }
@@ -866,12 +866,12 @@ function timeSince(since) {
 function firstOfObject(o) {
   for(var k in o) return o[k];
 }
-
+/*
 function reverseArray(array) {
 
   var length = array.length;
 
-  if ( length == 0 ) return array;
+  if ( length === 0 ) return array;
 
   var left = null;
   var right = null;
@@ -884,7 +884,7 @@ function reverseArray(array) {
   }
   return array;
 }
-
+*/
 function capitaliseFirstLetter(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);
