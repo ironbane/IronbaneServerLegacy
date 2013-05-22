@@ -3,7 +3,7 @@
         <h2>{{ cat.name }}</h2>
         <ul class="board-list">
             <li class="board" ng-repeat="board in cat.boards">
-                <a class="board-name {{ board.icon }}" ng-href="{{ board.url }}">{{ board.name }}</a>
+                <a ng-style="board.iconStyle" class="board-name" ng-href="{{ board.url }}">{{ board.name }}</a>
                 <span class="board-stats"><em>Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</em></span>
                 <p class="board-descr">{{ board.description }}</p>
             </li>

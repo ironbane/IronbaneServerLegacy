@@ -4,7 +4,7 @@
 
 <div class="forum-listing">
     <section class="forum-group">
-        <h1 class="{{ board.icon }}">{{ board.name }}</h1>
+        <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
         <ul class="board-list">
             <li class="board" ng-repeat="post in posts">
                 <a class="thread-post" ng-href="{{ post.url + '#' + post.id }}">

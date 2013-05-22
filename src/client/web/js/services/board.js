@@ -56,8 +56,19 @@ angular.module('IronbaneApp')
         this.postCount = 0;
         this.topicCount = 0;
 
-        // todo: save in db, configure
-        this.icon = 'beer-stein';
+        if(!this.icon) {
+            this.$setIcon('beer-stein');
+        } else {
+            this.$setIcon(this.icon);
+        }
+    };
+
+    Board.prototype.$setIcon = function(icon) {
+        this.icon = icon;
+        this.iconStyle = {
+            'background-image': 'url("/images/icons/svg/'+ icon + '.svg")',
+            'background-size': '32px 32px'
+        };
     };
 
     // get a single board
