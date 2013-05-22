@@ -300,7 +300,7 @@
         str = str.replace(/&amp;/g, '&');
 
         return str;
-    }
+    };
 
     var encode = function (str) {
         str = str.replace(/&/g, '&amp;');
@@ -314,12 +314,12 @@
         }
 
         return str;
-    }
+    };
 
     exports.entities = {
         encode: encode,
         decode: decode
-    }
+    };
 
     //This module is adapted from the CodeIgniter framework
     //The license is available at http://codeigniter.com/
@@ -525,7 +525,7 @@
     var Validator = exports.Validator = function() {}
 
     Validator.prototype.check = function(str, fail_msg) {
-        this.str = str == null || (isNaN(str) && str.length == undefined) ? '' : str+'';
+        this.str = str === null || (isNaN(str) && str.length == undefined) ? '' : str+'';
         this.msg = fail_msg;
         this._errors = [];
         return this;
@@ -553,116 +553,116 @@
             return this.error(this.msg || 'Invalid credit card');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isUrl = function() {
         if (!this.str.match(/^(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?:\w+:\w+@)?((?:(?:[-\w\d{1-3}]+\.)+(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|edu|co\.uk|ac\.uk|it|fr|tv|museum|asia|local|travel|[a-z]{2}))|((\b25[0-5]\b|\b[2][0-4][0-9]\b|\b[0-1]?[0-9]?[0-9]\b)(\.(\b25[0-5]\b|\b[2][0-4][0-9]\b|\b[0-1]?[0-9]?[0-9]\b)){3}))(?::[\d]{1,5})?(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?:#(?:[-\w~!$ |\/.,*:;=]|%[a-f\d]{2})*)?$/i) || this.str.length > 2083) {
             return this.error(this.msg || 'Invalid URL');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isIP = function() {
         if (!this.str.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)) {
             return this.error(this.msg || 'Invalid IP');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isAlpha = function() {
         if (!this.str.match(/^[a-zA-Z]+$/)) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isAlphanumeric = function() {
         if (!this.str.match(/^[a-zA-Z0-9]+$/)) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isNumeric = function() {
         if (!this.str.match(/^-?[0-9]+$/)) {
             return this.error(this.msg || 'Invalid number');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isLowercase = function() {
         if (!this.str.match(/^[a-z0-9]+$/)) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isUppercase = function() {
         if (!this.str.match(/^[A-Z0-9]+$/)) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isInt = function() {
         if (!this.str.match(/^(?:-?(?:0|[1-9][0-9]*))$/)) {
             return this.error(this.msg || 'Invalid integer');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isDecimal = function() {
         if (!this.str.match(/^(?:-?(?:0|[1-9][0-9]*))?(?:\.[0-9]*)?$/)) {
             return this.error(this.msg || 'Invalid decimal');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isFloat = function() {
         return this.isDecimal();
-    }
+    };
 
     Validator.prototype.notNull = function() {
         if (this.str === '') {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isNull = function() {
         if (this.str !== '') {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.notEmpty = function() {
         if (this.str.match(/^[\s\t\r\n]*$/)) {
             return this.error(this.msg || 'String is whitespace');
         }
         return this;
-    }
+    };
 
     Validator.prototype.equals = function(equals) {
-        if (this.str != equals) {
+        if (this.str !== equals) {
             return this.error(this.msg || 'Not equal');
         }
         return this;
-    }
+    };
 
     Validator.prototype.contains = function(str) {
         if (this.str.indexOf(str) === -1) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.notContains = function(str) {
         if (this.str.indexOf(str) >= 0) {
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.regex = Validator.prototype.is = function(pattern, modifiers) {
         if (typeof pattern !== 'function') {
@@ -672,7 +672,7 @@
             return this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.notRegex = Validator.prototype.not = function(pattern, modifiers) {
         if (typeof pattern !== 'function') {
@@ -682,7 +682,7 @@
             this.error(this.msg || 'Invalid characters');
         }
         return this;
-    }
+    };
 
     Validator.prototype.len = function(min, max) {
         if (this.str.length < min) {
@@ -692,13 +692,13 @@
             return this.error(this.msg || 'String is too large');
         }
         return this;
-    }
+    };
 
     //Thanks to github.com/sreuter for the idea.
     Validator.prototype.isUUID = function(version) {
-        if (version == 3 || version == 'v3') {
+        if (version == 3 || version === 'v3') {
             pattern = /[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
-        } else if (version == 4 || version == 'v4') {
+        } else if (version == 4 || version === 'v4') {
             pattern = /[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
         } else {
             pattern = /[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
@@ -707,7 +707,7 @@
             return this.error(this.msg || 'Not a UUID');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isDate = function() {
         var intDate = Date.parse(this.str);
@@ -715,7 +715,7 @@
             return this.error(this.msg || 'Not a date');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isIn = function(options) {
         if (options && typeof options.indexOf === 'function') {
@@ -726,7 +726,7 @@
         } else {
             return this.error(this.msg || 'Invalid in() argument');
         }
-    }
+    };
 
     Validator.prototype.notIn = function(options) {
         if (options && typeof options.indexOf === 'function') {
@@ -737,7 +737,7 @@
         } else {
             return this.error(this.msg || 'Invalid notIn() argument');
         }
-    }
+    };
 
     Validator.prototype.min = function(val) {
         var number = parseFloat(this.str);
@@ -747,7 +747,7 @@
         }
 
         return this;
-    }
+    };
 
     Validator.prototype.max = function(val) {
         var number = parseFloat(this.str);
@@ -755,14 +755,14 @@
             return this.error(this.msg || 'Invalid number');
         }
         return this;
-    }
+    };
 
     Validator.prototype.isArray = function() {
         if (!Array.isArray(this.str)) {
             return this.error(this.msg || 'Not an array');
         }
         return this;
-    }
+    };
 
     var Filter = exports.Filter = function() {}
 
@@ -770,64 +770,64 @@
 
     Filter.prototype.modify = function(str) {
         this.str = str;
-    }
+    };
 
     //Create some aliases - may help code readability
     Filter.prototype.convert = Filter.prototype.sanitize = function(str) {
         this.str = str;
         return this;
-    }
+    };
 
     Filter.prototype.xss = function(is_image) {
         this.modify(exports.xssClean(this.str, is_image));
         return this.str;
-    }
+    };
 
     Filter.prototype.entityDecode = function() {
         this.modify(decode(this.str));
         return this.str;
-    }
+    };
 
     Filter.prototype.entityEncode = function() {
         this.modify(encode(this.str));
         return this.str;
-    }
+    };
 
     Filter.prototype.ltrim = function(chars) {
         chars = chars || whitespace;
         this.modify(this.str.replace(new RegExp('^['+chars+']+', 'g'), ''));
         return this.str;
-    }
+    };
 
     Filter.prototype.rtrim = function(chars) {
         chars = chars || whitespace;
         this.modify(this.str.replace(new RegExp('['+chars+']+$', 'g'), ''));
         return this.str;
-    }
+    };
 
     Filter.prototype.trim = function(chars) {
         chars = chars || whitespace;
         this.modify(this.str.replace(new RegExp('^['+chars+']+|['+chars+']+$', 'g'), ''));
         return this.str;
-    }
+    };
 
     Filter.prototype.ifNull = function(replace) {
         if (!this.str || this.str === '') {
             this.modify(replace);
         }
         return this.str;
-    }
+    };
 
     Filter.prototype.toFloat = function() {
         this.modify(parseFloat(this.str));
         return this.str;
-    }
+    };
 
     Filter.prototype.toInt = function(radix) {
         radix = radix || 10;
         this.modify(parseInt(this.str), radix);
         return this.str;
-    }
+    };
 
     //Any strings with length > 0 (except for '0' and 'false') are considered true,
     //all other strings are false
@@ -838,29 +838,29 @@
             this.modify(true);
         }
         return this.str;
-    }
+    };
 
     //String must be equal to '1' or 'true' to be considered true, all other strings
     //are false
     Filter.prototype.toBooleanStrict = function() {
-        if (this.str == '1' || this.str == 'true') {
+        if (this.str === '1' || this.str === 'true') {
             this.modify(true);
         } else {
             this.modify(false);
         }
         return this.str;
-    }
+    };
 
     //Quick access methods
     exports.sanitize = exports.convert = function(str) {
         var filter = new exports.Filter();
         return filter.sanitize(str);
-    }
+    };
 
     exports.check = exports.validate = exports.assert = function(str, fail_msg) {
         var validator = new exports.Validator();
         return validator.check(str, fail_msg);
-    }
+    };
 
 })(typeof(exports) === 'undefined' ? window : exports);
 

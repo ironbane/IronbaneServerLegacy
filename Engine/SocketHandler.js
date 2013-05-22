@@ -32,7 +32,7 @@ var SocketHandler = Class.extend({
 
         if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
-        if ( socket.unit == null ) {
+        if ( socket.unit === null ) {
           log("unit still null, so OK!");
         }
         else {
@@ -74,14 +74,14 @@ var SocketHandler = Class.extend({
         }
 
 
-        log("Client "+data["id"]+" connecting...");
+        log("Client "+data.id +" connecting...");
         console.log(data);
 
 
 
         // TODO: closure ok?
         (function(socket, data, reply) {
-          mysql.query('SELECT pass, editor FROM bcs_users WHERE id = ?', [data["id"]],
+          mysql.query('SELECT pass, editor FROM bcs_users WHERE id = ?', [data.id],
             function (err, results, fields) {
 
               //log("Initiating connection for ");
@@ -93,7 +93,7 @@ var SocketHandler = Class.extend({
 
               //return;
 
-              if ( results.length == 0 ) {
+              if ( results.length === 0 ) {
                 reply({
                   errmsg:"User does not exist!"
                 });
@@ -109,7 +109,7 @@ var SocketHandler = Class.extend({
               // Check the password
               var userdata = results[0];
 
-              if ( userdata["pass"] != data["pass"] ) {
+              if ( userdata.pass !== data.pass ) {
                 reply({
                   errmsg:"Password is incorrect!"
                 });
@@ -126,9 +126,9 @@ var SocketHandler = Class.extend({
                 for(var cx in worldHandler.world[z]) {
                   for(var cz in worldHandler.world[z][cx]) {
 
-                    if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
+                    if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
 
-                      var units = worldHandler.world[z][cx][cz]["units"];
+                      var units = worldHandler.world[z][cx][cz].units;
 
                       //log(units);
 
@@ -174,14 +174,14 @@ var SocketHandler = Class.extend({
               // Query data and DC if it's not valid
               (function(socket, data, reply) {
                 mysql.query(
-                  'SELECT * FROM ib_characters WHERE id = ?', [data["characterID"]],
+                  'SELECT * FROM ib_characters WHERE id = ?', [data.characterID],
                   function selectCb(err, results, fields) {
                     if (err) throw err;
                     console.log("ok2");
 
-                    if ( results.length == 0 ) {
+                    if ( results.length === 0 ) {
                       reply({
-                        errmsg:"No character with ID " + data["characterID"]+ " found!"
+                        errmsg:"No character with ID " + data.characterID+ " found!"
                       });
 
                       return;
@@ -196,7 +196,7 @@ var SocketHandler = Class.extend({
 
                     // Check if the character belongs to us
 
-                    if ( chardata.user != data.id ) {
+                    if ( chardata.user !== data.id ) {
                       reply({
                         errmsg:"Character's user ID does not match player ID"
                       });
@@ -204,7 +204,7 @@ var SocketHandler = Class.extend({
                     }
 
                     if ( data.guest ) {
-                      if ( chardata.user != 0 ) {
+                      if ( chardata.user !== 0 ) {
                         reply({
                           errmsg:"Character is not allowed for guest use"
                         });
@@ -225,18 +225,12 @@ var SocketHandler = Class.extend({
 
 
                     if ( !data.guest ) {
-                      mysql.query('UPDATE bcs_users SET characterused = ? WHERE id = ?', [data["characterID"],data["id"]]);
+                      mysql.query('UPDATE bcs_users SET characterused = ? WHERE id = ?', [data.characterID,data.id]);
                     }
-
-
-
-
-
-
 
                     (function(socket, data, reply, chardata) {
                       mysql.query(
-                        'SELECT * FROM ib_items WHERE owner = ?', [data["characterID"]],
+                        'SELECT * FROM ib_items WHERE owner = ?', [data.characterID],
                         function selectCb(err, results, fields) {
                           if (err) throw err;
 
@@ -297,10 +291,10 @@ var SocketHandler = Class.extend({
                           for(var z in worldHandler.world) {
                             for(var cx in worldHandler.world[z]) {
                               for(var cz in worldHandler.world[z][cx]) {
-                                if ( ISDEF(worldHandler.world[z][cx][cz]["units"]) ) {
-                                  var units = worldHandler.world[z][cx][cz]["units"];
+                                if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+                                  var units = worldHandler.world[z][cx][cz].units;
                                   for(var u=0;u<units.length;u++) {
-                                    if ( units[u].id < 0 || units[u] == socket.unit ) continue;
+                                    if ( units[u].id < 0 || units[u] === socket.unit ) continue;
 
                                     var name = '<div style="display:inline;color:'+chatHandler.GetChatColor(units[u])+'">'+units[u].name + '</div>';
                                     playerList.push(name);
@@ -310,21 +304,19 @@ var SocketHandler = Class.extend({
                             }
                           }
 
-                          if (playerList.length == 0) playerList.push("None");
+                          if (playerList.length === 0) playerList.push("None");
 
                           chatHandler.AnnouncePersonally(socket.unit, "Hey there, "+socket.unit.name+"!<br>Players online: "+playerList.join(", "), "#01ff46");
 
 
-                        })
+                        });
                     })(socket, data, reply, chardata);
 
-                  }
-                  )
+                  });
               })(socket, data, reply);
 
 
-            }
-            )
+            });
         })(socket, data, reply);
 
 
@@ -353,13 +345,13 @@ var SocketHandler = Class.extend({
 
       // Send to everyone!
       socket.on("chatMessage", function (data) {
-        data["message"] = data["message"].substr(0, 500);
+        data.message = data.message.substr(0, 500);
 
-        if ( data["message"].length <= 0 ) return;
+        if ( data.message.length <= 0 ) return;
 
         if ( socket.unit ) {
 
-          chatHandler.Say(socket.unit, data["message"]);
+          chatHandler.Say(socket.unit, data.message);
         }
       });
 
@@ -381,7 +373,7 @@ var SocketHandler = Class.extend({
 
           if ( bool ) {
             // Check for new players
-            var currentTime = parseInt((new Date()).getTime()/1000.0);
+            var currentTime = parseInt((new Date()).getTime()/1000.0, 10);
 
             if ( socket.unit.zone === 1
               && currentTime < socket.unit.creationtime + 1000
@@ -438,7 +430,7 @@ var SocketHandler = Class.extend({
 
         // Convert the weapon ID to a template ID
         var item = _.find(socket.unit.items, function(i){
-          return i.id === data.w
+          return i.id === data.w;
         });
 
         if ( _.isUndefined(item) ) {
@@ -474,7 +466,7 @@ var SocketHandler = Class.extend({
         if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
         var item = _.find(socket.unit.items, function(i){
-          return i.slot == barIndex
+          return i.slot == barIndex;
         });
 
         if ( _.isUndefined(item) ) {
@@ -572,7 +564,7 @@ var SocketHandler = Class.extend({
         // Add a new unit and give it the loot item
 
         var item = _.find(socket.unit.items, function(i){
-          return i.id == data.itemID
+          return i.id === data.itemID;
         });
 
         if ( _.isUndefined(item) ) {
@@ -590,7 +582,7 @@ var SocketHandler = Class.extend({
 
         // If it was equipped and type was armor/weapon, update the appearance
         if ( item.equipped ) {
-          if ( dataHandler.items[item.template].type == 'armor' ) {
+          if ( dataHandler.items[item.template].type === 'armor' ) {
             socket.unit.UpdateAppearance(true);
 
             // It's possible that armor increases the maximum health
@@ -659,7 +651,7 @@ var SocketHandler = Class.extend({
 
         // Do the change
         var item = _.find(bag.loot, function(i){
-          return i.id == data.itemID
+          return i.id == data.itemID;
         });
 
         // If we are a vendor, check if the player as enough money to buy it!
@@ -692,7 +684,7 @@ var SocketHandler = Class.extend({
           }
 
           switchItem = _.find(socket.unit.items, function(i){
-            return i.id == data.switchID
+            return i.id == data.switchID;
           });
 
           if ( _.isUndefined(switchItem) ) {
@@ -711,7 +703,7 @@ var SocketHandler = Class.extend({
         if ( !switchItem ) {
           //	Only a test when we're not switching items, because only then can you give slotNumbers (otherwise it's overwritten)
           var slotTest = _.find(socket.unit.items, function(i){
-            return i.slot == data.slotNumber
+            return i.slot == data.slotNumber;
           });
 
           if ( !_.isUndefined(slotTest) ) {
@@ -739,7 +731,7 @@ var SocketHandler = Class.extend({
         // Check if the bag is now empty
         // If so, remove it from the world
         if ( bag.template.type == UnitTypeEnum.LOOTABLE ) {
-          if ( bag.loot.length == 0 && !switchItem ) {
+          if ( bag.loot.length === 0 && !switchItem ) {
             if ( bag.param < 10 ) {
               bag.Remove();
             }
@@ -768,11 +760,11 @@ var SocketHandler = Class.extend({
 
           // If it was equipped and type was armor/weapon, update the appearance
           if ( switchItem.equipped ) {
-            if ( dataHandler.items[switchItem.template].type == 'armor' ) {
+            if ( dataHandler.items[switchItem.template].type === 'armor' ) {
               socket.unit.UpdateAppearance(true);
             }
-            if ( dataHandler.items[switchItem.template].type == 'weapon'
-              || dataHandler.items[switchItem.template].type == 'tool') {
+            if ( dataHandler.items[switchItem.template].type === 'weapon'
+              || dataHandler.items[switchItem.template].type === 'tool') {
               socket.unit.EmitNearby("updateWeapon", {
                 id:socket.unit.id,
                 weapon:0
@@ -789,7 +781,7 @@ var SocketHandler = Class.extend({
         }
 
 
-        if ( bag.template.type == UnitTypeEnum.VENDOR ) {
+        if ( bag.template.type === UnitTypeEnum.VENDOR ) {
           // Update the money
           socket.unit.coins -= item.price;
 
@@ -835,7 +827,7 @@ var SocketHandler = Class.extend({
 
         // Do the change
         var item = _.find(socket.unit.items, function(i){
-          return i.id == data.itemID
+          return i.id == data.itemID;
         });
 
         if ( _.isUndefined(item) ) {
@@ -848,7 +840,7 @@ var SocketHandler = Class.extend({
 
         // Check if the target slot is available
         var slotTest = _.find(bag.loot, function(i){
-          return i.slot == data.slotNumber
+          return i.slot == data.slotNumber;
         });
 
         if ( !_.isUndefined(slotTest) ) {
@@ -962,7 +954,7 @@ var SocketHandler = Class.extend({
         if ( _.isUndefined(data.npcID) ) {
           // Make sure we have the item we want to switch
           var item = _.find(socket.unit.items, function(i){
-            return i.id == data.itemID
+            return i.id === data.itemID;
           });
 
 
@@ -977,7 +969,7 @@ var SocketHandler = Class.extend({
 
           // Make sure we have the item we want to switch
           var item = _.find(socket.unit.items, function(i){
-            return i.id == data.itemID
+            return i.id == data.itemID;
           });
 
           if ( _.isUndefined(item) ) {
@@ -990,7 +982,7 @@ var SocketHandler = Class.extend({
 
 
           var switchItem = _.find(socket.unit.items, function(i){
-            return i.slot == data.slotNumber
+            return i.slot == data.slotNumber;
           });
 
           if ( !_.isUndefined(switchItem) ) {
@@ -1010,15 +1002,15 @@ var SocketHandler = Class.extend({
               errmsg:"Bag not found (too far?)"
             });
           }
-          else if ( bag.template.type != UnitTypeEnum.LOOTABLE
-            && bag.template.type != UnitTypeEnum.VENDOR
+          else if ( bag.template.type !== UnitTypeEnum.LOOTABLE
+            && bag.template.type !== UnitTypeEnum.VENDOR
             ) {
             reply({
               errmsg:"Wrong NPC type for loot!"
             });
           }
 
-          if ( bag.template.type == UnitTypeEnum.VENDOR ) {
+          if ( bag.template.type === UnitTypeEnum.VENDOR ) {
             reply({
               errmsg:ChooseRandom(["Dareth not touch my stuff!","What do you think yer doing?"])
             });
@@ -1046,7 +1038,7 @@ var SocketHandler = Class.extend({
 
 
           var switchItem = _.find(bag.loot, function(i){
-            return i.slot == data.slotNumber
+            return i.slot === data.slotNumber;
           });
 
           if ( !_.isUndefined(switchItem) ) {
@@ -1177,7 +1169,7 @@ var SocketHandler = Class.extend({
           }
 
           // Not ourselves!
-          if ( id == socket.unit.id ) return;
+          if ( id === socket.unit.id ) return;
 
           var targetUnit = worldHandler.FindUnitNear(id, socket.unit);
 
@@ -1263,7 +1255,7 @@ var SocketHandler = Class.extend({
       });
 
       socket.on("shutdown", function (value) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         log("Shutting down by user request ("+socket.unit.id+")");
 
@@ -1273,7 +1265,7 @@ var SocketHandler = Class.extend({
       });
 
       socket.on("backup", function () {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         log("Backing up server by user request ("+socket.unit.id+")");
 
@@ -1281,20 +1273,20 @@ var SocketHandler = Class.extend({
       });
 
       socket.on("chGodMode", function (value) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
         socket.unit.chGodMode = value;
       });
       socket.on("chInvisibleByMonsters", function (value) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
         socket.unit.chInvisibleByMonsters = value;
       });
       socket.on("ch999Damage", function (value) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
         socket.unit.ch999Damage = value;
       });
 
       socket.on("teleport", function (data, reply) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
         if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
         if ( !CheckData(data, ["pos", "zone", "name", "targetName"]) ) {
@@ -1325,7 +1317,7 @@ var SocketHandler = Class.extend({
       socket.on("setTileHeight", function (array) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         var zone = socket.unit.zone;
 
@@ -1333,16 +1325,16 @@ var SocketHandler = Class.extend({
           var data = array[d];
 
 
-          data.cx = parseInt(data.cx);
-          data.cz = parseInt(data.cz);
-          data.tx = parseInt(data.tx);
-          data.tz = parseInt(data.tz);
+          data.cx = parseInt(data.cx, 10);
+          data.cz = parseInt(data.cz, 10);
+          data.tx = parseInt(data.tx, 10);
+          data.tz = parseInt(data.tz, 10);
           data.height = parseFloat(data.height).Round(2);
 
 
           worldHandler.BuildWorldStructure(zone, data.cx, data.cz, true, data.tx, data.tz);
 
-          worldHandler.world[zone][data.cx][data.cz]["terrain"][data.tx][data.tz].y = data.height;
+          worldHandler.world[zone][data.cx][data.cz].terrain[data.tx][data.tz].y = data.height;
 
 
           // Set a timer to auto save this cell
@@ -1358,7 +1350,7 @@ var SocketHandler = Class.extend({
       socket.on("deleteNPC", function (id) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         var cellPos = worldHandler.GetUnitCell(id);
 
@@ -1374,11 +1366,11 @@ var SocketHandler = Class.extend({
         var cx = cellPos.x;
         var cz = cellPos.z;
 
-        var units = worldHandler.world[zone][cx][cz]["units"];
+        var units = worldHandler.world[zone][cx][cz].units;
 
         for(var u=0;u<units.length;u++) {
-          if ( units[u].id == id ) {
-            worldHandler.world[zone][cx][cz]["units"].splice(u, 1);
+          if ( units[u].id === id ) {
+            worldHandler.world[zone][cx][cz].units.splice(u, 1);
             break;
           }
         }
@@ -1387,8 +1379,8 @@ var SocketHandler = Class.extend({
         for(var x=cellPos.x-1;x<=cellPos.x+1;x++){
           for(var z=cellPos.z-1;z<=cellPos.z+1;z++){
             if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-              for(var u=0;u<worldHandler.world[zone][x][z]["units"].length;u++) {
-                worldHandler.world[zone][x][z]["units"][u].UpdateOtherUnitsList();
+              for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+                worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
               }
             }
           }
@@ -1406,7 +1398,7 @@ var SocketHandler = Class.extend({
       });
 
       socket.on("generateCell", function (data, reply) {
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         // debugger;
 
@@ -1417,7 +1409,7 @@ var SocketHandler = Class.extend({
         console.log(data);
 
 
-        worldHandler.GenerateCell( socket.unit.zone, cellPos.x, cellPos.z, parseInt(data.octaves), parseInt(data.persistence), parseFloat(data.scale), parseInt(data.tile), parseInt(data.heightOffset));
+        worldHandler.GenerateCell( socket.unit.zone, cellPos.x, cellPos.z, parseInt(data.octaves, 10), parseInt(data.persistence, 10), parseFloat(data.scale), parseInt(data.tile, 10), parseInt(data.heightOffset, 10));
 
         reply("OK");
 
@@ -1428,7 +1420,7 @@ var SocketHandler = Class.extend({
         console.log(data);
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         data.position = ConvertVector3(data.position);
         data.position = data.position.Round(2);
@@ -1453,7 +1445,7 @@ var SocketHandler = Class.extend({
         if ( !ISDEF(data.param) ) data.param = 0;
 
 
-        data.param = parseInt(data.param);
+        data.param = parseInt(data.param, 10);
 
 
         if ( !ISDEF(data.data) ) {
@@ -1492,7 +1484,7 @@ var SocketHandler = Class.extend({
 
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
 
 
@@ -1508,8 +1500,8 @@ var SocketHandler = Class.extend({
         if ( !ISDEF(worldHandler.world[zone][cellPos.x]) ) return;
         if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
 
-        if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z]["changeBuffer"]) ) {
-          worldHandler.world[zone][cellPos.x][cellPos.z]["changeBuffer"] = [];
+        if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer) ) {
+          worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer = [];
         }
 
 
@@ -1519,7 +1511,7 @@ var SocketHandler = Class.extend({
           pushData.metadata = {};
         }
 
-        worldHandler.world[zone][cellPos.x][cellPos.z]["changeBuffer"].push(pushData);
+        worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer.push(pushData);
 
 
 
@@ -1548,7 +1540,7 @@ var SocketHandler = Class.extend({
       socket.on("deleteModel", function (data) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
 
 
@@ -1567,26 +1559,26 @@ var SocketHandler = Class.extend({
 
 
         var foundOnBuffer = false;
-        for(var o=0;o<worldHandler.world[zone][cellPos.x][cellPos.z]["objects"].length;o++) {
-          var obj = worldHandler.world[zone][cellPos.x][cellPos.z]["objects"][o];
+        for(var o=0;o<worldHandler.world[zone][cellPos.x][cellPos.z].objects.length;o++) {
+          var obj = worldHandler.world[zone][cellPos.x][cellPos.z].objects[o];
 
           obj = ConvertVector3(obj);
           obj = obj.Round(2);
 
-          if ( data.x == obj.x && data.y == obj.y && data.z == obj.z ) {
+          if ( data.x === obj.x && data.y === obj.y && data.z === obj.z ) {
             // Found it on the buffer, so we added something and deleted it back before the save
             // Just delete it from the buffer, don't add to the deleteBuffer
             foundOnBuffer = true;
-            worldHandler.world[zone][cellPos.x][cellPos.z]["objects"].splice(o, 1);
+            worldHandler.world[zone][cellPos.x][cellPos.z].objects.splice(o, 1);
             break;
           }
         }
 
         if ( !foundOnBuffer ) {
-          if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z]["deleteBuffer"]) ) {
-            worldHandler.world[zone][cellPos.x][cellPos.z]["deleteBuffer"] = [];
+          if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer) ) {
+            worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer = [];
           }
-          worldHandler.world[zone][cellPos.x][cellPos.z]["deleteBuffer"].push(data);
+          worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer.push(data);
         }
 
 
@@ -1602,7 +1594,7 @@ var SocketHandler = Class.extend({
       socket.on("addModel", function (data) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         data.position = ConvertVector3(data.position);
         data.position = data.position.Round(2);
@@ -1617,7 +1609,7 @@ var SocketHandler = Class.extend({
         if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
 
         // Just add the object, and save it. Clients should automatically add it
-        worldHandler.world[zone][cellPos.x][cellPos.z]["objects"].push({
+        worldHandler.world[zone][cellPos.x][cellPos.z].objects.push({
           x:data.position.x,
           y:data.position.y,
           z:data.position.z,
@@ -1637,7 +1629,7 @@ var SocketHandler = Class.extend({
 
       socket.on("ppAddNode", function (position, reply) {
 
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         position = ConvertVector3(position).Round(2);
 
@@ -1647,11 +1639,11 @@ var SocketHandler = Class.extend({
         for(var cx in worldHandler.world[zone]) {
           for(var cz in worldHandler.world[zone][cx]) {
 
-            if ( worldHandler.world[zone][cx][cz]["graph"] === undefined ) continue;
-            if ( worldHandler.world[zone][cx][cz]["graph"]["nodes"] === undefined ) continue;
+            if ( worldHandler.world[zone][cx][cz].graph === undefined ) continue;
+            if ( worldHandler.world[zone][cx][cz].graph.nodes === undefined ) continue;
 
-            for(var n=0;n<worldHandler.world[zone][cx][cz]['graph']['nodes'].length;n++) {
-              if ( VectorDistanceSq(ConvertVector3(worldHandler.world[zone][cx][cz]['graph']['nodes'][n]['pos']), position) < 1 ) {
+            for(var n=0;n<worldHandler.world[zone][cx][cz].graph.nodes.length;n++) {
+              if ( VectorDistanceSq(ConvertVector3(worldHandler.world[zone][cx][cz].graph.nodes.n.pos), position) < 1 ) {
                 //                                reply({
                 //                                    errmsg:"Corrupt AddEdge data"
                 //                                });
@@ -1685,7 +1677,7 @@ var SocketHandler = Class.extend({
       socket.on("ppAddEdge", function (data, reply) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         if ( !CheckData(data, ["from","to","twoway"]) ) {
           reply({
@@ -1696,9 +1688,9 @@ var SocketHandler = Class.extend({
 
         var zone = socket.unit.zone;
 
-        nodeHandler.AddEdge(zone, data['from'], data['to'], data['twoway']);
+        nodeHandler.AddEdge(zone, data.from, data.to, data.twoway);
 
-        var position = nodeHandler.GetNodePosition(zone, data['from']);
+        var position = nodeHandler.GetNodePosition(zone, data.from);
 
         var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
         worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
@@ -1711,7 +1703,7 @@ var SocketHandler = Class.extend({
       socket.on("ppDeleteNode", function (data, reply) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         if ( !CheckData(data, ["id"]) ) {
           reply({
@@ -1723,16 +1715,16 @@ var SocketHandler = Class.extend({
         var zone = socket.unit.zone;
 
         // Check if the node is there
-        var nodeInfo = nodeHandler.GetNodeArrayIndex(zone, data['id']);
+        var nodeInfo = nodeHandler.GetNodeArrayIndex(zone, data.id);
         if ( !nodeInfo ) return;
 
-        var position = nodeHandler.GetNodePosition(zone, data['id']);
+        var position = nodeHandler.GetNodePosition(zone, data.id);
 
         var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
         worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
 
 
-        nodeHandler.DeleteNode(zone, data['id']);
+        nodeHandler.DeleteNode(zone, data.id);
 
 
 
@@ -1744,7 +1736,7 @@ var SocketHandler = Class.extend({
       socket.on("addGameObject", function (data) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         data.position = ConvertVector3(data.position);
         data.position = data.position.Round(2);
@@ -1759,7 +1751,7 @@ var SocketHandler = Class.extend({
         if ( !ISDEF(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
 
         // Just add the object, and save it. Clients should automatically add it
-        worldHandler.world[zone][cellPos.x][cellPos.z]["objects"].push({
+        worldHandler.world[zone][cellPos.x][cellPos.z].objects.push({
           x:data.position.x,
           y:data.position.y,
           z:data.position.z,
@@ -1774,20 +1766,20 @@ var SocketHandler = Class.extend({
       socket.on("setTileImage", function (data) {
 
         // Later report them!
-        if ( !socket.unit || socket.unit.editor == false ) return;
+        if ( !socket.unit || socket.unit.editor === false ) return;
 
         var zone = socket.unit.zone;
 
 
-        data.cx = parseInt(data.cx);
-        data.cz = parseInt(data.cz);
-        data.tx = parseInt(data.tx);
-        data.tz = parseInt(data.tz);
+        data.cx = parseInt(data.cx, 10);
+        data.cz = parseInt(data.cz, 10);
+        data.tx = parseInt(data.tx, 10);
+        data.tz = parseInt(data.tz, 10);
         data.height = parseFloat(data.height);
 
         worldHandler.BuildWorldStructure(zone, data.cx, data.cz, true, data.tx, data.tz);
 
-        worldHandler.world[zone][data.cx][data.cz]["terrain"][data.tx][data.tz].t = data.image;
+        worldHandler.world[zone][data.cx][data.cz].terrain[data.tx][data.tz].t = data.image;
 
         worldHandler.AutoSaveCell(zone, data.cx, data.cz);
 
@@ -1852,7 +1844,7 @@ var SocketHandler = Class.extend({
           socket.unit.side = socket.unit.heading.clone().Perp();
 
 
-          socket.unit.rotation.y = parseInt(data.r);
+          socket.unit.rotation.y = parseInt(data.r, 10);
 
           if ( ISDEF(data.u) ) {
             socket.unit.localPosition.copy(p);
@@ -1877,7 +1869,7 @@ var SocketHandler = Class.extend({
           // In addition, recalculate the unitlist for some units
           // Which ones?
           var cellPos = WorldToCellCoordinates(socket.unit.position.x, socket.unit.position.z, cellSize);
-          if ( cellPos.x != socket.unit.cellX || cellPos.z != socket.unit.cellZ ) {
+          if ( cellPos.x !== socket.unit.cellX || cellPos.z !== socket.unit.cellZ ) {
             socket.unit.ChangeCell(cellPos.x, cellPos.z);
           }
 

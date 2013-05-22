@@ -24,7 +24,7 @@ var ToggleableObstacle = Unit.extend({
 
     this._super(data);
              
-    this.on = ISDEF(this.data['startOpen']) ? this.data['startOpen'] : false;
+    this.on = ISDEF(this.data.startOpen) ? this.data.startOpen : false;
              
     this.leverList = [];
         
@@ -79,7 +79,7 @@ var ToggleableObstacle = Unit.extend({
       this.keyUseTimeout -= dTime;
     }
     else {
-      var units = worldHandler.world[this.zone][this.cellX][this.cellZ]["units"];
+      var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
                 
       for(var u=0;u<units.length;u++) {
         if ( !(units[u] instanceof Player) ) continue;

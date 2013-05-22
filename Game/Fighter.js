@@ -45,7 +45,7 @@ var Fighter = Actor.extend({
     }
 
     this.health = this.healthMax;
-    this.armor = this.armorMax,
+    this.armor = this.armorMax;
 
     this.chGodMode = false;
     this.chInvisibleByMonsters = false;
@@ -425,7 +425,7 @@ var Fighter = Actor.extend({
         id:this.id,
         s:"hm",
         hm:this.healthMax
-        }, 0, true);;
+        }, 0, true);
     }
 
     if ( this.health > this.healthMax ) {
@@ -464,7 +464,7 @@ var Fighter = Actor.extend({
         id:this.id,
         s:"am",
         am:this.armorMax
-        }, 0, true);;
+        }, 0, true);
     }
 
     if ( this.armor > this.armorMax ) {
@@ -620,8 +620,8 @@ var Fighter = Actor.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[this.zone][x][z]["units"].length;u++) {
-            var unit = worldHandler.world[this.zone][x][z]["units"][u];
+          for(var u=0;u<worldHandler.world[this.zone][x][z].units.length;u++) {
+            var unit = worldHandler.world[this.zone][x][z].units[u];
 
             if ( unit == this ) {
               continue;

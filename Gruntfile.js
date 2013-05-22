@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             web: ['deploy/web']
         },
 		jshint: {
-		files: ['src/client/web/js/**/*.js', 'test/**/*.js'],
+		files: ['src/client/web/js/**/*.js', 'Game/**/*.js'],
 		},
 		jasmine: {
 		pivotal: {
