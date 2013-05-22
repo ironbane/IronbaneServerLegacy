@@ -16,7 +16,7 @@
 */
 
 
-var dataPath = clientDir+'plugins/game/data';
+var dataPath = clientDir + 'data';
 
 var WorldHandler = Class.extend({
   Init: function() {

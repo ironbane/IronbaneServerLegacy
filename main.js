@@ -14,17 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-// Config variables
-
-var config = require('./config'),
+var config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
 
 // Mysql config
-var mysql_user = config.mysql_user;
-var mysql_password = config.mysql_password;
-var mysql_database = config.mysql_database;
-var clientDir = config.clientDir;
+var mysql_user = config.get('mysql_user');
+var mysql_password = config.get('mysql_password');
+var mysql_database = config.get('mysql_database');
+var clientDir = config.get('clientDir');
 
 // System start
 var SERVER = true;
@@ -41,7 +38,7 @@ params['heartbeat interval'] = 86400;
 params['polling duration'] = 86400;
 //
 
-var io = require('socket.io').listen(config.server_port, params);
+var io = require('socket.io').listen(config.get('server_port'), params);
 var mmysql = require('mysql');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
@@ -112,14 +109,13 @@ var includes = [
 
     './Init.js',
 
-
-clientDir + 'plugins/game/js/External/Shared.js',
-clientDir + 'plugins/game/js/External/Util.js',
-clientDir + 'plugins/game/js/External/NodeHandler.js',
+    './External/Shared.js',
+    './External/Util.js',
+    './External/NodeHandler.js',
 
     './External/perlin.js',
 
-clientDir + 'plugins/game/js/External/ImprovedNoise.js',
+    './External/ImprovedNoise.js',
 
 
     './Engine/ConsoleCommand.js',
@@ -341,7 +337,7 @@ app.configure(function() {
 // load routes
 require('./src/api')(app, mysql);
 // start api server
-app.listen(config.api_port);
+app.listen(config.get('api_port'));
 
 
 process.stdin.resume();

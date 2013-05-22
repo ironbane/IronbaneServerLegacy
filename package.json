@@ -32,7 +32,8 @@
     "passport": "~0.1.17",
     "passport-local": "~0.1.6",
     "bcrypt-nodejs": "0.0.3",
-    "marked": "~0.2.8"
+    "marked": "~0.2.8",
+    "nconf": "~0.6.7"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -40,6 +41,7 @@
     "grunt-contrib-less": "~0.5.1",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-clean": "~0.4.1",
-    "grunt-contrib-copy": "~0.4.1"
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-replace": "~0.4.4"
   }
 }

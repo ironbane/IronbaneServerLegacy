@@ -1,0 +1,1 @@
+{"nodes":[{"id":535,"pos":{"x":-244.5,"y":0.48,"z":171.01},"edges":[534,533,536],"f":0,"g":0,"h":0,"cost":1,"visited":false,"closed":false,"parent":null},{"id":544,"pos":{"x":-212.24,"y":0.52,"z":170.76},"edges":[543],"f":0,"g":0,"h":0,"cost":1,"visited":false,"closed":false,"parent":null}]}

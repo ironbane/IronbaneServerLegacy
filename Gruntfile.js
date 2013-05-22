@@ -5,6 +5,7 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        cfg: require('./nconf'),
         clean: {
             web: ['deploy/web']
         },
@@ -33,17 +34,24 @@ module.exports = function(grunt) {
                 }
             }
         },
+        replace: {
+            web: {
+                options: {
+                    variables: {
+                        root: '<%= cfg.get("root") %>'
+                    }
+                },
+                files: [
+                    {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: 'deploy/web/'}
+                ]
+            }
+        },
         copy: {
             options: {
                 processContentExclude: ['**/*.{png,gif,jpg,ico,psd}']
             },
             web: {
                 files: [{
-                    src: 'src/client/web/*.html',
-                    dest: 'deploy/web/',
-                    expand: true,
-                    flatten: true
-                }, {
                     src: 'src/client/web/views/*',
                     dest: 'deploy/web/views/',
                     expand: true,
@@ -59,6 +67,14 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'src/client/web'
                 }]
+            },
+            game: {
+                files: [{
+                    src: 'data/**/*',
+                    dest: 'deploy/game/',
+                    cwd: 'src/client/game',
+                    expand: true
+                }]
             }
         }
     });
@@ -69,8 +85,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'concat', 'uglify', 'less', 'copy']);
+    grunt.registerTask('default', ['clean', 'concat', 'uglify', 'less', 'replace', 'copy']);
 
 };
