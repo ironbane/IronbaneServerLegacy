@@ -55,6 +55,9 @@ angular.module('IronbaneApp')
 
         this.postCount = 0;
         this.topicCount = 0;
+
+        // todo: save in db, configure
+        this.icon = 'beer-stein';
     };
 
     // get a single board
