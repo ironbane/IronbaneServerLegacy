@@ -475,14 +475,14 @@ CREATE TABLE `bcs_users` (
   `last_page` varchar(255) NOT NULL DEFAULT '',
   `receive_email` tinyint(1) NOT NULL DEFAULT '1',
   `online` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `activationkey` varchar(12) NOT NULL,
+  `activationkey` varchar(12) DEFAULT NULL,
   `pending_editor` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `characterUsed` int(10) unsigned NOT NULL DEFAULT '0',
   `banned` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `rep` int(10) DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=417 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=419 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -491,7 +491,7 @@ CREATE TABLE `bcs_users` (
 
 LOCK TABLES `bcs_users` WRITE;
 /*!40000 ALTER TABLE `bcs_users` DISABLE KEYS */;
-INSERT INTO `bcs_users` VALUES (415,'warspawn','$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1);
+INSERT INTO `bcs_users` VALUES (415,'warspawn','$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1),(417,'test','$2a$10$tswqTfCmTEtRIs5v6/OOSOCzVxbVpFk0EjLaoV1HRQ/IOSfUOf9mO','test@test.org',0,1.0,1369031439,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1),(418,'testing','$2a$10$yFX9zefjZwn34bxN4OyJLu3ShkfVv6kZ8ATWC9cvKzBgQQrAeGqPi','test@test.com',0,1.0,1369031533,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1);
 /*!40000 ALTER TABLE `bcs_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -596,6 +596,7 @@ CREATE TABLE `forum_boards` (
   `moderatable` tinyint(1) NOT NULL DEFAULT '1',
   `order` tinyint(1) NOT NULL DEFAULT '0',
   `mod_only` tinyint(1) NOT NULL DEFAULT '0',
+  `icon` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -606,7 +607,7 @@ CREATE TABLE `forum_boards` (
 
 LOCK TABLES `forum_boards` WRITE;
 /*!40000 ALTER TABLE `forum_boards` DISABLE KEYS */;
-INSERT INTO `forum_boards` VALUES (1,'General',1,'General discussion about Ironbane.',1,1,0),(2,'Suggestions',1,'Just thought of something wickedly cool? Surprise us!',1,3,0),(3,'Support',1,'If you require assistance killing that gigantic boar, feel free to ask here.',1,2,0),(5,'Bugs',1,'Found something you could annoy a developer with? Report it here!',1,5,0),(6,'Off-Topic',1,'For all your overly dramatic posts. And humble discussions, too!',1,6,0),(7,'News',2,'The latest headlines about Ironbane.',0,0,0),(8,'Introductions',1,'Come on, don\'t be shy! Tell us a little about yourself!',1,0,0),(9,'General',4,'Anything you\'d like to discuss with the team.',0,10,1),(10,'Story',4,'Discuss things related to Ironbane\'s story.',0,20,1),(11,'Gameplay',4,'Talk about the different game mechanics, and which you think is cool for the game.',0,30,1),(12,'Using the editors',4,'Ask any questions you have on game commands, the level editor, the content editor and others.',1,40,1),(13,'Editor suggestions/bugs',4,'Discuss things you think would be nice to have, or a nasty bug you found.',1,50,1),(15,'Graphics',4,'For our beloved artists, talk about pixels, sprites, art and a lot more.',1,35,0),(16,'Changelog',4,'New versions with their changelog will be posted here for the sake of awesomeness',1,5,1);
+INSERT INTO `forum_boards` VALUES (1,'General',1,'General discussion about Ironbane.',1,1,0,NULL),(2,'Suggestions',1,'Just thought of something wickedly cool? Surprise us!',1,3,0,NULL),(3,'Support',1,'If you require assistance killing that gigantic boar, feel free to ask here.',1,2,0,NULL),(5,'Bugs',1,'Found something you could annoy a developer with? Report it here!',1,5,0,NULL),(6,'Off-Topic',1,'For all your overly dramatic posts. And humble discussions, too!',1,6,0,NULL),(7,'News',2,'The latest headlines about Ironbane.',0,0,0,'crowned-skull'),(8,'Introductions',1,'Come on, don\'t be shy! Tell us a little about yourself!',1,0,0,NULL),(9,'General',4,'Anything you\'d like to discuss with the team.',0,10,1,NULL),(10,'Story',4,'Discuss things related to Ironbane\'s story.',0,20,1,NULL),(11,'Gameplay',4,'Talk about the different game mechanics, and which you think is cool for the game.',0,30,1,NULL),(12,'Using the editors',4,'Ask any questions you have on game commands, the level editor, the content editor and others.',1,40,1,NULL),(13,'Editor suggestions/bugs',4,'Discuss things you think would be nice to have, or a nasty bug you found.',1,50,1,NULL),(15,'Graphics',4,'For our beloved artists, talk about pixels, sprites, art and a lot more.',1,35,0,NULL),(16,'Changelog',4,'New versions with their changelog will be posted here for the sake of awesomeness',1,5,1,NULL);
 /*!40000 ALTER TABLE `forum_boards` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -716,7 +717,7 @@ CREATE TABLE `bcs_articles` (
 
 LOCK TABLES `bcs_articles` WRITE;
 /*!40000 ALTER TABLE `bcs_articles` DISABLE KEYS */;
-INSERT INTO `bcs_articles` VALUES ('get-involved','Get Involved','## How does this work?\r\nAnyone can contribute something at any time. All you need is an account for Ironbane.\r\n\r\nWhen you add a contribution, you earn **reputation** (rep), which will be visible on your profile and on the forum. A higher rep allows you to get more privileges, such as becoming a moderator or game master, GitHub access, the ability to give others reputation for their work and more. We want to reward people for their work.\r\n\r\n##How much rep do I get for a contribution?\r\nThis will depends on the quality of work you provide, but here are some generic guidelines:\r\n###Generic reputation award table\r\n\r\n<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"4\" class=\"forumcontainer\">\r\n            <tbody><tr>\r\n                <th>Action</th>\r\n                <th>Reward</th>\r\n            </tr>\r\n            <tr>\r\n                <td class=\"row1\">Forum post</td>\r\n                <td class=\"row1\">1 rep</td>\r\n            </tr>\r\n            <tr>\r\n                <td class=\"row2\">Bug report</td>\r\n                <td class=\"row2\">5 rep</td>\r\n            </tr>\r\n             <tr>\r\n                <td class=\"row1\">Contributed content (art/music/model)</td>\r\n                <td class=\"row1\">10 rep (+ Bonus depending on quality)</td>\r\n            </tr>\r\n            <tr>\r\n                <td class=\"row2\">Accepted pull request</td>\r\n                <td class=\"row2\">20 rep (+ Bonus depending on quality)</td>\r\n            </tr>\r\n        </tbody>\r\n</table>\r\n\r\n## What can I work on?\r\nIf you were to join, what would you love to work on? Skill is important, but more important is your love for the skill. It doesn\'t matter if you suck, the only thing that is important is motivation. You must be willing to learn from others.\r\n\r\n<h2 class=\"centered\">[I want to code\\!](/articles/get-involved-code)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/code.png)\r\n</p>\r\n\r\n<h2 class=\"centered\">[I want to create 3D models\\!](/articles/get-involved-models)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/models.png)\r\n</p>\r\n\r\n<h2 class=\"centered\"> [I want to make art\\!](/articles/get-involved-art)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/art.png)\r\n</p>\r\n\r\nLooking for something else? Give a shout at the forums and let us know what you\'d like to help out with!',0,1368850945,0);
+INSERT INTO `bcs_articles` VALUES ('get-involved','Get Involved','## How does this work?\r\nAnyone can contribute something at any time. All you need is an account for Ironbane.\r\n\r\nWhen you add a contribution, you earn **reputation** (rep), which will be visible on your profile and on the forum. A higher rep allows you to get more privileges, such as becoming a moderator or game master, GitHub access, the ability to give others reputation for their work and more. We want to reward people for their work.\r\n\r\n##How much rep do I get for a contribution?\r\nThis will depends on the quality of work you provide, but here are some generic guidelines:\r\n###Generic reputation award table\r\n\r\n<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"4\" class=\"forumcontainer\">\r\n            <thead>\r\n             <tr>\r\n                <th>Action</th>\r\n                <th>Reward</th>\r\n            </tr>\r\n</thead>\r\n<tbody>\r\n            <tr>\r\n                <td class=\"row1\">Forum post</td>\r\n                <td class=\"row1\">1 rep</td>\r\n            </tr>\r\n            <tr>\r\n                <td class=\"row2\">Bug report</td>\r\n                <td class=\"row2\">5 rep</td>\r\n            </tr>\r\n             <tr>\r\n                <td class=\"row1\">Contributed content (art/music/model)</td>\r\n                <td class=\"row1\">10 rep (+ Bonus depending on quality)</td>\r\n            </tr>\r\n            <tr>\r\n                <td class=\"row2\">Accepted pull request</td>\r\n                <td class=\"row2\">20 rep (+ Bonus depending on quality)</td>\r\n            </tr>\r\n        </tbody>\r\n</table>\r\n\r\n## What can I work on?\r\nIf you were to join, what would you love to work on? Skill is important, but more important is your love for the skill. It doesn\'t matter if you suck, the only thing that is important is motivation. You must be willing to learn from others.\r\n\r\n<h2 class=\"centered\">[I want to code\\!](/article/get-involved-code)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/code.png)\r\n</p>\r\n\r\n<h2 class=\"centered\">[I want to create 3D models\\!](/article/get-involved-models)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/models.png)\r\n</p>\r\n\r\n<h2 class=\"centered\"> [I want to make art\\!](/article/get-involved-art)</h2>\r\n<p class=\"centered\">\r\n![coding](/images/uploads/public/art.png)\r\n</p>\r\n\r\nLooking for something else? Give a shout at the forums and let us know what you\'d like to help out with!',0,1368850945,0),('get-involved-code','Code!','## Coding\r\nI __love__ coding',415,1369032645,0);
 /*!40000 ALTER TABLE `bcs_articles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -729,4 +730,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-05-17 23:47:48
+-- Dump completed on 2013-05-22 16:40:46

@@ -53,8 +53,19 @@ angular.module('IronbaneApp')
         // todo: fill these
         this.url = '/forum/' + this.id;
 
-        this.postCount = 0;
-        this.topicCount = 0;
+        if(!this.icon) {
+            this.$setIcon('beer-stein');
+        } else {
+            this.$setIcon(this.icon);
+        }
+    };
+
+    Board.prototype.$setIcon = function(icon) {
+        this.icon = icon;
+        this.iconStyle = {
+            'background-image': 'url("/images/icons/svg/'+ icon + '.svg")',
+            'background-size': '32px 32px'
+        };
     };
 
     // get a single board
@@ -103,7 +114,9 @@ angular.module('IronbaneApp')
     Post.prototype.$save = function(boardId, topicId) {
         var url = '/api/forum/' + boardId + '/topics';
 
-        // todo: topicId support
+        if(topicId && topicId > 0) {
+            url = '/api/forum/topics/' + topicId;
+        }
 
         var promise = $http.post(url, this)
             .then(function(response) {
@@ -129,6 +142,26 @@ angular.module('IronbaneApp')
                 });
 
                 return posts;
+            });
+
+        return promise;
+    };
+
+    // get an entire thread
+    Post.getTopic = function(topicId) {
+        var promise = $http.get('/api/forum/topics/' + topicId)
+            .then(function(response) {
+                var posts = response.data;
+
+                // upgrade objects
+                posts.forEach(function(post, i) {
+                    post.author = new User(post.author);
+                    posts[i] = new Post(post);
+                });
+
+                return posts;
+            }, function(err) {
+                $log.log('error getting topic', topicId, err);
             });
 
         return promise;

@@ -4,7 +4,11 @@ module.exports = function(app, db) {
 
     // list boards
     app.get('/api/forum', function(req, res) {
-        db.query('SELECT forum_boards.*, forum_cats.name as category FROM forum_boards left join forum_cats on forum_boards.forumcat=forum_cats.id order by forum_cats.order, forum_boards.order', function(err, results) {
+        var topicQ = ' (select count(*) from forum_topics where board_id = fb.id) as topicCount, ',
+            postsQ = ' (select count(*) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ';
+
+        db.query('SELECT ' + topicQ + postsQ + 'fb.*, fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
+            function(err, results) {
             if (err) {
                 res.end('error', err);
                 return;
@@ -143,24 +147,72 @@ module.exports = function(app, db) {
     });
 
     // get all posts for topic
-    app.get('/api/forum/:boardId/topics/:topicId/posts', function(req, res) {
+    app.get('/api/forum/topics/:topicId', function(req, res) {
+        db.query('select * from forum_posts where topic_id = ? order by time asc', [req.params.topicId], function(err, results) {
+            if(err) {
+                res.end('error', err);
+                return;
+            }
 
+            // skip authors phase if there aren't any results
+            if(results.length === 0) {
+                res.send([]); // send 404 instead?
+                return;
+            }
+
+            var authors = [];
+
+            var posts = results;
+
+            posts.forEach(function(post) {
+                authors.push(post.user);
+                post.bbcontent = post.content;
+                bbcode.parse(post.content, function(html) {
+                    post.content = html;
+                });
+            });
+
+            // grab author details to populate
+            db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
+                if(err) {
+                    res.send('error loading users: ' + err, 500);
+                    return;
+                }
+
+                // loop through posts and nest author
+                posts.forEach(function(post) {
+                    for(var i=0;i<users.length;i++) {
+                        if(post.user === users[i].id) {
+                            post.author = users[i];
+                            // don't send password or activationkey
+                            delete post.author.pass;
+                            delete post.author.activationkey;
+                            break;
+                        }
+                    }
+                });
+
+                res.send(posts);
+            });
+        });
     });
 
     // create a new post
-    app.post('/api/forum/:boardId/topics/:topicId/posts', function(req, res) {
+    app.post('/api/forum/topics/:topicId', function(req, res) {
         var post = {
-            title: req.body.title,
             topic_id: req.params.topicId,
-            content: req.body.content,
-            time: (new Date()).valueOf() / 1000, // convert to seconds for mysql's unix_timestamp
-            user: 1 // todo: session user
+            title: req.body.title,
+            content: req.body.bbcontent,
+            time: req.body.time,
+            user: req.body.user
         };
 
-        // todo: auto topic creation?
-
-        db.query('insert into forum_posts set ?', post, function(err, results) {
-            res.send(results);
+        db.query('insert into forum_posts set ?', post, function(err, result) {
+            if(err) {
+                res.send('error creating post', 500);
+                return;
+            }
+            res.send(result);
         });
     });
 };

@@ -1,15 +1,12 @@
 <div class="forum-listing">
-    <div class="forum-group" ng-repeat="cat in cats">
+    <section class="forum-category" ng-repeat="cat in cats">
         <h2>{{ cat.name }}</h2>
         <ul class="board-list">
             <li class="board" ng-repeat="board in cat.boards">
-                <div class="icon"></div>
-                <div class="details">
-                    <h3><a class="link" ng-href="{{ board.url }}">{{ board.name }}</a></h3>
-                    <div class="descr">{{ board.description }}</div>
-                    <div class="stats">Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</div>
-                </div>
+                <a ng-style="board.iconStyle" class="board-name" ng-href="{{ board.url }}">{{ board.name }}</a>
+                <span class="board-stats"><em>Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</em></span>
+                <p class="board-descr">{{ board.description }}</p>
             </li>
         </ul>
-    </div>
+    </section>
 </div>
