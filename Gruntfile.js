@@ -57,6 +57,11 @@ module.exports = function(grunt) {
                     expand: true,
                     flatten: true
                 }, {
+                    src: 'src/client/web/partials/*',
+                    dest: 'deploy/web/partials/',
+                    expand: true,
+                    flatten: true
+                }, {
                     src: 'images/**/*',
                     dest: 'deploy/web/',
                     cwd: 'src/client/web',

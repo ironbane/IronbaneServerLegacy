@@ -4,6 +4,7 @@
 @import "mixins";
 
 // vars
+@black: #000;
 @primary1: #33cc99; // text green
 @primary2: #66ff66; // link/heading green
 @primary3: #257541; // darker green dashed border on footer?
@@ -140,8 +141,8 @@ footer .sock {
         }
         .board-list {
             .board {
-                clear: both;
-                height: 20px;
+                //clear: both;
+                //height: 20px;
                 padding: 8px;
                 margin: 0;
                 border-bottom: 1px dashed;
@@ -159,6 +160,21 @@ footer .sock {
     }
 }
 
+.new-topic-form {
+    text-align: left;
+    h1 {
+        margin: 0;
+        font-size: 22px;
+        text-align: left;
+        background-color: @black;
+        padding: 20px;
+    }
+    input { .placeholder(darken(@baseFontColor, 10%)); }
+    input[type=text] {
+        width: 95%;
+    }
+}
+
 .loginForm {
     input,
     textarea { .placeholder(darken(@baseFontColor, 10%)); }
@@ -166,8 +182,8 @@ footer .sock {
     input[type=text],
     button {
         color: @baseFontColor;
-        background-color: @primary4;
-        border-color: @primary3;
+        border-color: @primary4;
+        background-color: @primary3;
         font-weight: bold;
         font-size: 20px;
         padding: 10px;

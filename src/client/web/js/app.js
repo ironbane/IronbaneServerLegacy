@@ -67,6 +67,26 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
+        .when('/forum/:boardId/topics/:topicId', {
+            templateUrl: '/views/topic',
+            controller: 'TopicCtrl',
+            resolve: {
+                ResolveData: ['Board', 'Post', '$q', '$route', function(Board, Post, $q, $route) {
+                    var deferred = $q.defer(),
+                        boardId = $route.current.params.boardId,
+                        topicId = $route.current.params.topicId;
+
+                    $q.all([Board.get(boardId), Post.getTopic(topicId)])
+                        .then(function(results) {
+                            deferred.resolve({board: results[0], posts: results[1]});
+                        }, function(err) {
+                            deferred.reject(err);
+                        });
+
+                    return deferred.promise;
+                }]
+            }
+        })
         .when('/forum/:boardId/post', {
             templateUrl: '/views/postEdit',
             controller: 'PostEditCtrl',

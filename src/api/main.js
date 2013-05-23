@@ -76,4 +76,13 @@ module.exports = function(app, db) {
         }
         res.sendfile('deploy/web/views/' + file);
     });
+
+    app.get('/partials/:view', function(req, res) {
+        // allow us to omit the file extension...
+        var file = req.params.view;
+        if(file.search('.html') < 0) {
+            file += '.html';
+        }
+        res.sendfile('deploy/web/partials/' + file);
+    });
 };

@@ -117,7 +117,9 @@ angular.module('IronbaneApp')
     Post.prototype.$save = function(boardId, topicId) {
         var url = '/api/forum/' + boardId + '/topics';
 
-        // todo: topicId support
+        if(topicId && topicId > 0) {
+            url = '/api/forum/topics/' + topicId;
+        }
 
         var promise = $http.post(url, this)
             .then(function(response) {
@@ -143,6 +145,26 @@ angular.module('IronbaneApp')
                 });
 
                 return posts;
+            });
+
+        return promise;
+    };
+
+    // get an entire thread
+    Post.getTopic = function(topicId) {
+        var promise = $http.get('/api/forum/topics/' + topicId)
+            .then(function(response) {
+                var posts = response.data;
+
+                // upgrade objects
+                posts.forEach(function(post, i) {
+                    post.author = new User(post.author);
+                    posts[i] = new Post(post);
+                });
+
+                return posts;
+            }, function(err) {
+                $log.log('error getting topic', topicId, err);
             });
 
         return promise;
