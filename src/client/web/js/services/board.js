@@ -53,9 +53,6 @@ angular.module('IronbaneApp')
         // todo: fill these
         this.url = '/forum/' + this.id;
 
-        this.postCount = 0;
-        this.topicCount = 0;
-
         if(!this.icon) {
             this.$setIcon('beer-stein');
         } else {

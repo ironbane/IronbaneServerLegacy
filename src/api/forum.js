@@ -4,7 +4,11 @@ module.exports = function(app, db) {
 
     // list boards
     app.get('/api/forum', function(req, res) {
-        db.query('SELECT forum_boards.*, forum_cats.name as category FROM forum_boards left join forum_cats on forum_boards.forumcat=forum_cats.id order by forum_cats.order, forum_boards.order', function(err, results) {
+        var topicQ = ' (select count(*) from forum_topics where board_id = fb.id) as topicCount, ',
+            postsQ = ' (select count(*) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ';
+
+        db.query('SELECT ' + topicQ + postsQ + 'fb.*, fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
+            function(err, results) {
             if (err) {
                 res.end('error', err);
                 return;
