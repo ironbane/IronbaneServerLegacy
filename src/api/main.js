@@ -5,6 +5,7 @@ var express = require('express'),
 module.exports = function(app, db) {
     app.use('/game', express.static('deploy/game'));
     app.use('/css', express.static('deploy/web/css'));
+    app.use('/font', express.static('deploy/web/font'));
     app.use('/images', express.static('deploy/web/images'));
     app.use('/js', express.static('deploy/web/js'));
     app.use('/lib', express.static('deploy/web/lib'));

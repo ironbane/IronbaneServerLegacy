@@ -61,6 +61,11 @@ module.exports = function(grunt) {
                     dest: 'deploy/web/',
                     cwd: 'src/client/web',
                     expand: true
+                }, {
+                    src: 'font/**/*',
+                    dest: 'deploy/web/',
+                    cwd: 'src/client/web',
+                    expand: true
                 }, { // TODO: setup lib to copy only certain files?
                     src: 'lib/**/*',
                     dest: 'deploy/web/',

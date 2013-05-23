@@ -1,8 +1,7 @@
-<div class="tools">
-    <button ng-click="newTopic()">New Topic</button>
-</div>
-
 <div class="forum-listing">
+    <div class="tools">
+        <a href="javascript://" ng-click="newTopic()"><i class="icon-comment"></i> New Topic</a>
+    </div>
     <section class="forum-group">
         <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
         <ul class="board-list">

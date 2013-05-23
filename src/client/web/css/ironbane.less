@@ -1,4 +1,6 @@
 // ironbane.less
+@import "reset";
+@import "font-awesome/font-awesome";
 @import "mixins";
 
 // vars
@@ -91,8 +93,8 @@ footer .sock {
 
 .pipe-list {
     li a {margin: 0.5em;text-decoration: none;}
-    li:after {content: '|'};
-    li:last-child:after {content: ''};
+    li:after {content: "|";}
+    li:last-child:after {content: "";}
 }
 
 .board-list {
@@ -104,6 +106,11 @@ footer .sock {
 .forum-listing {
     text-align: left;
     margin: 8px;
+    .tools {
+        text-align: right;
+        padding: 6px;
+        a {text-decoration: none;}
+    }
     .forum-category {
         .board {
             background-color: #000;
