@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var config = require('./nconf'),
+var pkg = require('./package.json'),
+    config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
 
 // Mysql config
@@ -182,13 +183,35 @@ for (var f = 0; f < includes.length; f++) {
 var HttpServer = require('./src/server/http/server').Server,
     httpServer = new HttpServer();
 
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
+// setup REPL for console server mgmt
+var startREPL = function() {
+    var repl = require('repl'); // native node
 
-process.stdin.on('data', function(text) {
-    consoleHandler.Exec(text);
-});
+    // Not game stuff, this is for the server executable
+    process.stdin.setEncoding('utf8');
 
+    // startup a full node repl for javascript awesomeness
+    var serverREPL = repl.start({
+        prompt: "ironbane> ",
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    serverREPL.on('exit', function() {
+        // todo: other shutdown stuff, like stop db, etc.
+        process.exit();
+    });
+
+    // repl commands start with a dot i.e. ironbane> .exec
+    serverREPL.defineCommand('exec', function(text) {
+        consoleHandler.exec(text);
+    });
+
+    // context variables get attached to "global" of this instance
+    serverREPL.context.version = pkg.version;
+};
+// start it up, todo: only per config?
+startREPL();
 
 var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
