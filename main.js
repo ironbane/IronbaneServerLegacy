@@ -198,52 +198,12 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new LocalStrategy(function(username, password, done) {
-    var bcrypt = require('bcrypt-nodejs');
-    // asynchronous verification, for effect...
-    process.nextTick(function() {
-        // Find the user by username.  If there is no user with the given
-        // username, or the password is not correct, set the user to `false` to
-        // indicate failure and set a flash message.  Otherwise, return the
-        // authenticated `user`.
-        mysql.query('select * from bcs_users where username = ?', [username], function(err, results) {
-            if (err) {
-                return done(err);
-            }
-
-            if (results.length < 1) {
-                return done(null, false, {
-                    message: 'Unknown user ' + username
-                });
-            }
-
-            bcrypt.compare(password, results[0].password, function(err, res) {
-                if (err) {
-                    return done(null, false, {
-                        message: 'bcrypt error'
-                    });
-                }
-
-                if (res === false) {
-                    return done(null, false, {
-                        message: 'Invalid password'
-                    });
-                } else {
-                    var user = results[0];
-                    // add in security roles
-                    mysql.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                        if(err) {
-                            log('error getting roles!', err);
-                            user.roles = [];
-                        } else {
-                            user.roles = results.map(function(r) { return r.name; });
-                        }
-                        // at this point still send the user, error isn't fatal
-                        done(null, user);
-                    });
-                }
-            });
+    User.authenticate(username, password)
+        .then(function(user) {
+            done(null, user);
+        }, function(err) {
+            done(err, false);
         });
-    });
 }));
 var app = express(); // purposefully global
 app.passport = passport; // convienience
@@ -322,7 +282,7 @@ app.configure(function() {
 // load routes
 require('./src/server/http')(app, mysql);
 // start api server
-app.listen(config.get('api_port'));
+app.listen(config.get('http_port'));
 
 
 process.stdin.resume();
