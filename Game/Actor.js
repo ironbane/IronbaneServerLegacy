@@ -99,6 +99,11 @@ var Actor = MovingUnit.extend({
     // We got the closest node
     // Now build a path with all nodes that link to it
     var me = this;
+	
+	function AnnounceOccurredError(amount) {
+	
+            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened "+amount+" seconds ago.</i>", "red");
+    }
 
     function addEdgeNodes(list, zone, node) {
 
@@ -110,22 +115,18 @@ var Actor = MovingUnit.extend({
           // ERROR!
           // Not sure why, so send someone here and investigate
 
-          var msg = "Pathfinding node error! Please"
-            +" investigate the connection<br>between node <b>"+node.id
-            +"</b> and node <b>"+node.edges[x]+"</b>!<br>Location: "
-            + ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
+          var msg = "Pathfinding node error! Please" +
+		  " investigate the connection<br>between node <b>"+node.id +
+		  "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " + 
+		  ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
           chatHandler.AnnounceMods(msg, "red");
 
           log("ERROR: "+msg);
 
-          setTimeout(function(){
-            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened 15 seconds ago.</i>", "red");
-          }, 15000);
+          setTimeout(AnnounceOccurredError(15), 15000);
 
-          setTimeout(function(){
-            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened 60 seconds ago.</i>", "red");
-          }, 60000);
+          setTimeout(AnnounceOccurredError(60), 60000);
 
 
           // debugger;

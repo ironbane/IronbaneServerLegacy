@@ -62,7 +62,7 @@ var WorldHandler = Class.extend({
       var subcount = 0;
 
       // Every zone has their own set of nodes
-      this.world[z].allNodes = {};
+	  this.world[z].allNodes = {};
 	
       for(var cx in this.world[z]) {
 	  
@@ -225,7 +225,7 @@ var WorldHandler = Class.extend({
         }
 
 
-        if ( file != "terrain.dat" ) continue;
+        if ( file !== "terrain.dat" ) continue;
 
 
         worldHandler.world[zone][cx][cz].terrain = {};
@@ -309,7 +309,7 @@ var WorldHandler = Class.extend({
 
           if (err) throw err;
 
-
+		log("loading " + results.length + "units");
           for(var u=0;u<results.length;u++) {
 
 
@@ -424,6 +424,8 @@ var WorldHandler = Class.extend({
         unit = new Unit(data);
         break;
     }
+	
+	log(data.template.type);
 
     return unit;
   },

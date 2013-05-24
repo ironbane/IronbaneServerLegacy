@@ -25,28 +25,26 @@ var Server = Class.extend({
         this.npcIDCount = -1;
         this.itemIDCount = -1;
 
-        mysql.query('SELECT id FROM ib_units ORDER BY id DESC',
+        mysql.query('SELECT MAX(id) as id FROM ib_units',
             function (err, result) {
-                if ( result.length == 0 ) {
+                if ( result.length === 0 ) {
                     server.npcIDCount = 0;
                 }
                 else {
-                    server.npcIDCount = result[0]["id"];
+                    server.npcIDCount = result[0].id;
                 }
             });
-        mysql.query('SELECT id FROM ib_items ORDER BY id DESC',
+        mysql.query('SELECT MAX(id) as id FROM ib_items ORDER BY id DESC',
             function (err, result) {
                 if ( result.length == 0 ) {
                     server.itemIDCount = 0;
                 }
                 else {
-                    server.itemIDCount = result[0]["id"];
+                    server.itemIDCount = result[0].id;
                 }
             });
 
         this.versionWarningTimer = 10.0;
-
-
 
         this.startTime = (new Date()).getTime();
 
@@ -167,11 +165,6 @@ var Server = Class.extend({
                 }
             }
         }
-
-
-
-
-
         // Loop through all connected players in every cell and send each player an update of their otherUnits
 
         for(var z in worldHandler.world) {
@@ -249,21 +242,9 @@ var Server = Class.extend({
 
                                 }
 
-
-
-
-
-
-
                                 if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x;
                                 if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y;
                                 if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z;
-
-
-
-
-
-
                                 snapshot.push(packet);
 
                             }
