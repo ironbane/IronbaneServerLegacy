@@ -1,6 +1,6 @@
 // user.js - routes concerning users, login, registration, etc.
 module.exports = function(app, db) {
-    var User = require('../entity/user')(db);
+    var User = require('../../entity/user')(db);
 
     app.post('/login', function(req, res, next) {
         app.passport.authenticate('local', function(err, user, info) {

@@ -41,6 +41,7 @@ module.exports = function(db) {
 
     // static methods
 
+    // NOT SURE THIS WILL WORK AS IS
     User.query = function(query) {
         var deferred = Q.defer();
 

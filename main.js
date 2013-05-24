@@ -178,112 +178,9 @@ for (var f = 0; f < includes.length; f++) {
 }
 
 
-// create http api server
-var express = require('express');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var User = require('./src/server/entity/user')(mysql);
-
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-    User.getById(id)
-        .then(function(user) {
-            done(null, user);
-        }, function(err) {
-            done(err, false);
-        });
-});
-
-passport.use(new LocalStrategy(function(username, password, done) {
-    User.authenticate(username, password)
-        .then(function(user) {
-            done(null, user);
-        }, function(err) {
-            done(err, false);
-        });
-}));
-var app = express(); // purposefully global
-app.passport = passport; // convienience
-app.configure(function() {
-    app.use(express.bodyParser());
-    app.use(express.logger());
-    app.use(express.cookieParser());
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(express.session({
-        secret: 'horsehead bookends'
-    }));
-    // Initialize Passport!  Also use passport.session() middleware, to support
-    // persistent login sessions (recommended).
-    app.use(passport.initialize());
-    app.use(passport.session());
-
-    // Simple route middleware to ensure user is authenticated.
-    //   Use this route middleware on any resource that needs to be protected.  If
-    //   the request is authenticated (typically via a persistent login session),
-    //   the request will proceed.  Otherwise, the user will be redirected to the
-    //   login page.
-    app.ensureAuthenticated = function(req, res, next) {
-        if (req.isAuthenticated()) {
-            return next();
-        }
-        res.redirect('/login');
-    };
-
-    // ALL roles must be present to access
-    app.authorize = function(roles) {
-        // array or single...
-        if(typeof roles === 'string') {
-            roles = [roles];
-        }
-
-        var middle = function(req, res, next) {
-            if(!req.user.roles || req.user.roles.length === 0) {
-                next('unauthorized', 403);
-                return;
-            }
-
-            for(var i=0;i<roles.length;i++) {
-                if(req.user.roles.indexOf(roles[i]) < 0) {
-                    next('unauthorized', 403);
-                    return;
-                }
-            }
-            next();
-        };
-
-        return middle;
-    };
-
-    // ANY role may access
-    app.authorizeAny = function(roles) {
-        var middle = function(req, res, next) {
-            if(!req.user.roles || req.user.roles.length === 0) {
-                next('unauthorized', 403);
-                return;
-            }
-
-            for(var i=0;i<roles.length;i++) {
-                if(req.user.roles.indexOf(roles[i]) >= 0) {
-                    next();
-                    return;
-                }
-            }
-            next('unauthorized', 403);
-            return;
-        };
-
-        return middle;
-    };
-});
-// load routes
-require('./src/server/http')(app, mysql);
-// start api server
-app.listen(config.get('http_port'));
-
+// create web server
+var HttpServer = require('./src/server/http/server').Server,
+    httpServer = new HttpServer();
 
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
@@ -293,16 +190,7 @@ process.stdin.on('data', function(text) {
 });
 
 
-
-var oldTime = 0.0;
-var dTime = 0.0;
-var totalTimer = 0.0;
-
-var endTime = 0;
-
-
-// Main loop
-
+var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
 
     setTimeout(function() {
