@@ -335,7 +335,7 @@ app.configure(function() {
     };
 });
 // load routes
-require('./src/api')(app, mysql);
+require('./src/server/http')(app, mysql);
 // start api server
 app.listen(config.get('api_port'));
 
