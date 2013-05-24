@@ -112,6 +112,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
-    grunt.registerTask('default', ['jshint','jasmine','clean', 'concat', 'uglify', 'less', 'replace', 'copy']);
+    grunt.registerTask('default', ['clean', 'concat', 'uglify', 'less', 'replace', 'copy']);
 
 };

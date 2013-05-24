@@ -5,7 +5,7 @@
     <title>Ironbane! {{ subTitle }}</title>
 
     <!-- we need to base at other than root -->
-    <base href="@@root/IronbaneServer/deploy/web/" />
+    <base href="@@root" />
 
     <link href='http://fonts.googleapis.com/css?family=Cabin:400,600,400italic,600italic' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="css/ironbane.css">
@@ -35,14 +35,14 @@
             <div class="middle-left-pillar"></div>
             <div class="content">
                 <ul class="horizontal-list pipe-list mainNav">
-                    <li><a href="/">About</a></li>
-                    <li><a href="/forum">Forum</a></li>
-                    <li><a href="/game">Play Ironbane!</a></li>
-                    <li><a href="/article/get-involved">Get Involved</a></li>
+                    <li><a href="home">About</a></li>
+                    <li><a href="forum">Forum</a></li>
+                    <li><a href="game">Play Ironbane!</a></li>
+                    <li><a href="article/get-involved">Get Involved</a></li>
                     <li><a target="_new" href="https://github.com/ironbane">GitHub</a></li>
                     <li><a target="_new" href="https://twitter.com/IronbaneMMO">Twitter</a></li>
-                    <li><a href="/profile">Preferences</a></li>
-                    <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
+                    <li><a href="profile">Preferences</a></li>
+                    <li><a href="login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
                     <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
                     <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
                 </ul>

@@ -16,39 +16,39 @@
 */
 
 var SellMerchandise = State.extend({
-	Init: function() {
+    Init: function() {
 
 
-	},
-	Enter: function(unit) {
+    },
+    Enter: function(unit) {
 
-		this.restockTimer = 300.0;
-	},
-	Execute: function(unit, dTime) {
-
-
-		this.restockTimer -= dTime;
-
-		if ( this.restockTimer <= 0 ) {
-			this.restockTimer = 300.0;
+        this.restockTimer = 300.0;
+    },
+    Execute: function(unit, dTime) {
 
 
-			// Restock a random item
-			unit.SetWeaponsAndLoot();
+        this.restockTimer -= dTime;
 
-			// unit.Say(ChooseRandom([
-			// 	"I've got new stuff!",
-			// 	"Restocked merchandise!",
-			// 	"New and better deals!"
-			// ]));
-
-		}
-
-	},
-	Exit: function(unit) {
+        if ( this.restockTimer <= 0 ) {
+            this.restockTimer = 300.0;
 
 
-	},
+            // Restock a random item
+            unit.SetWeaponsAndLoot();
+
+            // unit.Say(ChooseRandom([
+            //  "I've got new stuff!",
+            //  "Restocked merchandise!",
+            //  "New and better deals!"
+            // ]));
+
+        }
+
+    },
+    Exit: function(unit) {
+
+
+    },
     HandleMessage: function(unit, message, data) {
 
 
