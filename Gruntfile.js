@@ -116,6 +116,12 @@ module.exports = function(grunt) {
                     expand: true
                 }]
             }
+        },
+        watch: {
+            css: {
+                files: 'src/client/web/css/**/*',
+                tasks: ['less']
+            }
         }
     });
 
@@ -127,6 +133,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
