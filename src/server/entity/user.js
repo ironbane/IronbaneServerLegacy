@@ -1,40 +1,43 @@
 // user.js - backend user entity / service
+var Class = require('../../common/class');
+
 module.exports = function(db) {
     var Q = require('q'),
         _ = require('underscore');
 
-    var User = function(json) {
-        _.extend(this, json || {});
-    };
+    var User = Class.extend({
+        init: function(json) {
+            _.extend(this, json || {});
+        },
+        $save: function() {
+            var self = this;
+            var bcrypt = require('bcrypt-nodejs'),
+                deferred = Q.defer();
 
-    User.prototype.$save = function() {
-        var self = this;
-        var bcrypt = require('bcrypt-nodejs'),
-            deferred = Q.defer();
-
-        if(self.id && self.id > 0) {
-            // then this is an update
-            // TODO: perform update
-            deferred.resolve(self);
-        } else {
-            // new user
-            self.reg_date = (new Date()).valueOf() / 1000;
-            self.password = bcrypt.hashSync(self.password);
-
-            db.query('insert into bcs_users set ?', self, function(err, result) {
-                if(err) {
-                    deferred.reject(err);
-                    return;
-                }
-
-                // result will contain id
-                self.id = result.insertId;
+            if(self.id && self.id > 0) {
+                // then this is an update
+                // TODO: perform update
                 deferred.resolve(self);
-            });
-        }
+            } else {
+                // new user
+                self.reg_date = (new Date()).valueOf() / 1000;
+                self.password = bcrypt.hashSync(self.password);
 
-        return deferred.promise;
-    };
+                db.query('insert into bcs_users set ?', self, function(err, result) {
+                    if(err) {
+                        deferred.reject(err);
+                        return;
+                    }
+
+                    // result will contain id
+                    self.id = result.insertId;
+                    deferred.resolve(self);
+                });
+            }
+
+            return deferred.promise;
+        }
+    });
 
     User.getById = function(id) {
         var deferred = Q.defer();

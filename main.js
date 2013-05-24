@@ -182,34 +182,19 @@ for (var f = 0; f < includes.length; f++) {
 var express = require('express');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var User = require('./src/server/entity/user')(mysql);
+
 passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-    mysql.query('select * from bcs_users where id = ?', [id], function(err, results) {
-        if(err) {
-            done(err, null);
-            return;
-        }
-
-        if(results.length === 0) {
-            done("no user found", false);
-        } else {
-            var user = results[0];
-            // add in security roles
-            mysql.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                if(err) {
-                    log('error getting roles!', err);
-                    user.roles = [];
-                } else {
-                    user.roles = results.map(function(r) { return r.name; });
-                }
-                // at this point still send the user, error isn't fatal
-                done(null, user);
-            });
-        }
-    });
+    User.getById(id)
+        .then(function(user) {
+            done(null, user);
+        }, function(err) {
+            done(err, false);
+        });
 });
 
 passport.use(new LocalStrategy(function(username, password, done) {
