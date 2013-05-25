@@ -72,7 +72,7 @@ var Server = Class.extend({
         app.passport = passport; // convienience
         app.configure(function() {
             app.use(express.bodyParser());
-            app.use(express.logger());
+            //app.use(express.logger());
             app.use(express.cookieParser());
             app.use(express.bodyParser());
             app.use(express.methodOverride());
@@ -144,8 +144,11 @@ var Server = Class.extend({
         });
         // load routes
         require('./routes')(app, db);
+
+        this.server = require('http').createServer(app);
+
         // start api server
-        app.listen(config.get('http_port'));
+        this.server.listen(config.get('http_port'));
 
         log('http server running on ' + config.get('http_port'));
     }

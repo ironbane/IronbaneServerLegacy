@@ -17,7 +17,7 @@
 var pkg = require('./package.json'),
     config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
-
+/*
 // Mysql config
 var mysql_user = config.get('mysql_user');
 var mysql_password = config.get('mysql_password');
@@ -176,12 +176,16 @@ var includes = [
 for (var f = 0; f < includes.length; f++) {
     log("Loading: " + includes[f]);
     eval(fs.readFileSync(includes[f]) + '');
-}
+}*/
 
 
 // create web server
 var HttpServer = require('./src/server/http/server').Server,
     httpServer = new HttpServer();
+
+// create socket server
+var SocketServer = require('./src/server/socket/server').Server,
+    socketServer = new SocketServer(httpServer.server);
 
 // setup REPL for console server mgmt
 var startREPL = function() {
@@ -204,7 +208,7 @@ var startREPL = function() {
 
     // repl commands start with a dot i.e. ironbane> .exec
     serverREPL.defineCommand('exec', function(text) {
-        consoleHandler.exec(text);
+        //consoleHandler.exec(text);
     });
 
     // context variables get attached to "global" of this instance
@@ -213,6 +217,7 @@ var startREPL = function() {
 // start it up, todo: only per config?
 startREPL();
 
+/*
 var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
 
@@ -235,4 +240,4 @@ function MainLoop() {
     endTime = (new Date()).getTime() - startTime;
 }
 
-MainLoop();
+MainLoop();*/

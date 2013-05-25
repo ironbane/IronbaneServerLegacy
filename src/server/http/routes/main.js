@@ -3,7 +3,7 @@ var express = require('express'),
     util = require('util');
 
 module.exports = function(app, db) {
-    app.use('/game', express.static('deploy/game'));
+    app.use('/game', express.static('deploy/web/game'));
     app.use('/css', express.static('deploy/web/css'));
     app.use('/font', express.static('deploy/web/font'));
     app.use('/images', express.static('deploy/web/images'));
