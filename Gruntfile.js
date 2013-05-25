@@ -44,6 +44,14 @@ module.exports = function(grunt) {
                 files: {
                     'deploy/web/css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
                 }
+            },
+            game: {
+                options: {
+                    yuicompress: true
+                },
+                files: {
+                    'deploy/web/game/css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
+                }
             }
         },
         replace: {
@@ -55,6 +63,16 @@ module.exports = function(grunt) {
                 },
                 files: [
                     {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: 'deploy/web/'}
+                ]
+            },
+            game: {
+                options: {
+                    variables: {
+                        root: '<%= cfg.get("root") %>'
+                    }
+                },
+                files: [
+                    {expand: true, flatten: true, src: ['src/client/game/index.html'], dest: 'deploy/web/game/'}
                 ]
             }
         },
@@ -93,7 +111,7 @@ module.exports = function(grunt) {
             game: {
                 files: [{
                     src: 'data/**/*',
-                    dest: 'deploy/game/',
+                    dest: 'deploy/web/game/',
                     cwd: 'src/client/game',
                     expand: true
                 }]

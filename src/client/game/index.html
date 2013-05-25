@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- @@root -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Ironbane MMO</title>
+
+    <!-- we need to base at other than root -->
+    <base href="game/" />
+
+    <link rel="stylesheet" type="text/css" href="css/ironbane.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io.connect();
+        socket.on('news', function (data) {
+            console.log(data);
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

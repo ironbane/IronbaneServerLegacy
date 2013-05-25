@@ -15,8 +15,6 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 var ConsoleHandler = Class.extend({
   Init: function() {
     this.AccessLevel = {
@@ -130,8 +128,12 @@ var ConsoleHandler = Class.extend({
     });
 
 
-    this.AddCommand(this.AccessLevel.GUEST, ["log"], "Log variable", "string", "", function (params) {
-      log(eval(params[0]));
+    this.AddCommand(this.AccessLevel.GUEST, ["log"], "Log variable", "string", "", function(params) {
+      if (!params) {
+        log('log what?');
+      } else {
+        log(eval(params[0]));
+      }
     });
 
     this.AddCommand(this.AccessLevel.GUEST, ["items"], "Log variable", "string", "", function (params) {
@@ -294,22 +296,21 @@ var ConsoleHandler = Class.extend({
   ResetAccess: function() {
     this.accessLevel = this.AccessLevel.GUEST;
   },
-  Exec: function(string) {
+  exec: function(string) {
     var params = string.split(/(".*?")/);
 
     var realparams = [];
-    for(var p=0;p<params.length;p++) {
+    for (var p = 0; p < params.length; p++) {
       var param = params[p];
 
       param = param.trim();
 
-      if ( param === '' ) continue;
+      if (param === '') continue;
 
 
-      if ( param.indexOf('"') === 0 ) {
+      if (param.indexOf('"') === 0) {
         realparams = realparams.concat([param.replace(/\"/g, '')]);
-      }
-      else {
+      } else {
         realparams = realparams.concat(param.split(' '));
       }
 
@@ -319,13 +320,11 @@ var ConsoleHandler = Class.extend({
 
     realparams.shift();
 
-    if ( typeof this.commands[command] !== "undefined" ) {
+    if (command in this.commands) {
       this.commands[command].Exec(realparams);
+    } else {
+      console.log("That command does not exist!");
     }
-    else {
-      log("That command does not exist!");
-    }
-
 
     this.ResetAccess();
   }

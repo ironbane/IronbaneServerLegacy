@@ -21,7 +21,7 @@ nconf.defaults({
     // socket server
     server_port: 8080,
     // web api for client
-    api_port: 8081
+    http_port: 8081
 });
 
 // send this configured reference

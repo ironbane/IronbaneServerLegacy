@@ -14,9 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var config = require('./nconf'),
+var pkg = require('./package.json'),
+    config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
-
+/*
 // Mysql config
 var mysql_user = config.get('mysql_user');
 var mysql_password = config.get('mysql_password');
@@ -175,189 +176,49 @@ var includes = [
 for (var f = 0; f < includes.length; f++) {
     log("Loading: " + includes[f]);
     eval(fs.readFileSync(includes[f]) + '');
-}
+}*/
 
 
-// create http api server
-var express = require('express');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
+// create web server
+var HttpServer = require('./src/server/http/server').Server,
+    httpServer = new HttpServer();
 
-passport.deserializeUser(function(id, done) {
-    mysql.query('select * from bcs_users where id = ?', [id], function(err, results) {
-        if(err) {
-            done(err, null);
-            return;
-        }
+// create socket server
+var SocketServer = require('./src/server/socket/server').Server,
+    socketServer = new SocketServer(httpServer.server);
 
-        if(results.length === 0) {
-            done("no user found", false);
-        } else {
-            var user = results[0];
-            // add in security roles
-            mysql.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                if(err) {
-                    log('error getting roles!', err);
-                    user.roles = [];
-                } else {
-                    user.roles = results.map(function(r) { return r.name; });
-                }
-                // at this point still send the user, error isn't fatal
-                done(null, user);
-            });
-        }
+// setup REPL for console server mgmt
+var startREPL = function() {
+    var repl = require('repl'); // native node
+
+    // Not game stuff, this is for the server executable
+    process.stdin.setEncoding('utf8');
+
+    // startup a full node repl for javascript awesomeness
+    var serverREPL = repl.start({
+        prompt: "ironbane> ",
+        input: process.stdin,
+        output: process.stdout
     });
-});
 
-passport.use(new LocalStrategy(function(username, password, done) {
-    var bcrypt = require('bcrypt-nodejs');
-    // asynchronous verification, for effect...
-    process.nextTick(function() {
-        // Find the user by username.  If there is no user with the given
-        // username, or the password is not correct, set the user to `false` to
-        // indicate failure and set a flash message.  Otherwise, return the
-        // authenticated `user`.
-        mysql.query('select * from bcs_users where username = ?', [username], function(err, results) {
-            if (err) {
-                return done(err);
-            }
-
-            if (results.length < 1) {
-                return done(null, false, {
-                    message: 'Unknown user ' + username
-                });
-            }
-
-            bcrypt.compare(password, results[0].password, function(err, res) {
-                if (err) {
-                    return done(null, false, {
-                        message: 'bcrypt error'
-                    });
-                }
-
-                if (res === false) {
-                    return done(null, false, {
-                        message: 'Invalid password'
-                    });
-                } else {
-                    var user = results[0];
-                    // add in security roles
-                    mysql.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                        if(err) {
-                            log('error getting roles!', err);
-                            user.roles = [];
-                        } else {
-                            user.roles = results.map(function(r) { return r.name; });
-                        }
-                        // at this point still send the user, error isn't fatal
-                        done(null, user);
-                    });
-                }
-            });
-        });
+    serverREPL.on('exit', function() {
+        // todo: other shutdown stuff, like stop db, etc.
+        process.exit();
     });
-}));
-var app = express(); // purposefully global
-app.passport = passport; // convienience
-app.configure(function() {
-    app.use(express.bodyParser());
-    app.use(express.logger());
-    app.use(express.cookieParser());
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(express.session({
-        secret: 'horsehead bookends'
-    }));
-    // Initialize Passport!  Also use passport.session() middleware, to support
-    // persistent login sessions (recommended).
-    app.use(passport.initialize());
-    app.use(passport.session());
 
-    // Simple route middleware to ensure user is authenticated.
-    //   Use this route middleware on any resource that needs to be protected.  If
-    //   the request is authenticated (typically via a persistent login session),
-    //   the request will proceed.  Otherwise, the user will be redirected to the
-    //   login page.
-    app.ensureAuthenticated = function(req, res, next) {
-        if (req.isAuthenticated()) {
-            return next();
-        }
-        res.redirect('/login');
-    };
+    // repl commands start with a dot i.e. ironbane> .exec
+    serverREPL.defineCommand('exec', function(text) {
+        //consoleHandler.exec(text);
+    });
 
-    // ALL roles must be present to access
-    app.authorize = function(roles) {
-        // array or single...
-        if(typeof roles === 'string') {
-            roles = [roles];
-        }
+    // context variables get attached to "global" of this instance
+    serverREPL.context.version = pkg.version;
+};
+// start it up, todo: only per config?
+startREPL();
 
-        var middle = function(req, res, next) {
-            if(!req.user.roles || req.user.roles.length === 0) {
-                next('unauthorized', 403);
-                return;
-            }
-
-            for(var i=0;i<roles.length;i++) {
-                if(req.user.roles.indexOf(roles[i]) < 0) {
-                    next('unauthorized', 403);
-                    return;
-                }
-            }
-            next();
-        };
-
-        return middle;
-    };
-
-    // ANY role may access
-    app.authorizeAny = function(roles) {
-        var middle = function(req, res, next) {
-            if(!req.user.roles || req.user.roles.length === 0) {
-                next('unauthorized', 403);
-                return;
-            }
-
-            for(var i=0;i<roles.length;i++) {
-                if(req.user.roles.indexOf(roles[i]) >= 0) {
-                    next();
-                    return;
-                }
-            }
-            next('unauthorized', 403);
-            return;
-        };
-
-        return middle;
-    };
-});
-// load routes
-require('./src/server/http')(app, mysql);
-// start api server
-app.listen(config.get('api_port'));
-
-
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
-
-process.stdin.on('data', function(text) {
-    consoleHandler.Exec(text);
-});
-
-
-
-var oldTime = 0.0;
-var dTime = 0.0;
-var totalTimer = 0.0;
-
-var endTime = 0;
-
-
-// Main loop
-
+/*
+var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
 
     setTimeout(function() {
@@ -379,4 +240,4 @@ function MainLoop() {
     endTime = (new Date()).getTime() - startTime;
 }
 
-MainLoop();
+MainLoop();*/
