@@ -121,6 +121,14 @@ module.exports = function(grunt) {
             css: {
                 files: 'src/client/web/css/**/*',
                 tasks: ['less']
+            },
+            html: {
+                files: 'src/client/web/**/*.html',
+                tasks: ['default']
+            },
+            js: {
+                files: 'src/client/web/**/*.js',
+                tasks: ['default']
             }
         }
     });
