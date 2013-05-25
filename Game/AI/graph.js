@@ -153,7 +153,7 @@ BinaryHeap.prototype = {
             // If the first child exists (is inside the array)...
             if (child1N < length) {
             // Look it up and compute its score.
-            var child1 = this.content[child1N],
+                var child1 = this.content[child1N],
                 child1Score = this.scoreFunction(child1);
 
             // If the score is less than our element's, we need to swap.

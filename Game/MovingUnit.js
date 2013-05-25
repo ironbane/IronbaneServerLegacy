@@ -52,7 +52,7 @@ var MovingUnit = Unit.extend({
         }
 
         var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
-        if ( cellPos.x != this.cellX || cellPos.z != this.cellZ ) {
+        if ( cellPos.x !== this.cellX || cellPos.z !== this.cellZ ) {
               this.ChangeCell(cellPos.x, cellPos.z);
         }
 

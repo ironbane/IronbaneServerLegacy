@@ -78,7 +78,7 @@ var NPC = Fighter.extend({
         if ( !_.isEmpty(this.template.weapons) ) {
             var weaponSplit = this.template.weapons.split(",");
             for(var w=0;w<weaponSplit.length;w++) {
-                this.weapons.push(dataHandler.items[parseInt(weaponSplit[w])]);
+                this.weapons.push(dataHandler.items[parseInt(weaponSplit[w], 10)]);
             }
 
             if ( this.weapons.length > 0 ) {
@@ -92,14 +92,14 @@ var NPC = Fighter.extend({
                 var item = null;
 
                 // No percentages for vendors!
-                if ( this.template.type == UnitTypeEnum.VENDOR ) {
-                     item = parseInt(lootSplit[l]);
+                if ( this.template.type === UnitTypeEnum.VENDOR ) {
+                     item = parseInt(lootSplit[l], 10);
                 }
                 else {
                     var chanceSplit = lootSplit[l].split(":");
 
-                    if ( WasLucky100(parseInt(chanceSplit[0])) ) {
-                        item = parseInt(chanceSplit[1]);
+                    if ( WasLucky100(parseInt(chanceSplit[0], 10)) ) {
+                        item = parseInt(chanceSplit[1], 10);
                     }
                 }
 
@@ -116,7 +116,7 @@ var NPC = Fighter.extend({
                         slot:l,
                         attr1: dataHandler.items[item].attr1,
                         equipped: 0
-                    }
+                    };
 
                     if ( this.template.type == UnitTypeEnum.VENDOR ) {
                         // Specifiy a price

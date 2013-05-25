@@ -45,7 +45,7 @@ var Fighter = Actor.extend({
     }
 
     this.health = this.healthMax;
-    this.armor = this.armorMax,
+    this.armor = this.armorMax;
 
     this.chGodMode = false;
     this.chInvisibleByMonsters = false;
@@ -289,7 +289,7 @@ var Fighter = Actor.extend({
   Die: function(killer) {
 
     if ( this.id < 0 ) {
-      debugger;
+      //debugger;
       this.HandleMessage("killed", {killer:killer});
 
       if ( this.loot.length > 0 ) {
@@ -425,7 +425,7 @@ var Fighter = Actor.extend({
         id:this.id,
         s:"hm",
         hm:this.healthMax
-        }, 0, true);;
+        }, 0, true);
     }
 
     if ( this.health > this.healthMax ) {
@@ -464,7 +464,7 @@ var Fighter = Actor.extend({
         id:this.id,
         s:"am",
         am:this.armorMax
-        }, 0, true);;
+        }, 0, true);
     }
 
     if ( this.armor > this.armorMax ) {
@@ -478,17 +478,17 @@ var Fighter = Actor.extend({
 
     // Loop over 10 slots, and check if we have an item that matches that
     // slot
-    for (var i = 0; i < 10; i++) {
-      var found = false;
+    var found = false;
+    while(!found && i < 10) {
 
-      _.each(this.items, function(item) {
-        if ( item.slot === i ) found = true;
-      });
-
-      if ( !found ) {
-        slot = i;
-        break;
+      for(var j = 0; j<this.items.length ; j++) {
+        if(items[j].slot === i) {
+            slot = i;
+            found = true;
+            break;
+        }
       }
+      
 
     }
 
@@ -620,8 +620,8 @@ var Fighter = Actor.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[this.zone][x][z]["units"].length;u++) {
-            var unit = worldHandler.world[this.zone][x][z]["units"][u];
+          for(var u=0;u<worldHandler.world[this.zone][x][z].units.length;u++) {
+            var unit = worldHandler.world[this.zone][x][z].units[u];
 
             if ( unit == this ) {
               continue;

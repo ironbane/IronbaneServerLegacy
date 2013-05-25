@@ -30,7 +30,7 @@ var RatBoss = State.extend({
 	},
 	HandleMessage: function(npc, message, data) {
 
-		debugger;
+		//debugger;
 
 		switch (message) {
 			case "respawned":
