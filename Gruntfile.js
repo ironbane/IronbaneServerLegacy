@@ -120,15 +120,15 @@ module.exports = function(grunt) {
         watch: {
             css: {
                 files: 'src/client/web/css/**/*',
-                tasks: ['less']
+                tasks: ['less', 'beep']
             },
             html: {
                 files: 'src/client/web/**/*.html',
-                tasks: ['default']
+                tasks: ['default', 'beep']
             },
             js: {
                 files: 'src/client/web/**/*.js',
-                tasks: ['default']
+                tasks: ['default', 'beep']
             }
         }
     });
@@ -142,6 +142,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
