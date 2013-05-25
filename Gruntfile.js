@@ -32,6 +32,14 @@ module.exports = function(grunt) {
                 files: {
                     'deploy/web/css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
                 }
+            },
+            game: {
+                options: {
+                    yuicompress: true
+                },
+                files: {
+                    'deploy/web/game/css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
+                }
             }
         },
         replace: {
