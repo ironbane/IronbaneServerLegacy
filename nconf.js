@@ -12,7 +12,7 @@ nconf.argv()
 
 // if not provided use these values
 nconf.defaults({
-    root: 'http://localhost/IronbaneServer/deploy/web/', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
+    root: '/', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',
