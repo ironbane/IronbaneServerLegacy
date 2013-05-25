@@ -9,17 +9,17 @@ module.exports = function(grunt) {
         clean: {
             web: ['deploy/web']
         },
-		jshint: {
-		files: ['src/client/web/js/**/*.js', 'Game/**/*.js'],
-		},
-		jasmine: {
-		pivotal: {
-      src: 'src/client/web/js/**/*.js',
-      options: {
-        specs: 'spec/*Spec.js',
-        helpers: 'spec/*Helper.js'
-      }
-    }
+        jshint: {
+            files: ['src/client/web/js/**/*.js', 'Game/**/*.js'],
+        },
+        jasmine: {
+            pivotal: {
+                src: 'src/client/web/js/**/*.js',
+                options: {
+                    specs: 'spec/*Spec.js',
+                    helpers: 'spec/*Helper.js'
+                }
+            }
 		},
         concat: {
             web: {
