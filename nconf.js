@@ -12,10 +12,10 @@ nconf.argv()
 
 // if not provided use these values
 nconf.defaults({
-    root: '', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
+    root: '/', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
     mysql_host: 'localhost',
     mysql_user: 'root',
-    mysql_password: 'root',
+    mysql_password: '',
     mysql_database: 'ironbane',
     clientDir: 'deploy/game/',
     // socket server

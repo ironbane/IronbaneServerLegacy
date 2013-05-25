@@ -157,7 +157,10 @@ var NodeHandler = Class.extend({
             }  
             
             
-            for(var c in terrainHandler.chunks) terrainHandler.chunks[c].ReloadWaypointsOnly();  
+            for(var c in terrainHandler.chunks) {
+			log(c);
+			terrainHandler.chunks[c].ReloadWaypointsOnly()
+			};  
         }        
     }
 });

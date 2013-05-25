@@ -19,10 +19,10 @@
 
 var KickReason = {
   CHEAT: "Cheating"
-}
+};
 
 var Player = Fighter.extend({
-  Init: function(data) {
+    Init: function(data) {
 
     // Params for players are still unused
     data.param = 0;
@@ -44,7 +44,7 @@ var Player = Fighter.extend({
 
     // Players can only attack monsters and eachother (for now)
     if ( victim.id < 0 ) {
-      if ( victim.template.type != UnitTypeEnum.MONSTER ) return;
+      if ( victim.template.type !== UnitTypeEnum.MONSTER ) return;
     }
     else {
 
@@ -113,16 +113,16 @@ var Player = Fighter.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
     var zone = this.zone;
-
+    var u = 0;
     // Remove the unit from the world cells
     if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
-      var units = worldHandler.world[zone][cx][cz]["units"];
-      for(var u=0;u<units.length;u++) {
+      var units = worldHandler.world[zone][cx][cz].units;
+      for( ;u<units.length;u++) {
         if ( units[u].id == this.id ) {
 
           //worldHandler.world[zone][cx][cz]["units"].splice(u, 1);
-          worldHandler.world[zone][cx][cz]["units"] =
-          _.without(worldHandler.world[zone][cx][cz]["units"], units[u]);
+          worldHandler.world[zone][cx][cz].units =
+          _.without(worldHandler.world[zone][cx][cz].units, units[u]);
           log('found in units list!');
           break;
         }
@@ -133,8 +133,8 @@ var Player = Fighter.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[zone][x][z]["units"].length;u++) {
-            worldHandler.world[zone][x][z]["units"][u].UpdateOtherUnitsList();
+          for( u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }
       }

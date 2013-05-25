@@ -9,6 +9,18 @@ module.exports = function(grunt) {
         clean: {
             web: ['deploy/web']
         },
+		jshint: {
+		files: ['src/client/web/js/**/*.js', 'Game/**/*.js'],
+		},
+		jasmine: {
+		pivotal: {
+      src: 'src/client/web/js/**/*.js',
+      options: {
+        specs: 'spec/*Spec.js',
+        helpers: 'spec/*Helper.js'
+      }
+    }
+		},
         concat: {
             web: {
                 src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
@@ -110,6 +122,8 @@ module.exports = function(grunt) {
     // load tasks
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');

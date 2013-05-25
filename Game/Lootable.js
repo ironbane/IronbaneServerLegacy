@@ -67,8 +67,8 @@ var Lootable = Unit.extend({
 
         var chanceSplit = lootSplit[l].split(":");
 
-        if ( WasLucky100(parseInt(chanceSplit[0])) ) {
-          item = parseInt(chanceSplit[1]);
+        if ( WasLucky100(parseInt(chanceSplit[0], 10) )) {
+          item = parseInt(chanceSplit[1], 10);
         }
 
 
@@ -85,7 +85,7 @@ var Lootable = Unit.extend({
             slot:l,
             attr1: dataHandler.items[item].attr1,
             equipped: 0
-          }
+          };
 
           this.loot.push(temp);
         }

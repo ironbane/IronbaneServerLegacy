@@ -30,7 +30,7 @@ var Actor = MovingUnit.extend({
     if ( this.id < 0 ) {
 
 
-      this.BuildWaypoints()
+      this.BuildWaypoints();
 
       // Load the real state
       var currentState = null;
@@ -79,11 +79,10 @@ var Actor = MovingUnit.extend({
     // First, find a "home" node from where we'll build our list
     var closestNode = null;
     var distance = Math.pow(50, 2);
-    var allNodes = worldHandler.world[this.zone]["allNodes"];
+    var allNodes = worldHandler.world[this.zone].allNodes;
 
-    for(var x in allNodes){
-      //for(var x=0;x<allNodes.length;x++){
-      var measuredDistance = DistanceSq(allNodes[x]['pos'], this.position);
+    for(var x=0;x<allNodes.length;x++){
+      var measuredDistance = DistanceSq(allNodes[x].pos, this.position);
       if ( measuredDistance < distance ) {
         closestNode = allNodes[x];
         distance = measuredDistance;
@@ -99,33 +98,34 @@ var Actor = MovingUnit.extend({
     // We got the closest node
     // Now build a path with all nodes that link to it
     var me = this;
+    
+    function AnnounceOccurredError(amount) {
+    
+            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened "+amount+" seconds ago.</i>", "red");
+    }
 
     function addEdgeNodes(list, zone, node) {
 
       for(var x=0;x<node.edges.length;x++){
-        var subNode = worldHandler.world[zone]["allNodes"][node.edges[x]];
+        var subNode = worldHandler.world[zone].allNodes[node.edges[x]];
 
         if ( !subNode ) {
 
           // ERROR!
           // Not sure why, so send someone here and investigate
 
-          var msg = "Pathfinding node error! Please"
-            +" investigate the connection<br>between node <b>"+node.id
-            +"</b> and node <b>"+node.edges[x]+"</b>!<br>Location: "
-            + ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
+          var msg = "Pathfinding node error! Please" +
+          " investigate the connection<br>between node <b>"+node.id +
+          "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " + 
+          ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
           chatHandler.AnnounceMods(msg, "red");
 
           log("ERROR: "+msg);
 
-          setTimeout(function(){
-            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened 15 seconds ago.</i>", "red");
-          }, 15000);
+          setTimeout(AnnounceOccurredError(15), 15000);
 
-          setTimeout(function(){
-            chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened 60 seconds ago.</i>", "red");
-          }, 60000);
+          setTimeout(AnnounceOccurredError(60), 60000);
 
 
           // debugger;
