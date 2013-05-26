@@ -16,6 +16,13 @@
 @import "scaffolding.less";
 @import "forms.less";
 
+@pageBackground: #051d1c;
+
+@baseFont:                      Verdana, Arial, sans-serif;
+@baseFontSize:                  12px;
+@baseFontColor:                 @primary1;
+@baseFontLineHeight:            1.231;
+
 html {height: 100%;}
 body {
     background-image: url(../images/bg.png);
@@ -61,7 +68,9 @@ header.logo {
 }
 
 // all links...
-a {color: @primary2;}
+a {
+    color: @primary2;
+}
 
 .content-wrap {
     display: table;
