@@ -120,12 +120,7 @@ a {color: @primary2;}
             height: 10px;
             width: 808px;
             position: absolute;
-            background: -moz-linear-gradient(top,  rgba(155,242,189,0) 33%, rgba(118,208,162,1) 40%, rgba(22,119,93,1) 58%, rgba(22,119,93,1) 60%, rgba(22,119,93,0) 66%); /* FF3.6+ */
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(33%,rgba(155,242,189,0)), color-stop(40%,rgba(118,208,162,1)), color-stop(58%,rgba(22,119,93,1)), color-stop(60%,rgba(22,119,93,1)), color-stop(66%,rgba(22,119,93,0))); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(top,  rgba(155,242,189,0) 33%,rgba(118,208,162,1) 40%,rgba(22,119,93,1) 58%,rgba(22,119,93,1) 60%,rgba(22,119,93,0) 66%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(top,  rgba(155,242,189,0) 33%,rgba(118,208,162,1) 40%,rgba(22,119,93,1) 58%,rgba(22,119,93,1) 60%,rgba(22,119,93,0) 66%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(top,  rgba(155,242,189,0) 33%,rgba(118,208,162,1) 40%,rgba(22,119,93,1) 58%,rgba(22,119,93,1) 60%,rgba(22,119,93,0) 66%); /* IE10+ */
-            background: linear-gradient(to bottom,  rgba(155,242,189,0) 33%,rgba(118,208,162,1) 40%,rgba(22,119,93,1) 58%,rgba(22,119,93,1) 60%,rgba(22,119,93,0) 66%); /* W3C */
+            #gradient > .vertical-three-colors(rgba(155,242,189,0), rgba(22,119,93,1), rgba(22,119,93,0));
         }
 
         .shadow-left {
@@ -304,5 +299,28 @@ table thead tr th {background-color: #0C0C0C;}
     }
     .article-author {
         float: right;
+    }
+}
+
+.editor-menu-list {
+    text-align: left;
+    background: black;
+    margin: 16px;
+    li {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 8px 0;
+        span {
+            display: inline-block;
+            &.title {width: 160px;}
+        }
+        .tool {
+            text-decoration: none;
+            float: right;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            &.remove {color: darkred;}
+        }
     }
 }
