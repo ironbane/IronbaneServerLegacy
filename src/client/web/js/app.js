@@ -96,5 +96,23 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
+        .when('/editor', {
+            templateUrl: '/views/editorMenu',
+            resolve: {
+                location: '$location'
+            }
+        })
+        .when('/editor/mainMenu', {
+            templateUrl: '/views/editMainMenu',
+            controller: 'EditMenuCtrl',
+            resolve: {
+                MenuData: ['$http', function($http) {
+                    return $http.get('/api/editor/menu')
+                        .then(function(response) {
+                            return response.data;
+                        });
+                }]
+            }
+        })
         .otherwise({redirectTo: '/'});
 }]);

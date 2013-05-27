@@ -1,0 +1,13 @@
+<div>
+    <ol>
+        <li ng-repeat="menuItem in menu | orderBy:'sort'">
+            <span>{{ menuItem.title }}</span> <span>{{ menuItem.path }}</span>
+        </li>
+    </ol>
+    <form name="editMainMenuForm">
+        <input type="text" name="title" ng-model="item.title" />
+        <input type="text" name="path" ng-model="item.path" />
+        <input type="number" name="sort" ng-model="item.sort" />
+        <button>Add</button>
+    </form>
+</div>

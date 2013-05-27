@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             web: ['deploy/web']
         },
         jshint: {
-            files: ['src/client/web/js/**/*.js', 'Game/**/*.js'],
+            files: ['src/client/web/js/**/*.js', 'Game/**/*.js']
         },
         jasmine: {
             pivotal: {
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
                     helpers: 'spec/*Helper.js'
                 }
             }
-		},
+        },
         concat: {
             web: {
                 src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
@@ -142,7 +142,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-beep');
+    grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
