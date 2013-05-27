@@ -3,6 +3,7 @@ module.exports = function(app, db) {
     require('./main')(app, db);
     require('./user')(app, db);
     require('./forum')(app, db);
+    require('./editor')(app, db);
     require('./article')(app, db);
     require('./characters')(app, db);
 

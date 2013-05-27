@@ -361,6 +361,34 @@ LOCK TABLES `bcs_pages` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `bcs_menu`
+--
+
+DROP TABLE IF EXISTS `bcs_menu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bcs_menu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) NOT NULL DEFAULT 'New Menu Item',
+  `path` varchar(255) NOT NULL DEFAULT '/',
+  `sort` int(11) NOT NULL DEFAULT '0',
+  `security` varchar(255) DEFAULT NULL,
+  `target` varchar(45) DEFAULT NULL COMMENT 'default null, do we need _new or _blank or _self ? use thise',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bcs_menu`
+--
+
+LOCK TABLES `bcs_menu` WRITE;
+/*!40000 ALTER TABLE `bcs_menu` DISABLE KEYS */;
+INSERT INTO `bcs_menu` VALUES (1,'About','/',1,NULL,NULL),(2,'Play!','/game',3,NULL,NULL),(3,'Forum','/forum',2,NULL,NULL),(4,'Get Involved','/article/get-involved',4,NULL,NULL),(5,'Twitter','https://twitter.com/IronbaneMMO',5,NULL,'_blank'),(6,'Github','https://github.com/ironbane/IronbaneServer/tree/webapi',6,NULL,'_blank');
+/*!40000 ALTER TABLE `bcs_menu` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `bcs_chat`
 --
 
@@ -482,7 +510,7 @@ CREATE TABLE `bcs_users` (
   `rep` int(10) DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=419 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=420 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -491,7 +519,7 @@ CREATE TABLE `bcs_users` (
 
 LOCK TABLES `bcs_users` WRITE;
 /*!40000 ALTER TABLE `bcs_users` DISABLE KEYS */;
-INSERT INTO `bcs_users` VALUES (415,'warspawn','$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1),(417,'test','$2a$10$tswqTfCmTEtRIs5v6/OOSOCzVxbVpFk0EjLaoV1HRQ/IOSfUOf9mO','test@test.org',0,1.0,1369031439,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1),(418,'testing','$2a$10$yFX9zefjZwn34bxN4OyJLu3ShkfVv6kZ8ATWC9cvKzBgQQrAeGqPi','test@test.com',0,1.0,1369031533,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1);
+INSERT INTO `bcs_users` VALUES (415,'warspawn','$2a$10$7wE4Mro17g2Iy98zLMs/N.0DajTEzn7Y7dZe94JxBUbwPlrfe/CIy','bsparks42@gmail.com',0,1.0,1368835045,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,'',0,0,0,1),(417,'test','$2a$10$tswqTfCmTEtRIs5v6/OOSOCzVxbVpFk0EjLaoV1HRQ/IOSfUOf9mO','test@test.org',0,1.0,1369031439,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1),(418,'testing','$2a$10$yFX9zefjZwn34bxN4OyJLu3ShkfVv6kZ8ATWC9cvKzBgQQrAeGqPi','test@test.com',0,1.0,1369031533,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1),(419,'tester','$2a$10$fsmTpKSF6uGr0ccgJow.2.BxiWok0ZUYymKoOwbmwuF/0mNYWyxU2','test@ing.com',0,1.0,1369430123,NULL,'',0,'','','','0',0,'','','',0,'',0,0,'',1,0,NULL,0,0,0,1);
 /*!40000 ALTER TABLE `bcs_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -536,7 +564,7 @@ CREATE TABLE `forum_topics` (
   `guild` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `board_id` (`board_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -545,7 +573,7 @@ CREATE TABLE `forum_topics` (
 
 LOCK TABLES `forum_topics` WRITE;
 /*!40000 ALTER TABLE `forum_topics` DISABLE KEYS */;
-INSERT INTO `forum_topics` VALUES (1,1,1368504484,0,'',0,0,0,0),(2,1,1368505834,0,'',0,0,0,0),(3,0,0,0,'',0,0,0,0),(4,0,0,0,'',0,0,0,0),(5,0,0,0,'',0,0,0,0),(6,1,0,0,'',0,0,0,0),(7,1,0,0,'',0,0,0,0),(8,1,0,0,'',0,0,0,0),(9,1,0,0,'',0,0,0,0),(10,1,1368688676,0,'',0,0,0,0);
+INSERT INTO `forum_topics` VALUES (1,1,1368504484,0,'',0,0,0,0),(2,1,1368505834,0,'',0,0,0,0),(3,0,0,0,'',0,0,0,0),(4,0,0,0,'',0,0,0,0),(5,0,0,0,'',0,0,0,0),(6,1,0,0,'',0,0,0,0),(7,1,0,0,'',0,0,0,0),(8,1,0,0,'',0,0,0,0),(9,1,0,0,'',0,0,0,0),(10,1,1368688676,0,'',0,0,0,0),(11,7,1369282480,0,'',0,0,0,0),(12,7,1369283069,0,'',0,0,0,0);
 /*!40000 ALTER TABLE `forum_topics` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -568,7 +596,7 @@ CREATE TABLE `forum_posts` (
   `lastedit_author` int(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `topic_id` (`topic_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -577,7 +605,7 @@ CREATE TABLE `forum_posts` (
 
 LOCK TABLES `forum_posts` WRITE;
 /*!40000 ALTER TABLE `forum_posts` DISABLE KEYS */;
-INSERT INTO `forum_posts` VALUES (1,'Testing','testing 123...',1,1368504912,1,0,0,0),(2,'Testing 2','testing [b]123...[/b]',1,1368505299,1,0,0,0),(3,'Testing 3','We\'ve decided to open source Ironbane, so now anyone can work on it easily! The source code is now live on [url=https://github.com/ironbane]GitHub[/url] and you can install and play around with it on your local machine! Be sure to read the Getting Started section on the repositories. If you need help setting things up, let me know!\r\n\r\nIn addition, there is now a reputation system in place for people who help out! Whether it\'s forum posts, bug reports, new content or pull requests you will get rewarded! Read more on the [url=http://ironbane.com/get-involved.php]Get Involved page[/url].',1,1368505505,2,0,0,0),(4,'q3rasd3','blah blah blah work darn it!!!\n\nmore and some [i]italics[/i]...',1,1368688398,9,0,0,0),(5,'Finally it works!','Not a radical release, but a major one due to the amount of bugfixes and editor additions for the team.\n\n[b]v0.1.6 Changelog[/b]\n[list][*]Fixed sprites showing black\n[*]Fixed some lighting artifacts on models\n[*]Fixed most transparency issues with models\n[*]Fixed guests not being able to play again after being killed\n[*]Changed weapon range of melee weapons\n[*]Editor: Added grid snapping (by default enabled)\n[*]Editor: Rotation of models now auto snap to 5 degrees\n[*]Editor: Added option to ignore the bounding box of the adjacent model\n[*]Editor: Fixed models snapping to bad angles when rotating backwards\n[*]Editor: Fixed models not being deleted sometimes\n[*]Editor: Fixed models still having an invisible collision box when deleted\n[*]Editor: Models now have a \'transparent\' field in the database[/list]',1,1368688676,10,0,0,0);
+INSERT INTO `forum_posts` VALUES (1,'Testing','testing 123...',1,1368504912,1,0,0,0),(2,'Testing 2','testing [b]123...[/b]',1,1368505299,1,0,0,0),(3,'Testing 3','We\'ve decided to open source Ironbane, so now anyone can work on it easily! The source code is now live on [url=https://github.com/ironbane]GitHub[/url] and you can install and play around with it on your local machine! Be sure to read the Getting Started section on the repositories. If you need help setting things up, let me know!\r\n\r\nIn addition, there is now a reputation system in place for people who help out! Whether it\'s forum posts, bug reports, new content or pull requests you will get rewarded! Read more on the [url=http://ironbane.com/get-involved.php]Get Involved page[/url].',1,1368505505,2,0,0,0),(4,'q3rasd3','blah blah blah work darn it!!!\n\nmore and some [i]italics[/i]...',1,1368688398,9,0,0,0),(5,'Finally it works!','Not a radical release, but a major one due to the amount of bugfixes and editor additions for the team.\n\n[b]v0.1.6 Changelog[/b]\n[list][*]Fixed sprites showing black\n[*]Fixed some lighting artifacts on models\n[*]Fixed most transparency issues with models\n[*]Fixed guests not being able to play again after being killed\n[*]Changed weapon range of melee weapons\n[*]Editor: Added grid snapping (by default enabled)\n[*]Editor: Rotation of models now auto snap to 5 degrees\n[*]Editor: Added option to ignore the bounding box of the adjacent model\n[*]Editor: Fixed models snapping to bad angles when rotating backwards\n[*]Editor: Fixed models not being deleted sometimes\n[*]Editor: Fixed models still having an invisible collision box when deleted\n[*]Editor: Models now have a \'transparent\' field in the database[/list]',1,1368688676,10,0,0,0),(6,'asdf','asdfasdfasdf',415,1369282480,11,0,0,0),(7,'Here we are with more news!','trying out some shiz...\n\n[code]<base href=\"/ironbane\" />[/code]\n\nhey, maybe that will work!',415,1369283069,12,0,0,0),(8,'ok, trying out a reply now','reply blah',415,1369286514,12,0,0,0),(9,'another reply','wooha\n\neat my shorts beyonce [quote]poop[/quote]',415,1369286873,12,0,0,0);
 /*!40000 ALTER TABLE `forum_posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -730,4 +758,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-05-22 16:40:46
+-- Dump completed on 2013-05-27 10:26:22
