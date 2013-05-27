@@ -1,7 +1,8 @@
-<div>
-    <ol>
+<div class="editor">
+    <ol class="editor-menu-list">
         <li ng-repeat="menuItem in menu | orderBy:'sort'">
-            <span>{{ menuItem.title }}</span> <span>{{ menuItem.path }}</span>
+            <span class="title">{{ menuItem.title }}</span> <span class="path">{{ menuItem.path }}</span>
+            <a class="tool remove" href="javascript://" ng-click="remove($event, menuItem)"><i class="icon-minus-sign"></i></a>
         </li>
     </ol>
     <form name="editMainMenuForm">
