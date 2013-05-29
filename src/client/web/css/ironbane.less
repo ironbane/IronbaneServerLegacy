@@ -130,7 +130,10 @@ a {color: @primary2;}
             background: url(../images/shadow_right.png);
         }
 
-        form {padding: 20px;margin: 20px;}
+        .content-body {
+            margin: 0 20px;
+            form {padding: 20px;margin: 20px;}
+        }
     }
 }
 
@@ -144,6 +147,7 @@ a {color: @primary2;}
 }
 
 footer .sock {
+    text-align: center;
     outline: 2px dashed @primary3;
     background-color: @pageBackground;
     width: 300px;
@@ -315,4 +319,10 @@ table thead tr th {background-color: #0C0C0C;}
             &.remove {color: darkred;}
         }
     }
+}
+
+.pipe-list {
+    li a {margin: 0.5em;text-decoration: none;}
+    li:after {content: "|";}
+    li:last-child:after {content: "";}
 }

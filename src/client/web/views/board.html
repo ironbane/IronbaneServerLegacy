@@ -1,22 +1,24 @@
-<section class="forum-listing">
-    <div class="tools">
-        <a href="javascript://" ng-click="newTopic()"><i class="icon-comment"></i> New Topic</a>
-    </div>
-    <section class="forum-group">
-        <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
-        <ul class="board-list">
-            <li class="board" ng-repeat="post in posts">
-                <a class="thread-post" href="/forum/{{board.id}}/topics/{{ post.topic_id }}">
-                    <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
-                </a>
-                <em class="thread-replies">0</em>
-                <strong class="thread-author">{{ post.author.username }}</strong>
-                <a class="thread-name" href="/forum/{{board.id}}/topics/{{ post.topic_id }}">{{ post.title }}</a>
-            </li>
-        </ul>
+<div class="content-body">
+    <section class="forum-listing">
+        <div class="tools">
+            <a href="javascript://" ng-click="newTopic()"><i class="icon-comment"></i> New Topic</a>
+        </div>
+        <section class="forum-group">
+            <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
+            <ul class="board-list">
+                <li class="board" ng-repeat="post in posts">
+                    <a class="thread-post" href="/forum/{{board.id}}/topics/{{ post.topic_id }}">
+                        <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
+                    </a>
+                    <em class="thread-replies">0</em>
+                    <strong class="thread-author">{{ post.author.username }}</strong>
+                    <a class="thread-name" href="/forum/{{board.id}}/topics/{{ post.topic_id }}">{{ post.title }}</a>
+                </li>
+            </ul>
+        </section>
     </section>
-</section>
-<section ng-show="currentUser.authenticated" class="new-topic-form">
-    <h1><i class="icon-edit"></i> New Topic</h1>
-    <post-editor board="board" topic="null"></post-editor>
-</section>
+    <section ng-show="currentUser.authenticated" class="new-topic-form">
+        <h1><i class="icon-edit"></i> New Topic</h1>
+        <post-editor board="board" topic="null"></post-editor>
+    </section>
+</div>
