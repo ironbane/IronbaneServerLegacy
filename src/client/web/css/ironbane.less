@@ -1,35 +1,25 @@
 // ironbane.less
-@import "reset";
+// some portions of this less taken from Twitter Bootstrap
+
+// Core variables and mixins
+@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "mixins.less";
+
+// CSS Reset
+@import "reset.less";
+
+// fonts
 @import "font-awesome/font-awesome";
 @import "PressStart2P/PressStart2P";
-@import "mixins";
 
-// vars
-@black: #000;
-@primary1: #33cc99; // text green
-@primary2: #66ff66; // link/heading green
-@primary3: #257541; // darker green dashed border on footer?
-@primary4: #103c32; // dark green background
-@primary5: #33ff99; // bright green headers
-
-@pageBackground: #051d1c;
-
-@baseFont:                      'Cabin', Arial, sans-serif;
-@baseFontSize:                  14px;
-@baseFontColor:                 @primary1;
-@baseFontLineHeight:            1.231;
+// core
+@import "scaffolding.less";
+@import "forms.less";
 
 html {height: 100%;}
 body {
-    background: @pageBackground;
     background-image: url(../images/bg.png);
-    font-family: @baseFont;
-    font-size: @baseFontSize;
-    line-height: @baseFontLineHeight;
-    color: @baseFontColor;
-    text-align: center;
     -webkit-font-smoothing: antialiased;
-    margin:0;
 }
 
 .clear {clear: both;}
@@ -37,6 +27,7 @@ body {
 header.logo {
     height:192px;
     position:relative;
+    text-align: center;
     .left-pillar, .right-pillar {
         width: 125px;
         height:100%;
@@ -87,6 +78,7 @@ a {color: @primary2;}
         padding-top: 4px;
 
         .navigation {
+            text-align: center;
             width:100%;
             padding-top: 5px;
             padding-bottom: 10px;
@@ -96,18 +88,16 @@ a {color: @primary2;}
             font-size: 12px;
 
             li {
-
                 a {
                     padding:5px 5px;
                     text-decoration: none;
                     line-height: 20px;
                     background:#0E3229;
-                }
-
-                a:hover {
-                    cursor:pointer;
-                    background:#C5B50C;
-                    color:#2B2702;
+                    &:hover {
+                        cursor: pointer;
+                        background:#C5B50C;
+                        color:#2B2702;
+                    }
                 }
             }
         }
@@ -139,6 +129,8 @@ a {color: @primary2;}
             right:0;
             background: url(../images/shadow_right.png);
         }
+
+        form {padding: 20px;margin: 20px;}
     }
 }
 
@@ -257,7 +249,7 @@ footer .sock {
         background-color: @black;
         padding: 20px;
     }
-    input { .placeholder(darken(@baseFontColor, 10%)); }
+    input { .placeholder(darken(@textColor, 10%)); }
     input[type=text] {
         width: 95%;
     }
@@ -265,11 +257,11 @@ footer .sock {
 
 .loginForm {
     input,
-    textarea { .placeholder(darken(@baseFontColor, 10%)); }
+    textarea { .placeholder(darken(@textColor, 10%)); }
 
     input[type=text],
     button {
-        color: @baseFontColor;
+        color: @textColor;
         border-color: @primary4;
         background-color: @primary3;
         font-weight: bold;
