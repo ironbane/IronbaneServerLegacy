@@ -5,10 +5,38 @@
             <a class="tool remove" href="javascript://" ng-click="remove($event, menuItem)"><i class="icon-minus-sign"></i></a>
         </li>
     </ol>
-    <form name="editMainMenuForm">
-        <input type="text" name="title" ng-model="item.title" />
-        <input type="text" name="path" ng-model="item.path" />
-        <input type="number" name="sort" ng-model="item.sort" />
-        <button>Add</button>
+    <form name="editMainMenuForm" class="form-horizontal">
+        <fieldset>
+            <legend>New Menu Item</legend>
+            <div class="control-group">
+                <label class="control-label" for="title">Title</label>
+                <div class="controls">
+                    <input type="text" id="title" name="title" ng-model="item.title" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="path">Path</label>
+                <div class="controls">
+                    <input type="text" id="path" name="path" ng-model="item.path" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="sort">Order</label>
+                <div class="controls">
+                    <input type="number" id="sort" name="sort" ng-model="item.sort" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="security">Security</label>
+                <div class="controls">
+                    <input type="text" id="security" name="security" ng-model="item.security" />
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <button class="btn">Add</button>
+                </div>
+            </div>
+        </fieldset>
     </form>
 </div>
