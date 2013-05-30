@@ -644,6 +644,7 @@ var SocketHandler = Class.extend({
                     reply({
                         errmsg:"Wrong NPC type for loot!"
                     });
+                    return;
                 }
 
                 // Do the change
@@ -998,6 +999,7 @@ var SocketHandler = Class.extend({
                         reply({
                             errmsg:"Bag not found (too far?)"
                         });
+                        return;
                     }
                     else if ( bag.template.type !== UnitTypeEnum.LOOTABLE
                         && bag.template.type !== UnitTypeEnum.VENDOR
@@ -1005,6 +1007,7 @@ var SocketHandler = Class.extend({
                         reply({
                             errmsg:"Wrong NPC type for loot!"
                         });
+                        return;
                     }
 
                     if ( bag.template.type === UnitTypeEnum.VENDOR ) {
@@ -1065,6 +1068,7 @@ var SocketHandler = Class.extend({
                     reply({
                         errmsg:"Bag not found (too far?)"
                     });
+                    return;
                 }
                 else if ( bag.template.type != UnitTypeEnum.LOOTABLE
                     && bag.template.type != UnitTypeEnum.VENDOR
@@ -1072,6 +1076,7 @@ var SocketHandler = Class.extend({
                     reply({
                         errmsg:"Wrong NPC type for loot!"
                     });
+                    return;
                 }
                 else {
                     reply(bag.loot);
