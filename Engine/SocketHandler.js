@@ -394,6 +394,7 @@ var SocketHandler = Class.extend({
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
+                if ( !socket.unit ) return;
 
                 if ( !CheckData(data, ["s","t","w","o","sw"]) ) {
                     reply({
@@ -461,6 +462,8 @@ var SocketHandler = Class.extend({
             socket.on("useItem", function (barIndex, reply) {
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+
+                if ( !socket.unit ) return;
 
                 var item = _.find(socket.unit.items, function(i){
                     return i.slot == barIndex;
@@ -558,6 +561,8 @@ var SocketHandler = Class.extend({
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
+                if ( !socket.unit ) return;
+
                 // Add a new unit and give it the loot item
 
                 var item = _.find(socket.unit.items, function(i){
@@ -627,6 +632,8 @@ var SocketHandler = Class.extend({
             socket.on("lootItem", function (data, reply) {
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+
+                if ( !socket.unit ) return;
 
                 var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
 
@@ -802,6 +809,8 @@ var SocketHandler = Class.extend({
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
+                if ( !socket.unit ) return;
+
                 var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
 
                 data.acceptOffer = ISDEF(data.acceptOffer) ? true : false;
@@ -940,6 +949,8 @@ var SocketHandler = Class.extend({
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
+                if ( !socket.unit ) return;
+
                 // Check if the slotNumber is within the bag's limits
                 if ( !_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9 ) {
                     reply({
@@ -1058,6 +1069,8 @@ var SocketHandler = Class.extend({
             socket.on("loot", function (npcID, reply) {
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+
+                if ( !socket.unit ) return;
 
                 // todo: check if NPC is nearby
 
