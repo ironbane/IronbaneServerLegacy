@@ -34,11 +34,18 @@ var params = {
 //
 // For running locally, don't use for production
 if ( !isProduction ) {
-    params.log = 0;
+    params.log = 1;
     params['close timeout'] = 86400;
     params['heartbeat timeout'] = 86400;
     params['heartbeat interval'] = 86400;
     params['polling duration'] = 86400;
+}
+else {
+    params.log = 0;
+    params['close timeout'] = 60 * 3;
+    params['heartbeat timeout'] = 60  * 3;
+    params['heartbeat interval'] = 25  * 3;
+    params['polling duration'] = 20 * 3;
 }
 //
 
