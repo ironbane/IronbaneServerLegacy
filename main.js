@@ -17,7 +17,7 @@
 var pkg = require('./package.json'),
     config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
-/*
+
 // Mysql config
 var mysql_user = config.get('mysql_user');
 var mysql_password = config.get('mysql_password');
@@ -176,13 +176,13 @@ var includes = [
 for (var f = 0; f < includes.length; f++) {
     log("Loading: " + includes[f]);
     eval(fs.readFileSync(includes[f]) + '');
-}*/
+}
 
 
 // create web server
 var HttpServer = require('./src/server/http/server').Server,
     httpServer = new HttpServer();
-
+/*
 // create socket server
 var SocketServer = require('./src/server/socket/server').Server,
     socketServer = new SocketServer(httpServer.server);
@@ -216,8 +216,8 @@ var startREPL = function() {
 };
 // start it up, todo: only per config?
 startREPL();
+*/
 
-/*
 var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
 
@@ -240,4 +240,4 @@ function MainLoop() {
     endTime = (new Date()).getTime() - startTime;
 }
 
-MainLoop();*/
+MainLoop();
