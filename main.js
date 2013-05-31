@@ -23,6 +23,7 @@ var mysql_user = config.get('mysql_user');
 var mysql_password = config.get('mysql_password');
 var mysql_database = config.get('mysql_database');
 var clientDir = config.get('clientDir');
+var isProduction = config.get('isProduction');
 
 // System start
 var SERVER = true;
@@ -32,11 +33,13 @@ var params = {
 
 //
 // For running locally, don't use for production
-params.log = 0;
-params['close timeout'] = 86400;
-params['heartbeat timeout'] = 86400;
-params['heartbeat interval'] = 86400;
-params['polling duration'] = 86400;
+if ( !isProduction ) {
+    params.log = 0;
+    params['close timeout'] = 86400;
+    params['heartbeat timeout'] = 86400;
+    params['heartbeat interval'] = 86400;
+    params['polling duration'] = 86400;
+}
 //
 
 var io = require('socket.io').listen(config.get('server_port'), params);
