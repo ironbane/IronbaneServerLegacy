@@ -73,6 +73,8 @@ var ChatHandler = Class.extend({
       var feedback = "("+unit.name+") "+message+"";
       var errorMessage = "";
 
+      var showFeedback = true;
+
       // feedback += "Command "+command+"<br>";
 
       switch(command) {
@@ -149,6 +151,8 @@ var ChatHandler = Class.extend({
           break;
         case "announce":
 
+          showFeedback = false;
+
           this.Announce(realparams[0]);
 
           break;
@@ -161,7 +165,9 @@ var ChatHandler = Class.extend({
         feedback += "<br>"+errorMessage;
       }
 
-      this.AnnounceMods(feedback, errorMessage ? "red" : "#01ff46");
+      if ( showFeedback ) {
+        this.AnnounceMods(feedback, errorMessage ? "red" : "#01ff46");
+      }
 
     }
     else {
