@@ -178,16 +178,16 @@ for (var f = 0; f < includes.length; f++) {
     eval(fs.readFileSync(includes[f]) + '');
 }*/
 
+// create game server, do it first so that the other 2 "servers" can query it
+var IronbaneGame = require('./src/server/game');
 
 // create web server
 var HttpServer = require('./src/server/http/server').Server,
-    httpServer = new HttpServer();
+    httpServer = new HttpServer({game: IronbaneGame});
 
 // create socket server
 var SocketServer = require('./src/server/socket/server').Server,
-    socketServer = new SocketServer(httpServer.server);
-
-var IronbaneGame = require('./src/server/game');
+    socketServer = new SocketServer({httpServer: httpServer.server, game: IronbaneGame});
 
 // setup REPL for console server mgmt
 var startREPL = function() {
