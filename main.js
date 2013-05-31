@@ -187,6 +187,8 @@ var HttpServer = require('./src/server/http/server').Server,
 var SocketServer = require('./src/server/socket/server').Server,
     socketServer = new SocketServer(httpServer.server);
 
+var IronbaneGame = require('./src/server/game');
+
 // setup REPL for console server mgmt
 var startREPL = function() {
     var repl = require('repl'); // native node
@@ -213,31 +215,7 @@ var startREPL = function() {
 
     // context variables get attached to "global" of this instance
     serverREPL.context.version = pkg.version;
+    serverREPL.context.game = IronbaneGame;
 };
 // start it up, todo: only per config?
 startREPL();
-
-/*
-var oldTime = dTime = totalTimer = endTime = 0;
-function MainLoop() {
-
-    setTimeout(function() {
-        MainLoop();
-    }, 100);
-
-    var now = (new Date()).getTime();
-    dTime = (now - oldTime) / 1000.0; //time diff in seconds
-    if (dTime > 0.3) {
-        dTime = 0.3;
-    }
-    oldTime = now;
-
-    var startTime = (new Date()).getTime();
-
-    //setTimeout(function(){log(NameGen(3, 8, "", ""))}, 1000);
-    server.Tick(dTime);
-
-    endTime = (new Date()).getTime() - startTime;
-}
-
-MainLoop();*/
