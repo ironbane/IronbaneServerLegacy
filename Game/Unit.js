@@ -284,9 +284,9 @@ var Unit = Class.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var unit in worldHandler.world[this.zone][x][z].units) {
-			if ( unit !== this ) secondList.push(unit);
-          }
+          _.each(worldHandler.world[this.zone][x][z].units, function(unit) {
+            if ( unit !== this ) secondList.push(unit);
+          }, this);
         }
       }
     }
