@@ -147,6 +147,11 @@ var ChatHandler = Class.extend({
           unit.socket.emit("setCoins", unit.coins);
 
           break;
+        case "announce":
+
+          this.Announce(realparams[0]);
+
+          break;
         default:
           errorMessage = "That command does not exist!";
           break;
@@ -214,7 +219,7 @@ var ChatHandler = Class.extend({
 
     var killername = killer.id > 0 ? '<div style="display:inline;color:'+this.GetChatColor(killer)+'">'+killer.name + '</div>' : killer.template.prefix+" "+killer.template.name;
     var word = ChooseRandom(("slaughtered butchered crushed defeated destroyed exterminated finished massacred mutilated slayed vanquished killed").split(" "));
-    
+
     var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">'+unit.name + '</div> was '+word+' by '+killername+'.';
 
     io.sockets.emit("chatMessage", {
