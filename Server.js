@@ -111,6 +111,8 @@ var Server = Class.extend({
                     "Would you like to work on an exciting project with a cool team?<br>"+
                     "Give us a shout in the forums!",
 
+                    "Follow us on Twitter! @IronbaneMMO",
+
                     "Ironbane is open source! Care to help out?<br>"+
                     "Check out the Get Involved page on the website!"
 
