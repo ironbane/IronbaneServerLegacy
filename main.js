@@ -34,7 +34,6 @@ var params = {
 //
 // For running locally, don't use for production
 
-var profiler = null;
 
 if ( !isProduction ) {
     params.log = 1;
@@ -50,7 +49,10 @@ else {
     params['heartbeat interval'] = 25  * 3;
     params['polling duration'] = 20 * 3;
 
-    profiler = require('webkit-devtools-agent');
+    require('nodetime').profile({
+        accountKey: '02d4f7720345c788c184c7b46609f7f9ba82cb86',
+        appName: 'Ironbane MMO'
+      });
 }
 //
 
@@ -222,33 +224,11 @@ var startREPL = function() {
     });
 
     // repl commands start with a dot i.e. ironbane> .exec
-    serverREPL.defineCommand('exec', function(text) {
-        //consoleHandler.exec(text);
-        log("Hello: "+text);
-    });
+    // serverREPL.defineCommand('exec', function(text) {
+    //     //consoleHandler.exec(text);
+    //     log("Hello: "+text);
+    // });
 
-    serverREPL.defineCommand('snapshot', function(text) {
-        if ( !profiler ) {
-            return log("No profiler installed!");
-        }
-
-        var snapshot = profiler.takeSnapshot(text);
-    });
-
-    serverREPL.defineCommand('startProfiling', function(text) {
-        if ( !profiler ) {
-            return log("No profiler installed!");
-        }
-
-        profiler.startProfiling(text);
-    });
-
-    serverREPL.defineCommand('stopProfiling', function(text) {
-        if ( !profiler ) {
-            return log("No profiler installed!");
-        }
-
-        var cpuProfile = profiler.stopProfiling(text);
     });
 
     // context variables get attached to "global" of this instance
