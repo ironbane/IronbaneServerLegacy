@@ -50,7 +50,7 @@ else {
     params['heartbeat interval'] = 25  * 3;
     params['polling duration'] = 20 * 3;
 
-    profiler = require('v8-profiler');
+    profiler = require('webkit-devtools-agent');
 }
 //
 
