@@ -478,17 +478,20 @@ var Fighter = Actor.extend({
 
     // Loop over 10 slots, and check if we have an item that matches that
     // slot
-    var found = false;
-    while(!found && i < 10) {
 
-      for(var j = 0; j<this.items.length ; j++) {
-        if(this.items[j].slot === i) {
-            slot = i;
-            found = true;
-            break;
-        }
+
+    for (var i = 0; i < 10; i++) {
+
+      var found = false;
+
+      _.each(this.items, function(item) {
+        if ( item.slot === i ) found = true;
+      });
+
+      if ( !found ) {
+        slot = i;
+        break;
       }
-
 
     }
 
