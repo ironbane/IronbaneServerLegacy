@@ -104,6 +104,9 @@ function keepAlive() {
             chatHandler.Announce("&lt;Server&gt; New update available!", "red");
             chatHandler.Announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
 
+            // Disconnect all clients first
+            io.sockets.emit("disconnect");
+
             setTimeout(function() {
                 mysql.query('DELETE FROM ib_config WHERE name = ?', ["restart"], function(err, results, fields) {
                     if (err) {
@@ -112,7 +115,7 @@ function keepAlive() {
 
                     process.exit();
                 });
-            }, 10000);
+            }, 20000);
         }
 
     });

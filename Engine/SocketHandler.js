@@ -44,6 +44,13 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
+                if ( shuttingDown ) {
+                    reply({
+                        errmsg:"The server is currently updating to a new version. Please refresh the page in a few seconds."
+                    });
+                    return;
+                }
+
 
 
                 //socket.unitID = characterIDCount++;
