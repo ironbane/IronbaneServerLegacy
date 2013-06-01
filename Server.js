@@ -75,7 +75,7 @@ var Server = Class.extend({
 
 
 
-        setTimeout(function(){server.AutoBackup();}, 300 * 1000);
+        //setTimeout(function(){server.AutoBackup();}, 3600 * 24 * 1000);
 
     },
     AutoBackup: function() {
