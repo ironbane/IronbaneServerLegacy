@@ -83,12 +83,7 @@ var Player = Fighter.extend({
     this.socket.disconnect();
 
   },
-  LeaveGame: function() {
-
-
-    chatHandler.LeaveGame(this);
-
-
+  Save: function() {
     // No updating for guests
     // Update MYSQL and set the character data
     mysql.query('UPDATE ib_characters SET ' +
@@ -108,6 +103,45 @@ var Player = Fighter.extend({
       this.id
       ]);
     //}
+
+
+    var cx = this.cellX;
+    var cz = this.cellZ;
+    var zone = this.zone;
+    var u = 0;
+
+    // Save the items
+    (function(unit){
+      mysql.query('DELETE FROM ib_items WHERE owner = ?',[unit.id], function (err, results, fields) {
+
+        for (var i=0;i<unit.items.length;i++) {
+          var item = unit.items[i];
+
+          // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
+          // Normally it doesn't matter which ID the items gets
+
+          mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot) ' +
+            'VALUES(?,?,?,?,?)', [
+            item.template,
+            item.attr1,
+            unit.id,
+            item.equipped,
+            item.slot
+            ]);
+        //}
+        }
+
+      });
+    })(this);
+
+  },
+  LeaveGame: function() {
+
+    this.Save();
+
+
+    chatHandler.LeaveGame(this);
+
 
 
     var cx = this.cellX;
@@ -141,29 +175,6 @@ var Player = Fighter.extend({
     }
 
 
-    // Save the items
-    (function(unit){
-      mysql.query('DELETE FROM ib_items WHERE owner = ?',[unit.id], function (err, results, fields) {
-
-        for (var i=0;i<unit.items.length;i++) {
-          var item = unit.items[i];
-
-          // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
-          // Normally it doesn't matter which ID the items gets
-
-          mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot) ' +
-            'VALUES(?,?,?,?,?)', [
-            item.template,
-            item.attr1,
-            unit.id,
-            item.equipped,
-            item.slot
-            ]);
-        //}
-        }
-
-      });
-    })(this);
 
   }
 });

@@ -36,7 +36,7 @@ var params = {
 
 
 if ( !isProduction ) {
-    params.log = 1;
+    params.log = 0;
     params['close timeout'] = 86400;
     params['heartbeat timeout'] = 86400;
     params['heartbeat interval'] = 86400;
@@ -122,6 +122,16 @@ function keepAlive() {
     return;
 }
 setInterval(keepAlive, 10000);
+
+
+setInterval(function autoSave() {
+    log("Auto-saving all players...")
+    worldHandler.LoopUnits(function(unit) {
+        if ( unit instanceof Player ) {
+            unit.Save();
+        }
+    });
+}, 10 * 1 * 1000);
 
 var includes = [
 
