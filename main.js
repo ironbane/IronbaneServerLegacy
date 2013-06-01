@@ -14,8 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var config = require('./nconf');
+
+if ( isProduction ) {
+    require('nodetime').profile({
+        accountKey: '02d4f7720345c788c184c7b46609f7f9ba82cb86',
+        appName: 'Ironbane MMO'
+      });
+}
+
 var pkg = require('./package.json'),
-    config = require('./nconf'),
     log = require('util').log; // built in timestampped logger
 
 // Mysql config
@@ -48,11 +56,6 @@ else {
     params['heartbeat timeout'] = 60  * 3;
     params['heartbeat interval'] = 25  * 3;
     params['polling duration'] = 20 * 3;
-
-    require('nodetime').profile({
-        accountKey: '02d4f7720345c788c184c7b46609f7f9ba82cb86',
-        appName: 'Ironbane MMO'
-      });
 }
 //
 
