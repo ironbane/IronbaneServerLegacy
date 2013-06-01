@@ -58,14 +58,14 @@ var WorldHandler = Class.extend({
 
     var count = 0;
     for(var z in this.world) {
-	
+
       var subcount = 0;
 
       // Every zone has their own set of nodes
 	  this.world[z].allNodes = {};
-	
+
       for(var cx in this.world[z]) {
-	  
+
         for(var cz in this.world[z][cx]) {
           if ( this.world[z][cx][cz] === undefined ) continue;
           if ( this.world[z][cx][cz].graph === undefined ) continue;
@@ -309,7 +309,6 @@ var WorldHandler = Class.extend({
 
           if (err) throw err;
 
-		log("loading " + results.length + "units");
           for(var u=0;u<results.length;u++) {
 
 
@@ -424,8 +423,6 @@ var WorldHandler = Class.extend({
         unit = new Unit(data);
         break;
     }
-	
-	log(data.template.type);
 
     return unit;
   },
