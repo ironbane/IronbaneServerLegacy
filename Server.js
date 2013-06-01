@@ -109,7 +109,10 @@ var Server = Class.extend({
 
                     "Are you a programmer? An artist? A 3D modeler?<br>"+
                     "Would you like to work on an exciting project with a cool team?<br>"+
-                    "Send me an e-mail at nikke@ironbane.com now!"
+                    "Give us a shout in the forums!",
+
+                    "Ironbane is open source! Care to help out?<br>"+
+                    "Check out the Get Involved page on the website!"
 
                 ]);
 
