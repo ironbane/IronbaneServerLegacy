@@ -257,12 +257,12 @@ function MainLoop() {
 
     setTimeout(function() {
         MainLoop();
-    }, 500);
+    }, 100);
 
     var now = (new Date()).getTime();
     dTime = (now - oldTime) / 1000.0; //time diff in seconds
-    if (dTime > 1.0) {
-        dTime = 1.0;
+    if (dTime > 0.3) {
+        dTime = 0.3;
     }
     oldTime = now;
 
