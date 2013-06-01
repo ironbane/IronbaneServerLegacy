@@ -250,24 +250,18 @@ var WorldHandler = Class.extend({
 
   },
   LoopUnits: function(fn) {
-    for(var z in worldHandler.world) {
-      for(var cx in worldHandler.world[z]) {
-        for(var cz in worldHandler.world[z][cx]) {
-
-          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
-
-            var units = worldHandler.world[z][cx][cz].units;
-
+    _.each(worldHandler.world, function(z) {
+      _.each(z, function(cx) {
+        _.each(cx, function(cz) {
+          if ( ISDEF(cz.units) ) {
+            var units = cz.units;
             for(var u=0;u<units.length;u++) {
-
               fn(units[u]);
-
             }
-
           }
-        }
-      }
-    }
+        });
+      });
+    });
   },
   LoadSwitches: function() {
 
