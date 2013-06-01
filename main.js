@@ -33,6 +33,9 @@ var params = {
 
 //
 // For running locally, don't use for production
+
+var profiler = null;
+
 if ( !isProduction ) {
     params.log = 1;
     params['close timeout'] = 86400;
@@ -46,6 +49,8 @@ else {
     params['heartbeat timeout'] = 60  * 3;
     params['heartbeat interval'] = 25  * 3;
     params['polling duration'] = 20 * 3;
+
+    profiler = require('v8-profiler');
 }
 //
 
@@ -219,6 +224,31 @@ var startREPL = function() {
     // repl commands start with a dot i.e. ironbane> .exec
     serverREPL.defineCommand('exec', function(text) {
         //consoleHandler.exec(text);
+        log("Hello: "+text);
+    });
+
+    serverREPL.defineCommand('snapshot', function(text) {
+        if ( !profiler ) {
+            return log("No profiler installed!");
+        }
+
+        var snapshot = profiler.takeSnapshot(text);
+    });
+
+    serverREPL.defineCommand('startProfiling', function(text) {
+        if ( !profiler ) {
+            return log("No profiler installed!");
+        }
+
+        profiler.startProfiling(text);
+    });
+
+    serverREPL.defineCommand('stopProfiling', function(text) {
+        if ( !profiler ) {
+            return log("No profiler installed!");
+        }
+
+        var cpuProfile = profiler.stopProfiling(text);
     });
 
     // context variables get attached to "global" of this instance
