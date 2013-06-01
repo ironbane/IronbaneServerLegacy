@@ -272,8 +272,6 @@ function MainLoop() {
     server.Tick(dTime);
 
     endTime = (new Date()).getTime() - startTime;
-
-    log("World tick...");
 }
 
 MainLoop();
