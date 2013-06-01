@@ -131,7 +131,7 @@ setInterval(function autoSave() {
             unit.Save();
         }
     });
-}, 10 * 1 * 1000);
+}, 60 * 1 * 1000);
 
 var includes = [
 
