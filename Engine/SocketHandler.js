@@ -666,6 +666,13 @@ var SocketHandler = Class.extend({
                     return i.id == data.itemID;
                 });
 
+                if ( !item ) {
+                    reply({
+                        errmsg:"Item to buy not found!"
+                    });
+                    return;
+                }
+
                 // If we are a vendor, check if the player as enough money to buy it!
                 if ( bag.template.type == UnitTypeEnum.VENDOR ) {
                     if ( item.price > 0 && socket.unit.coins < item.price ) {
