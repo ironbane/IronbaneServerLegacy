@@ -482,13 +482,13 @@ var Fighter = Actor.extend({
     while(!found && i < 10) {
 
       for(var j = 0; j<this.items.length ; j++) {
-        if(items[j].slot === i) {
+        if(this.items[j].slot === i) {
             slot = i;
             found = true;
             break;
         }
       }
-      
+
 
     }
 
