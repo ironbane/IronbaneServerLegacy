@@ -232,8 +232,6 @@ var startREPL = function() {
     //     log("Hello: "+text);
     // });
 
-    });
-
     // context variables get attached to "global" of this instance
     serverREPL.context.version = pkg.version;
 };
