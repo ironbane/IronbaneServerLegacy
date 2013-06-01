@@ -190,9 +190,9 @@ for (var f = 0; f < includes.length; f++) {
 
 
 // create web server
-// var HttpServer = require('./src/server/http/server').Server,
-//     httpServer = new HttpServer();
-/*
+var HttpServer = require('./src/server/http/server').Server,
+     httpServer = new HttpServer();
+
 // create socket server
 var SocketServer = require('./src/server/socket/server').Server,
     socketServer = new SocketServer(httpServer.server);
@@ -226,19 +226,19 @@ var startREPL = function() {
 };
 // start it up, todo: only per config?
 startREPL();
-*/
+
 
 var oldTime = dTime = totalTimer = endTime = 0;
 function MainLoop() {
 
     setTimeout(function() {
         MainLoop();
-    }, 500);
+    }, 100);
 
     var now = (new Date()).getTime();
     dTime = (now - oldTime) / 1000.0; //time diff in seconds
-    if (dTime > 1.0) {
-        dTime = 1.0;
+    if (dTime > 0.3) {
+        dTime = 0.3;
     }
     oldTime = now;
 
