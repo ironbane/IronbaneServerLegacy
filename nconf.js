@@ -21,7 +21,12 @@ nconf.defaults({
     // socket server
     server_port: 8080,
     // web api for client
-    http_port: 8081
+    http_port: 8081,
+    // game settings
+    guestSpawnZone: 1,
+    guestSpawnPosition: {x: 10, y: 0, z: 0},
+    playerSpawnTimeout: 5.0,
+    NPCSpawnTimeout: 10.0
 });
 
 // send this configured reference

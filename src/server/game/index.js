@@ -1,8 +1,11 @@
 // index.js - bootup the game
 
-var GameEngine = require('./engine');
+var GameEngine = require('./engine'),
+    World = require('./world');
+
 var game = new GameEngine({
-    autoBackup: false // for now omit
+    autoBackup: false,
+    world: new World()
 });
 
 game.on('tick', function(elapsed) {

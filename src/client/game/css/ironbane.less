@@ -1,3 +1,11 @@
 // ironbane.less
 
-body {background-color: grey;}
+body {background-color: grey;color: lime;}
+
+// main viewport should render under everything
+.viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -10000;
+}

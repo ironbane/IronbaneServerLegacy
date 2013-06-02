@@ -17,12 +17,19 @@ module.exports = function(socket, io, game) {
     game.on('chat.announce', function(message, color, room) {
         color = color || "#ffd800";
         // the UI should handle the markup and styling instead...
-        var out = '<p style="color:' + color + '">' + (room ? (room + ': ') : '') + message + '</p>';
+        //var out = '<p style="color:' + color + '">' + (room ? (room + ': ') : '') + message + '</p>';
+
+        var msg = {
+            message: message,
+            color: color,
+            room: room,
+            from: 'server'
+        };
 
         if(!room) {
-            io.sockets.emit('chatMessage', {message: out});
+            io.sockets.emit('chatMessage', msg);
         } else {
-            io.sockets.in(room).emit('chatMessage', {message: out});
+            io.sockets.in(room).emit('chatMessage', msg);
         }
     });
 
