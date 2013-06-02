@@ -92,7 +92,7 @@ var ConsoleHandler = Class.extend({
       log("All characters cleared!");
     });
 
-    this.AddCommand(this.AccessLevel.GUEST, ["clearzonedata","czd"], "Clear zone terrain and objects", "", "", function (params) {
+    this.AddCommand(this.AccessLevel.GUEST, ["clearzonedata","czd"], "Clear zone data", "", "", function (params) {
 
       if ( !params[0] ) {
         log("Need zone!");

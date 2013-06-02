@@ -1343,39 +1343,6 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("setTileHeight", function (array) {
-
-                // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                var zone = socket.unit.zone;
-
-                for(var d=0;d<array.length;d++) {
-                    var data = array[d];
-
-
-                    data.cx = parseInt(data.cx, 10);
-                    data.cz = parseInt(data.cz, 10);
-                    data.tx = parseInt(data.tx, 10);
-                    data.tz = parseInt(data.tz, 10);
-                    data.height = parseFloat(data.height).Round(2);
-
-
-                    worldHandler.BuildWorldStructure(zone, data.cx, data.cz, true, data.tx, data.tz);
-
-                    worldHandler.world[zone][data.cx][data.cz].terrain[data.tx][data.tz].y = data.height;
-
-
-                    // Set a timer to auto save this cell
-                    // If we set the height again, reset the timer
-                    worldHandler.AutoSaveCell(zone, data.cx, data.cz);
-
-                }
-
-                // Send to all other connected clients the new height
-                socket.unit.EmitNearby("setTileHeight", array);
-            });
-
             socket.on("deleteNPC", function (id) {
 
                 // Later report them!
@@ -1790,30 +1757,6 @@ var SocketHandler = Class.extend({
 
                 worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
 
-            });
-
-            socket.on("setTileImage", function (data) {
-
-                // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                var zone = socket.unit.zone;
-
-
-                data.cx = parseInt(data.cx, 10);
-                data.cz = parseInt(data.cz, 10);
-                data.tx = parseInt(data.tx, 10);
-                data.tz = parseInt(data.tz, 10);
-                data.height = parseFloat(data.height);
-
-                worldHandler.BuildWorldStructure(zone, data.cx, data.cz, true, data.tx, data.tz);
-
-                worldHandler.world[zone][data.cx][data.cz].terrain[data.tx][data.tz].t = data.image;
-
-                worldHandler.AutoSaveCell(zone, data.cx, data.cz);
-
-                // Send to all other connected clients the new height
-                socket.unit.EmitNearby("setTileImage", data);
             });
 
             socket.on("disconnect", function (data) {
