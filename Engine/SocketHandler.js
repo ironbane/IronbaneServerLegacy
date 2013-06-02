@@ -1632,25 +1632,20 @@ var SocketHandler = Class.extend({
                 var zone = socket.unit.zone;
 
                 // Check if there is a node at this position
-                for(var cx in worldHandler.world[zone]) {
-                    for(var cz in worldHandler.world[zone][cx]) {
-
-                        if ( worldHandler.world[zone][cx][cz].graph === undefined ) continue;
-                        if ( worldHandler.world[zone][cx][cz].graph.nodes === undefined ) continue;
-
-                        for(var n=0;n<worldHandler.world[zone][cx][cz].graph.nodes.length;n++) {
-                            if ( VectorDistanceSq(ConvertVector3(worldHandler.world[zone][cx][cz].graph.nodes.n.pos), position) < 1 ) {
-                                //                                reply({
-                                //                                    errmsg:"Corrupt AddEdge data"
-                                //                                });
-                                return;
+                var existingNode = false;
+                _.each(worldHandler.world[zone], function(cx) {
+                    _.each(cx, function(cz) {
+                        if ( cz.graph === undefined ) return;
+                        if ( cz.graph.nodes === undefined ) return;
+                        _.each(cz.graph.nodes, function(node) {
+                            if ( VectorDistanceSq(ConvertVector3(node.pos), position) < 1 ) {
+                                existingNode = true;
                             }
-                        }
-                    }
-                }
+                        });
+                    });
+                });
 
-
-
+                if ( existingNode ) return;
 
 
                 var newNodeID = worldHandler.GetWaypointID(zone);
