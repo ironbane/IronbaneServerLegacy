@@ -257,7 +257,7 @@ function MainLoop() {
 
     setTimeout(function() {
         MainLoop();
-    }, 100);
+    }, 200);
 
     var now = (new Date()).getTime();
     dTime = (now - oldTime) / 1000.0; //time diff in seconds
