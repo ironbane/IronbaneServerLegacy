@@ -29,6 +29,16 @@ angular.module('IronbaneApp')
             });
     };
 
+    User.register = function(username, password, emailaddress) {
+        return $http.post('api/user', {username: username, password: password, emailaddress: emailaddress})
+            .then(function(response) {
+
+            }, function(err){
+                return $q.reject(err);
+            });
+
+    };
+
     // get currently signed in user if exists or guest account
     User.getCurrentUser = function() {
         var deferred = $q.defer();

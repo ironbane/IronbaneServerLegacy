@@ -114,5 +114,9 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
+        .when('/preferences', {
+            templateUrl: '/views/profile',
+            controller: 'UserCtrl'
+        })
         .otherwise({redirectTo: '/'});
 }]);
