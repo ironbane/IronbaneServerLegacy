@@ -172,6 +172,10 @@ var ChatHandler = Class.extend({
     }
     else {
 
+      if ( !unit.editor ) {
+        message = message.replace(/<(?:.|\n)*?>/gm, '');
+      }
+
       //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);
       unit.Say(message);
 
