@@ -1,5 +1,9 @@
 <div>
-    <form name="registerForm" novalidate>
+    <form class = 'loginForm' name="registerForm" novalidate>
+
+        <div class="error" ng-hide=registerForm.$valid>Please fill in all the required fields</div>
+        <div class="error" ng-show="emailaddressTaken">An account with this email-address already exists</div>
+        <div class="error" ng-show="usernameTaken">this username is taken</div>
         email: <input type="email" name="email" ng-model="user.email" required /> <span ng-show="registerForm.email.$invalid" class="error">*</span>
         <br/>
         username: <input type="text" name="username" ng-model="user.username" required /> <span ng-show="registerForm.username.$invalid" class="error">*</span>
