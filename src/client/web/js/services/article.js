@@ -16,7 +16,7 @@ angular.module('IronbaneApp')
 
                 return article;
             }, function(err) {
-                $log.error('error retreiving article', err);
+                $log.error('error retrieving article', err);
             });
     };
 
