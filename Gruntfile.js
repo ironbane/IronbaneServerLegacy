@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
-    var webScriptPath = 'src/client/web/js';
+    var webScriptPath = 'src/client/web/js',
+        gameScriptPath = 'src/client/game/js';
 
     // Project configuration.
     grunt.initConfig({
@@ -25,6 +26,17 @@ module.exports = function(grunt) {
             web: {
                 src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
                 dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js'
+            },
+            game: {
+                // order is important
+                src: [
+                    'node_modules/three/three.js', // ensure using same copy as server
+                    'src/client/game/lib/ThreeOctree.js',
+                    'src/common/*.js',
+                    gameScriptPath + '/game.js', // bootstraps the module
+                    gameScriptPath + '/**/*.js'
+                ],
+                dest: 'deploy/web/game/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
         uglify: {
@@ -34,6 +46,10 @@ module.exports = function(grunt) {
             web: {
                 src: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js',
                 dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+            },
+            game: {
+                src: 'deploy/web/game/js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: 'deploy/web/game/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
         less: {
@@ -58,7 +74,9 @@ module.exports = function(grunt) {
             web: {
                 options: {
                     variables: {
-                        root: '<%= cfg.get("root") %>'
+                        root: '<%= cfg.get("root") %>',
+                        appName: '<%= pkg.name %>',
+                        appVersion: '<%= pkg.version %>'
                     }
                 },
                 files: [
@@ -68,7 +86,8 @@ module.exports = function(grunt) {
             game: {
                 options: {
                     variables: {
-                        root: '<%= cfg.get("root") %>'
+                        appName: '<%= pkg.name %>',
+                        appVersion: '<%= pkg.version %>'
                     }
                 },
                 files: [

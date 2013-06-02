@@ -14,10 +14,23 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+angular.module('IronbaneGame')
+.controller('MainCtrl', ['$scope', 'socket', 'GameEngine', function($scope, socket, GameEngine) {
+    $scope.messages = [];
 
-var guestSpawnZone = 1;
-var guestSpawnPosition = new THREE.Vector3(10, 0, 0);
+    $scope.game = new GameEngine();
 
+    socket.on('chatMessage', function(msg) {
+        $scope.messages.push(msg);
+    });
 
-var playerSpawnTimeout = 5.0;
-var NPCSpawnTimeout = 10.0;
+    $scope.sayIt = function() {
+        socket.emit('chatMessage', $scope.say);
+    };
+
+    $scope.login = function() {
+        socket.emit('connectServer', {username: $scope.user.username, password: $scope.user.password}, function(response) {
+            console.log('response: ', response, 'socket: ', socket);
+        });
+    };
+}]);
