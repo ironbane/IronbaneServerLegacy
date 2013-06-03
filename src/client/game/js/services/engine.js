@@ -15,6 +15,10 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 angular.module('IronbaneGame')
+.constant('VECTOR_UNIT', new THREE.Vector3(1, 1, 1))
+.constant('VECTOR_UNITX', new THREE.Vector3(1, 0, 0))
+.constant('VECTOR_UNITY', new THREE.Vector3(0, 1, 0))
+.constant('VECTOR_UNITZ', new THREE.Vector3(0, 0, 1))
     .factory('GameEngine', ['$window',
     function($window) {
         var animate = function(game) {

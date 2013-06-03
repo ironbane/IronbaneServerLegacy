@@ -197,7 +197,7 @@ if(ircConfig.enabled) {
     // todo: move to another file
     Ironbot.addListener('message', function(from, to, message) {
         if ( to.match(/^[#&]/) ) {
-            if(message.match(/uptime/)) {
+            if(message === 'uptime') {
                 Ironbot.say(to, 'Server uptime: ' + IronbaneGame.getUpTime());
             }
         }
