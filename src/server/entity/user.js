@@ -1,5 +1,6 @@
 // user.js - backend user entity / service
-var Class = require('../../common/class');
+var Class = require('../../common/class'),
+    log = require('util').log;
 
 module.exports = function(db) {
     var Q = require('q'),
