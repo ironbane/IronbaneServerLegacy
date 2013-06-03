@@ -26,7 +26,13 @@ nconf.defaults({
     guestSpawnZone: 1,
     guestSpawnPosition: {x: 10, y: 0, z: 0},
     playerSpawnTimeout: 5.0,
-    NPCSpawnTimeout: 10.0
+    NPCSpawnTimeout: 10.0,
+    irc: {
+        enabled: true,
+        server: 'irc.freenode.net',
+        nick: 'Ironbane',
+        channels: ['#ironbane']
+    }
 });
 
 // send this configured reference
