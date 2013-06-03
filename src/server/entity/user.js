@@ -96,7 +96,7 @@ module.exports = function(db) {
                 // add in security roles
                 db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
                     if(err) {
-                        log('error getting roles!', err);
+                        log('error getting roles! ' + err);
                         user.roles = [];
                     } else {
                         user.roles = results.map(function(r) { return r.name; });
