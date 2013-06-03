@@ -63,11 +63,9 @@ var ExploreAndLookForEnemies = State.extend({
                 }
                 else {
                     var randomNode = ChooseRandom(npc.connectedNodeList);
-                    this.targetPosition = ConvertVector3(randomNode.pos).addSelf(new THREE.Vector3(getRandomFloat(-1, 1), 0, getRandomFloat(-1, 1))).setY(0);
+                    this.targetPosition = ConvertVector3(randomNode.pos).addSelf(new THREE.Vector3(getRandomFloat(-1, 1), 0, getRandomFloat(-1, 1)));
                    // log("[ExploreAndLookForEnemies] Traveling to node "+randomNode.id+"...");
                 }
-
-
                 // npc.maxSpeed = getRandomFloat(2.0, 4.0);
 
 
@@ -92,8 +90,8 @@ var ExploreAndLookForEnemies = State.extend({
 
             var player = npc.FindNearestTarget(npc.template.aggroradius, true);
 
-            if ( player && player.InRangeOfPosition(npc.position, npc.template.spawnguardradius+npc.template.aggroradius) && 
-                this.minimumExploreTime <= 0 && 
+            if ( player && player.InRangeOfPosition(npc.position, npc.template.spawnguardradius+npc.template.aggroradius) &&
+                this.minimumExploreTime <= 0 &&
                 npc.InLineOfSight(player) ) {
                 // log("[ExploreAndLookForEnemies] Found enemy!");
                 npc.stateMachine.ChangeState(new ChaseEnemy(player));

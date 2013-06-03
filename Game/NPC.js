@@ -62,7 +62,6 @@ var NPC = Fighter.extend({
 
         if ( this.calculateNewPathTimeout >= 0 ) this.calculateNewPathTimeout -= dTime;
 
-
         this._super(dTime);
 
     },

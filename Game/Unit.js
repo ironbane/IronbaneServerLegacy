@@ -509,15 +509,14 @@ var Unit = Class.extend({
 
     var closestNode = null;
     var distance = Math.pow(50, 2);
-    for(var x in allNodes){
-      //for(var x=0;x<allNodes.length;x++){
-      var measuredDistance = DistanceSq(allNodes[x].pos, this.position);
+
+    _.each(allNodes, function(node) {
+      var measuredDistance = DistanceSq(node.pos, this.position);
       if ( measuredDistance < distance ) {
-        closestNode = allNodes[x];
+        closestNode = node;
         distance = measuredDistance;
       }
-    }
-
+    }, this);
 
     // Store the closest node
     this.closestNode = closestNode;
@@ -527,13 +526,14 @@ var Unit = Class.extend({
     var farthestNode = null;
     distance = Math.pow(50, 2);
     //for(var x=0;x<allNodes.length;x++){
-    for(var x in allNodes){
-      var measuredDistance = DistanceSq(allNodes[x].pos, targetPosition);
+
+    _.each(allNodes, function(node) {
+      var measuredDistance = DistanceSq(node.pos, targetPosition);
       if ( measuredDistance < distance ) {
-        farthestNode = allNodes[x];
+        farthestNode = node;
         distance = measuredDistance;
       }
-    }
+    }, this);
 
     // If we can't find any node, just go straight to the target
     if ( !closestNode || !farthestNode ) {
@@ -547,13 +547,13 @@ var Unit = Class.extend({
     // If the path is empty, go straight for the target
     if ( paths.length === 0 ) {
       this.targetNodePosition = targetPosition.clone();
-    //            log("[CalculatePath] No path found, going straight for the target! new targetNodePosition: "+this.targetNodePosition.ToString());
+               // log("[CalculatePath] No path found, going straight for the target! new targetNodePosition: "+this.targetNodePosition.ToString());
     }
     else {
       // Go for the first node in the list
       this.targetNodePosition = ConvertVector3(paths[0].pos);
-    //            log("[CalculatePath] Path found, going for the first in the list! new targetNodePosition: "+this.targetNodePosition.ToString());
-    //            log("[CalculatePath] First node ID: "+paths[0].id);
+               // log("[CalculatePath] Path found, going for the first in the list! new targetNodePosition: "+this.targetNodePosition.ToString());
+               // log("[CalculatePath] First node ID: "+paths[0].id);
     }
 
   },

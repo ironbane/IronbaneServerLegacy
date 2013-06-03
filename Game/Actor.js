@@ -76,19 +76,20 @@ var Actor = MovingUnit.extend({
     // Calculate realistic routes where we can go to
     this.connectedNodeList = [];
 
+
     // First, find a "home" node from where we'll build our list
     var closestNode = null;
     var distance = Math.pow(50, 2);
     var allNodes = worldHandler.world[this.zone].allNodes;
 
-    for(var x=0;x<allNodes.length;x++){
-      var measuredDistance = DistanceSq(allNodes[x].pos, this.position);
+    _.each(allNodes, function(node) {
+      var measuredDistance = DistanceSq(node.pos, this.position);
+
       if ( measuredDistance < distance ) {
-        closestNode = allNodes[x];
+        closestNode = node;
         distance = measuredDistance;
       }
-    }
-
+    }, this);
 
     if ( !closestNode ) {
       log("Warning: no nodes found for NPC "+this.id+"!");
@@ -98,9 +99,9 @@ var Actor = MovingUnit.extend({
     // We got the closest node
     // Now build a path with all nodes that link to it
     var me = this;
-    
+
     function AnnounceOccurredError(amount) {
-    
+
             chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened "+amount+" seconds ago.</i>", "red");
     }
 
@@ -116,7 +117,7 @@ var Actor = MovingUnit.extend({
 
           var msg = "Pathfinding node error! Please" +
           " investigate the connection<br>between node <b>"+node.id +
-          "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " + 
+          "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
           ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
           chatHandler.AnnounceMods(msg, "red");
