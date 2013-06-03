@@ -23,6 +23,17 @@ module.exports = function(db) {
                 self.reg_date = (new Date()).valueOf() / 1000;
                 self.password = bcrypt.hashSync(self.password);
 
+                db.query('select count(id) as c from bcs_users where username = ?', [self.username], function(err, results) {
+                    if (results['c'] === 1) {
+                        return deferred.reject("usernametaken");
+                    }
+                });
+                db.query('select count(id) as c from bcs_users where email = ?', [self.email], function(err, results) {
+                    if (results['c'] === 1) {
+                        return deferred.reject("this emailaddress is already taken");
+                    }
+                });
+
                 db.query('insert into bcs_users set ?', self, function(err, result) {
                     if(err) {
                         deferred.reject(err);
@@ -78,6 +89,7 @@ module.exports = function(db) {
 
             if(results.length === 0) {
                 deferred.reject("no user found");
+                return;
             } else {
                 var user = new User(results[0]);
                 // add in security roles
@@ -108,7 +120,7 @@ module.exports = function(db) {
             }
 
             if (results.length < 1) {
-                deferred.reject('Unknown user: ' + username);
+                return deferred.reject('Unknown user: ' + username);
             }
 
             bcrypt.compare(password, results[0].password, function(err, res) {
@@ -123,7 +135,7 @@ module.exports = function(db) {
                 } else {
                     var user = new User(results[0]);
                     // add in security roles
-                    db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
+                    db.query('select name from bcs_roles inner join bcs_user_roles on bcs_roles.id = role_id where user_id = ?)', [user.id], function(err, results) {
                         if(err) {
                             log('error getting roles!', err);
                             user.roles = [];
