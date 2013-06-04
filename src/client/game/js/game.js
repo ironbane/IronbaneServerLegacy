@@ -27,7 +27,7 @@ angular.module('IronbaneGame', [])
             templateUrl: '/game/views/play',
             controller: 'MainCtrl'
         })
-        .otherwise({redirectTo: '/'});;
+        .otherwise({redirectTo: '/'});
 }])
 .run(['GameEngine', '$rootScope', '$log', function(GameEngine, $rootScope, $log) {
     // start global game

@@ -20,11 +20,14 @@ angular.module('IronbaneGame')
         templateUrl: '/game/partials/loginBox',
         replace: true,
         restrict: 'AE',
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', '$location', function($scope, $location) {
             $scope.stage = 1;
-        }],
-        link: function(scope, el, attrs) {
-            scope.stage = 1;
-        }
+
+            $scope.play = function(character) {
+                if(character === 'guest') {
+                    $location.path('/play');
+                }
+            };
+        }]
     };
 }]);
