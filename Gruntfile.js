@@ -133,6 +133,16 @@ module.exports = function(grunt) {
                     dest: 'deploy/web/game/',
                     cwd: 'src/client/game',
                     expand: true
+                }, {
+                    src: 'src/client/game/views/*',
+                    dest: 'deploy/web/game/views/',
+                    expand: true,
+                    flatten: true
+                }, {
+                    src: 'src/client/game/partials/*',
+                    dest: 'deploy/web/game/partials/',
+                    expand: true,
+                    flatten: true
                 }]
             }
         },

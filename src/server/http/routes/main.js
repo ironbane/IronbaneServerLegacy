@@ -29,4 +29,22 @@ module.exports = function(app, db) {
         }
         res.sendfile('deploy/web/partials/' + file);
     });
+
+    app.get('/game/views/:view', function(req, res) {
+        // allow us to omit the file extension...
+        var file = req.params.view;
+        if(file.search('.html') < 0) {
+            file += '.html';
+        }
+        res.sendfile('deploy/web/game/views/' + file);
+    });
+
+    app.get('/game/partials/:view', function(req, res) {
+        // allow us to omit the file extension...
+        var file = req.params.view;
+        if(file.search('.html') < 0) {
+            file += '.html';
+        }
+        res.sendfile('deploy/web/game/partials/' + file);
+    });
 };

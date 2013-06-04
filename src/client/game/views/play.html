@@ -1,0 +1,10 @@
+<div class="play-hud">
+    <div class="chatbox">
+        <ul id="chatbox">
+            <li ng-repeat="message in messages">{{ message.room }} {{ message.from }} {{ message.message }}</li>
+        </ul>
+        <form name="chatForm" ng-submit="sayIt()">
+            <input type="text" name="say" ng-model="say" /><button>Say</button>
+        </form>
+    </div>
+</div>

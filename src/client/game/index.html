@@ -4,30 +4,19 @@
     <meta charset="utf-8">
     <title>Ironbane MMO</title>
 
-    <!-- we need to base at other than root -->
-    <base href="game/" />
+    <base href="/game/" />
 
-    <link rel="stylesheet" type="text/css" href="css/@@appName.css">
+    <link rel="stylesheet" type="text/css" href="/game/css/@@appName.css">
 
-    <script src="/lib/jquery-2.0.0.min.js"></script>
+    <script src="/lib/jquery/jquery-2.0.0.min.js"></script>
     <script src="/lib/angular-1.1.4/angular.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="js/@@appName-@@appVersion.js"></script>
+    <script src="/game/js/@@appName-@@appVersion.js"></script>
 </head>
-<body ng-app="IronbaneGame" ng-controller="MainCtrl">
-    <ul id="chatbox">
-        <li ng-repeat="message in messages">{{ message.room }} {{ message.from }} {{ message.message }}</li>
-    </ul>
-    <form name="chatForm" ng-submit="sayIt()">
-        <input type="text" name="say" ng-model="say" /><button>Say</button>
-    </form>
-    <form name="loginForm" ng-submit="login()">
-        <input type="text" name="username" ng-model="user.username" />
-        <input type="text" name="password" ng-model="user.password" />
-        <button>Login</button>
-    </form>
+<body ng-app="IronbaneGame">
+    <ng-view></ng-view>
     <viewport class="viewport" engine="game"></viewport>
 </body>
 </html>

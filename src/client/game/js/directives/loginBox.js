@@ -15,14 +15,16 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 angular.module('IronbaneGame')
-.controller('MainCtrl', ['$scope', 'socket', function($scope, socket) {
-    $scope.messages = [];
-
-    socket.on('chatMessage', function(msg) {
-        $scope.messages.push(msg);
-    });
-
-    $scope.sayIt = function() {
-        socket.emit('chatMessage', $scope.say);
+.directive('loginBox', ['$log', function($log) {
+    return {
+        templateUrl: '/game/partials/loginBox',
+        replace: true,
+        restrict: 'AE',
+        controller: ['$scope', function($scope) {
+            $scope.stage = 1;
+        }],
+        link: function(scope, el, attrs) {
+            scope.stage = 1;
+        }
     };
 }]);

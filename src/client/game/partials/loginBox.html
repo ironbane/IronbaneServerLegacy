@@ -1,0 +1,30 @@
+<div class="form-container">
+    <div ng-show="stage === 1" class="stage1">
+        <button class="btn wide" ng-click="play('guest')">Play as Guest</button>
+        <br class="spacer">
+        <button class="btn" ng-click="stage=2;">Log in</button>
+        <button class="btn" ng-click="stage=3;">Register</button>
+    </div>
+    <div ng-show="stage === 2" class="stage2">
+        <form name="loginForm">
+            <label for="loginUsername">username</label>
+            <input type="text" name="loginUsername" id="loginUsername" ng-model="user.username" required />
+            <label for="loginPassword">password</label>
+            <input type="text" name="loginPassword" id="loginPassword" ng-model="user.password" required />
+            <button class="btn" ng-click="login();">Login</button>
+            <button class="btn" ng-click="stage=1;">Back</button>
+        </form>
+    </div>
+    <div ng-show="stage === 3" class="stage3">
+        <form name="registrationForm">
+            <label for="regUsername">username</label>
+            <input type="text" name="regUsername" id="regUsername" ng-model="user.username" required />
+            <label for="regPassword">password</label>
+            <input type="text" name="regPassword" id="regPassword" ng-model="user.password" required />
+            <label for="regEmail">email</label>
+            <input type="email" name="regEmail" id="regEmail" ng-model="user.email" required />
+            <button class="btn" ng-click="register();">Register</button>
+            <button class="btn" ng-click="stage=1;">Back</button>
+        </form>
+    </div>
+</div>

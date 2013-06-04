@@ -15,14 +15,6 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 angular.module('IronbaneGame')
-.controller('MainCtrl', ['$scope', 'socket', function($scope, socket) {
-    $scope.messages = [];
-
-    socket.on('chatMessage', function(msg) {
-        $scope.messages.push(msg);
-    });
-
-    $scope.sayIt = function() {
-        socket.emit('chatMessage', $scope.say);
-    };
+.controller('HomeCtrl', ['$scope', function($scope) {
+    $scope.gameVersion = "0.1.7 Alpha"; // todo: get this dynamically
 }]);

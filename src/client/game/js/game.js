@@ -14,4 +14,26 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-angular.module('IronbaneGame', []);
+angular.module('IronbaneGame', [])
+.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
+
+    $routeProvider
+        .when('/', {
+            templateUrl: '/game/views/home',
+            controller: 'HomeCtrl'
+        })
+        .when('/play', {
+            templateUrl: '/game/views/play',
+            controller: 'MainCtrl'
+        })
+        .otherwise({redirectTo: '/'});;
+}])
+.run(['GameEngine', '$rootScope', '$log', function(GameEngine, $rootScope, $log) {
+    // start global game
+    $rootScope.game = new GameEngine();
+
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {
+        $log.log("[$routeChangeStart] ", next, JSON.stringify(next.path));
+    });
+}]);
