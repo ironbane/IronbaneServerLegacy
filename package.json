@@ -36,7 +36,9 @@
     "nconf": "~0.6.7",
     "q": "~0.9.4",
     "three": "~0.58.9",
-    "irc": "~0.3.6"
+    "irc": "~0.3.6",
+    "irc-colors": "~1.0.3",
+    "nickserv": "~0.3.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

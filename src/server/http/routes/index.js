@@ -6,6 +6,7 @@ module.exports = function(app, db) {
     require('./editor')(app, db);
     require('./article')(app, db);
     require('./characters')(app, db);
+    require('./world')(app, db);
 
     // special routing to make game a separate app
     app.get('/game/*', function(req, res) {

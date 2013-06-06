@@ -29,11 +29,17 @@ angular.module('IronbaneGame', [])
         })
         .otherwise({redirectTo: '/'});
 }])
-.run(['GameEngine', '$rootScope', '$log', function(GameEngine, $rootScope, $log) {
+.run(['GameEngine', '$rootScope', '$log', 'Zone', function(GameEngine, $rootScope, $log, Zone) {
     // start global game
     $rootScope.game = new GameEngine();
 
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         $log.log("[$routeChangeStart] ", next, JSON.stringify(next.path));
+    });
+
+    // get all zones on bootup
+    $rootScope.zones = [];
+    Zone.getAll().then(function(zones) {
+        angular.copy(zones, $rootScope.zones);
     });
 }]);
