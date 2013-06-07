@@ -168,6 +168,13 @@ var ToggleableObstacleMovementTypeEnum = {
   DoorZ : 3
 };
 
+var UserManagementTypeEnum = {
+  LIGHTWARN : 0,
+  SERIOUSWARN : 1,
+  KICK : 2,
+  BAN : 3
+};
+
 var meleeTimeout = 0.5;
 var meleeRange = 3.0;
 

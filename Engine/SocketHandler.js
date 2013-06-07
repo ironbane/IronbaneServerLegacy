@@ -21,7 +21,29 @@ var characterIDCount = 1;
 
 var SocketHandler = Class.extend({
     Init: function() {
+
+
+        this.bans = [];
+
+        var me = this;
+
+        mysql.query('SELECT * FROM ib_bans', function (err, results, fields) {
+            me.bans = results;
+        });
+
+
         io.sockets.on("connection", function (socket) {
+
+            socket.ip = socket.handshake.address.address;
+
+            // Check if we're banned
+            socket.banned = false;
+            _.each(me.bans, function(ban) {
+                if ( ban.ip === socket.ip ) {
+                    var time = Math.round((new Date()).getTime()/1000);
+                    if ( ban.until > time || !ban.until ) socket.banned = true;
+                }
+            });
 
             socket.unit = null;
 
@@ -85,7 +107,7 @@ var SocketHandler = Class.extend({
 
                 // TODO: closure ok?
                 (function(socket, data, reply) {
-                    mysql.query('SELECT pass, editor FROM bcs_users WHERE id = ?', [data.id],
+                    mysql.query('SELECT pass, editor, banned FROM bcs_users WHERE id = ?', [data.id],
                         function (err, results, fields) {
 
                             //log("Initiating connection for ");
@@ -116,6 +138,13 @@ var SocketHandler = Class.extend({
                             if ( userdata.pass !== data.pass ) {
                                 reply({
                                     errmsg:"Password is incorrect!"
+                                });
+                                return;
+                            }
+
+                            if ( userdata.banned || socket.banned ) {
+                                reply({
+                                    errmsg:"You have been banned."
                                 });
                                 return;
                             }
@@ -349,25 +378,28 @@ var SocketHandler = Class.extend({
 
             // Send to everyone!
             socket.on("chatMessage", function (data) {
+                if ( !socket.unit ) return;
+
                 data.message = data.message.substr(0, 500);
 
                 if ( data.message.length <= 0 ) return;
 
-                if ( socket.unit ) {
 
-                    chatHandler.Say(socket.unit, data.message);
-                }
+
+                chatHandler.Say(socket.unit, data.message);
             });
 
             socket.on("doJump", function (data) {
-                if ( socket.unit ) {
-                    socket.unit.EmitNearby("doJump", {
-                        id:socket.unit.id
-                    });
-                }
+                if ( !socket.unit ) return;
+
+                socket.unit.EmitNearby("doJump", {
+                    id:socket.unit.id
+                });
             });
 
             socket.on("readyToReceiveUnits", function (bool) {
+
+                if ( !socket.unit ) return;
 
                 if ( !_.isBoolean(bool) ) return;
 
@@ -399,9 +431,9 @@ var SocketHandler = Class.extend({
 
             socket.on("addProjectile", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 if ( !CheckData(data, ["s","t","w","o","sw"]) ) {
                     reply({
@@ -468,9 +500,10 @@ var SocketHandler = Class.extend({
 
             socket.on("useItem", function (barIndex, reply) {
 
+                if ( !socket.unit ) return;
+
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
-                if ( !socket.unit ) return;
 
                 var item = _.find(socket.unit.items, function(i){
                     return i.slot == barIndex;
@@ -566,9 +599,10 @@ var SocketHandler = Class.extend({
 
             socket.on("dropItem", function (data, reply) {
 
+                if ( !socket.unit ) return;
+
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
-                if ( !socket.unit ) return;
 
                 // Add a new unit and give it the loot item
 
@@ -638,9 +672,9 @@ var SocketHandler = Class.extend({
 
             socket.on("lootItem", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
 
@@ -821,9 +855,9 @@ var SocketHandler = Class.extend({
 
             socket.on("putItem", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
 
@@ -961,9 +995,9 @@ var SocketHandler = Class.extend({
 
             socket.on("switchItem", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 // Check if the slotNumber is within the bag's limits
                 if ( !_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9 ) {
@@ -1082,9 +1116,9 @@ var SocketHandler = Class.extend({
 
             socket.on("loot", function (npcID, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 // todo: check if NPC is nearby
 
@@ -1134,9 +1168,9 @@ var SocketHandler = Class.extend({
 
             socket.on("hit", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
 
                 if ( !CheckData(data, ["l","w"]) ) {
@@ -1222,9 +1256,9 @@ var SocketHandler = Class.extend({
 
             socket.on("ghit", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
                 if ( !socket.unit ) return;
+
+                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
 
                 if ( !CheckData(data, ["w","o"]) ) {
@@ -1278,9 +1312,11 @@ var SocketHandler = Class.extend({
 
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
-                reply( {
+                var response = {
                     "numberOfPlayersOnline" : io.sockets.clients().length
-                });
+                };
+
+                reply(response);
             });
 
             socket.on("shutdown", function (value) {
@@ -1312,6 +1348,77 @@ var SocketHandler = Class.extend({
             socket.on("ch999Damage", function (value) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
                 socket.unit.ch999Damage = value;
+            });
+
+            socket.on("pmManage", function (data) {
+                if ( !socket.unit || socket.unit.editor === false ) return;
+
+                if ( !CheckData(data, ["action", "characterName", "reason", "hours"]) ) {
+                    reply({
+                        errmsg:"Corrupt pmManage data"
+                    });
+                    return;
+                }
+
+                // Check that the user exists
+                var foundUnit = null;
+                worldHandler.LoopUnits(function(unit) {
+                    if ( unit instanceof Player && unit.name === data.characterName ) {
+                        foundUnit = unit;
+                    }
+                });
+
+                if ( !foundUnit ) {
+                    reply({
+                        errmsg:"Player '"+data.characterName+"' not found!"
+                    });
+                    return;
+                }
+
+                var reason = data.reason ? "Reason: "+data.reason : "No reason given";
+
+                switch (parseInt(data.action)) {
+                    case UserManagementTypeEnum.LIGHTWARN:
+                        var message = foundUnit.name+': Your behaviour is not tolerated. Stop it.';
+                        chatHandler.Announce(message, "yellow");
+                        break;
+                    case UserManagementTypeEnum.SERIOUSWARN:
+                        var message = foundUnit.name+': Continue like this and you will get banned. You have been warned.';
+                        chatHandler.Announce(message, "red");
+                        break;
+                    case UserManagementTypeEnum.KICK:
+                        var message = foundUnit.name+' has been kicked. ('+reason+')';
+                        chatHandler.Announce(message, "yellow");
+
+                        setTimeout(function() {
+                            foundUnit.Kick();
+                        }, 1000);
+                        break;
+                    case UserManagementTypeEnum.BAN:
+                        var until = Math.round((new Date()).getTime()/1000) +
+                                        (parseInt(data.hours) * 3600);
+
+                        var how = data.hours ? "permanently banned"
+                                    : "banned for "+data.hours+" hours";
+
+                        var message = foundUnit.name+' has been '+how+'. ('+reason+')';
+                        chatHandler.Announce(message, "red");
+
+                        mysql.query('INSERT INTO ib_bans SET ?',
+                        {
+                            ip:socket.ip,
+                            account:foundUnit.playerID,
+                            until:until
+                        });
+
+                        mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [foundUnit.playerID]);
+
+                        setTimeout(function() {
+                            foundUnit.Kick();
+                        }, 1000);
+                        break;
+                }
+
             });
 
             socket.on("teleport", function (data, reply) {
@@ -1412,8 +1519,6 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("addNPC", function (data) {
-
-                console.log(data);
 
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
