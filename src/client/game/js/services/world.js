@@ -139,6 +139,7 @@ angular.module('IronbaneGame')
                         }
 
                         self.terrain = new THREE.Mesh(parsed.geometry, new THREE.MeshFaceMaterial(parsed.materials));
+                        self.terrain.scale.multiplyScalar(300);
 
                         deferred.resolve();
                     }, function(err) {
