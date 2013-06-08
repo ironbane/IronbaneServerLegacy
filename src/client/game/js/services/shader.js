@@ -18,20 +18,20 @@ angular.module('IronbaneGame')
 .constant('SHADER_PATH', '/game/data/shaders/') // good for testing/mock todo: config?
 .factory('Shader', ['$log', '$http', '$q', 'SHADER_PATH', function($log, $http, $q, path) {
     return {
-        get: function(name) {
+        get: function(vShaderName, fShaderName) {
             var shader = {
                 fragment: null,
                 vertex: null
             };
 
-            return $q.all([$http.get(path + name + '.vs'), $http.get(path + name + '.fs')])
+            return $q.all([$http.get(path + vShaderName + '.vs'), $http.get(path + fShaderName + '.fs')])
                 .then(function(files) {
                     shader.vertex = files[0].data;
                     shader.fragment = files[1].data;
 
                     return shader;
                 }, function(err) {
-                    $log.error('error loading shader: ', name, err);
+                    $log.error('error loading shader: ', err);
                     $q.reject(err);
                 });
         }

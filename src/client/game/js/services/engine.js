@@ -57,14 +57,6 @@ angular.module('IronbaneGame')
                 this.world = new World();
                 this.world.addToScene(this.scene);
 
-                /*
-                var geometry = new THREE.CubeGeometry( 50, 50, 50 );
-                var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-
-                this.mesh = new THREE.Mesh( geometry, material );
-                this.scene.add( this.mesh );
-                */
-
                 this.renderer.setSize($window.innerWidth, $window.innerHeight);
                 el.append(this.renderer.domElement);
 
@@ -73,7 +65,7 @@ angular.module('IronbaneGame')
             tick: function() {
                 var dTime = this.clock.getDelta();
 
-                //this.mesh.rotation.x += 0.01;
+                this.world.tick(dTime);
             },
             render: function() {
                 this.renderer.render(this.scene, this.camera);
