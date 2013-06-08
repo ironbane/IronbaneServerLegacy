@@ -418,7 +418,7 @@ var SocketHandler = Class.extend({
                             && !socket.unit.hasSeenStartCutscene ) {
                             socket.unit.hasSeenStartCutscene = true;
 
-                            socket.unit.Cutscene("FindIronbane");
+                            //socket.unit.Cutscene("FindIronbane");
                         }
                     }
 
@@ -1382,11 +1382,11 @@ var SocketHandler = Class.extend({
                 switch (parseInt(data.action)) {
                     case UserManagementTypeEnum.LIGHTWARN:
                         var message = foundUnit.name+': Your behaviour is not tolerated. Stop it.';
-                        chatHandler.Announce(message, "yellow");
+                        chatHandler.Announce('<h3>'+message+'</h3>', "yellow");
                         break;
                     case UserManagementTypeEnum.SERIOUSWARN:
-                        var message = foundUnit.name+': Continue like this and you will get banned. You have been warned.';
-                        chatHandler.Announce(message, "red");
+                        var message = foundUnit.name+': Continue like this and you will get banned.<br>You have been warned.';
+                        chatHandler.Announce('<h3>'+message+'</h3>', "red");
                         break;
                     case UserManagementTypeEnum.KICK:
                         var message = foundUnit.name+' has been kicked. ('+reason+')';

@@ -40,7 +40,7 @@ var ChatHandler = Class.extend({
   },
   Say: function(unit, message) {
 
-    log(unit.name + ': '+message);
+
 
 
     if ( unit.editor && message.substr(0,1) == "/") {
@@ -153,7 +153,9 @@ var ChatHandler = Class.extend({
 
           showFeedback = false;
 
-          this.Announce(realparams[0]);
+          var color = realparams[1];
+
+          this.Announce(realparams[0], color);
 
           break;
         default:
@@ -187,6 +189,7 @@ var ChatHandler = Class.extend({
 
     }
 
+    log(unit.name + ': '+message);
 
   },
   Announce: function(message, color) {
