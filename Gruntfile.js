@@ -32,6 +32,7 @@ module.exports = function(grunt) {
                 src: [
                     'node_modules/three/three.js', // ensure using same copy as server
                     'src/client/game/lib/ThreeOctree.js',
+                    'src/client/game/lib/PixelationShader.js',
                     'src/common/*.js',
                     gameScriptPath + '/game.js', // bootstraps the module
                     gameScriptPath + '/**/*.js'

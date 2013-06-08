@@ -53,6 +53,14 @@ angular.module('IronbaneGame')
             particleHandler.removeAll();
 
             this.status = TERRAIN_STATUS.DESTROYED;
+        },
+        wake: function() {
+            // called after everything is loaded
+
+            // water
+            // clouds
+            // music?
+            // skybox
         }
     });
 

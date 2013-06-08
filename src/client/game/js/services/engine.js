@@ -15,12 +15,12 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 angular.module('IronbaneGame')
-.constant('VECTOR_UNIT', new THREE.Vector3(1, 1, 1))
-.constant('VECTOR_UNITX', new THREE.Vector3(1, 0, 0))
-.constant('VECTOR_UNITY', new THREE.Vector3(0, 1, 0))
-.constant('VECTOR_UNITZ', new THREE.Vector3(0, 0, 1))
-    .factory('GameEngine', ['$window',
-    function($window) {
+    .constant('VECTOR_UNIT', new THREE.Vector3(1, 1, 1))
+    .constant('VECTOR_UNITX', new THREE.Vector3(1, 0, 0))
+    .constant('VECTOR_UNITY', new THREE.Vector3(0, 1, 0))
+    .constant('VECTOR_UNITZ', new THREE.Vector3(0, 0, 1))
+    .factory('GameEngine', ['$window', 'World',
+    function($window, World) {
         var animate = function(game) {
             requestAnimationFrame(function() {
                 animate(game);
@@ -50,10 +50,20 @@ angular.module('IronbaneGame')
 
                 this.renderer = new THREE.WebGLRenderer({
                     antialias: false,
-                    clearColor: '#000',
-                    clearAlpha: 1,
                     maxLights: 20
                 });
+                this.renderer.setClearColor('#000');
+
+                this.world = new World();
+                this.world.addToScene(this.scene);
+
+                /*
+                var geometry = new THREE.CubeGeometry( 50, 50, 50 );
+                var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+
+                this.mesh = new THREE.Mesh( geometry, material );
+                this.scene.add( this.mesh );
+                */
 
                 this.renderer.setSize($window.innerWidth, $window.innerHeight);
                 el.append(this.renderer.domElement);
@@ -63,6 +73,7 @@ angular.module('IronbaneGame')
             tick: function() {
                 var dTime = this.clock.getDelta();
 
+                //this.mesh.rotation.x += 0.01;
             },
             render: function() {
                 this.renderer.render(this.scene, this.camera);
