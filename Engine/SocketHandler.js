@@ -1352,6 +1352,16 @@ var SocketHandler = Class.extend({
                 socket.unit.ch999Damage = value;
             });
 
+            socket.on("opReloadData", function (data) {
+                if ( !socket.unit || socket.unit.editor === false ) return;
+
+                dataHandler.Load();
+
+                setTimeout(function(){
+                    chatHandler.Announce("Reloaded NPC & Item templates", "white");
+                }, 1000);
+            });
+
             socket.on("pmManage", function (data) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
