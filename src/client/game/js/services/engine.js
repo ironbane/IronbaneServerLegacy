@@ -19,8 +19,8 @@ angular.module('IronbaneGame')
     .constant('VECTOR_UNITX', new THREE.Vector3(1, 0, 0))
     .constant('VECTOR_UNITY', new THREE.Vector3(0, 1, 0))
     .constant('VECTOR_UNITZ', new THREE.Vector3(0, 0, 1))
-    .factory('GameEngine', ['$window', 'World',
-    function($window, World) {
+    .factory('GameEngine', ['$window', 'World', 'DAY_TIME',
+    function($window, World, dayTime) {
         var animate = function(game) {
             requestAnimationFrame(function() {
                 animate(game);
@@ -69,6 +69,12 @@ angular.module('IronbaneGame')
             },
             render: function() {
                 this.renderer.render(this.scene, this.camera);
+            },
+            getGameTime: function() {
+                var time = Date.now();
+                var tod = (((time / 1000.0)) * 3.6 * 100 / dayTime) % 360;
+
+                return tod;
             }
         });
 

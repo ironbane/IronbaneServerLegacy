@@ -33,10 +33,6 @@ angular.module('IronbaneGame', [])
     // start global game
     $rootScope.game = new GameEngine();
 
-    $rootScope.$on("$routeChangeStart", function(event, next, current) {
-        $log.log("[$routeChangeStart] ", next, JSON.stringify(next.path));
-    });
-
     // get all zones on bootup
     $rootScope.zones = [];
     Zone.getAll().then(function(zones) {

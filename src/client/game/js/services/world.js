@@ -16,11 +16,12 @@
 */
 angular.module('IronbaneGame')
     .constant('DAY_TIME', 60 * 15)
-    .factory('World', ['$log', '$q', 'Shader', 'VECTOR_UNITY', 'DAY_TIME',
-    function($log, $q, Shader, VECTOR_UNITY, dayTime) {
+    .factory('World', ['$log', '$q', 'Shader', 'VECTOR_UNITY', 'DAY_TIME', '$http',
+    function($log, $q, Shader, VECTOR_UNITY, dayTime, $http) {
         var World = Class.extend({
             lights: {},
             sky: {},
+            terrain: {},
             isReady: false,
             init: function(settings) {
                 angular.copy(settings || {}, this);
@@ -52,7 +53,10 @@ angular.module('IronbaneGame')
                         self.sky.mesh = new THREE.Mesh(geometry, material);
 
                         deferred.resolve(self.sky);
-                    });
+                    }, function(err) {
+                            $log.log('error getting sky shaders', err);
+                            deferred.reject(err);
+                        });
 
                 return deferred.promise;
             },
@@ -87,12 +91,17 @@ angular.module('IronbaneGame')
                             world.sun = new THREE.Mesh(geometry, material);
 
                             deferred.resolve(world.sun);
+                        }, function(err) {
+                            $log.log('error getting sun shaders', err);
+                            deferred.reject(err);
                         });
                 });
 
                 return deferred.promise;
             },
             setupLights: function() {
+                var deferred = $q.defer();
+
                 this.lights.ambient = new THREE.AmbientLight(0x444444);
 
                 this.lights.directional = new THREE.DirectionalLight(0xcccccc);
@@ -105,11 +114,50 @@ angular.module('IronbaneGame')
                 shadowLight.castShadow = true;
                 shadowLight.shadowDarkness = 0.3;
                 this.lights.shadow = shadowLight;
+
+                deferred.resolve(this.lights);
+
+                return deferred.promise;
+            },
+            createTerrain: function() {
+                var deferred = $q.defer(),
+                    self = this,
+                    jsonLoader = new THREE.JSONLoader(),
+                    materialPath = '/game/data/map/materials/';
+
+                    // todo: move to mesh loading service
+                $http.get('/game/data/map/1.js')
+                    .then(function(response) {
+                        var json = response.data,
+                            parsed;
+
+                        try {
+                            parsed = jsonLoader.parse(json, materialPath);
+                        } catch(e) {
+                            deferred.reject('parsing error ' + e);
+                            return;
+                        }
+
+                        self.terrain = new THREE.Mesh(parsed.geometry, new THREE.MeshFaceMaterial(parsed.materials));
+
+                        deferred.resolve();
+                    }, function(err) {
+                        $log.log('error loading terrain json');
+                        deferred.reject(err);
+                    });
+
+                return deferred.promise;
             },
             load: function() {
-                var deferred = $q.defer();
+                var deferred = $q.defer(),
+                    tasks = [];
 
-                $q.all([$q.when(this.setupLights()), this.createSkySphere(), this.createSun()])
+                tasks.push(this.setupLights());
+                tasks.push(this.createSun());
+                tasks.push(this.createTerrain());
+                tasks.push(this.createSkySphere());
+
+                $q.all(tasks)
                     .then(function(results) {
                         $log.log('world load success', results);
                         deferred.resolve();
@@ -131,9 +179,11 @@ angular.module('IronbaneGame')
                         scene.add(world.lights.ambient);
                         scene.add(world.lights.directional);
                         scene.add(world.lights.shadow);
-                        //scene.add(world.terrain);
+                        scene.add(world.terrain);
 
                         world.isReady = true;
+                    }, function(err) {
+                        $log.log('error loading world', err);
                     });
             },
             tick: function(dTime) {
