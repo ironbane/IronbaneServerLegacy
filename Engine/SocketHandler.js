@@ -270,6 +270,8 @@ var SocketHandler = Class.extend({
                                                     // It's possible that the items are empty!
                                                     chardata.items = results;
 
+                                                    chardata.editor = data.editor;
+
                                                     var unit = new Player(chardata);
 
 
@@ -1704,6 +1706,9 @@ var SocketHandler = Class.extend({
 
                 var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
 
+                if ( !worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z) ) {
+                    worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
+                }
 
                 if ( !ISDEF(worldHandler.world[zone]) ) return;
                 if ( !ISDEF(worldHandler.world[zone][cellPos.x]) ) return;

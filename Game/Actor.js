@@ -80,7 +80,7 @@ var Actor = MovingUnit.extend({
     // First, find a "home" node from where we'll build our list
     var closestNode = null;
     var distance = Math.pow(50, 2);
-    var allNodes = worldHandler.world[this.zone].allNodes;
+    var allNodes = worldHandler.allNodes[this.zone];
 
     _.each(allNodes, function(node) {
       var measuredDistance = DistanceSq(node.pos, this.position);
@@ -108,7 +108,7 @@ var Actor = MovingUnit.extend({
     function addEdgeNodes(list, zone, node) {
 
       for(var x=0;x<node.edges.length;x++){
-        var subNode = worldHandler.world[zone].allNodes[node.edges[x]];
+        var subNode = worldHandler.allNodes[zone][node.edges[x]];
 
         if ( !subNode ) {
 

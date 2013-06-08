@@ -26,6 +26,8 @@ var WorldHandler = Class.extend({
     // [zone][cx][cz]
     this.world = {};
 
+    this.allNodes = {};
+
     this.switches = {};
 
     this.LoadWorldLight();
@@ -62,7 +64,7 @@ var WorldHandler = Class.extend({
       var subcount = 0;
 
       // Every zone has their own set of nodes
-	  this.world[z].allNodes = {};
+	  this.allNodes[z] = {};
 
       for(var cx in this.world[z]) {
 
@@ -78,7 +80,7 @@ var WorldHandler = Class.extend({
 			//console.log(node);
 			//console.log(this.world[z].allNodes);
             //this.world[z].allNodes.node['id'] = node;
-			this.world[z].allNodes[node.id] = node;
+			this.allNodes[z][node.id] = node;
             count++;
             subcount++;
           }

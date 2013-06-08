@@ -82,15 +82,18 @@ var Unit = Class.extend({
 
     this.standingOnUnitId = 0;
 
-
-
     if ( worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ) ) {
-
       worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
     }
     else {
       // We are in a bad cell??? Find a place to spawn! Or DC
       log("Bad cell found for "+this.id);
+
+      if ( this.id > 0 && this.editor ) {
+          log("...but I'm generating one because he's an editor.");
+          worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
+          worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
+      }
     }
 
 
@@ -133,6 +136,14 @@ var Unit = Class.extend({
 
     if ( worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ) ) {
       worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
+    }
+    else {
+      log("[Teleport] Cell does not exist.");
+      if ( this.id > 0 && this.editor ) {
+        log("[Teleport] Generating cell because he's an editor.");
+        worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
+        worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
+      }
     }
 
     this.UpdateNearbyUnitsOtherUnitsLists();
@@ -366,6 +377,14 @@ var Unit = Class.extend({
       // What if the cell doesn't exist? Don't add?
       if ( worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z) ) {
         worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
+      }
+      else {
+        log("[ChangeCell] Cell does not exist.");
+        if ( this.id > 0 && this.editor ) {
+          log("[ChangeCell] Generating cell because he's an editor.");
+          worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
+          worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
+        }
       }
 
       var cellsToRecalculate = [];
