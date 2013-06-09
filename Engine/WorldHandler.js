@@ -228,8 +228,8 @@ var WorldHandler = Class.extend({
       }
     });
   },
-  LoopUnitsNear: function(cx, cz, fn) {
-    this.LoopCellsNear(cx, cz, function(cell) {
+  LoopUnitsNear: function(zone, cellX, cellZ, fn) {
+    this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
       if ( !_.isUndefined(cell.units) ) {
         _.each(cell.units, function(unit) {
           fn(unit);
@@ -246,9 +246,9 @@ var WorldHandler = Class.extend({
       });
     });
   },
-  LoopCellsNear: function(cx, cz, fn) {
-    for(var x=cx-1;x<=cx+1;x++){
-        for(var z=cz-1;z<=cz+1;z++){
+  LoopCellsNear: function(zone, cellX, cellZ, fn) {
+    for(var x=cellX-1;x<=cellX+1;x++){
+        for(var z=cellZ-1;z<=cellZ+1;z++){
             if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
                 fn(worldHandler.world[zone][x][z]);
             }
@@ -256,13 +256,13 @@ var WorldHandler = Class.extend({
     }
   },
   LoopCellsWithIndex: function(fn) {
-    for(var z in this.world) {
-      if ( !this.world.hasOwnProperty(z) ) continue;
-      for(var cx in this.world[z]) {
-        if ( !this.world[z].hasOwnProperty(cx) ) continue;
-        for(var cz in this.world[z][cx]) {
-          if ( !this.world[z][cx].hasOwnProperty(cz) ) continue;
-          fn(z, cx, cz);
+    for(var zone in this.world) {
+      if ( !this.world.hasOwnProperty(zone) ) continue;
+      for(var cellX in this.world[zone]) {
+        if ( !this.world[zone].hasOwnProperty(cellX) ) continue;
+        for(var cellZ in this.world[zone][cellX]) {
+          if ( !this.world[zone][cellX].hasOwnProperty(cellZ) ) continue;
+          fn(zone, cellX, cellZ);
         }
       }
     }

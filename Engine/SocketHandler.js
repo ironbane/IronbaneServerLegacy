@@ -1470,7 +1470,6 @@ var SocketHandler = Class.extend({
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
                 var unit = worldHandler.FindUnit(id);
-                var cellPos = worldHandler.GetUnitCell(id);
 
                 var zone = socket.unit.zone;
 
@@ -1483,10 +1482,10 @@ var SocketHandler = Class.extend({
                 var cx = unit.cellX;
                 var cz = unit.cellZ;
 
-                var units = worldHandler.world[zone][cx][cz].units;
-                units = _.without(units, unit);
+                worldHandler.world[zone][cx][cz].units =
+                    _.without(worldHandler.world[zone][cx][cz].units, unit);
 
-                worldHandler.LoopUnitsNear(cx, cz, function(unit) {
+                worldHandler.LoopUnitsNear(zone, cx, cz, function(unit) {
                     unit.UpdateOtherUnitsList();
                 });
 
