@@ -394,6 +394,8 @@ var SocketHandler = Class.extend({
             socket.on("doJump", function (data) {
                 if ( !socket.unit ) return;
 
+                debugger;
+
                 socket.unit.EmitNearby("doJump", {
                     id:socket.unit.id
                 });

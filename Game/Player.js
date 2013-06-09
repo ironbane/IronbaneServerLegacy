@@ -150,17 +150,11 @@ var Player = Fighter.extend({
     var u = 0;
     // Remove the unit from the world cells
     if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
-      var units = worldHandler.world[zone][cx][cz].units;
-      for( ;u<units.length;u++) {
-        if ( units[u].id == this.id ) {
-
-          //worldHandler.world[zone][cx][cz]["units"].splice(u, 1);
-          worldHandler.world[zone][cx][cz].units =
-          _.without(worldHandler.world[zone][cx][cz].units, units[u]);
-          log('found in units list!');
-          break;
-        }
-      }
+      var newList = [];
+      _.each(worldHandler.world[zone][cx][cz].units, function(unit) {
+        if ( unit.id != this.id ) newList.push(unit);
+      }, this);
+      worldHandler.world[zone][cx][cz].units = newList;
     }
 
     // Update all players that are nearby

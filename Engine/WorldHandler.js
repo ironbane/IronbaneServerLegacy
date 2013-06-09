@@ -101,41 +101,46 @@ var WorldHandler = Class.extend({
     log("Loaded "+count+" waypoints in total");
 
   },
+  LoopCells: function(fn) {
+    _.each(this.world, function(zone) {
+      _.each(zone, function(cellX) {
+        _.each(cellX, function(cellZ) {
+          fn(cellZ);
+        });
+      });
+    });
+  },
+  LoopCellsWithIndex: function(fn) {
+    for(var z in this.world) {
+      if ( !this.world.hasOwnProperty(z) ) continue;
+      for(var cx in this.world[z]) {
+        if ( !this.world[z].hasOwnProperty(cx) ) continue;
+        for(var cz in this.world[z][cx]) {
+          if ( !this.world[z][cx].hasOwnProperty(cz) ) continue;
+          fn(z, cx, cz);
+        }
+      }
+    }
+  },
   Tick: function(dTime) {
 
     if ( !this.hasLoadedWorld ) return;
 
     if ( !this.awake ) {
       var hasLoadedUnits = true;
-      for(var z in this.world) {
-        for(var cx in this.world[z]) {
-          for(var cz in this.world[z][cx]) {
-            if ( !worldHandler.world[z][cx][cz].hasLoadedUnits ) {
-				hasLoadedUnits = false;
-				//this.Awake();
-				//return;
-			}
-          }
-        }
-      }
+
+      this.LoopCells(function(cell) {
+        if ( !cell.hasLoadedUnits ) hasLoadedUnits = false;
+      });
 
       if ( hasLoadedUnits ) this.Awake();
     }
 
   },
   SaveWorld: function() {
-
-
-    for(var z in this.world) {
-      for(var cx in this.world[z]) {
-        for(var cz in this.world[z][cx]) {
-          this.SaveCell(z, cx, cz);
-
-
-        }
-      }
-    }
-
+    this.LoopCellsWithIndex(function(z, cx, cz) {
+      this.SaveCell(z, cx, cz);
+    });
   },
   DoFullBackup: function() {
     chatHandler.AnnounceMods("Backing up server...", "blue");
@@ -662,21 +667,14 @@ var WorldHandler = Class.extend({
   },
   FindUnit: function(id) {
 
-    for(var z in worldHandler.world) {
-      for(var cx in worldHandler.world[z]) {
-        for(var cz in worldHandler.world[z][cx]) {
+    var foundUnit = null;
 
-          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+    this.LoopUnits(function(unit) {
+      if ( foundUnit ) return;
+      if ( unit.id === id ) foundUnit = unit;
+    });
 
-            var units = worldHandler.world[z][cx][cz].units;
-            for(var u=0;u<units.length;u++) {
-              if ( units[u].id === id ) return units[u];
-            }
-          }
-        }
-      }
-    }
-    return null;
+    return foundUnit;
   },
   // Only for players!!!!
   FindPlayerByName: function(name) {
