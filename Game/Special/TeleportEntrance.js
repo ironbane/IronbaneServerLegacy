@@ -46,8 +46,6 @@ var TeleportEntrance = Unit.extend({
             this.targetExit = null;
         }
 
-        console.log(this.targetExit);
-
 
     },
     Tick: function(dTime) {

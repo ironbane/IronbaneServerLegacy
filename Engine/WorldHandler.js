@@ -101,27 +101,6 @@ var WorldHandler = Class.extend({
     log("Loaded "+count+" waypoints in total");
 
   },
-  LoopCells: function(fn) {
-    _.each(this.world, function(zone) {
-      _.each(zone, function(cellX) {
-        _.each(cellX, function(cellZ) {
-          fn(cellZ);
-        });
-      });
-    });
-  },
-  LoopCellsWithIndex: function(fn) {
-    for(var z in this.world) {
-      if ( !this.world.hasOwnProperty(z) ) continue;
-      for(var cx in this.world[z]) {
-        if ( !this.world[z].hasOwnProperty(cx) ) continue;
-        for(var cz in this.world[z][cx]) {
-          if ( !this.world[z][cx].hasOwnProperty(cz) ) continue;
-          fn(z, cx, cz);
-        }
-      }
-    }
-  },
   Tick: function(dTime) {
 
     if ( !this.hasLoadedWorld ) return;
@@ -241,18 +220,52 @@ var WorldHandler = Class.extend({
 
   },
   LoopUnits: function(fn) {
-    _.each(worldHandler.world, function(z) {
-      _.each(z, function(cx) {
-        _.each(cx, function(cz) {
-          if ( ISDEF(cz.units) ) {
-            var units = cz.units;
-            for(var u=0;u<units.length;u++) {
-              fn(units[u]);
-            }
-          }
+    this.LoopCells(function(cell) {
+      if ( !_.isUndefined(cell.units) ) {
+        _.each(cell.units, function(unit) {
+          fn(unit);
+        });
+      }
+    });
+  },
+  LoopUnitsNear: function(cx, cz, fn) {
+    this.LoopCellsNear(cx, cz, function(cell) {
+      if ( !_.isUndefined(cell.units) ) {
+        _.each(cell.units, function(unit) {
+          fn(unit);
+        });
+      }
+    });
+  },
+  LoopCells: function(fn) {
+    _.each(this.world, function(zone) {
+      _.each(zone, function(cellX) {
+        _.each(cellX, function(cellZ) {
+          fn(cellZ);
         });
       });
     });
+  },
+  LoopCellsNear: function(cx, cz, fn) {
+    for(var x=cx-1;x<=cx+1;x++){
+        for(var z=cz-1;z<=cz+1;z++){
+            if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
+                fn(worldHandler.world[zone][x][z]);
+            }
+        }
+    }
+  },
+  LoopCellsWithIndex: function(fn) {
+    for(var z in this.world) {
+      if ( !this.world.hasOwnProperty(z) ) continue;
+      for(var cx in this.world[z]) {
+        if ( !this.world[z].hasOwnProperty(cx) ) continue;
+        for(var cz in this.world[z][cx]) {
+          if ( !this.world[z][cx].hasOwnProperty(cz) ) continue;
+          fn(z, cx, cz);
+        }
+      }
+    }
   },
   LoadSwitches: function() {
 
@@ -744,31 +757,6 @@ var WorldHandler = Class.extend({
       }
     }
     return false;
-  } ,
-  GetUnitCell: function(id) {
-    for(var z in worldHandler.world) {
-      for(var cx in worldHandler.world[z]) {
-        for(var cz in worldHandler.world[z][cx]) {
-
-          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
-
-            var units = worldHandler.world[z][cx][cz].units;
-
-            for(var u=0;u<units.length;u++) {
-              if ( units[u].id == id ) {
-                return {
-                  zone:z,
-                  x:cx,
-                  z:cz
-                };
-              }
-            }
-
-          }
-        }
-      }
-    }
-    return null;
   },
   AutoSaveCell: function(zone, x, z) {
     // Set a timer to auto save this cell

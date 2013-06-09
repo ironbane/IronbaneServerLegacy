@@ -1469,39 +1469,26 @@ var SocketHandler = Class.extend({
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
+                var unit = worldHandler.FindUnit(id);
                 var cellPos = worldHandler.GetUnitCell(id);
 
                 var zone = socket.unit.zone;
 
-
                 // We only need an ID
-                if ( !cellPos ) {
-                    log("Could not find unit cell for deletion: "+id);
+                if ( !unit ) {
+                    log("Unit not found for deleteNPC: "+id);
                     return;
                 }
 
-                var cx = cellPos.x;
-                var cz = cellPos.z;
+                var cx = unit.cellX;
+                var cz = unit.cellZ;
 
                 var units = worldHandler.world[zone][cx][cz].units;
+                units = _.without(units, unit);
 
-                for(var u=0;u<units.length;u++) {
-                    if ( units[u].id === id ) {
-                        worldHandler.world[zone][cx][cz].units.splice(u, 1);
-                        break;
-                    }
-                }
-
-
-                for(var x=cellPos.x-1;x<=cellPos.x+1;x++){
-                    for(var z=cellPos.z-1;z<=cellPos.z+1;z++){
-                        if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-                            for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
-                                worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
-                            }
-                        }
-                    }
-                }
+                worldHandler.LoopUnitsNear(cx, cz, function(unit) {
+                    unit.UpdateOtherUnitsList();
+                });
 
                 mysql.query('DELETE FROM ib_units WHERE ?',
                 {
