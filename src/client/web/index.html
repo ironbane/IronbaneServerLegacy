@@ -5,14 +5,14 @@
     <title>Ironbane! {{ subTitle }}</title>
 
     <!-- we need to base at other than root -->
-    <base href="@@root/" />
+    <base href="@@root"/>
 
     <link href='http://fonts.googleapis.com/css?family=Cabin:400,600,400italic,600italic' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="/css/@@appName.css">
 
     <script src="/lib/jquery/jquery-2.0.0.min.js"></script>
     <script src="/lib/angular-1.1.4/angular.min.js"></script>
-
+    <script src="/js/controllers/menu.js"></script>
     <!-- markItUp! skin -->
     <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css">
     <!--  markItUp! toolbar skin -->
@@ -36,8 +36,11 @@
                 <div class="shadow-left"></div>
                 <div class="shadow-right"></div>
                 <div class="border-line"></div>
-                <div class="navigation">
+                <div class="navigation" ng-controller="menuCtrl">
                     <ul class="horizontal-list">
+                        <li ng-repeat="menuitem in menuitems">
+                            <a ng-href="{{menuitem.path}}">
+                                {{menuitem.title}}</a></li>
                         <li><a href="/">About</a></li>
                         <li><a href="/forum">Forum</a></li>
                         <li><a href="/game" target="_self">Play!</a></li>
