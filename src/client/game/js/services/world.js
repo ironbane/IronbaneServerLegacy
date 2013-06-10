@@ -138,10 +138,10 @@ angular.module('IronbaneGame')
                             return;
                         }
 
-                        THREE.GeometryUtils.triangulateQuads(parsed.geometry);
-
-                        parsed.geometry.computeCentroids();
-                        parsed.geometry.computeFaceNormals();
+                        // for some reason the ambient light is turned off on the model
+                        angular.forEach(parsed.materials, function(material) {
+                            material.ambient.set('#fff');
+                        });
 
                         self.terrain = new THREE.Mesh(parsed.geometry, new THREE.MeshFaceMaterial(parsed.materials));
                         self.terrain.scale.multiplyScalar(300);
@@ -248,10 +248,9 @@ angular.module('IronbaneGame')
                     }
 
                     alr = THREE.Math.clamp(alr, 0, 1);
-                    alg = THREE.Math.clamp(alr, 0, 1);
-                    alb = THREE.Math.clamp(alr, 0, 1);
+                    alg = THREE.Math.clamp(alg, 0, 1);
+                    alb = THREE.Math.clamp(alb, 0, 1);
 
-                    this.lights.ambient.color.setRGB(0.4, 0.4, 0.4);
                     this.lights.directional.color.setRGB(str + (alr * 0.6), stg + (alg * 0.6), stb + (alb * 0.6));
                 }
             }
