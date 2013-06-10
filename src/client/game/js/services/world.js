@@ -131,6 +131,11 @@ angular.module('IronbaneGame')
                         var json = response.data,
                             parsed;
 
+                        // temp hack: need to add texture repeating to json
+                        angular.forEach(json.materials, function(mat) {
+                            mat.mapDiffuseWrap = ["repeat", "repeat"];
+                        });
+
                         try {
                             parsed = jsonLoader.parse(json, materialPath);
                         } catch(e) {
@@ -140,6 +145,7 @@ angular.module('IronbaneGame')
 
                         // for some reason the ambient light is turned off on the model
                         angular.forEach(parsed.materials, function(material) {
+                            //$log.log('mat', material);
                             material.ambient.set('#fff');
                         });
 
