@@ -1,6 +1,7 @@
 // index.js
 module.exports = function(app, db) {
     require('./main')(app, db);
+    require('./menu')(app, db);
     require('./user')(app, db);
     require('./forum')(app, db);
     require('./editor')(app, db);

@@ -13,7 +13,6 @@ angular.module('IronbaneApp')
                 cats.forEach(function(cat, i) {
                     cats[i] = new Menu(cats[i]);
                 });
-
                 return cats;
             }, function(err) {
                 $log.error('Error retreiving menu from server.', err);
@@ -21,4 +20,5 @@ angular.module('IronbaneApp')
 
         return promise;
     };
+    return Menu;
 }]);

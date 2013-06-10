@@ -12,7 +12,6 @@
 
     <script src="/lib/jquery/jquery-2.0.0.min.js"></script>
     <script src="/lib/angular-1.1.4/angular.min.js"></script>
-    <script src="/js/controllers/menu.js"></script>
     <!-- markItUp! skin -->
     <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css">
     <!--  markItUp! toolbar skin -->
@@ -36,22 +35,16 @@
                 <div class="shadow-left"></div>
                 <div class="shadow-right"></div>
                 <div class="border-line"></div>
-                <div class="navigation" ng-controller="menuCtrl">
+                <nav ng-controller="menuCtrl">
                     <ul class="horizontal-list">
                         <li ng-repeat="menuitem in menuitems">
-                            <a ng-href="{{menuitem.path}}">
-                                {{menuitem.title}}</a></li>
-                        <li><a href="/">About</a></li>
-                        <li><a href="/forum">Forum</a></li>
-                        <li><a href="/game" target="_self">Play!</a></li>
-                        <li><a href="/article/get-involved">Get Involved</a></li>
-                        <li><a target="_new" href="https://twitter.com/IronbaneMMO">Twitter</a></li>
-                        <li ng-show="currentUser.authenticated"><a href="/profile">Preferences</a></li>
-                        <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
-                        <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
-                        <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
+                            <a {{menuitem.options}} ng-href="{{menuitem.path}}">
+                                {{menuitem.title}}
+                            </a>
+                        </li>
+                        
                     </ul>
-                </div>
+                </nav>
                 <ng-view></ng-view>
             </div>
             <div class="middle-right-pillar"></div>

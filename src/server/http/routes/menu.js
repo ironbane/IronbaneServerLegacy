@@ -2,6 +2,7 @@
 module.exports = function(app, db) {
 
 	 app.get('/api/menu/main', function(req, res) {
+        
        
         db.query('SELECT * FROM bcs_menu',
             function(err, results) {
@@ -13,3 +14,4 @@ module.exports = function(app, db) {
             res.send(results);
         });
     });
+}
