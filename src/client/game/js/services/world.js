@@ -138,10 +138,15 @@ angular.module('IronbaneGame')
                             return;
                         }
 
+                        THREE.GeometryUtils.triangulateQuads(parsed.geometry);
+
+                        parsed.geometry.computeCentroids();
+                        parsed.geometry.computeFaceNormals();
+
                         self.terrain = new THREE.Mesh(parsed.geometry, new THREE.MeshFaceMaterial(parsed.materials));
                         self.terrain.scale.multiplyScalar(300);
 
-                        deferred.resolve();
+                        deferred.resolve(parsed);
                     }, function(err) {
                         $log.log('error loading terrain json');
                         deferred.reject(err);

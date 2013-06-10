@@ -19,8 +19,15 @@ angular.module('IronbaneGame')
     .constant('VECTOR_UNITX', new THREE.Vector3(1, 0, 0))
     .constant('VECTOR_UNITY', new THREE.Vector3(0, 1, 0))
     .constant('VECTOR_UNITZ', new THREE.Vector3(0, 0, 1))
-    .factory('GameEngine', ['$window', 'World', 'DAY_TIME',
-    function($window, World, dayTime) {
+    // should this be elsewhere?
+    .constant('PREVIEW', {
+        position: new THREE.Vector3(0, 10, 0),
+        distance: 15,
+        height: 5,
+        speed: 200
+    })
+    .factory('GameEngine', ['$log', '$window', 'World', 'DAY_TIME', 'PREVIEW',
+    function($log, $window, World, dayTime, PREVIEW) {
         var animate = function(game) {
             requestAnimationFrame(function() {
                 animate(game);
@@ -64,6 +71,12 @@ angular.module('IronbaneGame')
             },
             tick: function() {
                 var dTime = this.clock.getDelta();
+
+                // preview spin
+                this.camera.position.x = PREVIEW.position.x + (Math.cos(Date.now() / 20000) * PREVIEW.distance) - 0;
+                this.camera.position.y = PREVIEW.position.y + PREVIEW.height;
+                this.camera.position.z = PREVIEW.position.z + (Math.sin(Date.now() / 20000) * PREVIEW.distance) - 0;
+                this.camera.lookAt(PREVIEW.position);
 
                 this.world.tick(dTime);
             },
