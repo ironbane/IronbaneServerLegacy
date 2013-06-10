@@ -147,6 +147,7 @@
 	"colorSpecular" : [0.8, 0.8, 0.8],
 	"illumination" : 2,
 	"mapDiffuse" : "11.png",
+	"mapDiffuseWrap" : ["repeat", "repeat"],
 	"specularCoef" : 0.0,
 	"transparency" : 1.0
 	}],

@@ -30,6 +30,7 @@ module.exports = function(grunt) {
             game: {
                 // order is important
                 src: [
+                    'src/client/game/lib/game-shim.js',
                     'node_modules/three/three.js', // ensure using same copy as server
                     'src/client/game/lib/ThreeOctree.js',
                     'src/client/game/lib/PixelationShader.js',

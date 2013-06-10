@@ -17,4 +17,9 @@
 angular.module('IronbaneGame')
 .controller('HomeCtrl', ['$scope', function($scope) {
     $scope.gameVersion = "0.1.7 Alpha"; // todo: get this dynamically
+
+    // move this to options menu eventually
+    $scope.goFullscreen = function() {
+        document.documentElement.requestFullScreen();
+    };
 }]);

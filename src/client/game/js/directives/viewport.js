@@ -23,6 +23,14 @@ angular.module('IronbaneGame')
         },
         link: function(scope, el, attrs) {
             scope.engine.start(el);
+
+            $window.addEventListener('resize', function() {
+                // notify the renderer of the size change
+                scope.engine.renderer.setSize($window.innerWidth, $window.innerHeight);
+                // update the camera
+                scope.engine.camera.aspect = $window.innerWidth / $window.innerHeight;
+                scope.engine.camera.updateProjectionMatrix();
+            });
         }
     };
 }]);

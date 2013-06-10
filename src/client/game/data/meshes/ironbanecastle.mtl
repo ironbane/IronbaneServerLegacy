@@ -1,0 +1,100 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 04.11.2012 17:38:41
+
+newmtl Material__157
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\50.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\50.png
+
+newmtl Material__127
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+
+newmtl Material__125
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+
+newmtl Material__124
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\33.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\33.png
+
+newmtl Material__155
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\8.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\8.png
+
+newmtl Material__156
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\49.png
+
+newmtl Material__131
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\8.png
+	map_Kd C:\Users\Nick\Documents\xampp\htdocs\Ironbane\plugins\game\images\tiles\8.png
