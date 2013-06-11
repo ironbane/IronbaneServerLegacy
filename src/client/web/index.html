@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/css/@@appName.css">
 
     <script src="/lib/jquery/jquery-2.0.0.min.js"></script>
-    <script src="/lib/angular-1.1.4/angular.min.js"></script>
+    <script src="/lib/angular/angular.min.js"></script>
     <!-- markItUp! skin -->
     <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css">
     <!--  markItUp! toolbar skin -->
@@ -37,17 +37,13 @@
                 <div class="border-line"></div>
                 <nav ng-controller="menuCtrl">
                     <ul class="horizontal-list">
-                        <li ng-repeat="menuitem in menuitems">
-                            <a {{menuitem.options}} ng-href="{{menuitem.path}}">
+                            <li ng-repeat="menuitem in menuitems">
+                            <a ng-show="currentUser.$hasRole(menuitem.security) && currentUser.authenticated == menuitem.authenticated" ng-href="{{menuitem.path}}">
                                 {{menuitem.title}}
                             </a>
                         </li>
-                        <li>
-                            <ng-switch on="currentUser.authenticated">
-                            <a ng-switch-when="false" ng-href="/login">log in!</a>
-                            <a ng-switch-when="true" ng-href="/logout">log out!</a>
-                        </ng-switch>
-                        </li>
+                        <li><a ng-hide="currentUser.authenticated" ng-href="/login">log in</a></li>
+                        <li><a ng-show="currentUser.authenticated" ng-href="/logout">log out</a></li>
                     </ul>
                 </nav>
                 <ng-view></ng-view>
