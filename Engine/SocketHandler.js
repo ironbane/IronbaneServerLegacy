@@ -101,8 +101,6 @@ var SocketHandler = Class.extend({
 
 
                 log("Client "+data.id +" connecting...");
-                console.log(data);
-
 
 
                 // TODO: closure ok?
@@ -111,9 +109,6 @@ var SocketHandler = Class.extend({
                         function (err, results, fields) {
 
                             //log("Initiating connection for ");
-
-
-                            console.log(err);
 
                             if (err) throw err;
 
@@ -174,7 +169,8 @@ var SocketHandler = Class.extend({
                                                 if ( !units[u].socket || units[u].socket.disconnected ) {
                                                     log("Error: corrupt player found in-game!");
                                                     log("Begin unit data");
-                                                    console.log(units[u]);
+                                                    console.log(units[u].id);
+                                                    console.log(units[u].name);
                                                     log("End unit data");
                                                     log("Forcing disconnect...");
                                                     units[u].LeaveGame();
@@ -187,7 +183,8 @@ var SocketHandler = Class.extend({
                                                 if ( units[u].playerID === data.id ) {
                                                     log("Duplicate character found!");
                                                     log("Begin unit data");
-                                                    console.log(units[u]);
+                                                    console.log(units[u].id);
+                                                    console.log(units[u].name);
                                                     log("End unit data");
                                                     reply({
                                                         errmsg:"You can only play with one character at a time!"
@@ -202,15 +199,12 @@ var SocketHandler = Class.extend({
                                 }
                             }
 
-                            //                                  console.log("ok");
-                            //                                  console.log(data);
                             // Query data and DC if it's not valid
                             (function(socket, data, reply) {
                                 mysql.query(
                                     'SELECT * FROM ib_characters WHERE id = ?', [data.characterID],
                                     function selectCb(err, results, fields) {
                                         if (err) throw err;
-                                        console.log("ok2");
 
                                         if ( results.length === 0 ) {
                                             reply({
@@ -427,11 +421,6 @@ var SocketHandler = Class.extend({
                     }
 
                 }
-                else {
-                    log("no unit yet");
-                }
-
-
 
             });
 
@@ -1510,8 +1499,6 @@ var SocketHandler = Class.extend({
                 var cellPos = WorldToCellCoordinates(data.pos.x, data.pos.z, cellSize);
 
                 socket.unit.UpdateCellPosition();
-
-                console.log(data);
 
 
                 worldHandler.GenerateCell( socket.unit.zone, cellPos.x, cellPos.z, parseInt(data.octaves, 10), parseInt(data.persistence, 10), parseFloat(data.scale), parseInt(data.tile, 10), parseInt(data.heightOffset, 10));

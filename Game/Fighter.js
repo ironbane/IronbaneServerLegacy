@@ -295,8 +295,7 @@ var Fighter = Actor.extend({
       if ( this.loot.length > 0 ) {
         var angle = getRandomFloat(0,1) * Math.PI * 2;
 
-        log("spawning lootbag...");
-
+        //log("spawning lootbag...");
 
         var bag = new Lootable({
           id: server.GetAValidNPCID(),
@@ -317,13 +316,11 @@ var Fighter = Actor.extend({
           item.owner = bag.id;
           // Add the item to the lootbag
 
-
-//          // Make a copy of the item, so we don't remove the same item (reference)
-//          // when we actually loot it as a player
+          // Make a copy of the item, so we don't remove the same item (reference)
+          // when we actually loot it as a player
           bag.loot.push(item);
         }
 
-        console.log(bag);
       }
 
 
