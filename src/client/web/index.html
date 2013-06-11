@@ -42,7 +42,12 @@
                                 {{menuitem.title}}
                             </a>
                         </li>
-                        
+                        <li>
+                            <ng-switch on="currentUser.authenticated">
+                            <a ng-switch-when="false" ng-href="/login">log in!</a>
+                            <a ng-switch-when="true" ng-href="/logout">log out!</a>
+                        </ng-switch>
+                        </li>
                     </ul>
                 </nav>
                 <ng-view></ng-view>
