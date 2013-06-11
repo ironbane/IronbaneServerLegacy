@@ -84,6 +84,11 @@ var Player = Fighter.extend({
       chatHandler.Announce(''+message+'', "red");
   },
   Kick: function(reason) {
+    // Immunity
+    if ( this.editor ) {
+      chatHandler.Announce(this.name+' has immunity.', "yellow");
+      return;
+    }
 
     var me = this;
 
@@ -96,6 +101,12 @@ var Player = Fighter.extend({
 
   },
   Ban: function(hours, reason) {
+      // Immunity
+      if ( this.editor ) {
+        chatHandler.Announce(this.name+' has immunity.', "red");
+        return;
+      }
+
       var until = Math.round((new Date()).getTime()/1000) +
                       (parseInt(hours) * 3600);
 
@@ -112,7 +123,9 @@ var Player = Fighter.extend({
           until:until
       });
 
-      mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
+      if ( !this.isGuest ) {
+        mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
+      }
 
       this.Kick();
   },

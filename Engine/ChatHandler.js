@@ -158,6 +158,30 @@ var ChatHandler = Class.extend({
           this.Announce(realparams[0], color);
 
           break;
+        case "warn":
+          showFeedback = false;
+
+          var target = FindPlayerByName(realparams[0]);
+          if ( target ) target.LightWarn();
+          break;
+        case "seriouswarn":
+          showFeedback = false;
+
+          var target = FindPlayerByName(realparams[0]);
+          if ( target ) target.SeriousWarn();
+          break;
+        case "kick":
+          showFeedback = false;
+
+          var target = FindPlayerByName(realparams[0]);
+          if ( target ) target.Kick();
+          break;
+        case "ban":
+          showFeedback = false;
+
+          var target = FindPlayerByName(realparams[0]);
+          if ( target ) target.Ban();
+          break;
         default:
           errorMessage = "That command does not exist!";
           break;
@@ -193,6 +217,8 @@ var ChatHandler = Class.extend({
 
   },
   Announce: function(message, color) {
+    log("[Announce] "+message);
+
     color = color || "#ffd800";
     message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
     io.sockets.emit("chatMessage", {
@@ -200,12 +226,30 @@ var ChatHandler = Class.extend({
     });
   },
   AnnounceMods: function(message, color) {
+    log("[AnnounceMods] "+message);
+
     color = color || "#ffd800";
     message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
     var clients = io.sockets.clients();
 
     for(var c=0;c<clients.length;c++){
       if ( clients[c].unit && clients[c].unit.editor ) {
+        clients[c].emit("chatMessage", {
+          message: message
+        });
+      }
+    }
+  },
+  AnnounceNick: function(message, color) {
+    // Log it just in case
+    log("[AnnounceNick] "+message);
+
+    color = color || "#ffd800";
+    message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
+    var clients = io.sockets.clients();
+
+    for(var c=0;c<clients.length;c++){
+      if ( clients[c].unit && clients[c].unit.playerID === 1 ) {
         clients[c].emit("chatMessage", {
           message: message
         });

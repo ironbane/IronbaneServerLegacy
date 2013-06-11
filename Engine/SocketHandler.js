@@ -272,6 +272,8 @@ var SocketHandler = Class.extend({
                                                     // Link the unit with the player ID
                                                     unit.playerID = data.id;
 
+                                                    unit.isGuest = data.guest;
+
                                                     socket.unit = unit;
 
                                                     // Provide a circular reference
@@ -376,7 +378,11 @@ var SocketHandler = Class.extend({
             socket.on("chatMessage", function (data) {
                 if ( !socket.unit ) return;
 
-                if ( !_.isString(data.message) ) return;
+                if ( !_.isString(data.message) ) {
+                    chatHandler.AnnounceNick("Warning: Hacked client in "+
+                        "[chatMessage]<br>User "+socket.unit.name+"", "red");
+                    return;
+                }
 
                 data.message = data.message.substr(0, 500);
 
