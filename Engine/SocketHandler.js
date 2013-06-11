@@ -382,6 +382,8 @@ var SocketHandler = Class.extend({
             socket.on("chatMessage", function (data) {
                 if ( !socket.unit ) return;
 
+                if ( !_.isString(data.message) ) return;
+
                 data.message = data.message.substr(0, 500);
 
                 if ( data.message.length <= 0 ) return;
