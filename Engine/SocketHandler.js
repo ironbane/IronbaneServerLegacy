@@ -1574,7 +1574,8 @@ var SocketHandler = Class.extend({
 
                     if (err) throw err;
 
-                    worldHandler.MakeUnitFromData(data).Awake();
+                    var unit = worldHandler.MakeUnitFromData(data);
+                    if ( unit ) unit.Awake();
 
                 });
 

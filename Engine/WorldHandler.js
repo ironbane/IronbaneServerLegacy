@@ -344,7 +344,7 @@ var WorldHandler = Class.extend({
         if (err) throw err;
       });
 
-      return;
+      return null;
     }
 
     data.template = dataHandler.units[data.template];
