@@ -368,7 +368,7 @@ var Fighter = Actor.extend({
       this.HandleMessage("respawned", {});
     }
 
-    log("Respawned "+this.id);
+    // log("Respawned "+this.id);
 
     // Send the client that it's okay to revert back
     this.EmitNearby("respawn", {

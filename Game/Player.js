@@ -61,15 +61,12 @@ var Player = Fighter.extend({
     // Remove the character from the DB
     // We don't need to delete the unit, since the player can't really do
     // anything anymore and will have to leave sooner or later
-
-
     mysql.query('DELETE FROM ib_characters WHERE id = ?', [this.id]);
 
     this.items = [];
 
     // Delete the items
     mysql.query('DELETE FROM ib_items WHERE owner = ?',[this.id]);
-
 
   },
   BigMessage: function(message) {
@@ -78,10 +75,46 @@ var Player = Fighter.extend({
   Cutscene: function(id) {
     this.socket.emit("cutscene", id);
   },
-  Kick: function() {
+  LightWarn: function() {
+      var message = this.name+': Your behaviour is not tolerated. Stop it.';
+      chatHandler.Announce(''+message+'', "yellow");
+  },
+  SeriousWarn: function() {
+      var message = this.name+': Continue like this and you will get banned.<br>You have been warned.';
+      chatHandler.Announce(''+message+'', "red");
+  },
+  Kick: function(reason) {
 
-    this.socket.disconnect();
+    var me = this;
 
+    var message = this.name+' has been kicked. ('+reason+')';
+    chatHandler.Announce(message, "yellow");
+
+    setTimeout(function() {
+        me.disconnect();
+    }, 1000);
+
+  },
+  Ban: function(hours, reason) {
+      var until = Math.round((new Date()).getTime()/1000) +
+                      (parseInt(hours) * 3600);
+
+      var how = hours ? "permanently banned"
+                  : "banned for "+hours+" hours";
+
+      var message = this.name+' has been '+how+'. ('+reason+')';
+      chatHandler.Announce(message, "red");
+
+      mysql.query('INSERT INTO ib_bans SET ?',
+      {
+          ip:socket.ip,
+          account:this.playerID,
+          until:until
+      });
+
+      mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
+
+      this.Kick();
   },
   Save: function() {
     // No updating for guests

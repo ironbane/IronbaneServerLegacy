@@ -390,8 +390,6 @@ var SocketHandler = Class.extend({
             socket.on("doJump", function (data) {
                 if ( !socket.unit ) return;
 
-                debugger;
-
                 socket.unit.EmitNearby("doJump", {
                     id:socket.unit.id
                 });
@@ -1384,43 +1382,16 @@ var SocketHandler = Class.extend({
 
                 switch (parseInt(data.action)) {
                     case UserManagementTypeEnum.LIGHTWARN:
-                        var message = foundUnit.name+': Your behaviour is not tolerated. Stop it.';
-                        chatHandler.Announce(''+message+'', "yellow");
+                        foundUnit.LightWarn();
                         break;
                     case UserManagementTypeEnum.SERIOUSWARN:
-                        var message = foundUnit.name+': Continue like this and you will get banned.<br>You have been warned.';
-                        chatHandler.Announce(''+message+'', "red");
+                        foundUnit.SeriousWarn();
                         break;
                     case UserManagementTypeEnum.KICK:
-                        var message = foundUnit.name+' has been kicked. ('+reason+')';
-                        chatHandler.Announce(message, "yellow");
-
-                        setTimeout(function() {
-                            foundUnit.Kick();
-                        }, 1000);
+                        foundUnit.Kick(reason);
                         break;
                     case UserManagementTypeEnum.BAN:
-                        var until = Math.round((new Date()).getTime()/1000) +
-                                        (parseInt(data.hours) * 3600);
-
-                        var how = data.hours ? "permanently banned"
-                                    : "banned for "+data.hours+" hours";
-
-                        var message = foundUnit.name+' has been '+how+'. ('+reason+')';
-                        chatHandler.Announce(message, "red");
-
-                        mysql.query('INSERT INTO ib_bans SET ?',
-                        {
-                            ip:socket.ip,
-                            account:foundUnit.playerID,
-                            until:until
-                        });
-
-                        mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [foundUnit.playerID]);
-
-                        setTimeout(function() {
-                            foundUnit.Kick();
-                        }, 1000);
+                        foundUnit.Ban(data.hours, reason);
                         break;
                 }
 
