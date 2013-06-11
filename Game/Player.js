@@ -90,13 +90,15 @@ var Player = Fighter.extend({
       return;
     }
 
+    var reason = reason ? "Reason: "+reason : "No reason given";
+
     var me = this;
 
     var message = this.name+' has been kicked. ('+reason+')';
     chatHandler.Announce(message, "yellow");
 
     setTimeout(function() {
-        me.disconnect();
+        me.socket.disconnect();
     }, 1000);
 
   },
@@ -106,6 +108,12 @@ var Player = Fighter.extend({
         chatHandler.Announce(this.name+' has immunity.', "red");
         return;
       }
+
+      var me = this;
+
+      hours = hours || 1;
+
+      var reason = reason ? "Reason: "+reason : "No reason given";
 
       var until = Math.round((new Date()).getTime()/1000) +
                       (parseInt(hours) * 3600);
@@ -118,16 +126,20 @@ var Player = Fighter.extend({
 
       mysql.query('INSERT INTO ib_bans SET ?',
       {
-          ip:socket.ip,
+          ip:me.socket.ip,
           account:this.playerID,
           until:until
+      },  function() {
+        socketHandler.UpdateBans();
       });
 
       if ( !this.isGuest ) {
         mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
       }
 
-      this.Kick();
+      setTimeout(function() {
+          me.socket.disconnect();
+      }, 1000);
   },
   Save: function() {
     // No updating for guests

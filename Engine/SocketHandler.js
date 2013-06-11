@@ -27,9 +27,8 @@ var SocketHandler = Class.extend({
 
         var me = this;
 
-        mysql.query('SELECT * FROM ib_bans', function (err, results, fields) {
-            me.bans = results;
-        });
+        this.UpdateBans();
+
 
 
         io.sockets.on("connection", function (socket) {
@@ -1384,7 +1383,7 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                var reason = data.reason ? "Reason: "+data.reason : "No reason given";
+
 
                 switch (parseInt(data.action)) {
                     case UserManagementTypeEnum.LIGHTWARN:
@@ -1917,6 +1916,13 @@ var SocketHandler = Class.extend({
 
                 }
             });
+        });
+    },
+    UpdateBans: function() {
+        var me = this;
+
+        mysql.query('SELECT * FROM ib_bans', function (err, results, fields) {
+            me.bans = results;
         });
     },
     IsLoggedIn: function(socket) {

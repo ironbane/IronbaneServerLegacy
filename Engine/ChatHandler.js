@@ -161,26 +161,26 @@ var ChatHandler = Class.extend({
         case "warn":
           showFeedback = false;
 
-          var target = FindPlayerByName(realparams[0]);
+          var target = worldHandler.FindPlayerByName(realparams[0]);
           if ( target ) target.LightWarn();
           break;
         case "seriouswarn":
           showFeedback = false;
 
-          var target = FindPlayerByName(realparams[0]);
+          var target = worldHandler.FindPlayerByName(realparams[0]);
           if ( target ) target.SeriousWarn();
           break;
         case "kick":
           showFeedback = false;
 
-          var target = FindPlayerByName(realparams[0]);
-          if ( target ) target.Kick();
+          var target = worldHandler.FindPlayerByName(realparams[0]);
+          if ( target ) target.Kick(realparams[1]);
           break;
         case "ban":
           showFeedback = false;
 
-          var target = FindPlayerByName(realparams[0]);
-          if ( target ) target.Ban();
+          var target = worldHandler.FindPlayerByName(realparams[0]);
+          if ( target ) target.Ban(realparams[1], realparams[2]);
           break;
         default:
           errorMessage = "That command does not exist!";
