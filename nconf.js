@@ -12,7 +12,7 @@ nconf.argv()
 
 // if not provided use these values
 nconf.defaults({
-    root: '/', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
+    root: '',
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',
@@ -28,7 +28,7 @@ nconf.defaults({
     playerSpawnTimeout: 5.0,
     NPCSpawnTimeout: 10.0,
     irc: {
-        enabled: true,
+        enabled: false, // default false so contributors dont *have* to flood the channel with Ironbane clones :)
         server: 'irc.freenode.net',
         nick: 'Ironbane',
         channels: ['#ironbane']
