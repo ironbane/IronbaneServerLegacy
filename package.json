@@ -51,6 +51,7 @@
     "grunt-replace": "~0.4.4",
     "grunt-contrib-jasmine": "~0.4.2",
     "grunt-contrib-watch": "~0.4.3",
-    "grunt-beep": "~0.2.0"
+    "grunt-beep": "~0.2.0",
+    "require-dir": "~0.1.0"
   }
 }
