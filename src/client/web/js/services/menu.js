@@ -9,13 +9,15 @@ angular.module('IronbaneApp')
     Menu.getNavigation = function() {
         var promise = $http.get('/api/menu/main')
             .then(function(response) {
-                var cats = response.data;
-                cats.forEach(function(cat, i) {
-                    cats[i] = new Menu(cats[i]);
+                 var result = [];
+
+                angular.forEach(response.data, function(data) {
+                    result.push(new Menu(data));
                 });
-                return cats;
+
+                return result;
             }, function(err) {
-                $log.error('Error retreiving menu from server.', err);
+                $log.log('error getting menu data', err);
             });
 
         return promise;
