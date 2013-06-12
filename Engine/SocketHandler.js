@@ -51,7 +51,7 @@ var SocketHandler = Class.extend({
                 if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
 
                 if ( socket.unit === null ) {
-                    log("unit still null, so OK!");
+                    // log("unit still null, so OK!");
                 }
                 else {
                     log("unit already exists!");

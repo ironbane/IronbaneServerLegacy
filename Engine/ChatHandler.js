@@ -205,10 +205,10 @@ var ChatHandler = Class.extend({
       //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);
       unit.Say(message);
 
-      message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">&lt;'+unit.name + '&gt;</div> ' +message;
+      var htmlMessage = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">&lt;'+unit.name + '&gt;</div> ' +message;
 
       io.sockets.emit("chatMessage", {
-        message: message
+        message: htmlMessage
       });
 
     }
