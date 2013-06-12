@@ -5,13 +5,13 @@
     <title>Ironbane! {{ subTitle }}</title>
 
     <!-- we need to base at other than root -->
-    <base href="@@root"/>
+    <base href="@@root/"/>
 
     <link href='http://fonts.googleapis.com/css?family=Cabin:400,600,400italic,600italic' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="/css/@@appName.css">
 
     <script src="/lib/jquery/jquery-2.0.0.min.js"></script>
-    <script src="/lib/angular/angular.min.js"></script>
+    <script src="/lib/angular-1.1.4/angular.min.js"></script>
     <!-- markItUp! skin -->
     <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css">
     <!--  markItUp! toolbar skin -->
@@ -37,7 +37,7 @@
                 <div class="border-line"></div>
                 <nav ng-controller="menuCtrl">
                     <ul class="horizontal-list">
-                            <li ng-repeat="menuitem in menuitems">
+                            <li ng-repeat="menuitem in menuitems | orderBy: menuitem.sort" >
                             <a ng-show="currentUser.$hasRole(menuitem.security) && currentUser.authenticated == menuitem.authenticated" ng-href="{{menuitem.path}}">
                                 {{menuitem.title}}
                             </a>
