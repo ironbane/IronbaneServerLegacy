@@ -26,8 +26,8 @@ angular.module('IronbaneGame')
         height: 5,
         speed: 200
     })
-    .factory('GameEngine', ['$log', '$window', 'World', 'DAY_TIME', 'PREVIEW', 'InputService',
-    function($log, $window, World, dayTime, PREVIEW, Input) {
+    .factory('GameEngine', ['$log', '$window', 'World', 'DAY_TIME', 'PREVIEW', 'InputService', 'InputAction',
+    function($log, $window, World, dayTime, PREVIEW, Input, InputAction) {
         var animate = function(game) {
             requestAnimationFrame(function() {
                 animate(game);
@@ -39,6 +39,10 @@ angular.module('IronbaneGame')
 
         var Engine = Class.extend({
             init: function() {
+
+                // for now config some input here
+                Input.addAction(new InputAction('walk', ['W', 'Up'], 'keyboard', 'walk forward'));
+                Input.addAction(new InputAction('chat', 'Enter', 'keyboard', 'open chat to speak'));
 
             },
             start: function(el) {
@@ -83,8 +87,12 @@ angular.module('IronbaneGame')
                 this.world.tick(dTime);
                 this.input.tick(dTime);
 
-                if(this.input.getKBState(13).pressed) {
-                    $log.log(this.input.getKBState(13));
+                if(this.input.actionPressed('chat')) {
+                    $log.log('chat pressed!');
+                }
+
+                if(this.input.actionPressed('walk')) {
+                    $log.log('walk pressed!');
                 }
             },
             render: function() {
