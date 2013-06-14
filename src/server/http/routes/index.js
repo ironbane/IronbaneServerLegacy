@@ -1,13 +1,15 @@
 // index.js
 module.exports = function(app, db) {
-    _ = require('underscore');
+    // order matters to some degree, main first
+    require('./main')(app, db);
+    require('./user')(app, db);
+    require('./menu')(app, db);
+    require('./forum')(app, db);
+    require('./editor')(app, db);
+    require('./article')(app, db);
+    require('./characters')(app, db);
+    require('./world')(app, db);
 
-    var requireDir = require('require-dir');
-var dir = requireDir('./');
-    _.each(dir, function(tFile) {
-        tFile(app, db);
-    });
-    
 
     // special routing to make game a separate app
     app.get('/game/*', function(req, res) {

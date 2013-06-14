@@ -3,6 +3,15 @@ angular.module('IronbaneApp')
 .factory('Menu', ['$http', '$log', function($http, $log) {
     var Menu = function(json) {
         angular.copy(json || {}, this);
+
+        // convert security into an array unless null (no security)
+        if(this.security && this.security.length && this.security.length > 0) {
+            try {
+                this.security = angular.fromJson(this.security);
+            } catch(e) {
+                this.security = [this.security];
+            }
+        }
     };
 
     // get all categories by themselves
@@ -22,5 +31,6 @@ angular.module('IronbaneApp')
 
         return promise;
     };
+
     return Menu;
 }]);

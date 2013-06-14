@@ -37,13 +37,13 @@
                 <div class="border-line"></div>
                 <nav ng-controller="menuCtrl">
                     <ul class="horizontal-list">
-                            <li ng-repeat="menuitem in menuitems | orderBy: menuitem.sort" >
-                            <a ng-show="currentUser.$hasRole(menuitem.security) && currentUser.authenticated == menuitem.authenticated" ng-href="{{menuitem.path}}">
+                        <li ng-repeat="menuitem in menuitems | orderBy: menuitem.sort" >
+                            <a ng-show="currentUser.$hasRole(menuitem.security)" target="{{ menuitem.target }}" ng-href="{{ menuitem.path }}">
                                 {{menuitem.title}}
                             </a>
                         </li>
-                        <li><a ng-hide="currentUser.authenticated" ng-href="/login">log in</a></li>
-                        <li><a ng-show="currentUser.authenticated" ng-href="/logout">log out</a></li>
+                        <li><a ng-hide="currentUser.authenticated" ng-href="/login">Log In</a></li>
+                        <li><a target="_self" ng-show="currentUser.authenticated" ng-href="/logout">Log Out</a></li>
                     </ul>
                 </nav>
                 <ng-view></ng-view>

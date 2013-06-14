@@ -10,17 +10,26 @@ angular.module('IronbaneApp')
     // todo: make this a getter?
     User.prototype.$avatar = function() { return this.forum_avatar || DEFAULT_AVATAR; };
 
+    // test if user has ANY of the roles passed in
     User.prototype.$hasRole = function(role) {
-        if(role === null) return true;
-        role = role.split(',').map(function( num ){ return parseInt( num, 10 ) } );
-        for(var i=0;i<role.length;i++){
-            if(this.roles.indexOf(role[i])>=0 ){
-                console.log("user has role " + role[i] );
-                return true;
+        if (role === null) {
+            return true;
+        }
+
+        if(angular.isArray(role)) {
+            for (var i = 0, len=role.length; i < len; i++) {
+                if (this.roles.indexOf(role[i]) >= 0) {
+                    $log.log("user has role " + role[i]);
+                    return true;
+                }
             }
-        } 
+        } else if(angular.isString(role)) {
+            return this.roles.indexOf(role) >= 0;
+        }
+
         return false;
     };
+
     // login user, sets currentUser
     User.login = function(username, password) {
         return $http.post('/login', {username: username, password: password})

@@ -26,8 +26,8 @@ angular.module('IronbaneGame')
         height: 5,
         speed: 200
     })
-    .factory('GameEngine', ['$log', '$window', 'World', 'DAY_TIME', 'PREVIEW',
-    function($log, $window, World, dayTime, PREVIEW) {
+    .factory('GameEngine', ['$log', '$window', 'World', 'DAY_TIME', 'PREVIEW', 'InputService',
+    function($log, $window, World, dayTime, PREVIEW, Input) {
         var animate = function(game) {
             requestAnimationFrame(function() {
                 animate(game);
@@ -42,6 +42,8 @@ angular.module('IronbaneGame')
 
             },
             start: function(el) {
+                this.input = Input;
+
                 this.scene = new THREE.Scene();
 
                 this.octree = new THREE.Octree();
@@ -79,6 +81,11 @@ angular.module('IronbaneGame')
                 this.camera.lookAt(PREVIEW.position);
 
                 this.world.tick(dTime);
+                this.input.tick(dTime);
+
+                if(this.input.getKBState(13).pressed) {
+                    $log.log(this.input.getKBState(13));
+                }
             },
             render: function() {
                 this.renderer.render(this.scene, this.camera);

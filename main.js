@@ -190,7 +190,7 @@ var SocketServer = require('./src/server/socket/server').Server,
     socketServer = new SocketServer({httpServer: httpServer.server, game: IronbaneGame});
 
 // start Ironbot the IRC minion
-/*
+
 var ircConfig = config.get('irc'),
     Ironbot = null;
 if(ircConfig.enabled) {
@@ -204,7 +204,7 @@ if(ircConfig.enabled) {
         }
     });
 }
-*/
+
 // setup REPL for console server mgmt
 var startREPL = function() {
     var repl = require('repl'); // native node
@@ -232,7 +232,7 @@ var startREPL = function() {
     // context variables get attached to "global" of this instance
     serverREPL.context.version = pkg.version;
     serverREPL.context.game = IronbaneGame;
-   // serverREPL.context.ircbot = Ironbot;
+    serverREPL.context.ircbot = Ironbot;
 };
 // start it up, todo: only per config?
 startREPL();
