@@ -11,9 +11,16 @@ angular.module('IronbaneApp')
     User.prototype.$avatar = function() { return this.forum_avatar || DEFAULT_AVATAR; };
 
     User.prototype.$hasRole = function(role) {
-        return this.roles.indexOf(role) >= 0;
+        if(role === null) return true;
+        role = role.split(',').map(function( num ){ return parseInt( num, 10 ) } );
+        for(var i=0;i<role.length;i++){
+            if(this.roles.indexOf(role[i])>=0 ){
+                console.log("user has role " + role[i] );
+                return true;
+            }
+        } 
+        return false;
     };
-
     // login user, sets currentUser
     User.login = function(username, password) {
         return $http.post('/login', {username: username, password: password})
