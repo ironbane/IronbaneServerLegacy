@@ -43,7 +43,7 @@ var ChatHandler = Class.extend({
 
 
 
-    if ( unit.editor && message.substr(0,1) == "/") {
+    if ( message.substr(0,1) == "/") {
 
 
       var params = message.split(/(".*?")/);
@@ -77,114 +77,105 @@ var ChatHandler = Class.extend({
 
       // feedback += "Command "+command+"<br>";
 
-      switch(command) {
-        case "giveitem":
+      if ( unit.editor ) {
+        switch(command) {
+          case "giveitem":
 
-          // So, which item?
-          var template = -1;
+            // So, which item?
+            var template = -1;
 
-          // Try to convert to integer, if we passed an ID
-          var testConvert = parseInt(realparams[0], 10);
+            // Try to convert to integer, if we passed an ID
+            var testConvert = parseInt(realparams[0], 10);
 
 
 
-          // It appears we passed a string
-          if ( _.isNaN(testConvert) ) {
-            testConvert = realparams[0];
-            // Must be a string, truey again!
-            _.each(dataHandler.items, function(item) {
-              if ( item.name.indexOf(testConvert) != -1 ) {
-                  // Found!
-                  template = item.id;
-              }
-            });
+            // It appears we passed a string
+            if ( _.isNaN(testConvert) ) {
+              testConvert = realparams[0];
+              // Must be a string, truey again!
+              _.each(dataHandler.items, function(item) {
+                if ( item.name.indexOf(testConvert) != -1 ) {
+                    // Found!
+                    template = item.id;
+                }
+              });
 
-          }
-          else {
-            if ( dataHandler.items[testConvert] ) {
-              template = testConvert;
             }
-          }
+            else {
+              if ( dataHandler.items[testConvert] ) {
+                template = testConvert;
+              }
+            }
 
-          if ( template === -1 ) {
-            errorMessage = "Item not found!";
-            break;
-          }
-
-          console.log("template ID: "+template);
-
-          template = dataHandler.items[template];
-
-          // Find a free slot
-          var slot = -1;
-
-          // Loop over 10 slots, and check if we have an item that matches that
-          // slot
-          for (var i = 0; i < 10; i++) {
-            var found = false;
-
-            _.each(unit.items, function(item) {
-              if ( item.slot === i ) found = true;
-            });
-
-            if ( !found ) {
-              slot = i;
+            if ( template === -1 ) {
+              errorMessage = "Item not found!";
               break;
             }
 
-          }
+            console.log("template ID: "+template);
+
+            template = dataHandler.items[template];
+
+            // Find a free slot
+            var slot = -1;
+
+            // Loop over 10 slots, and check if we have an item that matches that
+            // slot
+            for (var i = 0; i < 10; i++) {
+              var found = false;
+
+              _.each(unit.items, function(item) {
+                if ( item.slot === i ) found = true;
+              });
+
+              if ( !found ) {
+                slot = i;
+                break;
+              }
+
+            }
 
 
-          if ( slot === -1 ) {
-            errorMessage = "You have no free space!";
+            if ( slot === -1 ) {
+              errorMessage = "You have no free space!";
+              break;
+            }
+
+            unit.GiveItem(template);
+
             break;
-          }
+          case "givecoins":
 
-          unit.GiveItem(template);
+            unit.coins += parseInt(realparams[0], 10);
+            unit.socket.emit("setCoins", unit.coins);
 
-          break;
-        case "givecoins":
+            break;
+          case "announce":
+            var color = realparams[1];
 
-          unit.coins += parseInt(realparams[0], 10);
-          unit.socket.emit("setCoins", unit.coins);
+            this.Announce(realparams[0], color);
 
-          break;
-        case "announce":
-
-          showFeedback = false;
-
-          var color = realparams[1];
-
-          this.Announce(realparams[0], color);
-
-          break;
-        case "warn":
-          showFeedback = false;
-
-          var target = worldHandler.FindPlayerByName(realparams[0]);
-          if ( target ) target.LightWarn();
-          break;
-        case "seriouswarn":
-          showFeedback = false;
-
-          var target = worldHandler.FindPlayerByName(realparams[0]);
-          if ( target ) target.SeriousWarn();
-          break;
-        case "kick":
-          showFeedback = false;
-
-          var target = worldHandler.FindPlayerByName(realparams[0]);
-          if ( target ) target.Kick(realparams[1]);
-          break;
-        case "ban":
-          showFeedback = false;
-
-          var target = worldHandler.FindPlayerByName(realparams[0]);
-          if ( target ) target.Ban(realparams[1], realparams[2]);
-          break;
-        default:
-          errorMessage = "That command does not exist!";
-          break;
+            break;
+          case "warn":
+            var target = worldHandler.FindPlayerByName(realparams[0]);
+            if ( target ) target.LightWarn();
+            break;
+          case "seriouswarn":
+            var target = worldHandler.FindPlayerByName(realparams[0]);
+            if ( target ) target.SeriousWarn();
+            break;
+          case "kick":
+            var target = worldHandler.FindPlayerByName(realparams[0]);
+            if ( target ) target.Kick(realparams[1]);
+            break;
+          case "ban":
+            var target = worldHandler.FindPlayerByName(realparams[0]);
+            if ( target ) target.Ban(realparams[1], realparams[2]);
+            break;
+          default:
+            errorMessage = "That command does not exist!";
+            break;
+        }
       }
 
       if ( errorMessage ) {
@@ -192,7 +183,7 @@ var ChatHandler = Class.extend({
       }
 
       if ( showFeedback ) {
-        this.AnnounceMods(feedback, errorMessage ? "red" : "#01ff46");
+        this.AnnouncePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
       }
 
     }
