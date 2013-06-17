@@ -385,6 +385,9 @@ var SocketHandler = Class.extend({
 
                 data.message = data.message.substr(0, 100);
 
+                // No empty messages
+                if ( !data.message ) return;
+
                 if ( socket.unit.lastChatTime > (new Date()).getTime()-2000 ) {
                     chatHandler.AnnouncePersonally(socket.unit,
                         "Please don't spam the server.", "yellow");
