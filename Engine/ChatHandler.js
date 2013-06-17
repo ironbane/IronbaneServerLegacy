@@ -190,7 +190,7 @@ var ChatHandler = Class.extend({
     else {
 
       if ( !unit.editor ) {
-        message = message.replace(/<(?:.|\n)*?>/gm, '');
+        message = sanitize(message).entityEncode();
       }
 
       //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);

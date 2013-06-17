@@ -71,8 +71,11 @@ var wrench = require('wrench');
 var util = require('util');
 
 var fsi = require('./External/fsi.js');
-var check = require('./External/validator.js').check;
-var sanitize = require('./External/validator.js').sanitize;
+
+// https://github.com/chriso/node-validator
+var check = require('validator').check,
+    sanitize = require('validator').sanitize;
+
 var _ = require('underscore');
 
 // Everything runs on one database, since the db is not hurt that bad by performance
