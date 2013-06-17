@@ -393,6 +393,7 @@ var SocketHandler = Class.extend({
 
                 socket.unit.lastChatTime = (new Date()).getTime();
 
+
                 if ( data.message.length <= 0 ) return;
 
 
