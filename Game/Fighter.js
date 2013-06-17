@@ -351,11 +351,11 @@ var Fighter = Actor.extend({
       //debugger;
 
       // People who die in the tutorial need to do it again
-      if ( this.zone === 3 ) {
-        this.Teleport(3, new THREE.Vector3(-8, 1, -14), true);
+      if ( this.zone === tutorialSpawnZone ) {
+        this.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
       }
       else {
-        this.Teleport(1, new THREE.Vector3(0, 0, 0), true);
+        this.Teleport(normalSpawnZone, normalSpawnPosition, true);
       }
     }
     else {

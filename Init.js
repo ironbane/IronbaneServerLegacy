@@ -19,5 +19,10 @@ var guestSpawnZone = 1;
 var guestSpawnPosition = new THREE.Vector3(10, 0, 0);
 
 
+var tutorialSpawnZone = 3;
+var tutorialSpawnPosition = new THREE.Vector3(42, 57, 59);
+var normalSpawnZone = 1;
+var normalSpawnPosition = new THREE.Vector3(3, 20, -4);
+
 var playerSpawnTimeout = 5.0;
 var NPCSpawnTimeout = 10.0;
