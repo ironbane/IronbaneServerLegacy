@@ -14,16 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 
 var ChatHandler = Class.extend({
-  Init: function() {
-
-  },
   GetChatColor: function(unit) {
 
     //        switch(unit.editor) {
@@ -39,28 +31,21 @@ var ChatHandler = Class.extend({
     return "#1beee7";
   },
   Say: function(unit, message) {
-
-
-
-
-    if ( message.substr(0,1) == "/") {
-
-
+    if (message.substr(0, 1) === "/") {
       var params = message.split(/(".*?")/);
 
       var realparams = [];
-      for(var p=0;p<params.length;p++) {
+      for (var p = 0; p < params.length; p++) {
         var param = params[p];
 
         param = param.trim();
 
-        if ( param === '' ) continue;
+        if (param === '') continue;
 
 
-        if ( param.indexOf('"') === 0 ) {
+        if (param.indexOf('"') === 0) {
           realparams = realparams.concat([param.replace(/\"/g, '')]);
-        }
-        else {
+        } else {
           realparams = realparams.concat(param.split(' '));
         }
 
@@ -70,15 +55,15 @@ var ChatHandler = Class.extend({
 
       realparams.shift();
 
-      var feedback = "("+unit.name+") "+message+"";
+      var feedback = "(" + unit.name + ") " + message + "";
       var errorMessage = "";
 
       var showFeedback = true;
 
       // feedback += "Command "+command+"<br>";
 
-      if ( unit.editor ) {
-        switch(command) {
+      if (unit.editor) {
+        switch (command) {
           case "giveitem":
 
             // So, which item?
@@ -87,32 +72,29 @@ var ChatHandler = Class.extend({
             // Try to convert to integer, if we passed an ID
             var testConvert = parseInt(realparams[0], 10);
 
-
-
             // It appears we passed a string
-            if ( _.isNaN(testConvert) ) {
+            if (_.isNaN(testConvert)) {
               testConvert = realparams[0];
               // Must be a string, truey again!
               _.each(dataHandler.items, function(item) {
-                if ( item.name.indexOf(testConvert) != -1 ) {
-                    // Found!
-                    template = item.id;
+                if (item.name.indexOf(testConvert) !== -1) {
+                  // Found!
+                  template = item.id;
                 }
               });
 
-            }
-            else {
-              if ( dataHandler.items[testConvert] ) {
+            } else {
+              if (dataHandler.items[testConvert]) {
                 template = testConvert;
               }
             }
 
-            if ( template === -1 ) {
+            if (template === -1) {
               errorMessage = "Item not found!";
               break;
             }
 
-            console.log("template ID: "+template);
+            log("template ID: " + template);
 
             template = dataHandler.items[template];
 
@@ -125,18 +107,17 @@ var ChatHandler = Class.extend({
               var found = false;
 
               _.each(unit.items, function(item) {
-                if ( item.slot === i ) found = true;
+                if (item.slot === i) found = true;
               });
 
-              if ( !found ) {
+              if (!found) {
                 slot = i;
                 break;
               }
 
             }
 
-
-            if ( slot === -1 ) {
+            if (slot === -1) {
               errorMessage = "You have no free space!";
               break;
             }
@@ -158,19 +139,19 @@ var ChatHandler = Class.extend({
             break;
           case "warn":
             var target = worldHandler.FindPlayerByName(realparams[0]);
-            if ( target ) target.LightWarn();
+            if (target) target.LightWarn();
             break;
           case "seriouswarn":
             var target = worldHandler.FindPlayerByName(realparams[0]);
-            if ( target ) target.SeriousWarn();
+            if (target) target.SeriousWarn();
             break;
           case "kick":
             var target = worldHandler.FindPlayerByName(realparams[0]);
-            if ( target ) target.Kick(realparams[1]);
+            if (target) target.Kick(realparams[1]);
             break;
           case "ban":
             var target = worldHandler.FindPlayerByName(realparams[0]);
-            if ( target ) target.Ban(realparams[1], realparams[2]);
+            if (target) target.Ban(realparams[1], realparams[2]);
             break;
           default:
             errorMessage = "That command does not exist!";
@@ -178,108 +159,139 @@ var ChatHandler = Class.extend({
         }
       }
 
-      if ( errorMessage ) {
-        feedback += "<br>"+errorMessage;
+      if (errorMessage) {
+        feedback += "<br>" + errorMessage;
       }
 
-      if ( showFeedback ) {
+      if (showFeedback) {
         this.AnnouncePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
       }
 
-    }
-    else {
+    } else {
 
-      if ( !unit.editor ) {
+      if (!unit.editor) {
         message = sanitize(message).entityEncode();
       }
 
       //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);
       unit.Say(message);
 
-      var htmlMessage = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">&lt;'+unit.name + '&gt;</div> ' +message;
+      var messageData = {
+          type: 'say',
+          user: {
+              name: unit.name,
+              rank: unit.editor ? 'gm' : 'user'
+          },
+          message: message
+      };
 
-      io.sockets.emit("chatMessage", {
-        message: htmlMessage
-      });
-
+      io.sockets.emit("chatMessage", messageData);
     }
-
-
-
   },
   Announce: function(message, color) {
-    log("[Announce] "+message);
+      log("[Announce] " + message);
 
-    color = color || "#ffd800";
-    message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
-    io.sockets.emit("chatMessage", {
-      message: message
-    });
+      color = color || "#ffd800";
+
+      var messageData = {
+          type: 'announce',
+          message: {
+              color: color,
+              text: message
+          }
+      };
+
+      io.sockets.emit("chatMessage", messageData);
   },
   AnnounceMods: function(message, color) {
-    log("[AnnounceMods] "+message);
+      log("[AnnounceMods] " + message);
 
-    color = color || "#ffd800";
-    message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
-    var clients = io.sockets.clients();
+      color = color || "#ffd800";
+      var messageData = {
+          type: 'announce:mods',
+          message: {
+              color: color,
+              text: message
+          }
+      };
+      var clients = io.sockets.clients();
 
-    for(var c=0;c<clients.length;c++){
-      if ( clients[c].unit && clients[c].unit.editor ) {
-        clients[c].emit("chatMessage", {
-          message: message
-        });
+      for (var c = 0; c < clients.length; c++) {
+          if (clients[c].unit && clients[c].unit.editor) {
+              clients[c].emit("chatMessage", messageData);
+          }
       }
-    }
   },
   AnnounceNick: function(message, color) {
-    // Log it just in case
-    log("[AnnounceNick] "+message);
+      // Log it just in case
+      log("[AnnounceNick] " + message);
 
-    color = color || "#ffd800";
-    message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
-    var clients = io.sockets.clients();
-
-    for(var c=0;c<clients.length;c++){
-      if ( clients[c].unit && clients[c].unit.playerID === 1 ) {
-        clients[c].emit("chatMessage", {
-          message: message
-        });
+      color = color || "#ffd800";
+      var nick;
+      var clients = io.sockets.clients();
+      for (var c = 0; c < clients.length; c++) {
+          if (clients[c].unit && clients[c].unit.playerID === 1) {
+              nick = clients[c].unit;
+          }
       }
-    }
+
+      if(!nick) {
+          log("[AnnounceNick] Nick's not here man.");
+          return;
+      }
+
+      this.AnnouncePersonally(nick, message, color);
   },
   AnnouncePersonally: function(unit, message, color) {
-    color = color || "#ffd800";
-    message = '<div style="display:inline;color:'+color+'">'+message+'</div>';
-    unit.socket.emit("chatMessage", {
-      message: message
-    });
+      var messageData = {
+          type: 'announce:personal',
+          message: {
+              color: color,
+              text: message
+          }
+      };
+
+      unit.socket.emit("chatMessage", messageData);
   },
   JoinGame: function(unit) {
+      var messageData = {
+          type: 'join',
+          user: {
+              name: unit.name,
+              rank: unit.editor ? 'gm' : 'user'
+          }
+      };
 
-    var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">'+unit.name + '</div> has joined the game!';
-
-    io.sockets.emit("chatMessage", {
-      message: message
-    });
+      io.sockets.emit("chatMessage", messageData);
   },
   Died: function(unit, killer) {
-    log(unit.name + ' was killed by '+(killer.id > 0 ? killer.name : killer.template.prefix+" "+killer.template.name));
+      var killerName = killer.id > 0 ? killer.name : killer.template.prefix + ' ' + killer.template.name;
 
-    var killername = killer.id > 0 ? '<div style="display:inline;color:'+this.GetChatColor(killer)+'">'+killer.name + '</div>' : killer.template.prefix+" "+killer.template.name;
-    var word = ChooseRandom(("slaughtered butchered crushed defeated destroyed exterminated finished massacred mutilated slayed vanquished killed").split(" "));
+      log(unit.name + ' was killed by ' + killerName);
 
-    var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">'+unit.name + '</div> was '+word+' by '+killername+'.';
-
-    io.sockets.emit("chatMessage", {
-      message: message
-    });
+      var messageData = {
+          type: 'died',
+          killer: {
+              name: killerName,
+              rank: killer.id > 0 ? (killer.editor ? 'gm' : 'user') : 'npc'
+          },
+          victim: {
+              name: unit.name,
+              rank: unit.editor ? 'gm' : 'user'
+          }
+      };
+      io.sockets.emit("chatMessage", messageData);
   },
   LeaveGame: function(unit) {
-    var message = '<div style="display:inline;color:'+this.GetChatColor(unit)+'">'+unit.name + '</div> has left the game. ';
+      var messageData = {
+          type: 'leave',
+          user: {
+              name: unit.name,
+              rank: unit.editor ? 'gm' : 'user'
+          }
+      };
 
-    io.sockets.emit("chatMessage", {
-      message: message
-    });
+      io.sockets.emit("chatMessage", messageData);
   }
 });
 
