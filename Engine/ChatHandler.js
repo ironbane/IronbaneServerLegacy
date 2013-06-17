@@ -204,7 +204,7 @@ var ChatHandler = Class.extend({
 
     }
 
-    log(unit.name + ': '+message);
+
 
   },
   Announce: function(message, color) {

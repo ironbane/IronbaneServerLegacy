@@ -399,7 +399,7 @@ var SocketHandler = Class.extend({
 
                 if ( data.message.length <= 0 ) return;
 
-
+                log(socket.unit.name + ': '+data.message);
 
                 chatHandler.Say(socket.unit, data.message);
             });
