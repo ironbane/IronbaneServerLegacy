@@ -38,6 +38,8 @@ var Player = Fighter.extend({
     this.unitsInLineOfSight = [];
 
 
+    // Prevent spammers
+    this.lastChatTime = 0;
 
   },
   Attack: function(victim, weapon) {

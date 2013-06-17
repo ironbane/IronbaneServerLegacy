@@ -383,7 +383,15 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                data.message = data.message.substr(0, 500);
+                data.message = data.message.substr(0, 100);
+
+                if ( socket.unit.lastChatTime > (new Date()).getTime()-2000 ) {
+                    chatHandler.AnnouncePersonally(socket.unit,
+                        "Please don't spam the server.", "yellow");
+                    return;
+                }
+
+                socket.unit.lastChatTime = (new Date()).getTime();
 
                 if ( data.message.length <= 0 ) return;
 
