@@ -18,13 +18,15 @@ nconf.defaults({
     mysql_password: '',
     mysql_database: 'ironbane',
     clientDir: 'deploy/game/',
-	
+
 	// whether you intend to run this as a production server
 	isProduction: false,
     // socket server
     server_port: 8080,
     // web api for client
-    http_port: 8081
+    http_port: 8081,
+
+    cryptSalt: ""
 });
 
 // send this configured reference

@@ -42,3 +42,8 @@ var walk = function(dir, done) {
 function RandomClamped() { return (Math.random()*2)-1; }
 
 
+function passwordHash(password) {
+    var shasum = crypto.createHash('md5');
+    shasum.update(cryptSalt+password);
+    return shasum.digest('hex');
+}

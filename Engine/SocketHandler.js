@@ -123,8 +123,6 @@ var SocketHandler = Class.extend({
                             //                            log("inter");
 
 
-
-
                             // Check if the passwords match
                             // Check the password
                             var userdata = results[0];

@@ -32,6 +32,9 @@ var mysql_password = config.get('mysql_password');
 var mysql_database = config.get('mysql_database');
 var clientDir = config.get('clientDir');
 var isProduction = config.get('isProduction');
+var cryptSalt = config.get('cryptSalt');
+
+if ( !cryptSalt ) throw "No password hash set!";
 
 // System start
 var SERVER = true;
@@ -69,6 +72,7 @@ var window = {};
 var NameGen = require('./External/namegen');
 var wrench = require('wrench');
 var util = require('util');
+var crypto = require('crypto');
 
 var fsi = require('./External/fsi.js');
 
