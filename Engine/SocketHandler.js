@@ -260,6 +260,17 @@ var SocketHandler = Class.extend({
                                                 function selectCb(err, results, fields) {
                                                     if (err) throw err;
 
+                                                    // parse the metadata
+                                                    results.forEach(function(item) {
+                                                        if(item.data) {
+                                                            try {
+                                                                item.data = JSON.parse(item.data);
+                                                            } catch(e) {
+                                                                // invalid json?
+                                                            }
+                                                        }
+                                                    });
+
                                                     // It's possible that the items are empty!
                                                     chardata.items = results;
 
@@ -278,13 +289,11 @@ var SocketHandler = Class.extend({
                                                     // Provide a circular reference
                                                     socket.unit.socket = socket;
 
-                                                    socket.unit.editor = data.editor == 1 ? true : false;
+                                                    socket.unit.editor = data.editor === 1;
 
                                                     // Update us, and all players that are nearby
                                                     var cx = unit.cellX;
                                                     var cz = unit.cellZ;
-
-
 
                                                     // When we make this unit, it should automatically create a otherUnits list
                                                     // When this list is created, each unit that is added must be sent to it's socket if it's a player
@@ -298,23 +307,23 @@ var SocketHandler = Class.extend({
 
 
                                                     reply({
-                                                        id:socket.unit.id,
-                                                        name:socket.unit.name,
-                                                        zone:socket.unit.zone,
-                                                        position:socket.unit.position,
-                                                        rotY:socket.unit.rotation.y,
-                                                        editor:socket.unit.editor,
-                                                        size:socket.unit.size,
-                                                        health:socket.unit.health,
-                                                        armor:socket.unit.armor,
-                                                        coins:socket.unit.coins,
-                                                        healthMax:socket.unit.healthMax,
-                                                        armorMax:socket.unit.armorMax,
-                                                        hair:socket.unit.hair,
-                                                        eyes:socket.unit.eyes,
-                                                        skin:socket.unit.skin,
-                                                        items:results,
-                                                        heartPieces:socket.unit.heartpieces
+                                                        id: socket.unit.id,
+                                                        name: socket.unit.name,
+                                                        zone: socket.unit.zone,
+                                                        position: socket.unit.position,
+                                                        rotY: socket.unit.rotation.y,
+                                                        editor: socket.unit.editor,
+                                                        size: socket.unit.size,
+                                                        health: socket.unit.health,
+                                                        armor: socket.unit.armor,
+                                                        coins: socket.unit.coins,
+                                                        healthMax: socket.unit.healthMax,
+                                                        armorMax: socket.unit.armorMax,
+                                                        hair: socket.unit.hair,
+                                                        eyes: socket.unit.eyes,
+                                                        skin: socket.unit.skin,
+                                                        items: socket.unit.items,
+                                                        heartPieces: socket.unit.heartpieces
                                                     });
 
                                                     var playerList = [];
@@ -861,6 +870,109 @@ var SocketHandler = Class.extend({
                     reply("OK");
                 }
 
+            });
+
+            // when you put some cash type item onto the cashbox slot
+            socket.on('putCash', function(data, callback) {
+                // add to coins, etc...
+                // Do the change
+                var item = _.find(socket.unit.items, function(i) {
+                    return i.id === data.itemId;
+                });
+
+                //console.log('items!! ', item, data, socket.unit.items);
+
+                if (_.isUndefined(item)) {
+                    // Not found, so return
+                    callback({
+                        message: "Item not found in player items!"
+                    });
+                    return;
+                }
+
+                if(socket.unit.id !== item.owner) {
+                    callback({
+                        message: "You do not own this item!"
+                    });
+                    return;
+                }
+
+                socket.unit.coins += item.value;
+
+                // remove item from inv
+                socket.unit.items = _.filter(socket.unit.items, function(i) {
+                    return i.id !== item.id;
+                });
+                // todo: sync inventory
+
+                socket.emit('setCoins', socket.unit.coins);
+                callback(null, 'ok');
+            });
+
+            // when you want to drop some money on the ground
+            socket.on('dropCash', function(data, callback) {
+                if(data.amount > socket.unit.coins) {
+                    err = {
+                        message: 'You don\'t have that many coins, stop trying to cheat.'
+                    };
+                    callback(err);
+                    return;
+                }
+
+                // spawn loot with cash object
+
+                // find a cash template
+                // todo: find one with similar value? pick random from array? for now, first.
+                var template = _.find(dataHandler.items, function(i) {
+                    return i.type === 'cash';
+                });
+
+                if(!template) {
+                    callback({
+                        type: 'server_fault',
+                        message: 'Server doesn\'t have any cash objects!!'
+                    });
+                    return;
+                }
+
+                var item = {
+                    id: server.GetAValidItemID(),
+                    attr1: template.attr1,
+                    value: data.amount, // this one is not part of the instance yet (only in memory)
+                    equipped: 0,
+                    slot: 0,
+                    template: template.id,
+                    value: data.amount,
+                    data: {
+                        droppedBy: socket.unit.id
+                    }
+                };
+
+                var spawnPos = socket.unit.position.clone().addSelf(socket.unit.heading);
+
+                var bag = new Lootable({
+                    id: server.GetAValidNPCID(),
+                    x: spawnPos.x,
+                    y: spawnPos.y,
+                    z: spawnPos.z,
+                    zone: socket.unit.zone,
+
+                    // Hacky: refers to lootBag ID
+                    template: dataHandler.units[lootBagTemplate],
+
+                    roty: 0
+                }, false);
+
+                item.owner = bag.id;
+
+                // Add the item to the lootbag
+                bag.loot.push(item);
+
+                socket.unit.coins -= data.amount;
+
+                // add to coins, etc...
+                socket.emit('setCoins', socket.unit.coins);
+                callback(null, 'ok');
             });
 
             socket.on("putItem", function (data, reply) {
