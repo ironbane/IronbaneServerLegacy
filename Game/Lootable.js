@@ -42,6 +42,16 @@ var Lootable = Unit.extend({
 
               // Link the items collection to the bag
               unit.loot = results;
+              unit.loot.forEach(function(loot) {
+                if(loot.data) {
+                  try {
+                    loot.data = JSON.parse(loot.data);
+                  } catch(e) {
+                    // some error parsing JSON, not valid JSON likely...
+                    console.log('error parsing JSON for item data', loot);
+                  }
+                }
+              });
             //console.log(results);
             });
         })(this);

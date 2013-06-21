@@ -15,14 +15,12 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 var KickReason = {
   CHEAT: "Cheating"
 };
 
 var Player = Fighter.extend({
-    Init: function(data) {
+  Init: function(data) {
 
     // Params for players are still unused
     data.param = 0;
@@ -45,10 +43,9 @@ var Player = Fighter.extend({
   Attack: function(victim, weapon) {
 
     // Players can only attack monsters and eachother (for now)
-    if ( victim.id < 0 ) {
-      if ( victim.template.type !== UnitTypeEnum.MONSTER ) return;
-    }
-    else {
+    if (victim.id < 0) {
+      if (victim.template.type !== UnitTypeEnum.MONSTER) return;
+    } else {
 
       // Only in PvP arenas?
 
@@ -68,80 +65,80 @@ var Player = Fighter.extend({
     this.items = [];
 
     // Delete the items
-    mysql.query('DELETE FROM ib_items WHERE owner = ?',[this.id]);
+    mysql.query('DELETE FROM ib_items WHERE owner = ?', [this.id]);
 
   },
   BigMessage: function(message) {
-    this.socket.emit("bigMessage", {message:message});
+    this.socket.emit("bigMessage", {
+      message: message
+    });
   },
   Cutscene: function(id) {
     this.socket.emit("cutscene", id);
   },
   LightWarn: function() {
-      var message = this.name+': Your behaviour is not tolerated. Stop it.';
-      chatHandler.Announce(''+message+'', "yellow");
+    var message = this.name + ': Your behaviour is not tolerated. Stop it.';
+    chatHandler.Announce('' + message + '', "yellow");
   },
   SeriousWarn: function() {
-      var message = this.name+': Continue like this and you will get banned.<br>You have been warned.';
-      chatHandler.Announce(''+message+'', "red");
+    var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
+    chatHandler.Announce('' + message + '', "red");
   },
   Kick: function(reason) {
     // Immunity
-    if ( this.editor ) {
-      chatHandler.Announce(this.name+' has immunity.', "yellow");
+    if (this.editor) {
+      chatHandler.Announce(this.name + ' has immunity.', "yellow");
       return;
     }
 
-    var reason = reason ? "Reason: "+reason : "No reason given";
+    var reason = reason ? "Reason: " + reason : "No reason given";
 
     var me = this;
 
-    var message = this.name+' has been kicked. ('+reason+')';
+    var message = this.name + ' has been kicked. (' + reason + ')';
     chatHandler.Announce(message, "yellow");
 
     setTimeout(function() {
-        me.socket.disconnect();
+      me.socket.disconnect();
     }, 1000);
 
   },
   Ban: function(hours, reason) {
-      // Immunity
-      if ( this.editor ) {
-        chatHandler.Announce(this.name+' has immunity.', "red");
-        return;
-      }
+    // Immunity
+    if (this.editor) {
+      chatHandler.Announce(this.name + ' has immunity.', "red");
+      return;
+    }
 
-      var me = this;
+    var me = this;
 
-      hours = hours || 1;
+    hours = hours || 1;
 
-      var reason = reason ? "Reason: "+reason : "No reason given";
+    var reason = reason ? "Reason: " + reason : "No reason given";
 
-      var until = Math.round((new Date()).getTime()/1000) +
-                      (parseInt(hours) * 3600);
+    var until = Math.round((new Date()).getTime() / 1000) +
+      (parseInt(hours) * 3600);
 
-      var how = hours ? "permanently banned"
-                  : "banned for "+hours+" hours";
+    var how = hours ? "permanently banned" : "banned for " + hours + " hours";
 
-      var message = this.name+' has been '+how+'. ('+reason+')';
-      chatHandler.Announce(message, "red");
+    var message = this.name + ' has been ' + how + '. (' + reason + ')';
+    chatHandler.Announce(message, "red");
 
-      mysql.query('INSERT INTO ib_bans SET ?',
-      {
-          ip:me.socket.ip,
-          account:this.playerID,
-          until:until
-      },  function() {
-        socketHandler.UpdateBans();
-      });
+    mysql.query('INSERT INTO ib_bans SET ?', {
+      ip: me.socket.ip,
+      account: this.playerID,
+      until: until
+    }, function() {
+      socketHandler.UpdateBans();
+    });
 
-      if ( !this.isGuest ) {
-        mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
-      }
+    if (!this.isGuest) {
+      mysql.query('UPDATE bcs_users SET banned = 1 WHERE id = ?', [this.playerID]);
+    }
 
-      setTimeout(function() {
-          me.socket.disconnect();
-      }, 1000);
+    setTimeout(function() {
+      me.socket.disconnect();
+    }, 1000);
   },
   Save: function() {
     // No updating for guests
@@ -161,9 +158,7 @@ var Player = Fighter.extend({
       this.zone,
       this.rotation.y,
       this.id
-      ]);
-    //}
-
+    ]);
 
     var cx = this.cellX;
     var cz = this.cellZ;
@@ -171,24 +166,26 @@ var Player = Fighter.extend({
     var u = 0;
 
     // Save the items
-    (function(unit){
-      mysql.query('DELETE FROM ib_items WHERE owner = ?',[unit.id], function (err, results, fields) {
+    (function(unit) {
+      mysql.query('DELETE FROM ib_items WHERE owner = ?', [unit.id], function(err, results, fields) {
 
-        for (var i=0;i<unit.items.length;i++) {
+        for (var i = 0; i < unit.items.length; i++) {
           var item = unit.items[i];
 
           // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
           // Normally it doesn't matter which ID the items gets
 
-          mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot) ' +
-            'VALUES(?,?,?,?,?)', [
+          mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot, value, data) ' +
+            'VALUES(?,?,?,?,?,?,?)', [
             item.template,
             item.attr1,
             unit.id,
             item.equipped,
-            item.slot
-            ]);
-        //}
+            item.slot,
+            item.value || 0,
+            JSON.stringify(item.data)
+          ]);
+          //}
         }
 
       });
@@ -209,19 +206,19 @@ var Player = Fighter.extend({
     var zone = this.zone;
     var u = 0;
     // Remove the unit from the world cells
-    if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
+    if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
       var newList = [];
       _.each(worldHandler.world[zone][cx][cz].units, function(unit) {
-        if ( unit.id != this.id ) newList.push(unit);
+        if (unit.id != this.id) newList.push(unit);
       }, this);
       worldHandler.world[zone][cx][cz].units = newList;
     }
 
     // Update all players that are nearby
-    for(var x=cx-1;x<=cx+1;x++){
-      for(var z=cz-1;z<=cz+1;z++){
-        if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for( u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
+    for (var x = cx - 1; x <= cx + 1; x++) {
+      for (var z = cz - 1; z <= cz + 1; z++) {
+        if (worldHandler.CheckWorldStructure(zone, x, z)) {
+          for (u = 0; u < worldHandler.world[zone][x][z].units.length; u++) {
             worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }
