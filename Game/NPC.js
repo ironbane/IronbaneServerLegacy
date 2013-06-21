@@ -66,58 +66,65 @@ var NPC = Fighter.extend({
 
     },
     SetWeaponsAndLoot: function() {
-
         this.weapons = [];
         this.loot = [];
         this.weapon = null;
 
-
-
         // Store the weapons and loot
-        if ( !_.isEmpty(this.template.weapons) ) {
+        if (!_.isEmpty(this.template.weapons)) {
             var weaponSplit = this.template.weapons.split(",");
-            for(var w=0;w<weaponSplit.length;w++) {
+            for (var w = 0; w < weaponSplit.length; w++) {
                 this.weapons.push(dataHandler.items[parseInt(weaponSplit[w], 10)]);
             }
 
-            if ( this.weapons.length > 0 ) {
+            if (this.weapons.length > 0) {
                 this.weapon = this.weapons[0];
             }
         }
 
-        if ( !_.isEmpty(this.template.loot) ) {
-            var lootSplit = this.template.loot.split(";");
-            for(var l=0;l<lootSplit.length;l++) {
+        var theLoot = "";
+        // if we have JSON loot use that otherwise fall back to template
+        if (this.data && !_.isEmpty(this.data.loot)) {
+            theLoot = this.data.loot;
+        } else if (!_.isEmpty(this.template.loot)) {
+            theLoot = this.template.loot;
+        }
+
+        if (!_.isEmpty(theLoot)) {
+            var lootSplit = theLoot.split(";");
+            for (var l = 0; l < lootSplit.length; l++) {
                 var item = null;
 
                 // No percentages for vendors!
-                if ( this.template.type === UnitTypeEnum.VENDOR ) {
-                     item = parseInt(lootSplit[l], 10);
-                }
-                else {
+                if (this.template.type === UnitTypeEnum.VENDOR) {
+                    item = parseInt(lootSplit[l], 10);
+                } else {
                     var chanceSplit = lootSplit[l].split(":");
 
-                    if ( WasLucky100(parseInt(chanceSplit[0], 10)) ) {
+                    if (WasLucky100(parseInt(chanceSplit[0], 10))) {
                         item = parseInt(chanceSplit[1], 10);
                     }
                 }
 
-                if ( item ) {
+                if (item) {
 
-                    if ( !ISDEF(dataHandler.items[item]) ) {
-                        log("Warning! item "+item+" not found for NPC "+this.id+"!");
+                    if (!ISDEF(dataHandler.items[item])) {
+                        log("Warning! item " + item + " not found for NPC " + this.id + "!");
                         continue;
                     }
 
+                    var itemTemplate = dataHandler.items[item];
+
                     var temp = {
                         id: server.GetAValidItemID(),
-                        template : item,
-                        slot:l,
-                        attr1: dataHandler.items[item].attr1,
-                        equipped: 0
+                        template: item,
+                        slot: l,
+                        attr1: itemTemplate.attr1,
+                        equipped: 0,
+                        value: itemTemplate.basevalue || 0
                     };
 
-                    if ( this.template.type == UnitTypeEnum.VENDOR ) {
+                    if (this.template.type === UnitTypeEnum.VENDOR) {
                         // Specifiy a price
                         temp.price = CalculateItemPrice(temp);
 
@@ -130,7 +137,7 @@ var NPC = Fighter.extend({
             }
         }
 
-
+        //console.log('**** LOOT SET FOR: ', this.id, this.loot);
     },
     Jump: function() {
         this.EmitNearby("doJump", {
