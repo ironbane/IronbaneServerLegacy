@@ -872,38 +872,74 @@ var SocketHandler = Class.extend({
 
             // when you put some cash type item onto the cashbox slot
             socket.on('putCash', function(data, callback) {
-                // add to coins, etc...
-                // Do the change
-                var item = _.find(socket.unit.items, function(i) {
-                    return i.id === data.itemId;
-                });
+                var item = null,
+                    bag = null,
+                    player = socket.unit;
 
-                //console.log('items!! ', item, data, socket.unit.items);
+                if(data.npcId) {
+                    bag = worldHandler.FindUnitNear(data.npcId, player);
+
+                    if (!bag) {
+                        reply({
+                            errmsg: "Bag not found (too far?)"
+                        });
+                        return;
+                    }
+
+                    if (bag.template.type !== UnitTypeEnum.LOOTABLE) {
+                        reply({
+                            errmsg: "Wrong NPC type for loot!"
+                        });
+                        return;
+                    }
+
+                    item = _.find(bag.loot, function(i) {
+                        return i.id === data.itemId;
+                    });
+                } else {
+                    item = _.find(player.items, function(i) {
+                        return i.id === data.itemId;
+                    });
+                }
+
+                //console.log('items!! ', item, data, player.items);
 
                 if (_.isUndefined(item)) {
                     // Not found, so return
                     callback({
-                        message: "Item not found in player items!"
+                        message: "Item not found!"
                     });
                     return;
                 }
 
-                if(socket.unit.id !== item.owner) {
+                if(bag === null && player.id !== item.owner) {
                     callback({
                         message: "You do not own this item!"
                     });
                     return;
                 }
 
-                socket.unit.coins += item.value;
+                player.coins += item.value;
 
                 // remove item from inv
-                socket.unit.items = _.filter(socket.unit.items, function(i) {
-                    return i.id !== item.id;
-                });
-                // todo: sync inventory
+                if (bag) {
+                    bag.loot = _.without(bag.loot, item);
+                    // Check if the bag is now empty
+                    // If so, remove it from the world
+                    if (bag.loot.length === 0) {
+                        if (bag.param < 10) {
+                            bag.Remove();
+                        }
+                    } else {
+                        // Renew the lifetimer so it doesn't suddenly disappear
+                        bag.lifeTime = 0.0;
+                        player.EmitNearby("lootFromBag", data.npcId, 20);
+                    }
+                } else {
+                    player.items = _.without(player.items, item);
+                }
 
-                socket.emit('setCoins', socket.unit.coins);
+                socket.emit('setCoins', player.coins);
                 callback(null, 'ok');
             });
 
