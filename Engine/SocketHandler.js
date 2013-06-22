@@ -1576,7 +1576,7 @@ var SocketHandler = Class.extend({
 
                 var targetUnit = worldHandler.FindPlayerByName(data.targetName);
 
-                var zone = data.zone;
+                var zone = parseInt(data.zone, 10);
                 var pos = targetUnit ? targetUnit.position : ConvertVector3(data.pos);
 
 

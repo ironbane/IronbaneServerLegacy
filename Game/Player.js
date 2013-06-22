@@ -42,6 +42,11 @@ var Player = Fighter.extend({
   },
   Tick: function(dTime) {
 
+    // console.log("this.zone: "+this.zone);
+    // console.log("this.position: "+this.position.ToString());
+    // console.log("this.respawnTimer: "+this.respawnTimer);
+    // console.log("this.health: "+this.health);
+
     if ( this.health > 0 && this.zone === 4 && this.position.y <= 0.1 ) {
 
         this.SetHealth(0);

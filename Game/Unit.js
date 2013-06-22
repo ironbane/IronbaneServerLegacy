@@ -59,6 +59,9 @@ var Unit = Class.extend({
 
     this.rotation = new THREE.Vector3(this.rotx, this.roty, this.rotz);
 
+    // Convert zone to int
+    this.zone = parseInt(this.zone, 10);
+
 
     // Update the heading based on the rotation
     var radians = (this.rotation.y + 90) * (Math.PI/180);
