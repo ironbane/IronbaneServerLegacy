@@ -131,6 +131,66 @@ var ChatHandler = Class.extend({
             unit.socket.emit("setCoins", unit.coins);
 
             break;
+          case "check":
+
+            // Check the server for errors!
+
+            // First check for NPC's without nodes
+
+            var errors = "";
+            worldHandler.LoopUnits(function(unit) {
+              if ( unit.id < 0 ) {
+
+                // Check for empty nodes
+                if ( unit.connectedNodeList && !unit.connectedNodeList.length ) {
+                  errors += "Warning: no nodes found for NPC "+
+                    Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
+                }
+
+                // Check for bad cells
+                if ( !worldHandler.CheckWorldStructure(unit.zone, unit.cellX, unit.cellZ) ) {
+                  errors += "Warning: unexisting cell found for NPC "+
+                    Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
+                }
+
+                // Check for bad loot
+                if ( !_.isEmpty(unit.template.loot) ) {
+                  var lootSplit = unit.template.loot.split(";");
+                  for(var l=0;l<lootSplit.length;l++) {
+                    var item = null;
+
+                    // No percentages for vendors!
+                    if ( unit.template.type === UnitTypeEnum.VENDOR ) {
+                         item = parseInt(lootSplit[l], 10);
+                    }
+                    else {
+                        var chanceSplit = lootSplit[l].split(":");
+
+                        if ( WasLucky100(parseInt(chanceSplit[0], 10)) ) {
+                            item = parseInt(chanceSplit[1], 10);
+                        }
+                    }
+
+                    if ( item ) {
+                      if ( !ISDEF(dataHandler.items[item]) ) {
+                          errors += "Warning: item "+item+" not found for loot in NPC "+unit.id+"!<br>";
+                      }
+                    }
+                  }
+                }
+
+              }
+            });
+
+            if ( errors ) {
+              errorMessage = "Following errors were found:<br>"+errors;
+            }
+            else {
+              feedback += "No errors found!";
+            }
+
+
+            break;
           case "announce":
             var color = realparams[1];
 

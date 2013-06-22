@@ -138,7 +138,8 @@ var Unit = Class.extend({
       worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
     }
     else {
-      log("[Teleport] Cell does not exist.");
+      log("[Teleport] Cell does not exist for unit #"+
+        this.id+" ("+this.cellX+", "+this.cellZ+")");
       if ( this.id > 0 && this.editor ) {
         log("[Teleport] Generating cell because he's an editor.");
         worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
@@ -379,7 +380,8 @@ var Unit = Class.extend({
         worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
       }
       else {
-        log("[ChangeCell] Cell does not exist.");
+      log("[Teleport] Cell does not exist for unit #"+
+        this.id+" ("+cellPos.x+", "+cellPos.z+")");
         if ( this.id > 0 && this.editor ) {
           log("[ChangeCell] Generating cell because he's an editor.");
           worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
@@ -581,6 +583,8 @@ var Unit = Class.extend({
       id:this.id,
       message:text
     }, 0, true);
+  },
+  DebugLocationString: function() {
+    return "zone "+this.zone+", pos "+this.position.Round().ToString();
   }
-
 });
