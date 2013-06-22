@@ -40,6 +40,30 @@ var Player = Fighter.extend({
     this.lastChatTime = 0;
 
   },
+  Tick: function(dTime) {
+
+    if ( this.health > 0 && this.zone === 4 && this.position.y <= 0.1 ) {
+
+        this.SetHealth(0);
+
+        // Remove their items
+        this.items = [];
+
+        this.EmitNearby("getMeleeHit", {
+          victim:this.id,
+          attacker:0,
+          h:0,
+          a:0
+        }, 0, true);
+
+        this.respawnTimer = 10.0;
+
+        chatHandler.DiedSpecial(this, "lava");
+    }
+
+    this._super(dTime);
+
+  },
   Attack: function(victim, weapon) {
 
     // Players can only attack monsters and eachother (for now)

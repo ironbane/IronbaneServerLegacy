@@ -342,6 +342,21 @@ var ChatHandler = Class.extend({
       };
       io.sockets.emit("chatMessage", messageData);
   },
+  DiedSpecial: function(unit, cause) {
+
+      log(unit.name + ' was killed by ' + cause);
+
+      var messageData = {
+          type: 'diedspecial',
+          cause: cause,
+          victim: {
+              name: unit.name,
+              rank: unit.editor ? 'gm' : 'user'
+          }
+      };
+
+      io.sockets.emit("chatMessage", messageData);
+  },
   LeaveGame: function(unit) {
       var messageData = {
           type: 'leave',
