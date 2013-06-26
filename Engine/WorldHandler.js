@@ -19,7 +19,6 @@
 var dataPath = clientDir + 'data';
 
 var WorldHandler = Class.extend({
-  units: {}, // fast lookup by id
   Init: function() {
 
 
@@ -65,7 +64,7 @@ var WorldHandler = Class.extend({
       var subcount = 0;
 
       // Every zone has their own set of nodes
-	  this.allNodes[z] = {};
+    this.allNodes[z] = {};
 
       for(var cx in this.world[z]) {
 
@@ -75,13 +74,13 @@ var WorldHandler = Class.extend({
           if ( this.world[z][cx][cz].graph.nodes === undefined ) continue;
 
           //this.allNodes = worldHandler.world[this.zone][cx][cz]['graph']['nodes'].concat(this.allNodes);
-		  var len = this.world[z][cx][cz].graph.nodes.length;
+      var len = this.world[z][cx][cz].graph.nodes.length;
           for(var x=0;x<len;x++){
             var node = this.world[z][cx][cz].graph.nodes[x];
-			//console.log(node);
-			//console.log(this.world[z].allNodes);
+      //console.log(node);
+      //console.log(this.world[z].allNodes);
             //this.world[z].allNodes.node['id'] = node;
-			this.allNodes[z][node.id] = node;
+      this.allNodes[z][node.id] = node;
             count++;
             subcount++;
           }
@@ -165,7 +164,7 @@ var WorldHandler = Class.extend({
 
     walk(dataPath, function(err, results) {
       if (err) throw err;
-		var rl = results.length;
+    var rl = results.length;
       for (var r=0;r<rl;r++) {
         results[r] = results[r].replace(dataPath+"/", "");
 
@@ -291,27 +290,43 @@ var WorldHandler = Class.extend({
 
 
   },
-    LoadUnits: function(zone, cellX, cellZ) {
-        var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize),
-            WH = this;
+  LoadUnits: function(zone, cellX, cellZ) {
 
-        mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?', [
-            zone, (worldPos.x - cellSizeHalf), (worldPos.z - cellSizeHalf), (worldPos.x + cellSizeHalf), (worldPos.z + cellSizeHalf)
-        ], function(err, results, fields) {
 
-            if (err) {
-                throw err;
-            }
+    var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize);
 
-            for (var u = 0; u < results.length; u++) {
-                var unitdata = results[u];
-                WH.units[unitdata.id] = WH.MakeUnitFromData(unitdata);
-            }
 
-            WH.world[zone][cellX][cellZ].hasLoadedUnits = true;
+
+
+
+
+    (function(zone,cellX,cellZ){
+      mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?',
+        [zone,(worldPos.x-cellSizeHalf),(worldPos.z-cellSizeHalf),(worldPos.x+cellSizeHalf),(worldPos.z+cellSizeHalf)],
+        function (err, results, fields) {
+
+          if (err) throw err;
+
+          for(var u=0;u<results.length;u++) {
+
+
+            var unitdata = results[u];
+
+
+            worldHandler.MakeUnitFromData(unitdata);
+
+
+          }
+
+          worldHandler.world[zone][cellX][cellZ].hasLoadedUnits = true;
+
         });
-    },
+    })(zone, cellX, cellZ);
 
+
+
+
+  },
   MakeUnitFromData: function(data) {
     data.id = -data.id;
 
@@ -663,16 +678,17 @@ var WorldHandler = Class.extend({
       }
     }
   },
-    FindUnit: function(id) {
-      var foundUnit = null;
+  FindUnit: function(id) {
 
-      this.LoopUnits(function(unit) {
-        if ( foundUnit ) return;
-        if ( unit.id === id ) foundUnit = unit;
-      });
+    var foundUnit = null;
 
-      return foundUnit;
-    },
+    this.LoopUnits(function(unit) {
+      if ( foundUnit ) return;
+      if ( unit.id === id ) foundUnit = unit;
+    });
+
+    return foundUnit;
+  },
   // Only for players!!!!
   FindPlayerByName: function(name) {
 
@@ -779,4 +795,3 @@ var WorldHandler = Class.extend({
 });
 
 var worldHandler = new WorldHandler();
-

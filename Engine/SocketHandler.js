@@ -870,145 +870,6 @@ var SocketHandler = Class.extend({
 
             });
 
-            // when you put some cash type item onto the cashbox slot
-            socket.on('putCash', function(data, callback) {
-                var item = null,
-                    bag = null,
-                    player = socket.unit;
-
-                if(data.npcId) {
-                    bag = worldHandler.FindUnitNear(data.npcId, player);
-
-                    if (!bag) {
-                        reply({
-                            errmsg: "Bag not found (too far?)"
-                        });
-                        return;
-                    }
-
-                    if (bag.template.type !== UnitTypeEnum.LOOTABLE) {
-                        reply({
-                            errmsg: "Wrong NPC type for loot!"
-                        });
-                        return;
-                    }
-
-                    item = _.find(bag.loot, function(i) {
-                        return i.id === data.itemId;
-                    });
-                } else {
-                    item = _.find(player.items, function(i) {
-                        return i.id === data.itemId;
-                    });
-                }
-
-                //console.log('items!! ', item, data, player.items);
-
-                if (_.isUndefined(item)) {
-                    // Not found, so return
-                    callback({
-                        message: "Item not found!"
-                    });
-                    return;
-                }
-
-                if(bag === null && player.id !== item.owner) {
-                    callback({
-                        message: "You do not own this item!"
-                    });
-                    return;
-                }
-
-                player.coins += item.value;
-
-                // remove item from inv
-                if (bag) {
-                    bag.loot = _.without(bag.loot, item);
-                    // Check if the bag is now empty
-                    // If so, remove it from the world
-                    if (bag.loot.length === 0) {
-                        if (bag.param < 10) {
-                            bag.Remove();
-                        }
-                    } else {
-                        // Renew the lifetimer so it doesn't suddenly disappear
-                        bag.lifeTime = 0.0;
-                        player.EmitNearby("lootFromBag", data.npcId, 20);
-                    }
-                } else {
-                    player.items = _.without(player.items, item);
-                }
-
-                socket.emit('setCoins', player.coins);
-                callback(null, 'ok');
-            });
-
-            // when you want to drop some money on the ground
-            socket.on('dropCash', function(data, callback) {
-                if(data.amount > socket.unit.coins) {
-                    err = {
-                        message: 'You don\'t have that many coins, stop trying to cheat.'
-                    };
-                    callback(err);
-                    return;
-                }
-
-                // spawn loot with cash object
-
-                // find a cash template
-                // todo: find one with similar value? pick random from array? for now, first.
-                var template = _.find(dataHandler.items, function(i) {
-                    return i.type === 'cash';
-                });
-
-                if(!template) {
-                    callback({
-                        type: 'server_fault',
-                        message: 'Server doesn\'t have any cash objects!!'
-                    });
-                    return;
-                }
-
-                var item = {
-                    id: server.GetAValidItemID(),
-                    attr1: template.attr1,
-                    value: data.amount, // this one is not part of the instance yet (only in memory)
-                    equipped: 0,
-                    slot: 0,
-                    template: template.id,
-                    value: data.amount,
-                    data: {
-                        droppedBy: socket.unit.id
-                    }
-                };
-
-                var spawnPos = socket.unit.position.clone().addSelf(socket.unit.heading);
-
-                var bag = new Lootable({
-                    id: server.GetAValidNPCID(),
-                    x: spawnPos.x,
-                    y: spawnPos.y,
-                    z: spawnPos.z,
-                    zone: socket.unit.zone,
-
-                    // Hacky: refers to lootBag ID
-                    template: dataHandler.units[lootBagTemplate],
-
-                    roty: 0
-                }, false);
-
-                item.owner = bag.id;
-
-                // Add the item to the lootbag
-                bag.loot.push(item);
-
-                socket.unit.coins -= data.amount;
-
-                // add to coins, etc...
-                socket.emit('setCoins', socket.unit.coins);
-                callback(null, 'ok');
-            });
-
             socket.on("putItem", function (data, reply) {
 
                 if ( !socket.unit ) return;
@@ -1149,6 +1010,7 @@ var SocketHandler = Class.extend({
 
             });
 
+            // swapping items, which also will handle combining/stacking
             socket.on("switchItem", function(data, reply) {
                 if (_.isUndefined(reply) || !_.isFunction(reply)) {
                     log('switchItem no callback defined!');
@@ -1191,7 +1053,7 @@ var SocketHandler = Class.extend({
 
                     if (!_.isUndefined(switchItem)) {
                         // stackables
-                        if(dataHandler.items[switchItem.template].type === 'cash' && dataHandler.items[item.template].type === 'cash') {
+                        if(switchItem.getType() === 'cash' && item.getType() === 'cash') {
                             item.value += switchItem.value;
                             socket.unit.items = _.without(socket.unit.items, switchItem);
                         } else {
@@ -1248,7 +1110,7 @@ var SocketHandler = Class.extend({
 
                     if (!_.isUndefined(switchItem)) {
                         // stackables
-                        if(dataHandler.items[switchItem.template].type === 'cash' && dataHandler.items[item.template].type === 'cash') {
+                        if(switchItem.getType() === 'cash' && item.getType() === 'cash') {
                             item.value += switchItem.value;
                             socket.unit.items = _.without(socket.unit.items, switchItem);
                         } else {
