@@ -43,7 +43,18 @@ var Item = Class.extend({
             _.extend(this, config);
         }
     },
+    // these getters setup so that the item instance could in the future have values
+    // not on the template, but in the data JSON
     getType: function() {
         return this.$template.type;
+    },
+    getSubType: function() {
+        return this.$template.subtype;
+    },
+    getImage: function() {
+        return this.$template.image;
+    },
+    getBaseValue: function() {
+        return this.$template.basevalue;
     }
 });

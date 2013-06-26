@@ -871,88 +871,87 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("putItem", function (data, reply) {
+                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                    log('switchItem no callback defined!');
+                    return;
+                }
 
-                if ( !socket.unit ) return;
-
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
-                var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
-
-                data.acceptOffer = ISDEF(data.acceptOffer) ? true : false;
-
-
-                if (!bag ) {
+                if (!socket.unit) {
                     reply({
-                        errmsg:"Bag not found (too far?)"
+                        errmsg: 'no unit!'
                     });
                     return;
                 }
 
-                if ( bag.template.type != UnitTypeEnum.LOOTABLE
-                    && bag.template.type != UnitTypeEnum.VENDOR
-                    ) {
+                var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
+
+                if (!bag) {
                     reply({
-                        errmsg:"Wrong NPC type for loot!"
+                        errmsg: "Bag not found (too far?)"
+                    });
+                    return;
+                }
+
+                if (bag.template.type != UnitTypeEnum.LOOTABLE && bag.template.type != UnitTypeEnum.VENDOR) {
+                    reply({
+                        errmsg: "Wrong NPC type for loot!"
                     });
                     return;
                 }
 
                 // Do the change
-                var item = _.find(socket.unit.items, function(i){
-                    return i.id == data.itemID;
+                var item = _.find(socket.unit.items, function(i) {
+                    return i.id === data.itemID;
                 });
 
-                if ( _.isUndefined(item) ) {
+                if (_.isUndefined(item)) {
                     // Not found, so return
                     reply({
-                        errmsg:"Item not found in player items!"
+                        errmsg: "Item not found in player items!"
                     });
                     return;
                 }
 
                 // Check if the target slot is available
-                var slotTest = _.find(bag.loot, function(i){
-                    return i.slot == data.slotNumber;
+                var slotTest = _.find(bag.loot, function(i) {
+                    return i.slot === data.slotNumber;
                 });
 
-                if ( !_.isUndefined(slotTest) ) {
-                    // We found an item :O, that means there is already an item with this slotNumber!
+                if (!_.isUndefined(slotTest)) {
                     reply({
-                        errmsg:"slotNumber is already taken"
+                        errmsg: "slotNumber is already taken"
                     });
                     return;
                 }
 
                 // Check if the slotNumber is within the bag's limits
-                if ( !_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9 ) {
+                if (!_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9) {
                     reply({
-                        errmsg:"Invalid slotNumber"
+                        errmsg: "Invalid slotNumber"
                     });
                     return;
                 }
 
-                if ( bag.template.type == UnitTypeEnum.VENDOR ) {
+                if (bag.template.type == UnitTypeEnum.VENDOR) {
 
                     var offeredPrice = (CalculateItemPrice(item) / 2).Round();
                     offeredPrice = Math.max(offeredPrice, 0);
 
-                    if ( !data.acceptOffer ) {
+                    if (!data.acceptOffer) {
 
-                        if ( offeredPrice > 0 ) {
+                        if (offeredPrice > 0) {
                             reply({
-                                offeredPrice:offeredPrice
+                                offeredPrice: offeredPrice
                             });
                             return;
-                        }
-                        else {
+                        } else {
                             reply({
-                                errmsg:ChooseRandom(["Take yer stuff with ye!","Haven't ye got better items?","Me thinks that is not worth the trouble!"])
+                                errmsg: ChooseRandom(["Take yer stuff with ye!", "Haven't ye got better items?", "Me thinks that is not worth the trouble!"])
                             });
                             return;
                         }
                         return;
-                    }
-                    else {
+                    } else {
 
                         // Put the price tag back (x2 :P)
                         item.price = offeredPrice * 2;
@@ -960,13 +959,12 @@ var SocketHandler = Class.extend({
                         // Give the player the original price
                         socket.unit.coins += offeredPrice;
 
-                        bag.Say(ChooseRandom(["A pleasure doing business!","Ye got a good deal!","'Tis most splendid!"]));
+                        bag.Say(ChooseRandom(["A pleasure doing business!", "Ye got a good deal!", "'Tis most splendid!"]));
 
                     }
                 }
 
-
-                if ( bag.template.type == UnitTypeEnum.LOOTABLE ) {
+                if (bag.template.type == UnitTypeEnum.LOOTABLE) {
                     // Renew the lifetimer so it doesn't suddenly disappear
                     bag.lifeTime = 0.0;
                 }
@@ -981,15 +979,15 @@ var SocketHandler = Class.extend({
                 item.slot = data.slotNumber;
 
                 // If it was equipped and type was armor/weapon, update the appearance
-                if ( item.equipped ) {
-                    if ( dataHandler.items[item.template].type == 'armor' ) {
+                if (item.equipped) {
+                    if (dataHandler.items[item.template].type == 'armor') {
                         socket.unit.UpdateAppearance(true);
                     }
-                    if ( dataHandler.items[item.template].type == 'weapon' ||
+                    if (dataHandler.items[item.template].type == 'weapon' ||
                         dataHandler.items[item.template].type == 'tool') {
                         socket.unit.EmitNearby("updateWeapon", {
-                            id:socket.unit.id,
-                            weapon:0
+                            id: socket.unit.id,
+                            weapon: 0
                         });
                     }
                 }
@@ -997,17 +995,13 @@ var SocketHandler = Class.extend({
 
                 socket.unit.EmitNearby("lootFromBag", data.npcID, 20);
 
-
-                if ( data.acceptOffer ) {
+                if (data.acceptOffer) {
                     reply({
-                        newCoins:socket.unit.coins
-                        });
-                }
-                else {
+                        newCoins: socket.unit.coins
+                    });
+                } else {
                     reply("OK");
                 }
-
-
             });
 
             // swapping items, which also will handle combining/stacking
