@@ -64,73 +64,41 @@ var ChatHandler = Class.extend({
 
       if (unit.editor) {
         switch (command) {
-          case "giveitem":
+            case "giveitem":
+                // So, which item?
+                var template = -1;
 
-            // So, which item?
-            var template = -1;
-
-            // Try to convert to integer, if we passed an ID
-            var testConvert = parseInt(realparams[0], 10);
-
-            // It appears we passed a string
-            if (_.isNaN(testConvert)) {
-              testConvert = realparams[0];
-              // Must be a string, truey again!
-              _.each(dataHandler.items, function(item) {
-                if (item.name.indexOf(testConvert) !== -1) {
-                  // Found!
-                  template = item.id;
+                // Try to convert to integer, if we passed an ID
+                var testConvert = parseInt(realparams[0], 10);
+                if (_.isNumber(testConvert)) {
+                    template = dataHandler.items[testConvert];
+                } else {
+                    template = _.where(dataHandler.items, {
+                        name: realparams[0]
+                    })[0];
                 }
-              });
 
-            } else {
-              if (dataHandler.items[testConvert]) {
-                template = testConvert;
-              }
-            }
+                if (template) {
+                    if (!unit.GiveItem(template)) {
+                        errorMessage = 'You have no free space!';
+                    }
+                } else {
+                    errorMessage = "Item not found!";
+                }
 
-            if (template === -1) {
-              errorMessage = "Item not found!";
-              break;
-            }
-
-            log("template ID: " + template);
-
-            template = dataHandler.items[template];
-
-            // Find a free slot
-            var slot = -1;
-
-            // Loop over 10 slots, and check if we have an item that matches that
-            // slot
-            for (var i = 0; i < 10; i++) {
-              var found = false;
-
-              _.each(unit.items, function(item) {
-                if (item.slot === i) found = true;
-              });
-
-              if (!found) {
-                slot = i;
                 break;
-              }
-
-            }
-
-            if (slot === -1) {
-              errorMessage = "You have no free space!";
-              break;
-            }
-
-            unit.GiveItem(template);
-
-            break;
-          case "givecoins":
-
-            unit.coins += parseInt(realparams[0], 10);
-            unit.socket.emit("setCoins", unit.coins);
-
-            break;
+            case "givecoins":
+                // find a "cash" item
+                var moneybag = _.where(dataHandler.items, {type: 'cash'})[0],
+                    amount = parseInt(realparams[0], 10);
+                if(moneybag) {
+                    if(!unit.GiveItem(moneybag, {value: amount})) {
+                        errorMessage = 'You have no free space!';
+                    }
+                } else {
+                    errorMessage = 'no cash items found!';
+                }
+                break;
           case "check":
 
             // Check the server for errors!

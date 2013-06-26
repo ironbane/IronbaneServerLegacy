@@ -439,25 +439,30 @@ var Fighter = Actor.extend({
       this.SetArmor(this.armorMax);
     }
   },
-    GiveItem: function(template) {
+    GiveItem: function(template, config) {
         // todo: variable max inv?
         if (this.items.length >= 10) {
             // no free slots
-            return;
+            return false;
         }
 
         var taken = _.pluck(this.items, 'slot');
         // take first available slot
         var slot = _.difference([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], taken)[0];
 
+        // config passed in goes to instance
+        config = config || {};
+
+        config.owner = this.id;
+        config.slot = slot;
+
         // create new item based off the template
-        var item = new Item(template, {
-            owner: this.id,
-            slot: slot
-        });
+        var item = new Item(template, config);
         this.items.push(item);
 
         this.socket.emit("receiveItem", item);
+
+        return true;
     },
     UpdateAppearance: function(sendChanges) {
         this.head = 0;
