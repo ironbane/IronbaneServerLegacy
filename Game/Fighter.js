@@ -469,48 +469,24 @@ var Fighter = Actor.extend({
     }
   },
   GiveItem: function(template) {
-
-    // Find a free slot
-    var slot = -1;
-
-    // Loop over 10 slots, and check if we have an item that matches that
-    // slot
-
-
-    for (var i = 0; i < 10; i++) {
-
-      var found = false;
-
-      _.each(this.items, function(item) {
-        if ( item.slot === i ) found = true;
-      });
-
-      if ( !found ) {
-        slot = i;
-        break;
+      // todo: variable max inv?
+      if (this.items.length >= 10) {
+          // no free slots
+          return;
       }
 
-    }
+      var taken = _.pluck(this.items, 'slot');
+      // take first available slot
+      var slot = _.difference([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], taken)[0];
 
+      // create new item based off the template
+      var item = new Item(template, {
+          owner: this.id,
+          slot: slot
+      });
+      this.items.push(item);
 
-    if ( slot === -1 ) {
-      return;
-    }
-
-    var item = {
-      attr1: template.attr1,
-      equipped: 0,
-      id: server.GetAValidItemID(),
-      owner: this.id,
-      slot: slot,
-      template: template.id
-    };
-
-    // console.log(item);
-
-    this.items.push(item);
-
-    this.socket.emit("receiveItem", item);
+      this.socket.emit("receiveItem", item);
   },
   UpdateAppearance: function(sendChanges) {
 

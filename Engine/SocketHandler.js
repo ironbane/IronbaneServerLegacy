@@ -1149,120 +1149,114 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("switchItem", function (data, reply) {
+            socket.on("switchItem", function(data, reply) {
+                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                    log('switchItem no callback defined!');
+                    return;
+                }
 
-                if ( !socket.unit ) return;
-
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
-                // Check if the slotNumber is within the bag's limits
-                if ( !_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9 ) {
+                if (!socket.unit) {
                     reply({
-                        errmsg:"Invalid slotNumber"
+                        errmsg: 'no unit!'
                     });
                     return;
                 }
 
+                // Check if the slotNumber is within the bag's limits
+                if (!_.isNumber(data.slotNumber) || data.slotNumber < 0 || data.slotNumber > 9) {
+                    reply({
+                        errmsg: "Invalid slotNumber"
+                    });
+                    return;
+                }
 
-                if ( _.isUndefined(data.npcID) ) {
+                // switching within our own inventory
+                if (_.isUndefined(data.npcID)) {
                     // Make sure we have the item we want to switch
-                    var item = _.find(socket.unit.items, function(i){
+                    var item = _.find(socket.unit.items, function(i) {
                         return i.id === data.itemID;
                     });
 
-
-
-                    if ( _.isUndefined(item) ) {
+                    if (_.isUndefined(item)) {
                         // Not found, so return
                         reply({
-                            errmsg:"Item not found in player items!"
+                            errmsg: "Item not found in player items!"
                         });
                         return;
                     }
 
-                    // Make sure we have the item we want to switch
-                    var item = _.find(socket.unit.items, function(i){
-                        return i.id == data.itemID;
-                    });
-
-                    if ( _.isUndefined(item) ) {
-                        // Not found, so return
-                        reply({
-                            errmsg:"Item not found in loot bag!"
-                        });
-                        return;
-                    }
-
-
-                    var switchItem = _.find(socket.unit.items, function(i){
+                    var switchItem = _.find(socket.unit.items, function(i) {
                         return i.slot == data.slotNumber;
                     });
 
-                    if ( !_.isUndefined(switchItem) ) {
-                        // We found an item, so prepare for a full switch, not just a movement
-                        switchItem.slot = item.slot;
+                    if (!_.isUndefined(switchItem)) {
+                        // stackables
+                        if(dataHandler.items[switchItem.template].type === 'cash' && dataHandler.items[item.template].type === 'cash') {
+                            item.value += switchItem.value;
+                            socket.unit.items = _.without(socket.unit.items, switchItem);
+                        } else {
+                            // We found an item, so prepare for a full switch, not just a movement
+                            switchItem.slot = item.slot;
+                        }
                     }
-
                     item.slot = data.slotNumber;
 
-                }
-                else {
+                } else {
 
                     var bag = worldHandler.FindUnitNear(data.npcID, socket.unit);
 
-                    if (!bag ) {
+                    if (!bag) {
                         reply({
-                            errmsg:"Bag not found (too far?)"
+                            errmsg: "Bag not found (too far?)"
                         });
                         return;
-                    }
-                    else if ( bag.template.type !== UnitTypeEnum.LOOTABLE
-                        && bag.template.type !== UnitTypeEnum.VENDOR
-                        ) {
+                    } else if (bag.template.type !== UnitTypeEnum.LOOTABLE && bag.template.type !== UnitTypeEnum.VENDOR) {
                         reply({
-                            errmsg:"Wrong NPC type for loot!"
+                            errmsg: "Wrong NPC type for loot!"
                         });
                         return;
                     }
 
-                    if ( bag.template.type === UnitTypeEnum.VENDOR ) {
+                    if (bag.template.type === UnitTypeEnum.VENDOR) {
                         reply({
-                            errmsg:ChooseRandom(["Dareth not touch my stuff!","What do you think yer doing?"])
+                            errmsg: ChooseRandom(["Dareth not touch my stuff!", "What do you think yer doing?"])
                         });
                         return;
                     }
 
                     // Make sure we have the item we want to switch
-                    var item = _.find(bag.loot, function(i){
+                    var item = _.find(bag.loot, function(i) {
                         return i.id == data.itemID;
                     });
 
-                    if ( _.isUndefined(item) ) {
+                    if (_.isUndefined(item)) {
                         // Not found, so return
                         reply({
-                            errmsg:"Item not found in loot bag!"
+                            errmsg: "Item not found in loot bag!"
                         });
                         return;
                     }
 
-
-                    if ( bag.template.type == UnitTypeEnum.LOOTABLE ) {
+                    if (bag.template.type == UnitTypeEnum.LOOTABLE) {
                         // Renew the lifetimer so it doesn't suddenly disappear
                         bag.lifeTime = 0.0;
                     }
 
-
-                    var switchItem = _.find(bag.loot, function(i){
+                    var switchItem = _.find(bag.loot, function(i) {
                         return i.slot === data.slotNumber;
                     });
 
-                    if ( !_.isUndefined(switchItem) ) {
-                        // We found an item, so prepare for a full switch, not just a movement
-                        switchItem.slot = item.slot;
+                    if (!_.isUndefined(switchItem)) {
+                        // stackables
+                        if(dataHandler.items[switchItem.template].type === 'cash' && dataHandler.items[item.template].type === 'cash') {
+                            item.value += switchItem.value;
+                            socket.unit.items = _.without(socket.unit.items, switchItem);
+                        } else {
+                            // We found an item, so prepare for a full switch, not just a movement
+                            switchItem.slot = item.slot;
+                        }
                     }
-
                     item.slot = data.slotNumber;
-
 
                     socket.unit.EmitNearby("lootFromBag", data.npcID, 20);
                 }

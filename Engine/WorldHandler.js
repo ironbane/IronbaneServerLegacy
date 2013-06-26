@@ -19,6 +19,7 @@
 var dataPath = clientDir + 'data';
 
 var WorldHandler = Class.extend({
+  units: {}, // fast lookup by id
   Init: function() {
 
 
@@ -290,43 +291,27 @@ var WorldHandler = Class.extend({
 
 
   },
-  LoadUnits: function(zone, cellX, cellZ) {
+    LoadUnits: function(zone, cellX, cellZ) {
+        var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize),
+            WH = this;
 
+        mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?', [
+            zone, (worldPos.x - cellSizeHalf), (worldPos.z - cellSizeHalf), (worldPos.x + cellSizeHalf), (worldPos.z + cellSizeHalf)
+        ], function(err, results, fields) {
 
-    var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize);
+            if (err) {
+                throw err;
+            }
 
+            for (var u = 0; u < results.length; u++) {
+                var unitdata = results[u];
+                WH.units[unitdata.id] = WH.MakeUnitFromData(unitdata);
+            }
 
-
-
-
-
-    (function(zone,cellX,cellZ){
-      mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?',
-        [zone,(worldPos.x-cellSizeHalf),(worldPos.z-cellSizeHalf),(worldPos.x+cellSizeHalf),(worldPos.z+cellSizeHalf)],
-        function (err, results, fields) {
-
-          if (err) throw err;
-
-          for(var u=0;u<results.length;u++) {
-
-
-            var unitdata = results[u];
-
-
-            worldHandler.MakeUnitFromData(unitdata);
-
-
-          }
-
-          worldHandler.world[zone][cellX][cellZ].hasLoadedUnits = true;
-
+            WH.world[zone][cellX][cellZ].hasLoadedUnits = true;
         });
-    })(zone, cellX, cellZ);
+    },
 
-
-
-
-  },
   MakeUnitFromData: function(data) {
     data.id = -data.id;
 
@@ -678,17 +663,16 @@ var WorldHandler = Class.extend({
       }
     }
   },
-  FindUnit: function(id) {
+    FindUnit: function(id) {
+      var foundUnit = null;
 
-    var foundUnit = null;
+      this.LoopUnits(function(unit) {
+        if ( foundUnit ) return;
+        if ( unit.id === id ) foundUnit = unit;
+      });
 
-    this.LoopUnits(function(unit) {
-      if ( foundUnit ) return;
-      if ( unit.id === id ) foundUnit = unit;
-    });
-
-    return foundUnit;
-  },
+      return foundUnit;
+    },
   // Only for players!!!!
   FindPlayerByName: function(name) {
 
