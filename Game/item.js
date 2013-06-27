@@ -36,7 +36,7 @@ var Item = Class.extend({
         this.template = template.id;
 
         this.attr1 = template.attr1;
-        this.value = template.basevalue;
+        this.value = template.basevalue || 0;
 
         // copy for faster searching
         this.type = template.type;

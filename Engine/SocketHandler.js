@@ -540,6 +540,8 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
+                console.log('useItem', player.items, item);
+
                 switch (item.getType()) {
                     case 'consumable':
                         // Remove the item
@@ -1030,7 +1032,7 @@ var SocketHandler = Class.extend({
                     }
 
                     var switchItem = _.find(player.items, function(i) {
-                        return i.slot == data.slotNumber;
+                        return i.slot === data.slotNumber;
                     });
 
                     if (!_.isUndefined(switchItem)) {

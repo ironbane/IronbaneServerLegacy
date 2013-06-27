@@ -114,15 +114,9 @@ var NPC = Fighter.extend({
                     }
 
                     var itemTemplate = dataHandler.items[item];
-
-                    var temp = {
-                        id: server.GetAValidItemID(),
-                        template: item,
-                        slot: l,
-                        attr1: itemTemplate.attr1,
-                        equipped: 0,
-                        value: itemTemplate.basevalue || 0
-                    };
+                    var temp = new Item(itemTemplate, {
+                        slot: l
+                    });
 
                     if (this.template.type === UnitTypeEnum.VENDOR) {
                         // Specifiy a price
