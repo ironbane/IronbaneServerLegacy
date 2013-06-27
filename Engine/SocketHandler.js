@@ -247,6 +247,7 @@ var SocketHandler = Class.extend({
                                         }
 
                                         (function(socket, data, reply, chardata) {
+                                            chardata.items = [];
                                             mysql.query(
                                                 'SELECT * FROM ib_items WHERE owner = ?', [data.characterID],
                                                 function selectCb(err, results, fields) {
@@ -261,10 +262,15 @@ var SocketHandler = Class.extend({
                                                                 // invalid json?
                                                             }
                                                         }
+                                                        var template = _.find(dataHandler.items, function(t) {
+                                                            return t.id === item.template;
+                                                        });
+                                                        if(template) {
+                                                            chardata.items.push(new Item(template, item));
+                                                        } else {
+                                                            log('could not find template for item result: ' + item.template);
+                                                        }
                                                     });
-
-                                                    // It's possible that the items are empty!
-                                                    chardata.items = results;
 
                                                     chardata.editor = data.editor;
 
