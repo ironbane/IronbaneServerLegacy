@@ -540,7 +540,7 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                console.log('useItem', player.items, item);
+                //console.log('useItem', player.items, item);
 
                 switch (item.getType()) {
                     case 'consumable':
