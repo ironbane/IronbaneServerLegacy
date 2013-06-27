@@ -38,6 +38,10 @@ var Item = Class.extend({
         this.attr1 = template.attr1;
         this.value = template.basevalue;
 
+        // copy for faster searching
+        this.type = template.type;
+        this.subtype = template.subtype;
+
         // update any additional properties
         if(config) {
             _.extend(this, config);
