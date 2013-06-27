@@ -540,7 +540,7 @@ var Fighter = Actor.extend({
         // sum value of cash items in inventory
         return _.reduce(_.pluck(_.where(this.items, {
             type: 'cash'
-        }), value), function(memo, num) {
+        }), 'value'), function(memo, num) {
             return memo + num;
         }, 0);
     },
