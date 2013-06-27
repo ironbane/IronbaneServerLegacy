@@ -448,7 +448,7 @@ var Fighter = Actor.extend({
 
         var taken = _.pluck(this.items, 'slot');
         // take first available slot
-        var slot = _.difference([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], taken)[0];
+        var slot = _.difference(_.range(10), taken)[0];
 
         // config passed in goes to instance
         config = config || {};
@@ -461,6 +461,33 @@ var Fighter = Actor.extend({
         this.items.push(item);
 
         this.socket.emit("receiveItem", item);
+
+        return true;
+    },
+    addCoins: function(amount) {
+        // attempt to auto stack coins
+        if(amount <= 0) {
+            return false;
+        }
+
+        var bags = _.where(this.items, {type: 'cash'});
+        if(bags.length > 0) {
+            // for now just add to the first bag,
+            // todo: bag limits?
+            bags[0].value += amount;
+        } else {
+            // need to add one if the slot is available
+            var template = _.where(dataHandler.items, {type: 'cash'})[0];
+            if(!template) {
+                log('server has no cash items!!!');
+                return false;
+            }
+
+            if(!this.GiveItem(template, {value: amount})) {
+                // no room in inventory for coins!
+                return false;
+            }
+        }
 
         return true;
     },
@@ -508,6 +535,44 @@ var Fighter = Actor.extend({
         }
 
         return null;
+    },
+    getTotalCoins: function() {
+        // sum value of cash items in inventory
+        return _.reduce(_.pluck(_.where(this.items, {
+            type: 'cash'
+        }), value), function(memo, num) {
+            return memo + num;
+        }, 0);
+    },
+    purchase: function(item) {
+        // if player has multiple money bags need to remove them until finished
+        var bags = _.where(this.items, {type: 'cash'}),
+            bagIndex = 0,
+            available = this.getTotalCoins(),
+            remaining = item.price;
+
+        if(!remaining || remaining <= 0) {
+            return false; // invalid price! (fallback to value or basevalue?)
+        }
+
+        if(available < remaining) {
+            return false; // can't afford
+        }
+
+        while(remaining > 0) {
+            if(bags[bagIndex].value - remaining < 0) {
+                remaining -= bags[bagIndex].value;
+                this.items = _.without(this.items, bags[bagIndex]);
+            } else {
+                bags[bagIndex].value -= remaining;
+                remaining = 0;
+            }
+
+            bagIndex++;
+        }
+
+        // purchase successful
+        return true;
     },
   InLineOfSight: function(unit, noHeadingCheck) {
     var unitToUs = unit.position.clone().subSelf(this.position);
