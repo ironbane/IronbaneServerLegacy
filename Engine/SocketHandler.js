@@ -837,7 +837,7 @@ var SocketHandler = Class.extend({
                 // No need to refresh if the bag is not empty anymore, since it'll get deleted anyway on the client
                 // They will receive a BAG NOT FOUND error otherwise
                 if (bag.loot.length > 0) {
-                    player.EmitNearby("lootFromBag", data.npcID, 20);
+                    player.EmitNearby("lootFromBag", {bag: data.npcID, loot: bag.loot}, 20, true);
                 }
 
                 if (bag.template.type === UnitTypeEnum.VENDOR) {
@@ -980,7 +980,7 @@ var SocketHandler = Class.extend({
                 }
                 item.equipped = 0;
 
-                player.EmitNearby("lootFromBag", data.npcID, 20);
+                player.EmitNearby("lootFromBag", {bag: data.npcID, loot: bag.loot}, 20, true);
 
                 if (data.acceptOffer) {
                     reply({
@@ -1104,10 +1104,13 @@ var SocketHandler = Class.extend({
                     }
                     item.slot = data.slotNumber;
 
-                    socket.unit.EmitNearby("lootFromBag", data.npcID, 20);
+                    socket.unit.EmitNearby("lootFromBag", {bag: data.npcID, loot: bag.loot}, 20, true);
                 }
 
-                reply("OK");
+                // because we might have stacked something, let's sync up with the client now
+                reply({
+                    items: player.items
+                });
             });
 
             socket.on("loot", function(npcID, reply) {
