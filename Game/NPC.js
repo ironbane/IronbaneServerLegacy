@@ -120,7 +120,7 @@ var NPC = Fighter.extend({
 
                     if (this.template.type === UnitTypeEnum.VENDOR) {
                         // Specifiy a price
-                        temp.price = CalculateItemPrice(temp);
+                        temp.price = temp.value;
 
                         // And an owner
                         temp.owner = this.id;

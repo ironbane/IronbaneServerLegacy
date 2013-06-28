@@ -1111,13 +1111,22 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("loot", function(npcID, reply) {
+                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                    log('switchItem no callback defined!');
+                    return;
+                }
 
-                if (!socket.unit) return;
+                if (!socket.unit) {
+                    reply({
+                        errmsg: 'no unit!'
+                    });
+                    return;
+                }
 
-                if (_.isUndefined(reply) || !_.isFunction(reply)) return;
+                var player = socket.unit;
 
                 // todo: check if NPC is nearby
-                var bag = worldHandler.FindUnitNear(npcID, socket.unit);
+                var bag = worldHandler.FindUnitNear(npcID, player);
 
                 if (!bag) {
                     reply({
@@ -1136,18 +1145,6 @@ var SocketHandler = Class.extend({
                 if (bag.template.type === UnitTypeEnum.LOOTABLE) {
                     // Renew the lifetimer so it doesn't suddenly disappear
                     bag.lifeTime = 0.0;
-                }
-
-                switch (bag.template.type) {
-                    case UnitTypeEnum.LOOTABLE:
-                    case UnitTypeEnum.VENDOR:
-                        reply(bag.loot);
-                        break;
-                    default:
-                        reply({
-                            errmsg: "Wrong NPC type for loot!"
-                        });
-                        break;
                 }
             });
 
