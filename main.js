@@ -188,7 +188,7 @@ var includes = [
     './Game/AI/States/TurretKillable.js',
     './Game/AI/States/Wander.js',
 
-
+    './Game/item.js',
     './Game/SteeringBehaviour.js',
     './Game/Unit.js',
     './Game/MovingUnit.js',
@@ -218,7 +218,7 @@ for (var f = 0; f < includes.length; f++) {
     eval(fs.readFileSync(includes[f]) + '');
 }
 
-
+/*
 // create web server
 var HttpServer = require('./src/server/http/server').Server,
      httpServer = new HttpServer();
@@ -226,6 +226,7 @@ var HttpServer = require('./src/server/http/server').Server,
 // create socket server
 var SocketServer = require('./src/server/socket/server').Server,
     socketServer = new SocketServer(httpServer.server);
+*/
 
 // setup REPL for console server mgmt
 var startREPL = function() {

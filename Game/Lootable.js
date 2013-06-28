@@ -16,117 +16,97 @@
 */
 
 var Lootable = Unit.extend({
-  Init: function(data, loadItems) {
+    lifeTime: 0,
+    loot: [],
+    Init: function(data, loadItems) {
+        this._super(data);
 
-    this.lifeTime = 0.0;
+        // HACKY HACKY!!! See NPC
+        // Set to the default template values
+        if (!ISDEF(this.param)) {
+          this.param = this.template.param;
+        }
+        // END HACKY
 
-    this._super(data);
+        if (loadItems) {
+            if (this.param < 10) {
+                this.loadItems();
+            } else {
+                this.Restock();
+            }
+        }
+    },
+    loadItems: function() {
+        var self = this;
+        mysql.query('SELECT * FROM ib_items WHERE owner = ?', [self.id], function(err, results) {
+            if(err) {
+                throw 'error fetching items ' + err;
+            }
 
-    // HACKY HACKY!!! See NPC
-
-    // Set to the default template values
-    if( !ISDEF(this.param) ) this.param = this.template.param;
-
-
-    // END HACKY
-
-    this.loot = [];
-
-    if ( loadItems ) {
-      if ( this.param < 10 ) {
-        (function(unit) {
-          mysql.query(
-            'SELECT * FROM ib_items WHERE owner = ?', [unit.id],
-            function selectCb(err, results, fields) {
-              if (err) throw err;
-
-              // Link the items collection to the bag
-              unit.loot = results;
-              unit.loot.forEach(function(loot) {
-                if(loot.data) {
-                  try {
-                    loot.data = JSON.parse(loot.data);
-                  } catch(e) {
-                    // some error parsing JSON, not valid JSON likely...
-                    console.log('error parsing JSON for item data', loot);
-                  }
+            _.each(results, function(loot) {
+                // find a template
+                var template = dataHandler.items[loot.template];
+                if(template) {
+                    if (loot.data) {
+                        try {
+                            loot.data = JSON.parse(loot.data);
+                        } catch (e) {
+                            // some error parsing JSON, not valid JSON likely...
+                            console.log('error parsing JSON for item data', loot);
+                        }
+                    }
+                    // add new item, DB values take precendence over item's Init
+                    self.loot.push(new Item(template, loot));
+                } else {
+                    log('warning no template found for item: ' + loot.id);
                 }
-              });
-            //console.log(results);
             });
-        })(this);
-      }
-      else {
-        this.Restock();
-      }
-    }
-  },
-  Awake: function() {
-    this._super();
+        });
+    },
+    Awake: function() {
+        this._super();
+    },
+    Restock: function() {
+        //    log("Restocking...");
+        this.loot = [];
+        // Load loot from metadata (with percentages!)
+        if (!_.isEmpty(this.data.loot)) {
+            var lootSplit = this.data.loot.split(";");
+            for (var l = 0; l < lootSplit.length; l++) {
+                var templateId = null;
+                var chanceSplit = lootSplit[l].split(":");
 
-  },
-  // Hacky....should have its own class
-  Restock: function() {
-//    log("Restocking...");
-    this.loot = [];
-    // Load loot from metadata (with percentages!)
-    if ( !_.isEmpty(this.data.loot) ) {
-      var lootSplit = this.data.loot.split(";");
-      for(var l=0;l<lootSplit.length;l++) {
-        var item = null;
+                if (WasLucky100(parseInt(chanceSplit[0], 10))) {
+                    templateId = parseInt(chanceSplit[1], 10);
+                }
 
-        var chanceSplit = lootSplit[l].split(":");
+                if (templateId) {
+                    if (!ISDEF(dataHandler.items[templateId])) {
+                        log("Warning! item " + templateId + " not found for Lootable " + this.id + "!");
+                        continue;
+                    }
 
-        if ( WasLucky100(parseInt(chanceSplit[0], 10) )) {
-          item = parseInt(chanceSplit[1], 10);
+                    var item = new Item(dataHandler.items[templateId], {slot: l});
+                    this.loot.push(item);
+                }
+            }
         }
+    },
+    Tick: function(dTime) {
+        this.lifeTime += dTime;
 
-
-        if ( item ) {
-
-          if ( !ISDEF(dataHandler.items[item]) ) {
-            log("Warning! item "+item+" not found for Lootable "+this.id+"!");
-            continue;
-          }
-
-          var temp = {
-            id: server.GetAValidItemID(),
-            template : item,
-            slot:l,
-            attr1: dataHandler.items[item].attr1,
-            equipped: 0
-          };
-
-          this.loot.push(temp);
+        // Lootbags (<10) are removed while lootable meshes restock
+        if (this.param < 10) {
+            if (this.lifeTime > 30) {
+                this.Remove();
+            }
+        } else {
+            if (this.lifeTime > this.data.respawnTime) {
+                //... restock :)
+                this.Restock();
+                this.lifeTime = 0;
+            }
         }
-      }
+        this._super(dTime);
     }
-
-  },
-  Tick: function(dTime) {
-
-
-
-    this.lifeTime += dTime;
-
-    // Lootbags (<10) are removed while lootable meshes restock
-    if ( this.param < 10 ) {
-      if ( this.lifeTime > 30 ) {
-        this.Remove();
-      }
-    }
-    else {
-      if ( this.lifeTime > this.data.respawnTime ) {
-        //... restock :)
-        this.Restock();
-        this.lifeTime = 0;
-      }
-
-
-    }
-
-
-    this._super(dTime);
-
-  }
 });
