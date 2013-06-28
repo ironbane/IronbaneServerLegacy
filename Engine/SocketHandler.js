@@ -923,7 +923,7 @@ var SocketHandler = Class.extend({
                 }
 
                 if (bag.template.type === UnitTypeEnum.VENDOR) {
-                    var offeredPrice = (CalculateItemPrice(item) / 2).Round();
+                    var offeredPrice = (item.value / 2).Round();
                     offeredPrice = Math.max(offeredPrice, 0);
 
                     if (!data.acceptOffer) {
