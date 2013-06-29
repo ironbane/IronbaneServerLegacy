@@ -70,7 +70,7 @@ var ChatHandler = Class.extend({
 
                 // Try to convert to integer, if we passed an ID
                 var testConvert = parseInt(realparams[0], 10);
-                if (_.isNumber(testConvert)) {
+                if (_.isNumber(testConvert) && !_.isNaN(testConvert)) {
                     template = dataHandler.items[testConvert];
                 } else {
                     template = _.where(dataHandler.items, {
