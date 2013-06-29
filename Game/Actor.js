@@ -100,7 +100,7 @@ var Actor = MovingUnit.extend({
     // Now build a path with all nodes that link to it
     var me = this;
 
-    function AnnounceOccurredError(amount) {
+    function AnnounceOccurredError(msg, amount) {
 
             chatHandler.AnnounceMods(msg+"<br><i>Warning: this error happened "+amount+" seconds ago.</i>", "red");
     }
@@ -124,9 +124,9 @@ var Actor = MovingUnit.extend({
 
           log("ERROR: "+msg);
 
-          setTimeout(AnnounceOccurredError(15), 15000);
+          setTimeout(AnnounceOccurredError(msg, 15), 15000);
 
-          setTimeout(AnnounceOccurredError(60), 60000);
+          setTimeout(AnnounceOccurredError(msg, 60), 60000);
 
 
           // debugger;
