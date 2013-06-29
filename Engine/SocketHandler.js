@@ -1875,10 +1875,12 @@ var SocketHandler = Class.extend({
 
                     socket.unit.rotation.y = parseInt(data.r, 10);
 
+                    // Check if the teleports are way off
+                    var errorMargin = 10;
+
                     if ( ISDEF(data.u) ) {
                         socket.unit.localPosition.copy(p);
                         socket.unit.standingOnUnitId = data.u;
-
 
                         // Find the unit, and get their position
                         // THIS will be our real position, otherwise we will give them false
@@ -1886,9 +1888,12 @@ var SocketHandler = Class.extend({
                         var train = worldHandler.FindUnit(data.u);
 
                         socket.unit.position.copy(train.position);
-
                     }
                     else {
+                        if ( !socket.unit.InRangeOfPosition(p, errorMargin) ) {
+                            return;
+                        }
+
                         socket.unit.position.copy(p);
                         socket.unit.standingOnUnitId = 0;
                     }
