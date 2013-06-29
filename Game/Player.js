@@ -169,58 +169,46 @@ var Player = Fighter.extend({
       me.socket.disconnect();
     }, 1000);
   },
-  Save: function() {
-    // No updating for guests
-    // Update MYSQL and set the character data
-    mysql.query('UPDATE ib_characters SET ' +
-      'x = ?,' +
-      'y = ?,' +
-      'z = ?,' +
-      'coins = ?,' +
-      'zone = ?,' +
-      'roty = ?' +
-      ' WHERE id = ?', [
-      this.position.x,
-      this.position.y,
-      this.position.z,
-      this.coins,
-      this.zone,
-      this.rotation.y,
-      this.id
-    ]);
+    Save: function() {
+        // No updating for guests
+        // Update MYSQL and set the character data
+        mysql.query('UPDATE ib_characters SET ' +
+            'x = ?,' +
+            'y = ?,' +
+            'z = ?,' +
+            'zone = ?,' +
+            'roty = ?' +
+            ' WHERE id = ?', [
+            this.position.x,
+            this.position.y,
+            this.position.z,
+            this.zone,
+            this.rotation.y,
+            this.id
+        ]);
 
-    var cx = this.cellX;
-    var cz = this.cellZ;
-    var zone = this.zone;
-    var u = 0;
+        // Save the items
+        (function(unit) {
+            mysql.query('DELETE FROM ib_items WHERE owner = ?', [unit.id], function(err, results, fields) {
+                for (var i = 0; i < unit.items.length; i++) {
+                    var item = unit.items[i];
 
-    // Save the items
-    (function(unit) {
-      mysql.query('DELETE FROM ib_items WHERE owner = ?', [unit.id], function(err, results, fields) {
-
-        for (var i = 0; i < unit.items.length; i++) {
-          var item = unit.items[i];
-
-          // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
-          // Normally it doesn't matter which ID the items gets
-
-          mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot, value, data) ' +
-            'VALUES(?,?,?,?,?,?,?)', [
-            item.template,
-            item.attr1,
-            unit.id,
-            item.equipped,
-            item.slot,
-            item.value || 0,
-            JSON.stringify(item.data)
-          ]);
-          //}
-        }
-
-      });
-    })(this);
-
-  },
+                    // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
+                    // Normally it doesn't matter which ID the items gets
+                    mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot, value, data) ' +
+                        'VALUES(?,?,?,?,?,?,?)', [
+                        item.template,
+                        item.attr1,
+                        unit.id,
+                        item.equipped,
+                        item.slot,
+                        item.value || 0,
+                        JSON.stringify(item.data)
+                    ]);
+                }
+            });
+        })(this);
+    },
   LeaveGame: function() {
 
     this.Save();

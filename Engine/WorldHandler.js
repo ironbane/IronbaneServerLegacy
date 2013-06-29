@@ -64,7 +64,7 @@ var WorldHandler = Class.extend({
       var subcount = 0;
 
       // Every zone has their own set of nodes
-	  this.allNodes[z] = {};
+    this.allNodes[z] = {};
 
       for(var cx in this.world[z]) {
 
@@ -74,13 +74,13 @@ var WorldHandler = Class.extend({
           if ( this.world[z][cx][cz].graph.nodes === undefined ) continue;
 
           //this.allNodes = worldHandler.world[this.zone][cx][cz]['graph']['nodes'].concat(this.allNodes);
-		  var len = this.world[z][cx][cz].graph.nodes.length;
+      var len = this.world[z][cx][cz].graph.nodes.length;
           for(var x=0;x<len;x++){
             var node = this.world[z][cx][cz].graph.nodes[x];
-			//console.log(node);
-			//console.log(this.world[z].allNodes);
+      //console.log(node);
+      //console.log(this.world[z].allNodes);
             //this.world[z].allNodes.node['id'] = node;
-			this.allNodes[z][node.id] = node;
+      this.allNodes[z][node.id] = node;
             count++;
             subcount++;
           }
@@ -164,7 +164,7 @@ var WorldHandler = Class.extend({
 
     walk(dataPath, function(err, results) {
       if (err) throw err;
-		var rl = results.length;
+    var rl = results.length;
       for (var r=0;r<rl;r++) {
         results[r] = results[r].replace(dataPath+"/", "");
 
@@ -795,4 +795,3 @@ var WorldHandler = Class.extend({
 });
 
 var worldHandler = new WorldHandler();
-

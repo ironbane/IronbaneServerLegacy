@@ -180,9 +180,6 @@ var meleeRange = 3.0;
 
 var maxHealth = 20;
 
-var maxCoins = 24;
-
-
 function CalculateItemPrice(item) {
     // for now use basevalue directly, eventually will have modifiers on the shopkeep
     return item.basevalue || 0;

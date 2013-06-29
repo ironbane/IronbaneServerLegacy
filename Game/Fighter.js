@@ -17,15 +17,11 @@
 
 var battleStatusTimeout = 10.0;
 
-
-
 var Fighter = Actor.extend({
   Init: function(data) {
-
     this._super(data);
 
     this.sendRotationPacketY = true;
-
     this.respawnTimer = 0.0;
 
     // NPC's don't really have an items array, but nevertheless...
@@ -51,8 +47,6 @@ var Fighter = Actor.extend({
     this.chInvisibleByMonsters = false;
     this.ch999Damage = false;
 
-
-
     this.UpdateAppearance(false);
 
     this.healthRegenTimeout = 0.0;
@@ -61,11 +55,7 @@ var Fighter = Actor.extend({
     this.armorRegenTimeout = 0.0;
     this.armorRegenInterval = 1.0;
 
-
     this.lastBattleActionTimer = 0.0;
-
-
-
   },
   IsInBattle: function() {
     return this.lastBattleActionTimer > 0;
@@ -286,112 +276,93 @@ var Fighter = Actor.extend({
         }, 0, true);
     }
   },
-  Die: function(killer) {
+    Die: function(killer) {
+        if (this.id < 0) {
+            //debugger;
+            this.HandleMessage("killed", {
+                killer: killer
+            });
 
-    if ( this.id < 0 ) {
-      //debugger;
-      this.HandleMessage("killed", {killer:killer});
+            if (this.loot.length > 0) {
+                var angle = getRandomFloat(0, 1) * Math.PI * 2;
 
-      if ( this.loot.length > 0 ) {
-        var angle = getRandomFloat(0,1) * Math.PI * 2;
+                //log("spawning lootbag...");
+                var bag = new Lootable({
+                    id: server.GetAValidNPCID(),
+                    x: this.position.x + Math.cos(angle),
+                    y: this.position.y,
+                    z: this.position.z + Math.sin(angle),
+                    zone: this.zone,
 
-        //log("spawning lootbag...");
+                    // Hacky: refers to lootBag ID
+                    template: dataHandler.units[lootBagTemplate],
 
-        var bag = new Lootable({
-          id: server.GetAValidNPCID(),
-          x:this.position.x+Math.cos(angle),
-          y:this.position.y,
-          z:this.position.z+Math.sin(angle),
-          zone:this.zone,
+                    roty: 0
+                }, false);
 
-          // Hacky: refers to lootBag ID
-          template:dataHandler.units[lootBagTemplate],
+                for (var i = 0; i < this.loot.length; i++) {
+                    var item = this.loot[i];
 
-          roty:0
-        }, false);
+                    item.owner = bag.id;
+                    // Add the item to the lootbag
 
-        for(var i=0;i<this.loot.length;i++) {
-          var item = this.loot[i];
+                    // Make a copy of the item, so we don't remove the same item (reference)
+                    // when we actually loot it as a player
+                    // BS: ^^^ is this actually happening?
+                    bag.loot.push(item);
+                }
+            }
+        } else {
+            // Remove their items
+            this.items = [];
 
-          item.owner = bag.id;
-          // Add the item to the lootbag
+            chatHandler.Died(this, killer);
+        }
+    },
+    Respawn: function() {
+        this.SetHealth(this.healthMax, true);
+        this.SetArmor(this.armorMax, true);
 
-          // Make a copy of the item, so we don't remove the same item (reference)
-          // when we actually loot it as a player
-          bag.loot.push(item);
+        if (this.id > 0) {
+            //      this.position = new THREE.Vector3(0, 0, 0);
+            //      this.zone = 1;
+            //debugger;
+
+            // People who die in the tutorial need to do it again
+            if (this.zone === tutorialSpawnZone) {
+                this.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+            } else {
+                this.Teleport(normalSpawnZone, normalSpawnPosition, true);
+            }
+        } else {
+            if (this instanceof NPC) {
+                this.SetWeaponsAndLoot();
+            }
+            this.position = this.startPosition.clone();
+            this.HandleMessage("respawned", {});
         }
 
-      }
+        // log("Respawned "+this.id);
 
+        // Send the client that it's okay to revert back
+        this.EmitNearby("respawn", {
+            id: this.id,
+            p: this.position.clone().Round(2),
+            z: this.zone,
+            h: this.health
+        }, 0, true);
 
-    }
-    else {
+        if (this.id > 0) {
+            // Give dull sword
+            // BS: better to have a NPC that hands them out?
+            template = dataHandler.items[1];
+            this.GiveItem(template);
+        }
 
-      // Remove their items
-      this.items = [];
-
-
-
-
-
-      chatHandler.Died(this, killer);
-    }
-
-
-  },
-  Respawn: function() {
-
-
-    this.SetHealth(this.healthMax, true);
-    this.SetArmor(this.armorMax, true);
-
-    if ( this.id > 0 ) {
-//      this.position = new THREE.Vector3(0, 0, 0);
-//      this.zone = 1;
-      //debugger;
-
-      // People who die in the tutorial need to do it again
-      if ( this.zone === tutorialSpawnZone ) {
-        this.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
-      }
-      else {
-        this.Teleport(normalSpawnZone, normalSpawnPosition, true);
-      }
-    }
-    else {
-      if ( this instanceof NPC ) {
-        this.SetWeaponsAndLoot();
-      }
-      this.position = this.startPosition.clone();
-
-
-      this.HandleMessage("respawned", {});
-    }
-
-    // log("Respawned "+this.id);
-
-    // Send the client that it's okay to revert back
-    this.EmitNearby("respawn", {
-      id:this.id,
-      p:this.position.clone().Round(2),
-      z:this.zone,
-      h:this.health
-      }, 0, true);
-
-    if ( this.id > 0 ) {
-      // Give dull sword
-      template = dataHandler.items[1];
-      this.GiveItem(template);
-    }
-
-    if ( this.id < 0 ) {
-      this.velocity.set(0,0,0);
-
-
-    }
-
-
-  },
+        if (this.id < 0) {
+            this.velocity.set(0, 0, 0);
+        }
+    },
   // Returns true when the max health changed
   CalculateMaxHealth: function(doEmit) {
     var oldHealthMax = this.healthMax;
@@ -468,124 +439,141 @@ var Fighter = Actor.extend({
       this.SetArmor(this.armorMax);
     }
   },
-  GiveItem: function(template) {
-
-    // Find a free slot
-    var slot = -1;
-
-    // Loop over 10 slots, and check if we have an item that matches that
-    // slot
-
-
-    for (var i = 0; i < 10; i++) {
-
-      var found = false;
-
-      _.each(this.items, function(item) {
-        if ( item.slot === i ) found = true;
-      });
-
-      if ( !found ) {
-        slot = i;
-        break;
-      }
-
-    }
-
-
-    if ( slot === -1 ) {
-      return;
-    }
-
-    var item = {
-      attr1: template.attr1,
-      equipped: 0,
-      id: server.GetAValidItemID(),
-      owner: this.id,
-      slot: slot,
-      template: template.id
-    };
-
-    // console.log(item);
-
-    this.items.push(item);
-
-    this.socket.emit("receiveItem", item);
-  },
-  UpdateAppearance: function(sendChanges) {
-
-
-
-    this.head = 0;
-    this.body = 0;
-    this.feet = 0;
-
-    //for(var i in this.items) {
-    for(var i=0;i<this.items.length;i++) {
-      var item = this.items[i];
-
-      var template = dataHandler.items[item.template];
-
-      if ( item.equipped ) {
-
-        if ( template.type == "armor" ) {
-
-          switch (template.subtype) {
-            case "head":
-              this.head = template.image;
-              break;
-            case "body":
-              this.body = template.image;
-              break;
-            case "feet":
-              this.feet = template.image;
-              break;
-          }
-
+    GiveItem: function(template, config) {
+        // todo: variable max inv?
+        if (this.items.length >= 10) {
+            // no free slots
+            return false;
         }
-      }
-    }
 
-    if ( sendChanges ) {
-      this.EmitNearby("updateClothes", {
-        id:this.id,
-        head:this.head,
-        body:this.body,
-        feet:this.feet
-      });
-    }
-  },
-  // SwingWeapon: function(pos) {
-  //   // Only for NPC's
+        var taken = _.pluck(this.items, 'slot');
+        // take first available slot
+        var slot = _.difference(_.range(10), taken)[0];
 
-  //   //if ( this.id > 0 ) return;
-  //   var data = {
-  //     id:this.id,
-  //     p:pos
-  //   };
+        // config passed in goes to instance
+        config = config || {};
 
-  //   if ( this.weapon ) {
-  //     data.w = this.weapon.id;
-  //   }
+        config.owner = this.id;
+        config.slot = slot;
 
-  //   this.EmitNearby("swingWeapon", data, 0, false);
+        // create new item based off the template
+        var item = new Item(template, config);
+        this.items.push(item);
 
-  // },
-  GetEquippedWeapon: function() {
+        this.socket.emit("receiveItem", item);
 
-    for(var i=0;i<this.items.length;i++) {
-      var item = this.items[i];
+        return true;
+    },
+    addCoins: function(amount) {
+        // attempt to auto stack coins
+        if(amount <= 0) {
+            return false;
+        }
 
-      var template = dataHandler.items[item.template];
+        var bags = _.where(this.items, {type: 'cash'});
+        if(bags.length > 0) {
+            // for now just add to the first bag,
+            // todo: bag limits?
+            bags[0].value += amount;
+        } else {
+            // need to add one if the slot is available
+            var template = _.where(dataHandler.items, {type: 'cash'})[0];
+            if(!template) {
+                log('server has no cash items!!!');
+                return false;
+            }
 
-      if ( item.equipped &&
-        (template.type == "weapon" || template.type == "tool")) {
-        return item;
-      }
-    }
+            if(!this.GiveItem(template, {value: amount})) {
+                // no room in inventory for coins!
+                return false;
+            }
+        }
 
-    return null;
-  },
+        return true;
+    },
+    UpdateAppearance: function(sendChanges) {
+        this.head = 0;
+        this.body = 0;
+        this.feet = 0;
+
+        for (var i = 0; i < this.items.length; i++) {
+            var item = this.items[i];
+
+            if (item.equipped) {
+                if (item.getType() === "armor") {
+                    switch (item.getSubType()) {
+                      case "head":
+                          this.head = item.getImage();
+                          break;
+                      case "body":
+                          this.body = item.getImage();
+                          break;
+                      case "feet":
+                          this.feet = item.getImage();
+                          break;
+                    }
+                }
+            }
+        }
+
+        if (sendChanges) {
+            this.EmitNearby("updateClothes", {
+                id: this.id,
+                head: this.head,
+                body: this.body,
+                feet: this.feet
+            });
+        }
+    },
+    GetEquippedWeapon: function() {
+        for (var i = 0; i < this.items.length; i++) {
+            var item = this.items[i];
+
+            if (item.equipped && (item.getType() === "weapon" || item.getType() === "tool")) {
+                return item;
+            }
+        }
+
+        return null;
+    },
+    getTotalCoins: function() {
+        // sum value of cash items in inventory
+        return _.reduce(_.pluck(_.where(this.items, {
+            type: 'cash'
+        }), 'value'), function(memo, num) {
+            return memo + num;
+        }, 0);
+    },
+    purchase: function(item) {
+        // if player has multiple money bags need to remove them until finished
+        var bags = _.where(this.items, {type: 'cash'}),
+            bagIndex = 0,
+            available = this.getTotalCoins(),
+            remaining = item.price;
+
+        if(!remaining || remaining <= 0) {
+            return false; // invalid price! (fallback to value or basevalue?)
+        }
+
+        if(available < remaining) {
+            return false; // can't afford
+        }
+
+        while(remaining > 0) {
+            if(bags[bagIndex].value - remaining < 0) {
+                remaining -= bags[bagIndex].value;
+                this.items = _.without(this.items, bags[bagIndex]);
+            } else {
+                bags[bagIndex].value -= remaining;
+                remaining = 0;
+            }
+
+            bagIndex++;
+        }
+
+        // purchase successful
+        return true;
+    },
   InLineOfSight: function(unit, noHeadingCheck) {
     var unitToUs = unit.position.clone().subSelf(this.position);
 
