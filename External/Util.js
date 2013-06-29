@@ -784,7 +784,9 @@ function VectorDistance(a,b) {
 function VectorDistanceSq(a,b) {
   return a.clone().subSelf(b).lengthSq();
 }
-
+THREE.Vector3.prototype.isNear = function(vec, range) {
+  return VectorDistanceSq(this, vec) <= range*range;
+};
 
 function WasLucky(maxchance) {
   return getRandomInt(1, maxchance) == 1;
