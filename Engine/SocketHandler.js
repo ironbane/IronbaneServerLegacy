@@ -19,6 +19,7 @@ var characterIDCount = 1;
 
 var SocketHandler = Class.extend({
     bans: [],
+    onlinePlayers: [],
     Init: function() {
         var me = this;
 
@@ -164,6 +165,10 @@ var SocketHandler = Class.extend({
                                                     console.log(units[u].name);
                                                     log("End unit data");
                                                     log("Forcing disconnect...");
+                                                    // remove them from online list if present
+                                                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
+                                                        return p.id === units[u].id;
+                                                    }));
                                                     units[u].LeaveGame();
                                                     continue;
                                                 }
@@ -303,7 +308,6 @@ var SocketHandler = Class.extend({
 
                                                     chatHandler.JoinGame(socket.unit);
 
-
                                                     reply({
                                                         id: socket.unit.id,
                                                         name: socket.unit.name,
@@ -323,28 +327,24 @@ var SocketHandler = Class.extend({
                                                         heartPieces: socket.unit.heartpieces
                                                     });
 
-                                                    var playerList = [];
-                                                    for(var z in worldHandler.world) {
-                                                        for(var cx in worldHandler.world[z]) {
-                                                            for(var cz in worldHandler.world[z][cx]) {
-                                                                if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
-                                                                    var units = worldHandler.world[z][cx][cz].units;
-                                                                    for(var u=0;u<units.length;u++) {
-                                                                        if ( units[u].id < 0 || units[u] === socket.unit ) continue;
+                                                    // just before we're added to the list of online players,
+                                                    // announce the others already online
+                                                    socket.emit('chatMessage', {
+                                                        type: 'welcome',
+                                                        user: {
+                                                            id: socket.unit.id,
+                                                            name: socket.unit.name
+                                                        },
+                                                        online: socketHandler.onlinePlayers
+                                                    });
 
-                                                                        var name = '<div style="display:inline;color:'+chatHandler.GetChatColor(units[u])+'">'+units[u].name + '</div>';
-                                                                        playerList.push(name);
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    if (playerList.length === 0) playerList.push("None");
-
-                                                    chatHandler.AnnouncePersonally(socket.unit, "Hey there, "+socket.unit.name+"!<br>Players online: "+playerList.join(", "), "#01ff46");
-
-
+                                                    // add us to the online player list
+                                                    socketHandler.onlinePlayers.push({
+                                                        id: socket.unit.id,
+                                                        name: socket.unit.name,
+                                                        rank: socket.unit.editor ? 'gm' : 'user'
+                                                    });
+                                                    //chatHandler.AnnouncePersonally(socket.unit, "Hey there, " + socket.unit.name + "!<br>Players online: " + playerList.join(", "), "#01ff46");
                                                 });
                                         })(socket, data, reply, chardata);
 
@@ -359,21 +359,21 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("backToMainMenu", function (data, reply) {
-
-                if ( socket.unit ) {
-
-                    if ( socket.unit.health <= 0 ) {
+            socket.on("backToMainMenu", function(data, reply) {
+                if (socket.unit) {
+                    if (socket.unit.health <= 0) {
                         reply({
-                            errmsg:"Please wait until you respawn!"
+                            errmsg: "Please wait until you respawn!"
                         });
                         return;
                     }
-
+                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
+                        return p.id === socket.unit.id;
+                    }));
                     socket.unit.LeaveGame();
                     reply("OK");
 
-                    log(socket.unit.name+" is back at the Main Menu.");
+                    log(socket.unit.name + " is back at the Main Menu.");
                 }
 
                 socket.unit = null;
@@ -1817,14 +1817,13 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("disconnect", function (data) {
-
-
-                if ( socket.unit ) {
-                    log(socket.unit.name+" disconnected.");
+                if (socket.unit) {
+                    log(socket.unit.name + " disconnected.");
+                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
+                        return p.id === socket.unit.id;
+                    }));
                     socket.unit.LeaveGame();
-
                 }
-
             });
 
             socket.on("playerdata", function (data) {
