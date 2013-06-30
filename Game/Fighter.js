@@ -227,17 +227,12 @@ var Fighter = Actor.extend({
           this.SetArmor(this.armor+1);
         }
       }
+
+      // No additional ticking needed for players (physics are done on the client)
+      if ( this.id > 0 ) return;
+
+      this._super(dTime);
     }
-
-    //        log("Tick: "+this.id);
-    //
-    //        console.log(this.socket);
-
-    // No additional ticking needed for players (physics are done on the client)
-    if ( this.id > 0 ) return;
-
-
-    this._super(dTime);
 
   },
   SetHealth: function(newHealth, noParticles) {

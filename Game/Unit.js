@@ -383,7 +383,7 @@ var Unit = Class.extend({
         worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
       }
       else {
-      log("[Teleport] Cell does not exist for unit #"+
+        log("[ChangeCell] Cell does not exist for unit #"+
         this.id+" ("+cellPos.x+", "+cellPos.z+")");
         if ( this.id > 0 && this.editor ) {
           log("[ChangeCell] Generating cell because he's an editor.");
