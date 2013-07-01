@@ -17,9 +17,9 @@
 
 
 var monsterStateMachines = {
-	"Rat Boss" : function() {
-		return new RatBoss();
-	}
+	// "Rat Boss" : function() {
+	// 	return new RatBoss();
+	// }
 };
 
 
@@ -30,7 +30,7 @@ var RatBoss = State.extend({
 	},
 	HandleMessage: function(npc, message, data) {
 
-		//debugger;
+		if ( !this.obstacleToOpenOnDeath ) return;
 
 		switch (message) {
 			case "respawned":
