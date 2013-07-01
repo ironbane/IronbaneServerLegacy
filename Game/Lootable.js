@@ -17,7 +17,6 @@
 
 var Lootable = Unit.extend({
     lifeTime: 0,
-    loot: [],
     Init: function(data, loadItems) {
         this._super(data);
 
@@ -27,6 +26,9 @@ var Lootable = Unit.extend({
           this.param = this.template.param;
         }
         // END HACKY
+
+
+        this.loot = [];
 
         if (loadItems) {
             if (this.param < 10) {
