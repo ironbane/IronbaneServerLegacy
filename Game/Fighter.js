@@ -18,48 +18,55 @@
 var battleStatusTimeout = 10.0;
 
 var Fighter = Actor.extend({
-  Init: function(data) {
-    this._super(data);
+    attackTimeout: 1,
+    Init: function(data) {
+        this._super(data);
 
-    this.sendRotationPacketY = true;
-    this.respawnTimer = 0.0;
+        this.sendRotationPacketY = true;
+        this.respawnTimer = 0.0;
 
-    // NPC's don't really have an items array, but nevertheless...
-    if ( this.items === undefined ) this.items = [];
+        // NPC's don't really have an items array, but nevertheless...
+        if (this.items === undefined) {
+            this.items = [];
+        }
 
-    // Health and armor are the same values for their maximum, only for bots
-    // Initially, their values come from MySQL and are afterwards updated within the server without updating MySQL
-    // The template values are used for Maximum values, and should never be changed
+        // Health and armor are the same values for their maximum, only for bots
+        // Initially, their values come from MySQL and are afterwards updated within the server without updating MySQL
+        // The template values are used for Maximum values, and should never be changed
 
-    if ( this.id < 0 ) {
-      this.healthMax = this.template.health;
-      this.armorMax = this.template.armor;
-    }
-    else {
-      this.CalculateMaxHealth();
-      this.CalculateMaxArmor();
-    }
+        if ( this.id < 0 ) {
+            this.healthMax = this.template.health;
+            this.armorMax = this.template.armor;
+        }
+        else {
+            this.CalculateMaxHealth();
+            this.CalculateMaxArmor();
+        }
 
-    this.health = this.healthMax;
-    this.armor = this.armorMax;
+        this.health = this.healthMax;
+        this.armor = this.armorMax;
 
-    this.chGodMode = false;
-    this.chInvisibleByMonsters = false;
-    this.ch999Damage = false;
+        this.chGodMode = false;
+        this.chInvisibleByMonsters = false;
+        this.ch999Damage = false;
 
-    this.UpdateAppearance(false);
+        this.UpdateAppearance(false);
 
-    this.healthRegenTimeout = 0.0;
-    this.healthRegenInterval = 1.0;
+        this.healthRegenTimeout = 0.0;
+        this.healthRegenInterval = 1.0;
 
-    this.armorRegenTimeout = 0.0;
-    this.armorRegenInterval = 1.0;
+        this.armorRegenTimeout = 0.0;
+        this.armorRegenInterval = 1.0;
 
-    this.lastBattleActionTimer = 0.0;
-  },
-  IsInBattle: function() {
-    return this.lastBattleActionTimer > 0;
-  },
+        this.lastBattleActionTimer = 0.0;
+
+        if(this.GetEquippedWeapon()) {
+          this.attackTimeout = this.GetEquippedWeapon().$template.delay;
+        }
+    },
+    IsInBattle: function() {
+        return this.lastBattleActionTimer > 0;
+    },
   ShootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
 
       aimError = ISDEF(aimError) ? aimError : 0;
@@ -85,26 +92,20 @@ var Fighter = Actor.extend({
         sw:swingWeapon
       });
   },
-  AttemptAttack: function(victim) {
-
-    // log("attempt attack");
-
-    this.HandleMessage("attemptAttack", {});
-    //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff" ) {
-    //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff"  ) {
-      // debugger;
-    if ( this.template.usebashattack ) {
-      this.Attack(victim, this.weapon);
-      // this.SwingWeapon(victim.position);
-    }
-    else {
-      //this.Attack(this.enemy, this.weapon);
-      this.ShootProjectile(victim.position, true, 0, this.template.aimerror);
-
-    }
-
-
-  },
+    AttemptAttack: function(victim) {
+        // log("attempt attack");
+        this.HandleMessage("attemptAttack", {});
+        //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff" ) {
+        //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff"  ) {
+        // debugger;
+        if (this.template.usebashattack) {
+            this.Attack(victim, this.weapon);
+            // this.SwingWeapon(victim.position);
+        } else {
+            //this.Attack(this.enemy, this.weapon);
+            this.ShootProjectile(victim.position, true, 0, this.template.aimerror);
+        }
+    },
   Attack: function(victim, weapon) {
 
     this.lastBattleActionTimer = battleStatusTimeout;
@@ -192,48 +193,50 @@ var Fighter = Actor.extend({
 
   },
   Tick: function(dTime) {
-
-    if ( this.lastBattleActionTimer > 0 ) this.lastBattleActionTimer -= dTime;
-
-
-    if ( this.health <= 0 ) {
-      if ( this.respawnTimer > 0.0 ) {
-        this.respawnTimer -= dTime;
-      }
-
-      if ( this.respawnTimer <= 0.0 ) {
-        // 22/12/12: Permadeath for players
-        // if ( this.id < 0 ) {
-          this.Respawn();
-        // }
-      }
+    if(this.attackTimeout > 0) {
+      this.attackTimeout -= dTime;
     }
-    else {
-      if ( this.healthRegenTimeout > 0 ) this.healthRegenTimeout -= dTime;
 
-      if ( this.lastBattleActionTimer <= 0 ) {
-        if ( this.healthRegenTimeout <= 0 ) {
-          if ( this.healthRegenTimeout <= 0 ) {
-            this.healthRegenTimeout = this.healthRegenInterval;
-            this.SetHealth(this.health+1);
-          }
+    if (this.lastBattleActionTimer > 0) {
+      this.lastBattleActionTimer -= dTime;
+    }
+
+    if (this.health <= 0) {
+      if (this.respawnTimer > 0.0) {
+        this.respawnTimer -= dTime;
+      } else {
+        this.Respawn();
+      }
+    } else {
+      if (this.healthRegenTimeout > 0) {
+        this.healthRegenTimeout -= dTime;
+      }
+
+      if (this.lastBattleActionTimer <= 0) {
+        if (this.healthRegenTimeout <= 0) {
+          this.healthRegenTimeout = this.healthRegenInterval;
+          this.SetHealth(this.health + 1);
         }
       }
+
       // Three seconds without being hit will recharge our armor
-      if ( this.armorRegenTimeout > 0 ) this.armorRegenTimeout -= dTime;
-      if ( this.lastBattleActionTimer <= battleStatusTimeout-3 ) {
-        if ( this.armorRegenTimeout <= 0 ) {
+      if (this.armorRegenTimeout > 0) {
+        this.armorRegenTimeout -= dTime;
+      }
+      if (this.lastBattleActionTimer <= battleStatusTimeout - 3) {
+        if (this.armorRegenTimeout <= 0) {
           this.armorRegenTimeout = this.armorRegenInterval;
-          this.SetArmor(this.armor+1);
+          this.SetArmor(this.armor + 1);
         }
       }
 
       // No additional ticking needed for players (physics are done on the client)
-      if ( this.id > 0 ) return;
+      if (this.id > 0) {
+        return;
+      }
 
       this._super(dTime);
     }
-
   },
   SetHealth: function(newHealth, noParticles) {
     var oldHealth = this.health;

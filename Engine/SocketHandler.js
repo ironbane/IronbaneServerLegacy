@@ -447,9 +447,33 @@ var SocketHandler = Class.extend({
 
             socket.on("addProjectile", function (data, reply) {
 
-                if ( !socket.unit ) return;
+                if (!socket.unit) return;
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+                if (_.isUndefined(reply) || !_.isFunction(reply)) return;
+
+                // check server's attack timeout not client
+                var weapon = socket.unit.GetEquippedWeapon();
+                if(!weapon) {
+                    reply({
+                        errmsg: 'No Equipped Weapon!'
+                    });
+                    return;
+                }
+                if (socket.unit.attackTimeout > 0) {
+                    //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
+                    // send the real delay, even non cheating players will be slightly out of sync
+                    // every now and then because of the server vs. client loops
+                    reply({
+                        delay: socket.unit.attackTimeout
+                    });
+                    return;
+                } else { // update the attack timer using server's value
+                    if (weapon) {
+                        socket.unit.attackTimeout = weapon.$template.delay;
+                    } else {
+                        socket.unit.attackTimeout = 1;
+                    }
+                }
 
                 if ( !CheckData(data, ["s","t","w","o","sw"]) ) {
                     reply({
@@ -512,6 +536,9 @@ var SocketHandler = Class.extend({
                         sw:data.sw
                     });
                 }
+
+                // need to let the local client know it's OK
+                reply('OK');
             });
 
             socket.on("useItem", function (barIndex, reply) {
