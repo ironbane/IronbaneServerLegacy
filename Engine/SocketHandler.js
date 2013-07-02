@@ -447,51 +447,57 @@ var SocketHandler = Class.extend({
 
             socket.on("addProjectile", function (data, reply) {
 
-                if (!socket.unit) return;
-
-                if (_.isUndefined(reply) || !_.isFunction(reply)) return;
-
-                // check server's attack timeout not client
-                var weapon = socket.unit.GetEquippedWeapon();
-                if(!weapon) {
-                    reply({
-                        errmsg: 'No Equipped Weapon!'
-                    });
+                if (!socket.unit) {
                     return;
                 }
-                if (socket.unit.attackTimeout > 0) {
-                    //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
-                    // send the real delay, even non cheating players will be slightly out of sync
-                    // every now and then because of the server vs. client loops
-                    reply({
-                        delay: socket.unit.attackTimeout
-                    });
+
+                if (_.isUndefined(reply) || !_.isFunction(reply)) {
                     return;
-                } else { // update the attack timer using server's value
-                    if (weapon) {
-                        socket.unit.attackTimeout = weapon.$template.delay;
-                    } else {
-                        socket.unit.attackTimeout = 1;
+                }
+
+                if (data.o > 0) { // only for players
+                    // check server's attack timeout not client
+                    var weapon = socket.unit.GetEquippedWeapon();
+                    if (!weapon) {
+                        reply({
+                            errmsg: 'No Equipped Weapon!'
+                        });
+                        return;
+                    }
+                    if (socket.unit.attackTimeout > 0) {
+                        //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
+                        // send the real delay, even non cheating players will be slightly out of sync
+                        // every now and then because of the server vs. client loops
+                        reply({
+                            delay: socket.unit.attackTimeout
+                        });
+                        return;
+                    } else { // update the attack timer using server's value
+                        if (weapon) {
+                            socket.unit.attackTimeout = weapon.$template.delay;
+                        } else {
+                            socket.unit.attackTimeout = 1;
+                        }
                     }
                 }
 
-                if ( !CheckData(data, ["s","t","w","o","sw"]) ) {
+                if (!CheckData(data, ["s", "t", "w", "o", "sw"])) {
                     reply({
-                        errmsg:"Corrupt projectile data"
+                        errmsg: "Corrupt projectile data"
                     });
                     return;
                 }
 
-                if ( !CheckVector(data.s) ) {
+                if (!CheckVector(data.s)) {
                     reply({
-                        errmsg:"Corrupt start vector for addProjectile"
+                        errmsg: "Corrupt start vector for addProjectile"
                     });
                     return;
                 }
 
-                if ( !CheckVector(data.t) ) {
+                if (!CheckVector(data.t)) {
                     reply({
-                        errmsg:"Corrupt target vector for addProjectile"
+                        errmsg: "Corrupt target vector for addProjectile"
                     });
                     return;
                 }
@@ -506,34 +512,33 @@ var SocketHandler = Class.extend({
 
 
                 // Convert the weapon ID to a template ID
-                var item = _.find(socket.unit.items, function(i){
+                var item = _.find(socket.unit.items, function(i) {
                     return i.id === data.w;
                 });
 
-                if ( _.isUndefined(item) ) {
+                if (_.isUndefined(item)) {
                     reply({
-                        errmsg:"No item found for addProjectile!"
+                        errmsg: "No item found for addProjectile!"
                     });
                     return;
                 }
-
 
                 var unit = worldHandler.FindUnitNear(data.o, socket.unit);
 
-                if (!unit ) {
+                if (!unit) {
                     reply({
-                        errmsg:"Unit not found for addProjectile!"
+                        errmsg: "Unit not found for addProjectile!"
                     });
                     return;
                 }
 
-                if ( socket.unit ) {
+                if (socket.unit) {
                     socket.unit.EmitNearby("addProjectile", {
-                        s:data.s,
-                        t:data.t,
-                        w:item.template,
-                        o:data.o,
-                        sw:data.sw
+                        s: data.s,
+                        t: data.t,
+                        w: item.template,
+                        o: data.o,
+                        sw: data.sw
                     });
                 }
 
