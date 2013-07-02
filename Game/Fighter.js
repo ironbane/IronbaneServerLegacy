@@ -350,13 +350,6 @@ var Fighter = Actor.extend({
             h: this.health
         }, 0, true);
 
-        if (this.id > 0) {
-            // Give dull sword
-            // BS: better to have a NPC that hands them out?
-            template = dataHandler.items[1];
-            this.GiveItem(template);
-        }
-
         if (this.id < 0) {
             this.velocity.set(0, 0, 0);
         }
