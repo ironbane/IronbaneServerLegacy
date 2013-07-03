@@ -1,25 +1,96 @@
 <!DOCTYPE html>
-<!-- @@root -->
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Ironbane MMO</title>
 
-    <!-- we need to base at other than root -->
-    <base href="game/" />
+    <base href="/game/" />
 
-    <link rel="stylesheet" type="text/css" href="css/ironbane.css">
+    <link rel="stylesheet" type="text/css" href="/game/css/@@appName.css">
+
+    <script src="/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="/lib/angular/1.1.5/angular.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
 
-    <script>
-        var socket = io.connect();
-        socket.on('news', function (data) {
-            console.log(data);
-        });
-    </script>
+    <script src="/game/js/@@appName-@@appVersion.js"></script>
 </head>
-<body>
+<body ng-app="Ironbane">
+    <!-- contents of frame.html from old client -->
+    <div id="loadingBar" style="display:none">
+        <img src="plugins/game/images/misc/loading.gif"><div class="spacersmall"></div>Loading...
+    </div>
+    <div id="gameFrame" style="opacity:0">
+        <div id="dropItemsBox"></div>
+        <div id="bigMessagesBox"></div>
+        <div id="loginBox">
+            <div id="logo" style="display:none"></div>
+            <div id="versionNumber" style="display:none"><div class="bigoutline">v0.2 Alpha</div></div>
+            <div class="spacer"></div>
+            <div id="loginContainer">
+                <div id="loginContent"></div>
+                <div id="noWebGL">
+                    <div id="hquote"></div>
+                    <div class="spacersmall"></div>
+                    <div class="gen">It appears your browser does not support WebGL, or it is not enabled.<div class="spacersmall"></div><div id="webglsolution"></div></div>
+                    <div class="spacer"></div>
+                </div>
+                <div id="serverDownDisconnect">
+                    <div class="spacer"></div>
+                    <h2>The server disconnected!<br></h2>
+                </div>
+            </div>
+            <div class="spacer"></div>
+        </div>
 
+        <div id="alertBox" style="display:none">
+            <div id="alertImage"></div>
+            <div id="alertMessage">Sample alert message</div>
+            <div id="alertOK">
+                <button id="btnOK" class="ibutton" style="width:100px;">Okay</button>
+                <button id="btnNo" class="ibutton" style="width:100px;">No way</button>
+            </div>
+        </div>
+
+        <div id="devNews" style="display:none"></div>
+
+        <div id="chatBox">
+            <chat-window id="chatContent"></chat-window>
+            <div id="chatInputBox">
+                <input type="text" name="chatInput" id="chatInput" class="iinput">
+            </div>
+        </div>
+
+        <div id="statBar">
+            <div id="healthBar"></div>
+            <div id="armorBar"></div>
+        </div>
+        <div id="coinBar"></div>
+        <div id="itemBar"></div>
+        <div id="lootBag"></div>
+        <div id="debugBox"></div>
+        <div id="soundToggleBox">
+            <button id="btnToggleSound" class="ibutton" style="width:40px"></button>
+        </div>
+        <div id="book">
+            <div id="bookPageLeft" class="bookPage"></div>
+            <div id="bookPageRight" class="bookPage"></div>
+            <div id="bookFooterLeft" class="bookFooter"></div>
+            <div id="bookFooterRight" class="bookFooter"></div>
+        </div>
+        <div id="map">
+            <canvas id="mapCanvas" width="768" height="768"></canvas>
+        </div>
+        <div id="tileSelectBox">
+            <div id="selectRange" class="gensmall"></div>
+            <div id="editormessage" style="font-size:10px;width:100%;height:30px"></div>
+            <div id="tileList" style="background-color:gray"></div>
+        </div>
+        <button id="bogusButton">Bogus</button>
+        <div id="tooltip"></div>
+        <div id="black-bar-top"></div>
+        <div id="black-bar-bottom"></div>
+        <div id="editorControls"></div>
+    </div>
 </body>
 </html>
