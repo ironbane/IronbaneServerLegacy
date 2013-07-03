@@ -163,10 +163,16 @@ module.exports = function(grunt) {
             },
             game: {
                 files: [{
+                    // game data, from what location?
                     src: 'data/**/*',
                     dest: '<%= cfg.get("clientDir") %>',
                     cwd: 'src/client/game',
                     expand: true
+                }, {
+                    src: 'lib/**/*',
+                    dest: '<%= cfg.get("clientDir") %>',
+                    expand: true,
+                    cwd: 'src/client/game'
                 }]
             }
         },
