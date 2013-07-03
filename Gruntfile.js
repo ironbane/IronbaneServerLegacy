@@ -6,8 +6,10 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         cfg: require('./nconf'),
+        gameScriptPath: 'src/client/game/js',
         clean: {
-            web: ['deploy/web']
+            web: ['deploy/web'],
+            game: ['<%= cfg.get("clientDir") %>']
         },
         jshint: {
             files: ['src/client/web/js/**/*.js', 'Game/**/*.js']
@@ -25,6 +27,51 @@ module.exports = function(grunt) {
             web: {
                 src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
                 dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js'
+            },
+            game: {
+                src: [ // order matters!
+                    "<%= gameScriptPath %>/Engine/Debug.js",
+                    "<%= gameScriptPath %>/Engine/Events.js",
+                    "<%= gameScriptPath %>/Engine/Input.js",
+                    "<%= gameScriptPath %>/Engine/SocketHandler.js",
+                    "<%= gameScriptPath %>/Engine/SoundHandler.js",
+                    "<%= gameScriptPath %>/Engine/TextureHandler.js",
+                    "<%= gameScriptPath %>/Engine/MeshHandler.js",
+                    "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
+                    "<%= gameScriptPath %>/Game.js",
+                    "<%= gameScriptPath %>/Game/Hud.js",
+                    "<%= gameScriptPath %>/Game/PhysicsObject.js",
+                    "<%= gameScriptPath %>/Game/Unit.js",
+                    "<%= gameScriptPath %>/Game/Billboard.js",
+                    "<%= gameScriptPath %>/Game/Waypoint.js",
+                    "<%= gameScriptPath %>/Game/ChatBubble.js",
+                    "<%= gameScriptPath %>/Game/Mesh.js",
+                    "<%= gameScriptPath %>/Game/DynamicMesh.js",
+                    "<%= gameScriptPath %>/Game/MovingObstacle.js",
+                    "<%= gameScriptPath %>/Game/Train.js",
+                    "<%= gameScriptPath %>/Game/ToggleableObstacle.js",
+                    "<%= gameScriptPath %>/Game/Lever.js",
+                    "<%= gameScriptPath %>/Game/TeleportEntrance.js",
+                    "<%= gameScriptPath %>/Game/TeleportExit.js",
+                    "<%= gameScriptPath %>/Game/HeartPiece.js",
+                    "<%= gameScriptPath %>/Game/MusicPlayer.js",
+                    "<%= gameScriptPath %>/Game/Sign.js",
+                    "<%= gameScriptPath %>/Game/Skybox.js",
+                    "<%= gameScriptPath %>/Game/LootBag.js",
+                    "<%= gameScriptPath %>/Game/LootableMesh.js",
+                    "<%= gameScriptPath %>/Game/Fighter.js",
+                    "<%= gameScriptPath %>/Game/Player.js",
+                    "<%= gameScriptPath %>/Game/Cell.js",
+                    "<%= gameScriptPath %>/Game/Cinema.js",
+                    "<%= gameScriptPath %>/Game/Cutscenes.js",
+                    "<%= gameScriptPath %>/Game/ParticleTypes.js",
+                    "<%= gameScriptPath %>/Game/Projectile.js",
+                    "<%= gameScriptPath %>/Game/ParticleEmitter.js",
+                    "<%= gameScriptPath %>/Game/ParticleHandler.js",
+                    "<%= gameScriptPath %>/Game/TerrainHandler.js",
+                    "<%= gameScriptPath %>/Game/LevelEditor.js"
+                ],
+                dest: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
         uglify: {
@@ -34,6 +81,10 @@ module.exports = function(grunt) {
             web: {
                 src: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js',
                 dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+            },
+            game: {
+                src: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
         less: {
@@ -50,7 +101,7 @@ module.exports = function(grunt) {
                     yuicompress: true
                 },
                 files: {
-                    'deploy/web/game/css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
+                    '<%= cfg.get("clientDir") %>css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
                 }
             }
         },
@@ -68,11 +119,13 @@ module.exports = function(grunt) {
             game: {
                 options: {
                     variables: {
-                        root: '<%= cfg.get("root") %>'
+                        root: '<%= cfg.get("root") %>',
+                        appName: '<%= pkg.name %>',
+                        appVersion: '<%= pkg.version %>'
                     }
                 },
                 files: [
-                    {expand: true, flatten: true, src: ['src/client/game/index.html'], dest: 'deploy/web/game/'}
+                    {expand: true, flatten: true, src: ['src/client/game/index.html'], dest: '<%= cfg.get("clientDir") %>'}
                 ]
             }
         },
@@ -111,7 +164,7 @@ module.exports = function(grunt) {
             game: {
                 files: [{
                     src: 'data/**/*',
-                    dest: 'deploy/web/game/',
+                    dest: '<%= cfg.get("clientDir") %>',
                     cwd: 'src/client/game',
                     expand: true
                 }]
@@ -146,6 +199,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-replace');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'concat', 'uglify', 'less', 'replace', 'copy']);
+    grunt.registerTask('default', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
 
 };

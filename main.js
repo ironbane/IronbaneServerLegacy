@@ -139,7 +139,7 @@ setInterval(keepAlive, 10000);
 
 
 setInterval(function autoSave() {
-    log("Auto-saving all players...")
+    log("Auto-saving all players...");
     worldHandler.LoopUnits(function(unit) {
         if ( unit instanceof Player ) {
             unit.Save();
