@@ -163,13 +163,18 @@ module.exports = function(grunt) {
             },
             game: {
                 files: [{
-                    // game data, from what location?
-                    src: 'data/**/*',
+                    // this is the folder structure only? get actual game data elsewhere?
+                    src: 'media/**/*',
                     dest: '<%= cfg.get("clientDir") %>',
                     cwd: 'src/client/game',
                     expand: true
                 }, {
                     src: 'lib/**/*',
+                    dest: '<%= cfg.get("clientDir") %>',
+                    expand: true,
+                    cwd: 'src/client/game'
+                }, {
+                    src: 'flash/**/*',
                     dest: '<%= cfg.get("clientDir") %>',
                     expand: true,
                     cwd: 'src/client/game'
