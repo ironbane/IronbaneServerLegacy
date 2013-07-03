@@ -27,7 +27,6 @@ var Lootable = Unit.extend({
         }
         // END HACKY
 
-
         this.loot = [];
 
         if (loadItems) {
