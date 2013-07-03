@@ -16,6 +16,9 @@
 */
 var config = require('./nconf');
 
+var isProduction = config.get('isProduction');
+var cryptSalt = config.get('cryptSalt');
+
 if ( isProduction ) {
     require('nodetime').profile({
         accountKey: '02d4f7720345c788c184c7b46609f7f9ba82cb86',
@@ -31,10 +34,11 @@ var mysql_user = config.get('mysql_user');
 var mysql_password = config.get('mysql_password');
 var mysql_database = config.get('mysql_database');
 var clientDir = config.get('clientDir');
-var isProduction = config.get('isProduction');
-var cryptSalt = config.get('cryptSalt');
 
-if ( !cryptSalt ) throw "No password hash set!";
+
+if (!cryptSalt) {
+    throw "No password hash set!";
+}
 
 // System start
 var SERVER = true;

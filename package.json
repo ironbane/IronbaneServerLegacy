@@ -1,6 +1,6 @@
 {
   "name": "ironbane",
-  "version": "0.1.7",
+  "version": "0.3",
   "description": "Ironbane, the open source browser MMO.",
   "main": "main.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "bcrypt-nodejs": "0.0.3",
     "marked": "~0.2.8",
     "nconf": "~0.6.7",
-	"validator": "~1.2.0",
+    "validator": "~1.2.0",
     "q": "~0.9.4"
   },
   "devDependencies": {

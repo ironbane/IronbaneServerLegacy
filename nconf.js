@@ -12,21 +12,42 @@ nconf.argv()
 
 // if not provided use these values
 nconf.defaults({
-    root: '/', // default is /, if you want to host it like http://localhost/ironbane/ as your root, put 'ironbane' in your config.json
+    root: '',
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',
     mysql_database: 'ironbane',
     clientDir: 'deploy/game/',
-
-	// whether you intend to run this as a production server
-	isProduction: false,
-    // socket server
+    cryptSalt: '',
+    isProduction: false,
     server_port: 8080,
-    // web api for client
-    http_port: 8081,
-
-    cryptSalt: ""
+    // game settings
+    game: {
+        timeouts: {
+            playerSpawn: 5,
+            npcSpawn: 10
+        },
+        spawns: {
+            guest: {
+                zone: 1,
+                position: {x: 10, y: 0, z: 0}
+            },
+            normal: {
+                zone: 1,
+                position: {x: 3, y: 20, z: -4}
+            },
+            tutorial: {
+                zone: 3,
+                position: {x: 42, y: 57, z: 59}
+            }
+        }
+    },
+    irc: {
+        enabled: false, // default false so contributors dont *have* to flood the channel with Ironbane clones :)
+        server: 'irc.freenode.net',
+        nick: 'Ironbane',
+        channels: ['#ironbane']
+    }
 });
 
 // send this configured reference
