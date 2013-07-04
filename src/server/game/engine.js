@@ -44,7 +44,7 @@ var loop = function(server) {
     }
 
     var currTime = Date.now();
-    var delta = Math.max(0, (currTime - server.lastTime));
+    var delta = Math.max(0.3, (currTime - server.lastTime) / 1000);
     server.tick(delta);
     server.lastTime = currTime;
 

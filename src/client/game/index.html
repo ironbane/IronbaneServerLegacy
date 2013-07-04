@@ -4,21 +4,32 @@
     <meta charset="utf-8">
     <title>Ironbane MMO</title>
 
-    <base href="/game/" />
+    <base href="@@root/" />
 
-    <link rel="stylesheet" type="text/css" href="/game/css/@@appName.css">
+    <link rel="stylesheet" type="text/css" href="@@root/css/@@appName.css">
+    <link rel="stylesheet" type="text/css" href="@@root/lib/jquery/plugins/jquery.jscrollpane.css">
 
-    <script src="/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
-    <script src="/lib/angular/1.1.5/angular.min.js"></script>
+    <!-- todo: automate libs? -->
+    <script src="@@root/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="@@root/lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
+    <script src="@@root/lib/jquery/plugins/jquery.mousewheel.js"></script>
+    <script src="@@root/lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
+    <script src="@@root/lib/angular/1.1.5/angular.min.js"></script>
+    <script src="@@root/lib/angular/1.1.5/angular-sanitize.min.js"></script>
+    <script src="@@root/lib/three/Three_r52.min.js"></script>
+    <script src="@@root/lib/three/ThreeOctree.js"></script>
+    <script src="@@root/lib/sound_manager_2/soundmanager2-nodebug-jsmin.js"></script>
+    <script src="@@root/lib/dat_gui/dat.gui.js"></script>
+    <script src="@@root/lib/three/Detector.js"></script>
+    <script src="@@root/lib/underscore/underscore-min.js"></script>
+    <script src="@@root/lib/tween/tween.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
-
-    <script src="/game/js/@@appName-@@appVersion.js"></script>
 </head>
 <body ng-app="Ironbane">
     <!-- contents of frame.html from old client -->
     <div id="loadingBar" style="display:none">
-        <img src="plugins/game/images/misc/loading.gif"><div class="spacersmall"></div>Loading...
+        <img src="@@root/media/images/misc/loading.gif"><div class="spacersmall"></div>Loading...
     </div>
     <div id="gameFrame" style="opacity:0">
         <div id="dropItemsBox"></div>
@@ -92,5 +103,35 @@
         <div id="black-bar-bottom"></div>
         <div id="editorControls"></div>
     </div>
+
+    <script>
+        // todo: eventually do whatever php was doing here or move it
+        var startdata = {
+            loggedIn: false,
+            characterUsed: 0,
+            using_ie: false,
+            using_safari: false
+        };
+
+        var ironbane_hostname = "localhost";
+        var ironbane_port = 8999;
+        var ironbane_root_directory = "/";
+
+        var hquote = "Sweet llamas of the Bahamas!";
+
+        var isEditor = false;
+        var debugging = false;
+
+        var preCatsTiles = [];
+        var items = {};
+        var units = {};
+        var modelEnum = {};
+        var preMeshes = {};
+        var zones = {};
+        var zoneSelection = {};
+
+        var newsPosts = '';
+    </script>
+    <script src="@@root/js/@@appName-@@appVersion.js"></script>
 </body>
 </html>
