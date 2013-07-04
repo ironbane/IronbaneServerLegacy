@@ -35,6 +35,7 @@ var Server = Class.extend({
         log('starting http server...');
 
         var db = require('mysql').createConnection({
+            host: config.get('mysql_host'),
             user: config.get('mysql_user'),
             password: config.get('mysql_password'),
             database: config.get('mysql_database')

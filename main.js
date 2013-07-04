@@ -60,6 +60,7 @@ var _ = require('underscore');
 // We cut the middle man and only use mysql occasionally to save/load data
 // Start MySQL - has to be here for global access below...
 var mysql = require('mysql').createConnection({
+    host: config.get('mysql_host'),
     user: config.get('mysql_user'),
     password: config.get('mysql_password'),
     database: config.get('mysql_database')

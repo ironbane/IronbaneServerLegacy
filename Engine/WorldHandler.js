@@ -16,7 +16,7 @@
 */
 
 
-var dataPath = clientDir + 'data';
+var dataPath = clientDir + 'media/data';
 
 var WorldHandler = Class.extend({
   Init: function() {
