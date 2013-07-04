@@ -8,7 +8,7 @@ var events = require('events'),
 // enhance default class
 sys.inherits(Class, events.EventEmitter);
 
-// todo: move this method to common lib
+// todo: move this method to common lib, also make finer grained
 function timeSince(date) {
 
     var seconds = Math.floor((new Date() - date) / 1000);

@@ -13,6 +13,7 @@ nconf.argv()
 // if not provided use these values
 nconf.defaults({
     root: '',
+    game_root: '/game',
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',
@@ -21,6 +22,7 @@ nconf.defaults({
     cryptSalt: '',
     isProduction: false,
     server_port: 8080,
+    session_secret: 'horsehead bookends',
     // game settings
     game: {
         timeouts: {

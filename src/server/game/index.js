@@ -4,9 +4,7 @@ var GameEngine = require('./engine');
 
 var game = new GameEngine();
 
-game.on('tick', function(elapsed) {
-    //console.log('test tick: ' + elapsed);
-});
+// eventually this game engine class will contain most of the references that are currently global
 
 game.start();
 

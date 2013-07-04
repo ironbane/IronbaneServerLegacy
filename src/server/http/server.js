@@ -77,7 +77,7 @@ var Server = Class.extend({
             app.use(express.bodyParser());
             app.use(express.methodOverride());
             app.use(express.session({
-                secret: 'horsehead bookends'
+                secret: config.get('session_secret')
             }));
             // Initialize Passport!  Also use passport.session() middleware, to support
             // persistent login sessions (recommended).
@@ -148,9 +148,9 @@ var Server = Class.extend({
         this.server = require('http').createServer(app);
 
         // start api server
-        this.server.listen(config.get('http_port'));
+        this.server.listen(config.get('server_port'));
 
-        log('http server running on ' + config.get('http_port'));
+        log('http server running on ' + config.get('server_port'));
     }
 });
 
