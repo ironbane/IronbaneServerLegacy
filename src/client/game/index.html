@@ -123,15 +123,17 @@
         var debugging = false;
 
         var preCatsTiles = [];
-        var items = {};
-        var units = {};
-        var modelEnum = {};
-        var preMeshes = {};
+        var items = {{{items}}};
+        var units = {{{units}}};
+        var unitTemplates = {{{unitTemplates}}};
+        var ModelEnum = {{{modelEnum}}};
+        var preMeshes = {{{preMeshes}}};
         var zones = {{{zones}}};
         var zoneSelection = {{{zoneSelection}}};
 
         var newsPosts = '';
     </script>
+    {{{shaders}}}
     <script src="@@root/js/@@appName-@@appVersion.js"></script>
 </body>
 </html>
