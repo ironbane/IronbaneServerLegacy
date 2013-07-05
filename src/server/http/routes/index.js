@@ -14,7 +14,15 @@ module.exports = function(app, db) {
         items = {},
         units = {},
         unitTemplates = {},
-        preMeshes = {},
+        preMeshes = {
+            0: {
+                id: 0,
+                name: "ERROR",
+                filename: "modelerror.obj",
+                scale: 1.00,
+                t1: "tiles/402"
+            }
+        },
         modelEnum = {};
 
     db.query('select * from ib_item_templates', [], function(err, results) {
