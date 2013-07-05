@@ -17,6 +17,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var config = require('../../../nconf'),
+    path = require('path'),
     Class = require('../../common/class'),
     log = require('util').log; // built in timestampped logger
 
@@ -71,6 +72,7 @@ var Server = Class.extend({
         }));
         var app = express(); // purposefully global
         app.passport = passport; // convienience
+
         app.configure(function() {
             app.use(express.bodyParser());
             //app.use(express.logger());
@@ -80,6 +82,9 @@ var Server = Class.extend({
             app.use(express.session({
                 secret: config.get('session_secret')
             }));
+            app.set('view engine', 'html');
+            app.set('views', config.get('clientDir'));
+            app.engine('html', require('hogan-express'));
             // Initialize Passport!  Also use passport.session() middleware, to support
             // persistent login sessions (recommended).
             app.use(passport.initialize());
