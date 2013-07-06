@@ -31,6 +31,7 @@ module.exports = function(grunt) {
             },
             game: {
                 src: [ // order matters!
+                    "src/client/game/shared.js",
                     "<%= gameScriptPath %>/External/seedrandom.js",
                     "<%= gameScriptPath %>/External/ImprovedNoise.js",
                     "<%= gameScriptPath %>/External/Init.js",

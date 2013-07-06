@@ -100,7 +100,10 @@ var Game = Class.extend({
 
     // todo: replace 0 with actual user id
     $.get('/api/user/' + 0 + '/characters', function(data) {
-      eval(data);
+      //console.log('character data:', data);
+
+      window.chars = data;
+      window.charCount = window.chars.length;
 
       hudHandler.MakeCharSelectionScreen();
 
