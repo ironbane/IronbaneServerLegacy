@@ -19,6 +19,7 @@ nconf.defaults({
     mysql_password: '',
     mysql_database: 'ironbane',
     clientDir: 'deploy/game/',
+    assetDir: 'media',
     cryptSalt: '',
     isProduction: false,
     server_port: 8080,

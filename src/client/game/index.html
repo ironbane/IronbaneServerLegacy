@@ -36,7 +36,9 @@
         <div id="bigMessagesBox"></div>
         <div id="loginBox">
             <div id="logo" style="display:none"></div>
-            <div id="versionNumber" style="display:none"><div class="bigoutline">v0.2 Alpha</div></div>
+            <div id="versionNumber" style="display:none">
+                <div class="bigoutline">@@gameVersion</div>
+            </div>
             <div class="spacer"></div>
             <div id="loginContainer">
                 <div id="loginContent"></div>
@@ -132,6 +134,8 @@
         var zoneSelection = {{{zoneSelection}}};
 
         var newsPosts = '';
+        var charCount = 0;
+        var chars = [];
     </script>
     {{{shaders}}}
     <script src="@@root/js/@@appName-@@appVersion.js"></script>

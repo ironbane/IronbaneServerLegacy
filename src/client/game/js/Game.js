@@ -98,8 +98,8 @@ var Game = Class.extend({
 
     hudHandler.ResizeFrame();
 
-
-    $.post('gamehandler.php?action=getchars', function(data) {
+    // todo: replace 0 with actual user id
+    $.get('/api/user/' + 0 + '/characters', function(data) {
       eval(data);
 
       hudHandler.MakeCharSelectionScreen();

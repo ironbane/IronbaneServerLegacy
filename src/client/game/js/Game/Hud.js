@@ -1314,7 +1314,8 @@ var HUDHandler = Class.extend({
                             return;
                         }
 
-                        $.post('gamehandler.php?action=getchars', function(data) {
+                        // todo: replace 0 with actual user id
+                        $.get('/api/user/' + 0 + '/characters', function(data) {
 
                             eval(data);
 
@@ -1453,7 +1454,8 @@ var HUDHandler = Class.extend({
 
                     if (string == 'OK') {
 
-                        $.post('gamehandler.php?action=getchars', function(data) {
+                        // todo: replace 0 with actual user id
+                        $.get('/api/user/' + 0 + '/characters', function(data) {
                             eval(data);
                             startdata.loggedIn = true;
 
@@ -1519,7 +1521,8 @@ var HUDHandler = Class.extend({
                     if (string.split(';')[0] == 'OK') {
                         hudHandler.MessageAlert(string.split(';')[1]);
 
-                        $.post('gamehandler.php?action=getchars', function(data) {
+                        // todo: replace 0 with actual user id
+                        $.get('/api/user/' + 0 + '/characters', function(data) {
                             eval(data);
 
                             startdata.loggedIn = true;

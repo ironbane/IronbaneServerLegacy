@@ -4,6 +4,9 @@ var express = require('express'),
     config = require('../../../../nconf');
 
 module.exports = function(app, db) {
+    // legacy media
+    app.use('/plugins', express.static(config.get('clientDir') + 'plugins'));
+
     app.use('/css', express.static(config.get('clientDir') + 'css'));
     app.use('/flash', express.static(config.get('clientDir') + 'flash'));
     app.use('/media', express.static(config.get('clientDir') + 'media'));

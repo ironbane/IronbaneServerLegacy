@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
     var webScriptPath = 'src/client/web/js';
+    var conf = require('./nconf');
 
     // Project configuration.
     grunt.initConfig({
@@ -131,7 +132,8 @@ module.exports = function(grunt) {
                     variables: {
                         root: '<%= cfg.get("root") %>',
                         appName: '<%= pkg.name %>',
-                        appVersion: '<%= pkg.version %>'
+                        appVersion: '<%= pkg.version %>',
+                        gameVersion: 'v<%= pkg.version %> Alpha' //todo: have alpha/beta stored in config?
                     }
                 },
                 files: [
@@ -188,6 +190,11 @@ module.exports = function(grunt) {
                     dest: '<%= cfg.get("clientDir") %>',
                     expand: true,
                     cwd: 'src/client/game'
+                }, {
+                    src: ['**/*'],
+                    dest: '<%= cfg.get("clientDir") %>',
+                    expand: true,
+                    cwd: '<%= cfg.get("assetDir") %>'
                 }]
             }
         },

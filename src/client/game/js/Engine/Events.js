@@ -220,12 +220,12 @@ $(document).keydown(function(event){
             $('div[id^="li"]').remove();
             $('div[id^="ii"]').remove();
 
-            $.post('gamehandler.php?action=getchars', function(data) {
-              eval(data);
+            // todo: replace 0 with actual user id
+            $.get('/api/user/' + 0 + '/characters', function(data) {
+                eval(data);
 
-              hudHandler.ShowMenuScreen();
-              hudHandler.MakeCharSelectionScreen();
-
+                hudHandler.ShowMenuScreen();
+                hudHandler.MakeCharSelectionScreen();
             });
 
           });
@@ -362,7 +362,7 @@ var mouseIntervalFunction = function(event){
         }
         else {
           _.each(ironbane.unitList, function(unit) {
-            
+
             if ( unit.id < 0 ) {
 
             if ( currentMouseToWorldData.object == unit.mesh ) {
