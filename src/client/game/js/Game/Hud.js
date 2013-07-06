@@ -1293,7 +1293,6 @@ var HUDHandler = Class.extend({
             $('#gameFrame').animate({
                 opacity: 0.00
             }, 1000, function() {
-
                 hudHandler.HideMenuScreen();
 
                 var tryConnect = function() {
@@ -1304,32 +1303,18 @@ var HUDHandler = Class.extend({
                     tryConnect();
                 } else {
                     // Quickly make a character as a guest
+                    $.post('/api/user/0/characters', function(response) {
+                        // should have a more global error handler...
+                        // hudHandler.MessageAlert(data.errmsg);
 
-                    $.post('gamehandler.php?action=makechar', function(string) {
+                        window.chars = [response];
+                        window.charCount = window.chars.length;
+                        window.startdata.characterUsed = response.id;
 
-                        data = JSON.parse(string);
-
-                        if (!_.isUndefined(data.errmsg)) {
-                            hudHandler.MessageAlert(data.errmsg);
-                            return;
-                        }
-
-                        // todo: replace 0 with actual user id
-                        $.get('/api/user/' + 0 + '/characters', function(data) {
-
-                            eval(data);
-
-                            tryConnect();
-                        });
-
-
+                        tryConnect();
                     });
                 }
-                // $("#gameFrame").css('opacity', '');
-                // $("#loadingBar").hide();
             });
-
-            //$('#charSelect').html(charSelect);
         };
 
 

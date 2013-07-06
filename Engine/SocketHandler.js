@@ -98,6 +98,7 @@ var SocketHandler = Class.extend({
 
 
                 // TODO: closure ok?
+                console.log('mouth of madness', data);
                 (function(socket, data, reply) {
                     mysql.query('SELECT pass, editor, banned FROM bcs_users WHERE id = ?', [data.id],
                         function (err, results, fields) {

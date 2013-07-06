@@ -4,8 +4,7 @@ module.exports = function(app, db) {
 
     // all characters for a user
     app.get('/api/user/:userId/characters', function(req, res) {
-        var userId = parseInt(req.params.userId, 10),
-            chars = [];
+        var userId = parseInt(req.params.userId, 10);
 
         if(userId === 0) {
             // guest
@@ -24,6 +23,29 @@ module.exports = function(app, db) {
             }, function(err) {
                 res.send(404, 'error loading characters for user: ' + userId);
             });
+        }
+    });
+
+    app.post('/api/user/:userId/characters', function(req, res) {
+        var userId = parseInt(req.params.userId, 10);
+
+        if(userId === 0) {
+            // guest
+            if(req.cookies.guestCharacterId) {
+                // check if char already exists and something...
+                res.send(404, 'already haz guest');
+            } else {
+                // generate a new random one
+                Character.getRandom(userId).then(function(character) {
+                    res.cookie('guestCharacterId', character.id, { maxAge: 900000, httpOnly: false});
+                    res.send(character);
+                }, function(err) {
+                    res.send(500, err);
+                });
+            }
+        } else {
+            // create character
+            res.send('creating new character for ' + userId);
         }
     });
 };
