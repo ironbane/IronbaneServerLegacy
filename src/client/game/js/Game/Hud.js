@@ -1414,47 +1414,44 @@ var HUDHandler = Class.extend({
 
         $('#btnLogin').click(function() {
 
-            if (slotsLeft <= 0) return;
+            if (slotsLeft <= 0) {
+                return;
+            }
 
             var newChar = '';
-
             newChar += '<label for="username">Username</label><div class="spacersmall"></div><input type="text" id="username" class="iinput" style="width:305px"><div class="spacersmall"></div><label for="password">Password</label><div class="spacersmall"></div><input type="password" id="password" class="iinput" style="width:305px"><div class="spacersmall"></div><button id="btnConfirmLogin" class="ibutton_attention" style="width:150px">Log in</button><button id="btnBack" class="ibutton" style="width:150px">Back</button>';
-
             $('#charSelect').html(newChar);
-
             $('#username').focus();
-
 
             var doLogin = (function() {
                 var username = $('#username').val();
                 var password = $('#password').val();
 
-
                 hudHandler.DisableButtons(['btnConfirmLogin', 'btnBack']);
 
-                $.post('gamehandler.php?action=login', {
-                    user: username,
-                    pass: password
-                }, function(string) {
+                $.post('/login', {
+                    username: username,
+                    password: password
+                })
+                .done(function(user) {
+                    startdata.loggedIn = true;
+                    startdata.name = user.name;
+                    startdata.pass = user.pass;
+                    startdata.user = user.id;
+                    window.isEditor = user.editor === 1;
 
-                    if (string == 'OK') {
-
-                        // todo: replace 0 with actual user id
-                        $.get('/api/user/' + 0 + '/characters', function(data) {
-                            eval(data);
-                            startdata.loggedIn = true;
-
-                            //hudHandler.EnableButtons(['btnConfirmLogin','btnBack']);
+                    // get characters for user
+                    $.get('/api/user/' + user.id + '/characters')
+                        .done(function(data) {
                             hudHandler.MakeCharSelectionScreen();
-
+                        })
+                        .fail(function(err) {
+                            console.error('error getting chars...', err);
                         });
-
-                    } else {
-                        hudHandler.MessageAlert(string);
-                        hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
-                    }
-
-
+                })
+                .fail(function(err) {
+                    hudHandler.MessageAlert(err);
+                    hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
                 });
             });
 
@@ -1469,9 +1466,7 @@ var HUDHandler = Class.extend({
             $('#btnConfirmLogin').click(doLogin);
 
             $('#btnBack').click(function() {
-
                 hudHandler.MakeCharSelectionScreen();
-
             });
         });
 

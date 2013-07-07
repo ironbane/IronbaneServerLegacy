@@ -10,7 +10,7 @@ module.exports = function(app, db) {
             }
             if (!user) {
                 req.session.messages = [info.message];
-                return res.send(info, 404);
+                return res.send(404, info);
             }
             req.logIn(user, function(err) {
                 if (err) {
@@ -19,6 +19,10 @@ module.exports = function(app, db) {
                 }
                 // send flag for UI
                 user.authenticated = true;
+                // todo: need this still with passport system?
+                res.cookie('bcs_username', user.name, { maxAge: 900000, httpOnly: false});
+                res.cookie('bcs_password', user.pass, { maxAge: 900000, httpOnly: false});
+
                 return res.send(user);
             });
         })(req, res, next);
@@ -34,7 +38,7 @@ module.exports = function(app, db) {
         if(req.user) {
             res.send(req.user);
         } else {
-            res.send('no user signed in', 404);
+            res.send(404, 'no user signed in');
         }
     });
 
@@ -45,7 +49,7 @@ module.exports = function(app, db) {
             .then(function(user) {
                 res.send(user);
             }, function(err) {
-                res.send(err, 500);
+                res.send(500, err);
             });
     });
 };

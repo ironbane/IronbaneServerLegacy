@@ -1,5 +1,7 @@
 // user.js - backend user entity / service
-var Class = require('../../common/class');
+var Class = require('../../common/class'),
+    config = require('../../../nconf'),
+    log = require('util').log;
 
 module.exports = function(db) {
     var Q = require('q'),
@@ -11,17 +13,22 @@ module.exports = function(db) {
         },
         $save: function() {
             var self = this;
-            var bcrypt = require('bcrypt-nodejs'),
-                deferred = Q.defer();
+            var deferred = Q.defer(),
+                crypto = require('crypto'),
+                shasum = crypto.createHash('md5'),
+                cryptSalt = config.get('cryptSalt');
 
             if(self.id && self.id > 0) {
                 // then this is an update
-                // TODO: perform update
+                // TODO: perform update (currently update done on php site)
                 deferred.resolve(self);
             } else {
                 // new user
                 self.reg_date = (new Date()).valueOf() / 1000;
-                self.password = bcrypt.hashSync(self.password);
+                shasum.update(cryptSalt + self.pass);
+                self.pass = shasum.digest('hex');
+
+                // TODO: make sure that DB has email and name as unique index
 
                 db.query('insert into bcs_users set ?', self, function(err, result) {
                     if(err) {
@@ -40,32 +47,6 @@ module.exports = function(db) {
     });
 
     // static methods
-
-    // NOT SURE THIS WILL WORK AS IS
-    User.query = function(query) {
-        var deferred = Q.defer();
-
-        db.query('select * from bcs_users where ?', query, function(err, results) {
-            if(err) {
-                deferred.reject(err);
-                return;
-            }
-
-            if(results.length === 0) {
-                deferred.resolve([]);
-                return;
-            }
-
-            // convert results into user objects
-            results.forEach(function(result, i) {
-                results[i] = new User(result);
-                // todo: get roles async
-            });
-            deferred.resolve(results);
-        });
-
-        return deferred.promise;
-    };
 
     User.getById = function(id) {
         var deferred = Q.defer();
@@ -100,9 +81,14 @@ module.exports = function(db) {
     // used for the login process
     User.authenticate = function(username, password) {
         var deferred = Q.defer(),
-            bcrypt = require('bcrypt-nodejs');
+            crypto = require('crypto'),
+            shasum = crypto.createHash('md5'),
+            cryptSalt = config.get('cryptSalt');
 
-        db.query('select * from bcs_users where username = ?', [username], function(err, results) {
+        shasum.update(cryptSalt + password);
+        var hashedPw = shasum.digest('hex');
+
+        db.query('select * from bcs_users where name = ?', [username], function(err, results) {
             if (err) {
                 return deferred.reject(err);
             }
@@ -111,30 +97,22 @@ module.exports = function(db) {
                 deferred.reject('Unknown user: ' + username);
             }
 
-            bcrypt.compare(password, results[0].password, function(err, res) {
-                if (err) {
-                    deferred.reject('bcrypt error', err);
-                    return;
-                }
-
-                if (res === false) {
-                    deferred.reject('Invalid password');
-                    return;
-                } else {
-                    var user = new User(results[0]);
-                    // add in security roles
-                    db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                        if(err) {
-                            log('error getting roles!', err);
-                            user.roles = [];
-                        } else {
-                            user.roles = results.map(function(r) { return r.name; });
-                        }
-                        // at this point still send the user, error isn't fatal
-                        deferred.resolve(user);
-                    });
-                }
-            });
+            if(hashedPw !== results[0].pass) {
+                deferred.reject('invalid password!');
+            } else {
+                var user = new User(results[0]);
+                // add in security roles
+                db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
+                    if(err) {
+                        log('error getting roles!', err);
+                        user.roles = [];
+                    } else {
+                        user.roles = results.map(function(r) { return r.name; });
+                    }
+                    // at this point still send the user, error isn't fatal
+                    deferred.resolve(user);
+                });
+            }
         });
 
         return deferred.promise;
