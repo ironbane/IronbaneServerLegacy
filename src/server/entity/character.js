@@ -15,7 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var Class = require('../../common/class'),
-    getName = require('../../common/namegen');
+    getName = require('../../common/namegen'),
+    log = require('util').log;
 
 // for now just sticking this here, todo: get from config or something
 var skinIdMaleStart = 1000;
@@ -96,7 +97,21 @@ module.exports = function(db) {
                 return;
             }
 
-            deferred.resolve(new Character(results[0]));
+            var outChar = new Character(results[0]);
+            // get equipment, for char select
+            db.query('select template from ib_items where owner=? and equipped=1', [outChar.id], function(err, results) {
+                if(err) {
+                    log('error getting equipment for character: ' + outChar.id);
+                }
+
+                // for the UI it's a comma delim string currently
+                if(_.isArray(results)) {
+                    outChar.equipment = _.pluck(results, 'template').join(',');
+                }
+
+                // either way we need to return the character, failed equipment might not be fatal
+                deferred.resolve(outChar);
+            });
         });
 
         return deferred.promise;
@@ -104,6 +119,29 @@ module.exports = function(db) {
 
     Character.getAllForUser = function(userId) {
         var deferred = Q.defer();
+
+        // todo: move this to item or characters service/entity??
+        var getEquipmentCB = function(character) {
+            return function() {
+                var eqDeferred = Q.defer();
+
+                db.query('select template from ib_items where owner=? and equipped=1', [character.id], function(err, results) {
+                    if(err) {
+                        log('error getting equipment for character: ' + character.id + ' >> ' + err);
+                    }
+
+                    // for the UI it's a comma delim string currently
+                    if(_.isArray(results)) {
+                        character.equipment = _.pluck(results, 'template').join(',');
+                    }
+
+                    // either way we need to return the character, failed equipment might not be fatal
+                    eqDeferred.resolve(character);
+                });
+
+                return eqDeferred.promise;
+            };
+        };
 
         db.query('select * from ib_characters where user=?', [userId], function(err, results) {
             if(err) {
@@ -117,10 +155,18 @@ module.exports = function(db) {
             }
 
             // convert results into objects
+            var equipped = [];
             results.forEach(function(result, i) {
                 results[i] = new Character(result);
+                equipped.push(getEquipmentCB(results[i])());
             });
-            deferred.resolve(results);
+
+            // only when all characters have finished loading equipment are we done
+            Q.all(equipped).then(function() {
+                deferred.resolve(results);
+            }, function(err) {
+                deferred.reject('all rejection!');
+            });
         });
 
         return deferred.promise;
