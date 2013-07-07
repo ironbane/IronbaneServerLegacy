@@ -121,16 +121,25 @@ module.exports = function(app, db) {
             outBig = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 1].join('_') + '.png';
 
         // start with the skin
-        var img = gm()
-            .in(basePath + 'skin/' + $skin + '.png')
-            .in(basePath + 'eyes/' + $eyes + '.png');
+        var img = gm(basePath + 'skin/' + $skin + '.png');
+
+        if(parseInt($eyes, 10) > 0) {
+            img = img.out(basePath + 'eyes/' + $eyes + '.png');
+        }
+
+        // head or hair
+        if(parseInt($head, 10) > 0) {
+            img = img.out(basePath + 'head/' + $head + '.png');
+        } else {
+            img = img.out(basePath + 'hair/' + $hair + '.png');
+        }
 
         if(parseInt($feet, 10) > 0) {
-            img = img.in(basePath + 'feet/' + $feet + '.png');
+            img = img.out(basePath + 'feet/' + $feet + '.png');
         }
 
         if(parseInt($body, 10) > 0) {
-            img = img.in(basePath + 'body/' + $body + '.png');
+            img = img.out(basePath + 'body/' + $body + '.png');
         }
 
         img = img.flatten();
