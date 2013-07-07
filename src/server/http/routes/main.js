@@ -111,6 +111,76 @@ module.exports = function(app, db) {
             });
     });
 
+    // character cache
+    // $character, $skin, $hair, $head, $body, $feet, $big=false
+    function createFullCharacterImage($skin, $eyes, $hair, $feet, $body, $head, $big) {
+        var deferred = require('q').defer(),
+            basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
+            cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
+            outSmall = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 0].join('_') + '.png',
+            outBig = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 1].join('_') + '.png';
+
+        // start with the skin
+        var img = gm()
+            .in(basePath + 'skin/' + $skin + '.png')
+            .in(basePath + 'eyes/' + $eyes + '.png');
+
+        if(parseInt($feet, 10) > 0) {
+            img = img.in(basePath + 'feet/' + $feet + '.png');
+        }
+
+        if(parseInt($body, 10) > 0) {
+            img = img.in(basePath + 'body/' + $body + '.png');
+        }
+
+        img = img.flatten();
+
+        // have to write the flatten first!
+        img.write(outSmall, function(err) {
+            if(err) {
+                deferred.reject('image error: ', err);
+                return;
+            }
+
+            if(parseInt($big, 10) === 1) {
+                gm(outSmall)
+                    .crop(16, 18, 16, 72)
+                    .filter('point')
+                    .resize(16*8, 18*8)
+                    .write(outBig, function(err) {
+                        if(err) {
+                            deferred.reject('image error: ', err);
+                            return;
+                        }
+
+                        deferred.resolve(outBig);
+                    });
+            } else {
+                deferred.resolve(outSmall);
+            }
+        });
+
+        return deferred.promise;
+    }
+
+    app.get('/plugins/game/images/characters/cache/*', function(req, res) {
+        var path = require('path'),
+            fs = require('fs'),
+            filename = path.basename(req.url, '.png');
+
+        // todo: test if exist and serve
+
+        var parts = filename.split('_');
+
+        createFullCharacterImage(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6])
+            .then(function(image) {
+                //res.setHeader('Content-Type', 'image/png');
+                res.sendfile(image);
+            }, function(err) {
+                res.send(500, err);
+            });
+    });
+
     // legacy media
     app.use('/plugins', express.static(config.get('clientDir') + 'plugins'));
 

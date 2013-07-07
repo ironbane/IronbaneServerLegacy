@@ -183,16 +183,13 @@ $(document).keydown(function(event){
   }
 
 
-  if ( event.keyCode == 27 ) {
+  if ( event.keyCode === 27 ) {
 
-    if ( !cinema.IsPlaying() ) {
+    if (!cinema.IsPlaying()) {
       hudHandler.MessageAlert("Back to the Main Menu?", "question", function() {
-
         socketHandler.readyToReceiveUnits = false;
-
-        socketHandler.socket.emit('backToMainMenu', {}, function (reply) {
-
-          if ( ISDEF(reply.errmsg) ) {
+        socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
+          if (ISDEF(reply.errmsg)) {
             hudHandler.MessageAlert(reply.errmsg);
             return;
           }
@@ -201,11 +198,15 @@ $(document).keydown(function(event){
             opacity: 0.00
           }, 1000, function() {
 
-            setTimeout(function(){ironbane.showingGame = false;}, 100);
+            setTimeout(function() {
+              ironbane.showingGame = false;
+            }, 100);
 
             socketHandler.inGame = false;
 
-            for(var u=0;u<ironbane.unitList.length;u++) ironbane.unitList[u].Destroy();
+            for (var u = 0; u < ironbane.unitList.length; u++) {
+              ironbane.unitList[u].Destroy();
+            }
 
             ironbane.unitList = [];
 
@@ -220,17 +221,19 @@ $(document).keydown(function(event){
             $('div[id^="li"]').remove();
             $('div[id^="ii"]').remove();
 
-            // todo: replace 0 with actual user id
-            $.get('/api/user/' + 0 + '/characters', function(data) {
-                eval(data);
+            // is startdata right here? check session user instead?
+            $.get('/api/user/' + startdata.user + '/characters')
+                .done(function(data) {
+                    window.chars = data;
+                    window.charCount = window.chars.length;
 
-                hudHandler.ShowMenuScreen();
-                hudHandler.MakeCharSelectionScreen();
-            });
-
+                    hudHandler.ShowMenuScreen();
+                    hudHandler.MakeCharSelectionScreen();
+                })
+                .fail(function(err) {
+                    console.error('error getting chars...', err);
+                });
           });
-
-
         });
       }, function() {
 

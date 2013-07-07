@@ -1453,14 +1453,14 @@ var HUDHandler = Class.extend({
                         });
                 })
                 .fail(function(err) {
-                    hudHandler.MessageAlert(err);
+                    hudHandler.MessageAlert(err.responseText);
                     hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
                 });
             });
 
             (function(doLogin) {
                 $('#charSelect').keydown(function(event) {
-                    if (event.keyCode == 13 && !hudHandler.alertBoxActive) {
+                    if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
                         doLogin();
                     }
                 });
