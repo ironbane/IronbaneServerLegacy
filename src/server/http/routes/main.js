@@ -46,6 +46,71 @@ module.exports = function(app, db) {
             });
     });
 
+    // armors grab the front and center and blow it up
+    app.get('/plugins/game/images/characters/base/:subtype/big.php', function(req, res) {
+        var imageId = req.query.i,
+            subtype = req.params.subtype,
+            path = config.get('clientDir') + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
+            cutpoint = [16, 76]; // for body
+
+        if(subtype === 'head') {
+            cutpoint = [0, 70];
+        }
+
+        if(subtype === 'feet') {
+            cutpoint = [16, 80];
+        }
+
+        if(!imageId) {
+            res.send(500, 'missing required param i');
+            return;
+        }
+
+        gm(path + '.png')
+            .crop(16, 16, cutpoint[0], cutpoint[1])
+            .filter('point')
+            .resize(48, 48)
+            .write(path + '_big.png', function(err) {
+                if(err) {
+                    res.send(500, err);
+                } else {
+                    res.sendfile(path + '_big.png');
+                }
+            });
+    });
+
+    app.get('/plugins/game/images/characters/base/:subtype/medium.php', function(req, res) {
+        var imageId = req.query.i,
+            subtype = req.params.subtype,
+            path = config.get('clientDir') + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
+            cutpoint = [16, 76]; // for body
+
+        if(subtype === 'head') {
+            cutpoint = [0, 70];
+        }
+
+        if(subtype === 'feet') {
+            cutpoint = [16, 80];
+        }
+
+        if(!imageId) {
+            res.send(500, 'missing required param i');
+            return;
+        }
+
+        gm(path + '.png')
+            .crop(16, 16, cutpoint[0], cutpoint[1])
+            .filter('point')
+            .resize(32, 32)
+            .write(path + '_medium.png', function(err) {
+                if(err) {
+                    res.send(500, err);
+                } else {
+                    res.sendfile(path + '_medium.png');
+                }
+            });
+    });
+
     // legacy media
     app.use('/plugins', express.static(config.get('clientDir') + 'plugins'));
 
