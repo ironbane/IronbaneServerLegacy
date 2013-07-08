@@ -112,62 +112,112 @@ module.exports = function(app, db) {
     });
 
     // character cache
+    function createCharacterHeadImage(id, isHead) {
+        var deferred = require('q').defer(),
+            fs = require('fs'),
+            basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
+            cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
+            headType = isHead ? 'head' : 'hair';
+
+        // easier to just pass in 0 than have even more conditional logic below
+        if(parseInt(id, 10) === 0) {
+            deferred.resolve('skip');
+            return deferred.promise;
+        }
+
+        fs.exists(basePath + headType + '/' + id + '.png', function(exists) {
+            if(!exists) {
+                deferred.reject('invalid id for ' + headType);
+                return;
+            }
+
+            fs.exists(cachePath + headType + '_' + id + '.png', function(cacheExists) {
+                if(cacheExists) {
+                    deferred.resolve(cachePath + headType + '_' + id + '.png');
+                    return;
+                } else {
+                    gm(basePath + headType + '/' + id + '.png')
+                        .append(basePath + headType + '/' + id + '.png', true)
+                        .append(basePath + headType + '/' + id + '.png', true)
+                        .write(cachePath + headType + '_' + id + '.png', function(err) {
+                            if(err) {
+                                deferred.reject('error generating head');
+                                return;
+                            }
+
+                            deferred.resolve(cachePath + headType + '_' + id + '.png');
+                        });
+                }
+            });
+        });
+
+        return deferred.promise;
+    }
+
     // $character, $skin, $hair, $head, $body, $feet, $big=false
     function createFullCharacterImage($skin, $eyes, $hair, $feet, $body, $head, $big) {
-        var deferred = require('q').defer(),
+        var Q = require('q'),
+            deferred = Q.defer(),
             basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
             cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
             outSmall = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 0].join('_') + '.png',
             outBig = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 1].join('_') + '.png';
 
-        // start with the skin
-        var img = gm(basePath + 'skin/' + $skin + '.png');
+        // for now need to build the head and hair separately
+        Q.all([createCharacterHeadImage($head, true), createCharacterHeadImage($hair, false)])
+            .then(function(results) {
+                // start with the skin
+                var img = gm(basePath + 'skin/' + $skin + '.png');
 
-        if(parseInt($eyes, 10) > 0) {
-            img = img.out(basePath + 'eyes/' + $eyes + '.png');
-        }
+                if(parseInt($eyes, 10) > 0) {
+                    img = img.out(basePath + 'eyes/' + $eyes + '.png');
+                }
 
-        // head or hair
-        if(parseInt($head, 10) > 0) {
-            img = img.out(basePath + 'head/' + $head + '.png');
-        } else {
-            img = img.out(basePath + 'hair/' + $hair + '.png');
-        }
+                // head or hair
+                if(parseInt($head, 10) > 0) {
+                    img = img.out(results[0]);
+                } else if(parseInt($hair, 10) > 0) {
+                    img = img.out(results[1]);
+                }
 
-        if(parseInt($feet, 10) > 0) {
-            img = img.out(basePath + 'feet/' + $feet + '.png');
-        }
+                if(parseInt($feet, 10) > 0) {
+                    img = img.out(basePath + 'feet/' + $feet + '.png');
+                }
 
-        if(parseInt($body, 10) > 0) {
-            img = img.out(basePath + 'body/' + $body + '.png');
-        }
+                if(parseInt($body, 10) > 0) {
+                    img = img.out(basePath + 'body/' + $body + '.png');
+                }
 
-        img = img.flatten();
+                img = img.flatten();
 
-        // have to write the flatten first!
-        img.write(outSmall, function(err) {
-            if(err) {
-                deferred.reject('image error: ', err);
+                // have to write the flatten first!
+                img.write(outSmall, function(err) {
+                    if(err) {
+                        deferred.reject('image error: ' + err);
+                        return;
+                    }
+
+                    if(parseInt($big, 10) === 1) {
+                        gm(outSmall)
+                            .crop(16, 18, 16, 72)
+                            .filter('point')
+                            .resize(16*8, 18*8)
+                            .write(outBig, function(err) {
+                                if(err) {
+                                    deferred.reject('image error: ' + err);
+                                    return;
+                                }
+
+                                deferred.resolve(outBig);
+                            });
+                    } else {
+                        deferred.resolve(outSmall);
+                    }
+                });
+            }, function(err) {
+                deferred.reject('error with head: ' + err);
                 return;
-            }
-
-            if(parseInt($big, 10) === 1) {
-                gm(outSmall)
-                    .crop(16, 18, 16, 72)
-                    .filter('point')
-                    .resize(16*8, 18*8)
-                    .write(outBig, function(err) {
-                        if(err) {
-                            deferred.reject('image error: ', err);
-                            return;
-                        }
-
-                        deferred.resolve(outBig);
-                    });
-            } else {
-                deferred.resolve(outSmall);
-            }
-        });
+            });
 
         return deferred.promise;
     }
