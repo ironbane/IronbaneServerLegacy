@@ -32,8 +32,11 @@ module.exports = function(app, db) {
         if(userId === 0) {
             // guest
             if(req.cookies.guestCharacterId) {
-                // check if char already exists and something...
-                res.send(404, 'already haz guest');
+                Character.get(req.cookies.guestCharacterId).then(function(character) {
+                    res.send(character);
+                }, function(err) {
+                    res.send(404, 'error loading guest character');
+                });
             } else {
                 // generate a new random one
                 Character.getRandom(userId).then(function(character) {

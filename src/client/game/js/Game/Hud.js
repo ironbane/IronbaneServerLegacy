@@ -1438,6 +1438,7 @@ var HUDHandler = Class.extend({
                     startdata.name = user.name;
                     startdata.pass = user.pass;
                     startdata.user = user.id;
+                    startdata.characterUsed = user.characterused;
                     window.isEditor = user.editor === 1;
 
                     // get characters for user

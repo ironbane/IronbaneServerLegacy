@@ -2,48 +2,64 @@
 var express = require('express'),
     util = require('util'),
     config = require('../../../../nconf'),
-    gm = require('gm');
+    gm = require('gm'),
+    fs = require('fs'),
+    Q = require('q');
 
 module.exports = function(app, db) {
     // define special routes prior to statics
     app.get('/plugins/game/images/items/big.php', function(req, res) {
-        var imageId = req.query.i;
+        var imageId = req.query.i,
+            path = config.get('clientDir') + 'plugins/game/images/items/' + imageId;
 
         if(!imageId) {
             res.send(500, 'missing required param i');
             return;
         }
 
-        gm(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '.png')
-            .filter('point')
-            .resize(40, 40)
-            .write(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '_big.png', function(err) {
-                if(err) {
-                    res.send(500, err);
-                } else {
-                    res.sendfile(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '_big.png');
-                }
-            });
+        fs.exists(path + '_big.png', function(exists) {
+            if(exists) {
+                res.sendfile(path + '_big.png');
+            } else {
+                gm(path + '.png')
+                    .filter('point')
+                    .resize(40, 40)
+                    .write(path + '_big.png', function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path + '_big.png');
+                        }
+                    });
+            }
+        });
     });
 
     app.get('/plugins/game/images/items/medium.php', function(req, res) {
-        var imageId = req.query.i;
+        var imageId = req.query.i,
+            path = config.get('clientDir') + 'plugins/game/images/items/' + imageId;
 
         if(!imageId) {
             res.send(500, 'missing required param i');
             return;
         }
-        // todo: just send converted if exists
-        gm(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '.png')
-            .filter('point')
-            .resize(24, 24)
-            .write(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '_medium.png', function(err) {
-                if(err) {
-                    res.send(500, err);
-                } else {
-                    res.sendfile(config.get('clientDir') + 'plugins/game/images/items/' + imageId + '_medium.png');
-                }
-            });
+
+        fs.exists(path + '_medium.png', function(exists) {
+            if(exists) {
+                res.sendfile(path + '_medium.png');
+            } else {
+                gm(path + '.png')
+                    .filter('point')
+                    .resize(24, 24)
+                    .write(path + '_medium.png', function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path + '_medium.png');
+                        }
+                    });
+            }
+        });
     });
 
     // armors grab the front and center and blow it up
@@ -66,17 +82,23 @@ module.exports = function(app, db) {
             return;
         }
 
-        gm(path + '.png')
-            .crop(16, 16, cutpoint[0], cutpoint[1])
-            .filter('point')
-            .resize(48, 48)
-            .write(path + '_big.png', function(err) {
-                if(err) {
-                    res.send(500, err);
-                } else {
-                    res.sendfile(path + '_big.png');
-                }
-            });
+        fs.exists(path + '_big.png', function(exists) {
+            if(exists) {
+                res.sendfile(path + '_big.png');
+            } else {
+                gm(path + '.png')
+                    .crop(16, 16, cutpoint[0], cutpoint[1])
+                    .filter('point')
+                    .resize(48, 48)
+                    .write(path + '_big.png', function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path + '_big.png');
+                        }
+                    });
+            }
+        });
     });
 
     app.get('/plugins/game/images/characters/base/:subtype/medium.php', function(req, res) {
@@ -98,23 +120,29 @@ module.exports = function(app, db) {
             return;
         }
 
-        gm(path + '.png')
-            .crop(16, 16, cutpoint[0], cutpoint[1])
-            .filter('point')
-            .resize(32, 32)
-            .write(path + '_medium.png', function(err) {
-                if(err) {
-                    res.send(500, err);
-                } else {
-                    res.sendfile(path + '_medium.png');
-                }
-            });
+        // no need to regenerate if it it already exists
+        fs.exists(path + '_medium.png', function(exists) {
+            if(exists) {
+                res.sendfile(path + '_medium.png');
+            } else {
+                gm(path + '.png')
+                    .crop(16, 16, cutpoint[0], cutpoint[1])
+                    .filter('point')
+                    .resize(32, 32)
+                    .write(path + '_medium.png', function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path + '_medium.png');
+                        }
+                    });
+            }
+        });
     });
 
     // character cache
     function createCharacterHeadImage(id, isHead) {
-        var deferred = require('q').defer(),
-            fs = require('fs'),
+        var deferred = Q.defer(),
             basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
             cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
             headType = isHead ? 'head' : 'hair';
@@ -156,8 +184,7 @@ module.exports = function(app, db) {
 
     // $character, $skin, $hair, $head, $body, $feet, $big=false
     function createFullCharacterImage($skin, $eyes, $hair, $feet, $body, $head, $big) {
-        var Q = require('q'),
-            deferred = Q.defer(),
+        var deferred = Q.defer(),
             basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
             cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
             outSmall = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 0].join('_') + '.png',
@@ -224,7 +251,6 @@ module.exports = function(app, db) {
 
     app.get('/plugins/game/images/characters/cache/*', function(req, res) {
         var path = require('path'),
-            fs = require('fs'),
             filename = path.basename(req.url, '.png');
 
         // todo: test if exist and serve
