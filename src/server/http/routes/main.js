@@ -194,7 +194,9 @@ module.exports = function(app, db) {
         Q.all([createCharacterHeadImage($head, true), createCharacterHeadImage($hair, false)])
             .then(function(results) {
                 // start with the skin
-                var img = gm(basePath + 'skin/' + $skin + '.png');
+                var img = gm()
+                    .background('transparent')
+                    .out(basePath + 'skin/' + $skin + '.png');
 
                 if(parseInt($eyes, 10) > 0) {
                     img = img.out(basePath + 'eyes/' + $eyes + '.png');
@@ -215,7 +217,7 @@ module.exports = function(app, db) {
                     img = img.out(basePath + 'body/' + $body + '.png');
                 }
 
-                img = img.flatten();
+                img = img.mosaic();
 
                 // have to write the flatten first!
                 img.write(outSmall, function(err) {
