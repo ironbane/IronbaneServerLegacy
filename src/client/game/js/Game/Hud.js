@@ -1177,8 +1177,7 @@ var HUDHandler = Class.extend({
                     }
                 }
 
-
-                getCharacterTexture({
+                var tex = getCharacterTexture({
                     skin: myChar.skin,
                     eyes: myChar.eyes,
                     hair: myChar.hair,
@@ -1186,12 +1185,8 @@ var HUDHandler = Class.extend({
                     body: body,
                     head: head,
                     big: 1
-                }, function(texture) {
-                    $('#charImage').attr('src', texture);
                 });
-
-
-                charSelect += '<div id="charPreview"><img id="charImage"></div>';
+                charSelect += '<div id="charPreview"><img id="charImage" src="' + tex + '"></div>';
 
             } else {
 
@@ -1541,60 +1536,42 @@ var HUDHandler = Class.extend({
 
         $('#btnNewChar').click(function() {
 
-            if (slotsLeft <= 0) return;
+            if (slotsLeft <= 0) {
+                return;
+            }
 
+            var preloadChars = [],
+                x = 0, y = 0, z = 0;
 
-            for (var x = skinIdMaleStart; x <= skinIdMaleEnd; x++) {
-                getCharacterTexture({
-                    skin: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
+            // just load every combination instead
+            for (x = skinIdMaleStart; x <= skinIdMaleEnd; x++) {
+                for (y = eyesIdMaleStart; y <= eyesIdMaleEnd; y++) {
+                    for (z = hairIdMaleStart; z <= hairIdMaleEnd; z++) {
+                        preloadChars.push(getCharacterTexture({
+                            skin: x,
+                            eyes: y,
+                            hair: z,
+                            big: 1
+                        }));
+                    }
+                }
             }
-            for (var x = skinIdFemaleStart; x <= skinIdFemaleEnd; x++) {
-                getCharacterTexture({
-                    skin: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
+            for (x = skinIdFemaleStart; x <= skinIdFemaleEnd; x++) {
+                for (y = eyesIdFemaleStart; y <= eyesIdFemaleEnd; y++) {
+                    for (z = hairIdFemaleStart; z <= hairIdFemaleEnd; z++) {
+                        preloadChars.push(getCharacterTexture({
+                            skin: x,
+                            eyes: y,
+                            hair: z,
+                            big: 1
+                        }));
+                    }
+                }
             }
-            for (var x = eyesIdMaleStart; x <= eyesIdMaleEnd; x++) {
-                getCharacterTexture({
-                    eyes: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
-            }
-            for (var x = eyesIdFemaleStart; x <= eyesIdFemaleEnd; x++) {
-                getCharacterTexture({
-                    eyes: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
-            }
-            for (var x = hairIdMaleStart; x <= hairIdMaleEnd; x++) {
-                getCharacterTexture({
-                    hair: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
-            }
-            for (var x = hairIdFemaleStart; x <= hairIdFemaleEnd; x++) {
-                getCharacterTexture({
-                    hair: x,
-                    big: 1
-                }, function(texture) {
-                    preload([texture]);
-                });
-            }
-            // for(var x=1;x<=hairIdLimit;x++){
-            //   preload(['plugins/game/images/characters/base/skin/'+x+'_big.png']);
-            // }
+
+            //console.log('permutations!', preloadChars.length);
+            // it's 1000 permutations, don't preload anymore, I think it'll actually be OK
+            //preload(preloadChars);
 
 
             var newChar = '<label for="ncname">Name</label><div class="spacersmall"></div><input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12"><div id="charCustomizationContainer"><div id="charCustomizationButtonsLeft"></div><div id="charCustomizationPreview"></div><div id="charCustomizationButtonsRight"></div></div><button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button><button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>';
@@ -1663,41 +1640,13 @@ var HUDHandler = Class.extend({
 
                 var cachefile = '';
 
-
-
                 cachefile = 'plugins/game/images/characters/cache/' +
-                    selectedSkin + '_0_0_0_0_0_1.png';
+                    selectedSkin + '_' + selectedEyes + '_' + selectedHair + '_0_0_0_1.png';
                 $('#charSkinLayer').css('background-image', 'url(' + cachefile + ')');
-
-                cachefile = 'plugins/game/images/characters/cache/0_' +
-                    selectedEyes + '_0_0_0_0_1.png';
-                $('#charEyesLayer').css('background-image', 'url(' + cachefile + ')');
-
-                cachefile = 'plugins/game/images/characters/cache/0_0_' +
-                    selectedHair + '_0_0_0_1.png';
-                $('#charHairLayer').css('background-image', 'url(' + cachefile + ')');
-
-                // getCharacterTexture({skin:selectedSkin,big:1}, function(texture) {
-                //   $('#charSkinLayer').css('background-image', 'url('+texture+')');
-                // });
-
-                // getCharacterTexture({eyes:selectedEyes,big:1}, function(texture) {
-                //   $('#charEyesLayer').css('background-image', 'url('+texture+')');
-                // });
-
-                // getCharacterTexture({hair:selectedHair,big:1}, function(texture) {
-                //   $('#charHairLayer').css('background-image', 'url('+texture+')');
-                // });
-
             };
 
             custChar += '<div id="charSkinLayer"></div>';
-            custChar += '<div id="charEyesLayer"></div>';
-            custChar += '<div id="charHairLayer"></div>';
-
-
             $('#charCustomizationPreview').html(custChar);
-
 
             (function(refreshChar) {
 

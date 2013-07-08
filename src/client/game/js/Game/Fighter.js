@@ -142,105 +142,72 @@ this.walkSoundTimer = 0.0;
 
   },
   UpdateClothes: function() {
+    var me = this;
 
+    var texture = getCharacterTexture(me.appearance);
+    var directionSpriteIndex = me.GetDirectionSpriteIndex();
+    if (me.mesh) {
+      ironbane.scene.remove(me.mesh);
+      me.mesh = null;
+    }
 
-    // Check if we're a player
-    //        if ( this.id > 0 ) {
+    var planeGeo = new THREE.PlaneGeometry(1.0, 1.0, 1, 1);
 
-      var me = this;
+    me.meshHeight = 1.0;
 
+    // Assign material
+    //
+    //        // Clear UV
+    //        planeGeo.faceUvs = [[]];
+    //        planeGeo.faceVertexUvs = [[]];
 
+    // planeGeo.faceUvs[0].push(new THREE.UV(0,1));
+    // planeGeo.faceVertexUvs[0].push(faceuv);
 
-    getCharacterTexture(me.appearance, function(texture) {
-
-      var directionSpriteIndex = me.GetDirectionSpriteIndex();
-
-
-    //        }
-    //        else  {
-    //            texture = NPCSpritePath + ''+this.param+'.png';
-    //        }
-
-
-      if ( me.mesh ) {
-        ironbane.scene.remove(me.mesh);
-        me.mesh = null;
+    var uniforms = {
+      uvScale: {
+        type: 'v2',
+        value: new THREE.Vector2(1, 1)
+      },
+      size: {
+        type: 'v2',
+        value: new THREE.Vector2(1, 1)
+      },
+      hue: {
+        type: 'v3',
+        value: new THREE.Vector3(1, 1, 1)
+      },
+      vSun: {
+        type: 'v3',
+        value: new THREE.Vector3(0, 0, 0)
+      },
+      texture1: {
+        type: 't',
+        value: textureHandler.GetFreshTexture(texture, true)
       }
+    };
 
-      var planeGeo = new THREE.PlaneGeometry(1.0, 1.0, 1, 1);
-
-      me.meshHeight = 1.0;
-
-      // Assign material
-      //
-      //        // Clear UV
-      //        planeGeo.faceUvs = [[]];
-      //        planeGeo.faceVertexUvs = [[]];
-
-      // planeGeo.faceUvs[0].push(new THREE.UV(0,1));
-      // planeGeo.faceVertexUvs[0].push(faceuv);
-
-      var uniforms = {
-        uvScale : {
-          type: 'v2',
-          value: new THREE.Vector2(1,1)
-        },
-        size : {
-          type: 'v2',
-          value: new THREE.Vector2(1,1)
-        },
-        hue : {
-          type: 'v3',
-          value: new THREE.Vector3(1,1,1)
-        },
-        vSun : {
-          type: 'v3',
-          value: new THREE.Vector3(0,0,0)
-        },
-        texture1 : {
-          type: 't',
-          value: textureHandler.GetFreshTexture( texture, true )
-        }
-      };
-
-      var shaderMaterial = new THREE.ShaderMaterial({
-        uniforms : uniforms,
-        vertexShader : $('#vertex').text(),
-        fragmentShader : $('#fragment').text(),
-        //transparent : true,
-        alphaTest: 0.5
-      });
-
-      //shaderMaterial = new THREE.MeshBasicMaterial( { map: textureHandler.GetTexture( texture ), alphaTest: 0.5, transparent: true } );
-
-      if ( stealth ) shaderMaterial.wireframe = true;
-
-      //shaderMaterial.wireframe = true;
-
-      //        planeGeo.materials = [shaderMaterial];
-      //        planeGeo.faces[0].materialIndex = 0;
-
-
-
-
-
-      me.mesh = new THREE.Mesh(planeGeo, shaderMaterial);
-
-      me.mesh.material.side = THREE.DoubleSide;
-
-      me.mesh.unit = me;
-
-
-      me.mesh.geometry.dynamic = true;
-
-      ironbane.scene.add(me.mesh);
-
+    var shaderMaterial = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: $('#vertex').text(),
+      fragmentShader: $('#fragment').text(),
+      //transparent : true,
+      alphaTest: 0.5
     });
 
+    //shaderMaterial = new THREE.MeshBasicMaterial( { map: textureHandler.GetTexture( texture ), alphaTest: 0.5, transparent: true } );
 
+    if (stealth) shaderMaterial.wireframe = true;
 
+    //shaderMaterial.wireframe = true;
 
-
+    //        planeGeo.materials = [shaderMaterial];
+    //        planeGeo.faces[0].materialIndex = 0;
+    me.mesh = new THREE.Mesh(planeGeo, shaderMaterial);
+    me.mesh.material.side = THREE.DoubleSide;
+    me.mesh.unit = me;
+    me.mesh.geometry.dynamic = true;
+    ironbane.scene.add(me.mesh);
   },
   UpdateWeapon: function(weapon) {
 

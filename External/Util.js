@@ -122,69 +122,6 @@ if ( !SERVER ) {
 
   var cachedCharacters = {};
 
-  function getCharacterTexture(options, foundFunction) {
-
-    // Check manually if the generated file exists
-    // Wait for its output. If it exists, execute foundFunction with the texture path
-    // If not, execute foundFunction with the php path
-
-    // var uid = "";
-
-    var props = ['skin', 'eyes', 'hair', 'feet', 'body', 'head', 'big'];
-    for (var i = props.length - 1; i >= 0; i--) {
-      if ( !ISDEF(options[props[i]]) ) options[props[i]] = 0;
-
-      // uid += options[props[i]]+"_";
-    }
-
-
-
-    var cachefile = 'plugins/game/images/characters/cache/'+
-    options.skin+
-    '_'+options.eyes+
-    '_'+options.hair+
-    '_'+options.feet+
-    '_'+options.body+
-    '_'+options.head+
-    '_'+(options.big?1:0)+
-    '.png';
-
-    if ( ISDEF(cachedCharacters[cachefile])) {
-      setTimeout(function(){
-        foundFunction(cachefile);
-      }, 0);
-      return;
-    }
-
-
-
-    $.ajax({
-      url:cachefile,
-      type:'HEAD',
-      error: function() {
-        var texture = 'gamehandler.php?action=clothes&c='+
-          options.skin+
-          '+'+options.eyes+
-          '+'+options.hair+
-          '+'+options.feet+
-          '+'+options.body+
-          '+'+options.head+
-          '+'+(options.big?1:0)+'';
-        cachedCharacters[cachefile] = true;
-        foundFunction(texture);
-      },
-      success: function() {
-        cachedCharacters[cachefile] = true;
-        foundFunction(cachefile);
-      }
-    });
-
-  }
-
-
-
-
-
 //    function loadTexture( path, textureOnly, materialOptions, textureOptions) {
 //
 //
