@@ -56,6 +56,50 @@ module.exports = function(db) {
         }
     });
 
+    function checkDuplicateName(name) {
+        var deferred = Q.defer();
+
+        db.query('select count(*) as count from ib_characters where name=?', [name], function(err, result) {
+            if(err) {
+                log('create char error checking for duplicate name: ' + err);
+            }
+
+            if(result[0].count === 0) {
+                deferred.resolve();
+            } else {
+                deferred.reject('a character with that name already exists');
+            }
+        });
+
+        return deferred.promise;
+    }
+
+    function checkValidName(name) {
+        var deferred = Q.defer();
+
+        // min length
+        if(name.length < 2) {
+            deferred.reject('minimum 2 char length');
+            return;
+        }
+
+        if(name.length > 12) {
+            deferred.reject('max 12 char length');
+            return;
+        }
+
+        // note doesn't allow international, do we want to globalize someday?
+        var alphaNum = /([a-zA-Z0-9]+)$/;
+        if(alphaNum.test(name) === false) {
+            deferred.reject('alphanumeric names only');
+            return;
+        }
+
+        deferred.resolve('valid name');
+
+        return deferred.promise;
+    }
+
     Character.prototype.$create = function() {
         var self = this,
             deferred = Q.defer(),
@@ -68,16 +112,24 @@ module.exports = function(db) {
                 hair: self.hair
             };
 
-        db.query('insert into ib_characters set ?', createObj, function(err, result) {
-             if(err) {
-                deferred.reject(err);
-                return;
-            }
+        // validation (todo: skin, hair, eyes, max characters)
+        Q.all([checkValidName(createObj.name), checkDuplicateName(createObj.name)])
+            .then(function() {
+                // all validations passed
+                db.query('insert into ib_characters set ?', createObj, function(err, result) {
+                     if(err) {
+                        deferred.reject(err);
+                        return;
+                    }
 
-            // result will contain id
-            self.id = result.insertId;
-            deferred.resolve(self);
-        });
+                    // result will contain id
+                    self.id = result.insertId;
+                    deferred.resolve(self);
+                });
+            }, function(err) {
+                console.log('create character validation failed! ', err, createObj);
+                deferred.reject('validation failed: ' + err);
+            });
 
         return deferred.promise;
     };

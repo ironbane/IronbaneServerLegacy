@@ -18,12 +18,35 @@ module.exports = function(app, db) {
                 res.send([]);
             }
         } else {
-            Character.getAllForUser(userId).then(function(characters) {
-                res.send(characters);
-            }, function(err) {
-                res.send(404, 'error loading characters for user: ' + userId);
-            });
+            // lock this down to only your own user (todo: allow admin)
+            if(req.isAuthenticated() && req.user.id === userId) {
+                Character.getAllForUser(userId).then(function(characters) {
+                    res.send(characters);
+                }, function(err) {
+                    res.send(404, 'error loading characters for user: ' + userId);
+                });
+            } else {
+                res.send(403, 'Cannot retreive characters that aren\'t yours');
+            }
         }
+    });
+
+    app.post('/api/user/:userId/characters', app.ensureAuthenticated, function(req, res) {
+        var userId = parseInt(req.params.userId, 10);
+
+        if(req.user.id !== userId) {
+            res.send(403, 'Cannot create characters for someone else!');
+            return;
+        }
+
+        var character = new Character(req.body);
+        character.user = userId;
+        character.$create().then(function() {
+            // object should be updated from DB with ID and whatever else...
+            res.send(character);
+        }, function(err) {
+            res.send(500, err);
+        });
     });
 
     app['delete']('/api/user/:userId/characters/:characterId', app.ensureAuthenticated, function(req, res) {

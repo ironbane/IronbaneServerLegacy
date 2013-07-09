@@ -1494,50 +1494,45 @@ var HUDHandler = Class.extend({
         });
 
         $('#btnNewChar').click(function() {
-
             if (slotsLeft <= 0) {
                 return;
             }
-            var newChar = '<label for="ncname">Name</label><div class="spacersmall"></div><input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12"><div id="charCustomizationContainer"><div id="charCustomizationButtonsLeft"></div><div id="charCustomizationPreview"></div><div id="charCustomizationButtonsRight"></div></div><button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button><button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>';
 
-            $('#charSelect').html(newChar);
+            var layout = [
+                '<label for="ncname">Name</label>',
+                '<div class="spacersmall"></div>',
+                '<input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12" />',
+                '<div id="charCustomizationContainer">',
+                    '<div id="charCustomizationButtonsLeft"></div>',
+                    '<div id="charCustomizationPreview">',
+                        '<div id="charSkinLayer"></div>',
+                    '</div>',
+                    '<div id="charCustomizationButtonsRight"></div>',
+                '</div>',
+                '<button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button>',
+                '<button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>'
+            ].join('');
+            $('#charSelect').html(layout);
 
             var custButtons = '';
-
-            //      custButtons += '<div style="float:left">';
-
-
             custButtons += 'Gender<br>';
             custButtons += '<button id="btnGenderChange" class="ibutton" style="width:70px;">Boy</button>';
-
             custButtons += '<br>';
             custButtons += 'Skin<br>';
             custButtons += '<button id="btnSkinPrev" class="ibutton" style="width:30px;">&#9664;</button>';
             custButtons += '<button id="btnSkinNext" class="ibutton" style="width:30px">&#9654;</button>';
-
-            //      custButtons += '</div>';
-
             $('#charCustomizationButtonsLeft').html(custButtons);
 
             custButtons = '';
-
-
             custButtons += 'Hair<br>';
             custButtons += '<button id="btnHairPrev" class="ibutton" style="width:30px;">&#9664;</button>';
             custButtons += '<button id="btnHairNext" class="ibutton" style="width:30px">&#9654;</button>';
-
             custButtons += 'Eyes<br>';
             custButtons += '<button id="btnEyesPrev" class="ibutton" style="width:30px;">&#9664;</button>';
             custButtons += '<button id="btnEyesNext" class="ibutton" style="width:30px">&#9654;</button>';
-
-            //      custButtons += '</div>';
-
             $('#charCustomizationButtonsRight').html(custButtons);
 
-
             var custChar = '';
-
-
             var constrainCustomizers = function() {
                 if (selectedMale) {
                     selectedSkin = Math.min(skinIdMaleEnd, selectedSkin);
@@ -1557,122 +1552,92 @@ var HUDHandler = Class.extend({
             };
 
             var refreshChar = function() {
-
                 constrainCustomizers();
 
-                //console.log("skin:" + selectedSkin + ",eyes:" + selectedEyes + ",hair:" + selectedHair);
-
-                var cachefile = '';
-
-                cachefile = 'plugins/game/images/characters/cache/' +
+                var cachefile = 'plugins/game/images/characters/cache/' +
                     selectedSkin + '_' + selectedEyes + '_' + selectedHair + '_0_0_0_1.png';
+
                 $('#charSkinLayer').css('background-image', 'url(' + cachefile + ')');
             };
 
-            custChar += '<div id="charSkinLayer"></div>';
-            $('#charCustomizationPreview').html(custChar);
+            $('#btnGenderChange').click(function() {
+                selectedMale = !selectedMale;
 
-            (function(refreshChar) {
+                $(this).html(selectedMale ? 'Boy' : 'Girl');
+                refreshChar();
+            });
 
+            $('#btnSkinNext').click(function() {
+                selectedSkin++;
+                refreshChar();
+            });
 
+            $('#btnSkinPrev').click(function() {
+                selectedSkin--;
+                refreshChar();
+            });
 
-                $('#btnGenderChange').click(function() {
-                    selectedMale = !selectedMale;
+            $('#btnEyesNext').click(function() {
+                selectedEyes++;
+                refreshChar();
+            });
 
-                    $('#btnGenderChange').html(selectedMale ? 'Boy' : 'Girl');
+            $('#btnEyesPrev').click(function() {
+                selectedEyes--;
+                refreshChar();
+            });
 
+            $('#btnHairNext').click(function() {
+                selectedHair++;
+                refreshChar();
+            });
 
-                    refreshChar();
-
-                });
-
-
-
-                $('#btnSkinNext').click(function() {
-                    selectedSkin++;
-                    refreshChar();
-                });
-
-                $('#btnSkinPrev').click(function() {
-                    selectedSkin--;
-                    refreshChar();
-                });
-
-                $('#btnEyesNext').click(function() {
-                    selectedEyes++;
-                    refreshChar();
-                });
-
-                $('#btnEyesPrev').click(function() {
-                    selectedEyes--;
-                    refreshChar();
-                });
-
-                $('#btnHairNext').click(function() {
-                    selectedHair++;
-                    refreshChar();
-                });
-
-                $('#btnHairPrev').click(function() {
-                    selectedHair--;
-                    refreshChar();
-                });
-
-            })(refreshChar);
+            $('#btnHairPrev').click(function() {
+                selectedHair--;
+                refreshChar();
+            });
 
             refreshChar();
 
-            //location.href = $('#charHairLayer').css('background-image'));
-            //$('#charHairLayer').css('background-image', 'url(images/characters/base/hair/'+selectedHair+'.png)');
-
             var confirmNewChar = (function() {
-
-
                 hudHandler.DisableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
 
                 var ncname = $('#ncname').val();
 
-
-
-                $.post('gamehandler.php?action=makechar', {
-                    name: ncname,
-                    skin: selectedSkin,
-                    eyes: selectedEyes,
-                    hair: selectedHair
-                }, function(string) {
-
-                    data = JSON.parse(string);
-
-                    if (!_.isUndefined(data.errmsg)) {
-                        hudHandler.MessageAlert(data.errmsg);
-                        hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
-                        return;
-                    }
-
-                    // Get id
-
-                    chars.push(data);
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/user/' + startdata.user + '/characters',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        name: ncname,
+                        skin: selectedSkin,
+                        eyes: selectedEyes,
+                        hair: selectedHair
+                    })
+                })
+                .done(function(response) {
+                    chars.push(response);
 
                     charCount = chars.length;
-                    if (charCount > 0 && startdata.characterUsed === 0) startdata.characterUsed = chars[0].id;
+                    startdata.characterUsed = response.id;
 
                     hudHandler.MakeCharSelectionScreen();
+                })
+                .fail(function(err) {
+                    hudHandler.MessageAlert(err.responseText);
+                    hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
                 });
             });
 
-            (function(confirmNewChar) {
-                $('#charSelect').keydown(function(event) {
-                    if (event.keyCode == 13 && !hudHandler.alertBoxActive) {
-                        confirmNewChar();
-                    }
-                });
-            })(confirmNewChar);
+            $('#charSelect').keydown(function(event) {
+                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                    confirmNewChar();
+                }
+            });
             $('#btnConfirmNewChar').click(confirmNewChar);
 
             $('#btnBackMainChar').click(function() {
-
                 hudHandler.MakeCharSelectionScreen();
-
             });
         });
 
