@@ -1093,7 +1093,6 @@ var HUDHandler = Class.extend({
         soundHandler.FadeIn("music/ib_theme", 5000);
     },
     MakeCharSelectionScreen: function() {
-
         var slotsLeft = slotsAvailable - charCount;
 
         var text = '';
@@ -1119,19 +1118,19 @@ var HUDHandler = Class.extend({
 
         var myChar = null;
         for (var c = 0; c < chars.length; c++) {
-            if (chars[c].id == startdata.characterUsed) {
+            if (chars[c].id === startdata.characterUsed) {
                 myChar = chars[c];
                 break;
             }
         }
 
         if (startdata.loggedIn) {
-            charSelect += '<button id="btnPrevChar" class="ibutton' + (charCount == 0 ? '_disabled' : '') + '" style="float:left;width:40px">&#9664;</button>';
+            charSelect += '<button id="btnPrevChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="float:left;width:40px">&#9664;</button>';
         }
 
         if (startdata.loggedIn) {
             if (startdata.characterUsed === 0) {
-                charSelect += '<button id="btnNewChar" class="ibutton' + (slotsLeft == 0 ? '_disabled' : '') + '" style="width:216px">Create Character</button>';
+                charSelect += '<button id="btnNewChar" class="ibutton' + (slotsLeft === 0 ? '_disabled' : '') + '" style="width:216px">Create Character</button>';
             } else {
 
                 //charSelect += '<button id="btnEnterChar" class="ibutton" style="width:214px">Enter Ironbane</button>';
@@ -1141,9 +1140,8 @@ var HUDHandler = Class.extend({
             }
         }
 
-
         if (startdata.loggedIn) {
-            charSelect += '<button id="btnNextChar" class="ibutton' + (charCount == 0 ? '_disabled' : '') + '" style="width:40px">&#9654;</button><br>';
+            charSelect += '<button id="btnNextChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="width:40px">&#9654;</button><br>';
         }
 
         if (startdata.loggedIn) {
@@ -1155,11 +1153,11 @@ var HUDHandler = Class.extend({
                 var body = 0;
                 var feet = 0;
 
-                if (myChar.equipment != '') {
+                if (myChar.equipment !== '') {
                     var charItems = myChar.equipment.split(',');
                     for (var i = 0; i < charItems.length; i++) {
                         var item = items[charItems[i]];
-                        if (item.type == 'armor') {
+                        if (item.type === 'armor') {
 
                             switch (item.subtype) {
                                 case 'head':
@@ -1195,16 +1193,12 @@ var HUDHandler = Class.extend({
 
             charSelect += '<div class="spacersmall"></div>';
 
-
             if (myChar) {
                 charSelect += '<button id="btnEnterChar" class="ibutton_attention" style="width:305px">Enter Ironbane</button>';
             }
         }
 
-
-
         $('#charSelect').html(charSelect);
-
 
         if (startdata.loggedIn) {
             $('#charSelect').css("height", "321px");
@@ -1212,15 +1206,13 @@ var HUDHandler = Class.extend({
             $('#charSelect').css("height", "");
         }
 
-
         $('#btnPrevChar').click(function() {
-
-            if (startdata.characterUsed == 0) {
+            if (startdata.characterUsed === 0) {
                 startdata.characterUsed = chars[((chars.length) - 1)].id;
             } else {
                 for (var c = 0; c < chars.length; c++) {
-                    if (chars[c].id == startdata.characterUsed) {
-                        var next = parseInt(c) - 1;
+                    if (chars[c].id === startdata.characterUsed) {
+                        var next = c - 1;
                         if (!_.isUndefined(chars[next])) {
                             startdata.characterUsed = chars[next].id;
                         } else {
@@ -1230,26 +1222,16 @@ var HUDHandler = Class.extend({
                     }
                 }
             }
-
-
-
             hudHandler.MakeCharSelectionScreen();
-
-            //$('#charSelect').html(charSelect);
         });
 
         $('#btnNextChar').click(function() {
-
-            if (startdata.characterUsed == 0) {
-
-
+            if (startdata.characterUsed === 0) {
                 startdata.characterUsed = chars[0].id;
-
-
             } else {
                 for (var c = 0; c < chars.length; c++) {
-                    if (chars[c].id == startdata.characterUsed) {
-                        var next = parseInt(c) + 1;
+                    if (chars[c].id === startdata.characterUsed) {
+                        var next = c + 1;
                         if (!_.isUndefined(chars[next])) {
                             startdata.characterUsed = chars[next].id;
                         } else {
@@ -1260,11 +1242,7 @@ var HUDHandler = Class.extend({
                 }
             }
 
-
-
             hudHandler.MakeCharSelectionScreen();
-
-            //$('#charSelect').html(charSelect);
         });
 
         var enterChar = function() {
@@ -1317,94 +1295,75 @@ var HUDHandler = Class.extend({
         $('#btnEnterChar').click(enterChar);
 
         $('#btnLogOut').click(function() {
-
             hudHandler.DisableButtons(['btnLogOut']);
 
-            $.post('gamehandler.php?action=logout', function(string) {
+            $.get('/logout')
+                .done(function(response) {
+                    if (response === 'OK') {
+                        chars = [];
+                        startdata.loggedIn = false;
+                        startdata.characterUsed = 0;
 
-                if (string == 'OK') {
-
-                    chars = [];
-                    startdata.loggedIn = false;
-                    startdata.characterUsed = 0;
-
-                    hudHandler.MakeCharSelectionScreen();
-
-                } else {
-                    hudHandler.EnableButtons(['btnLogOut']);
-                    hudHandler.MessageAlert(string);
-                }
-
-            });
-
-            //$('#charSelect').html(charSelect);
+                        hudHandler.MakeCharSelectionScreen();
+                    } else {
+                        hudHandler.EnableButtons(['btnLogOut']);
+                        hudHandler.MessageAlert(response);
+                    }
+                });
         });
 
         $('#btnDelChar').click(function() {
+            var contents = ['To confirm the deletion of this character, please enter its name exactly.',
+                    '<div class="spacersmall"></div>',
+                    '<label for="charName">Name</label>',
+                    '<div class="spacersmall"></div>',
+                    '<input type="charName" id="charName" class="iinput" style="width:305px" />',
+                    '<div class="spacersmall"></div>',
+                    '<button id="btnConfirmDeletion" class="ibutton_attention" style="width:150px">Delete</button>',
+                    '<button id="btnBack" class="ibutton" style="width:150px">Back</button>'
+            ].join('');
+            $('#charSelect').html(contents);
+            $('#charName').focus();
 
-            var newChar = '';
-
-            newChar += 'To confirm the deletion of this character, please enter your password.<div class="spacersmall"></div><label for="password">Password</label><div class="spacersmall"></div><input type="password" id="password" class="iinput" style="width:305px"><div class="spacersmall"></div><button id="btnConfirmDeletion" class="ibutton_attention" style="width:150px">Delete</button><button id="btnBack" class="ibutton" style="width:150px">Back</button>';
-
-            $('#charSelect').html(newChar);
-
-            $('#password').focus();
-
-            var confirmDeletion = (function() {
-
-                hudHandler.DisableButtons(['btnConfirmDeletion', 'btnBack']);
-
-                var password = $('#password').val();
-
-                $.post('gamehandler.php?action=delchar', {
-                    id: startdata.characterUsed,
-                    pass: password
-                }, function(string) {
-
-                    data = JSON.parse(string);
-
-                    if (!_.isUndefined(data.errmsg)) {
-                        hudHandler.MessageAlert(data.errmsg);
-                        hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
-                        return;
-                    }
-
-                    // Get id
-
-                    for (var c = 0; c < chars.length; c++) {
-                        if (chars[c].id == data.id) {
-
-                            if (chars[c].id == startdata.characterUsed) startdata.characterUsed = 0;
-
-                            chars.splice(c, 1);
-
-                            break;
-                        }
-                    }
-
-                    charCount = chars.length;
-                    if (charCount > 0 && startdata.characterUsed == 0) startdata.characterUsed = chars[0].id;
-
-                    hudHandler.MakeCharSelectionScreen();
-
-                });
+            var delChar = _.find(window.chars, function(c) {
+                return c.id === startdata.characterUsed;
             });
 
-            (function(confirmDeletion) {
-                $('#charSelect').keydown(function(event) {
-                    if (event.keyCode == 13 && !hudHandler.alertBoxActive) {
-                        confirmDeletion();
-                    }
-                });
-            })(confirmDeletion);
+            var confirmDeletion = function() {
+                hudHandler.DisableButtons(['btnConfirmDeletion', 'btnBack']);
+
+                var confirm = $('#charName').val();
+                if(confirm !== delChar.name) {
+                    hudHandler.MessageAlert('Name does not match character name!');
+                    hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
+                } else {
+                    $.ajax({
+                        url: '/api/user/' + startdata.user + '/characters/' + startdata.characterUsed,
+                        type: 'DELETE'
+                    }).done(function(response) {
+                        startdata.characterUsed = 0;
+                        window.chars = _.without(window.chars, delChar);
+                        window.charCount = window.chars.length;
+                        hudHandler.MakeCharSelectionScreen();
+                    }).fail(function(error) {
+                        //console.error('error deleting character!', error);
+                        hudHandler.MessageAlert(error.responseText);
+                        hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
+                    });
+                }
+            };
+
+            $('#charSelect').keydown(function(event) {
+                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                    confirmDeletion();
+                }
+            });
+
             $('#btnConfirmDeletion').click(confirmDeletion);
 
             $('#btnBack').click(function() {
-
                 hudHandler.MakeCharSelectionScreen();
-
             });
-            //$('#charSelect').html(charSelect);
         });
 
         $('#btnLogin').click(function() {
@@ -1539,41 +1498,6 @@ var HUDHandler = Class.extend({
             if (slotsLeft <= 0) {
                 return;
             }
-
-            var preloadChars = [],
-                x = 0, y = 0, z = 0;
-
-            // just load every combination instead
-            for (x = skinIdMaleStart; x <= skinIdMaleEnd; x++) {
-                for (y = eyesIdMaleStart; y <= eyesIdMaleEnd; y++) {
-                    for (z = hairIdMaleStart; z <= hairIdMaleEnd; z++) {
-                        preloadChars.push(getCharacterTexture({
-                            skin: x,
-                            eyes: y,
-                            hair: z,
-                            big: 1
-                        }));
-                    }
-                }
-            }
-            for (x = skinIdFemaleStart; x <= skinIdFemaleEnd; x++) {
-                for (y = eyesIdFemaleStart; y <= eyesIdFemaleEnd; y++) {
-                    for (z = hairIdFemaleStart; z <= hairIdFemaleEnd; z++) {
-                        preloadChars.push(getCharacterTexture({
-                            skin: x,
-                            eyes: y,
-                            hair: z,
-                            big: 1
-                        }));
-                    }
-                }
-            }
-
-            //console.log('permutations!', preloadChars.length);
-            // it's 1000 permutations, don't preload anymore, I think it'll actually be OK
-            //preload(preloadChars);
-
-
             var newChar = '<label for="ncname">Name</label><div class="spacersmall"></div><input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12"><div id="charCustomizationContainer"><div id="charCustomizationButtonsLeft"></div><div id="charCustomizationPreview"></div><div id="charCustomizationButtonsRight"></div></div><button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button><button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>';
 
             $('#charSelect').html(newChar);

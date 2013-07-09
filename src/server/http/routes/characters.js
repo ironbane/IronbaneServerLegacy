@@ -26,6 +26,41 @@ module.exports = function(app, db) {
         }
     });
 
+    app['delete']('/api/user/:userId/characters/:characterId', app.ensureAuthenticated, function(req, res) {
+        // todo: allow admin to delete a user's char? (&& req.user.admin !== 1)
+        var userId = parseInt(req.params.userId, 10),
+            characterId = parseInt(req.params.characterId, 10);
+
+        if(req.user.id !== userId) {
+            res.send(403, 'Cannot delete another user\'s character!');
+            return;
+        }
+
+        Character.get(characterId)
+            .then(function(character) {
+                // double check character and user match
+                if(character.user === userId) {
+                    character.$delete().then(function() {
+                        if(req.user.characterused === character.id) {
+                            req.user.characterused = 0;
+                            // todo: persist!
+                        }
+                        res.send('OK');
+                    }, function(err) {
+                        res.send(500, 'error deleting character! ' + err);
+                    });
+                } else {
+                    res.send(403, 'Cannot delete another user\'s character!');
+                }
+            }, function(err) {
+                if(err === 'not found') {
+                    res.send(404, err);
+                } else {
+                    res.send(500, err);
+                }
+            });
+    });
+
     app.post('/api/user/:userId/characters', function(req, res) {
         var userId = parseInt(req.params.userId, 10);
 

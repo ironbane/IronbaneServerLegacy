@@ -82,6 +82,29 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
+    Character.prototype.$delete = function() {
+        var self = this,
+            deferred = Q.defer();
+
+        // todo: make more asyncy
+        db.query('delete from ib_characters where id=?', [self.id], function(err, result) {
+            if(err) {
+                deferred.reject('error deleting character: ' + err);
+                return;
+            }
+
+            db.query('delete from ib_items where owner=?', [self.id], function(err, result) {
+                if(err) {
+                    log('error deleting character items: ' + err);
+                }
+
+                deferred.resolve('OK');
+            });
+        });
+
+        return deferred.promise;
+    };
+
     // get single by id
     Character.get = function(charId) {
         var deferred = Q.defer();

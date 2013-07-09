@@ -99,7 +99,8 @@ var Server = Class.extend({
                 if (req.isAuthenticated()) {
                     return next();
                 }
-                res.redirect('/login');
+
+                res.send(403, 'please log in first');
             };
 
             // ALL roles must be present to access
