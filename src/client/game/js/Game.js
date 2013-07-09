@@ -98,8 +98,13 @@ var Game = Class.extend({
 
     hudHandler.ResizeFrame();
 
-    // todo: replace 0 with actual user id
-    $.get('/api/user/' + 0 + '/characters', function(data) {
+    var charUrl = '';
+    if(startdata.user === 0) {
+      charUrl = '/api/guest/characters';
+    } else {
+      charUrl = '/api/user/' + startdata.user + '/characters';
+    }
+    $.get(charUrl, function(data) {
       //console.log('character data:', data);
 
       window.chars = data;

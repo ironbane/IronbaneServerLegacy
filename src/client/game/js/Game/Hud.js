@@ -1276,7 +1276,7 @@ var HUDHandler = Class.extend({
                     tryConnect();
                 } else {
                     // Quickly make a character as a guest
-                    $.post('/api/user/0/characters', function(response) {
+                    $.get('/api/guest/characters', function(response) {
                         // should have a more global error handler...
                         // hudHandler.MessageAlert(data.errmsg);
 
