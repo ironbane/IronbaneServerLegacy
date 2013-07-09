@@ -14,6 +14,7 @@ nconf.argv()
 nconf.defaults({
     root: '',
     game_root: '/game',
+    game_host: 'localhost',
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',

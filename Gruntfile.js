@@ -132,6 +132,8 @@ module.exports = function(grunt) {
                 options: {
                     variables: {
                         root: '<%= cfg.get("root") %>',
+                        host: '<%= cfg.get("game_host") %>',
+                        port: '<%= cfg.get("server_port") %>',
                         appName: '<%= pkg.name %>',
                         appVersion: '<%= pkg.version %>',
                         gameVersion: 'v<%= pkg.version %> Alpha' //todo: have alpha/beta stored in config?
