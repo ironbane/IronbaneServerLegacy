@@ -148,8 +148,6 @@ var Game = Class.extend({
 
     terrainHandler.Tick(dTime);
 
-    meshHandler.Tick(dTime);
-
     if ( socketHandler.loggedIn ) {
 
       // Add the player once we have terrain we can walk on

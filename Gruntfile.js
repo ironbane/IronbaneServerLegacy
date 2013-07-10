@@ -32,6 +32,7 @@ module.exports = function(grunt) {
             game: {
                 src: [ // order matters!
                     "src/client/game/shared.js",
+                    "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     "<%= gameScriptPath %>/External/seedrandom.js",
                     "<%= gameScriptPath %>/External/ImprovedNoise.js",
                     "<%= gameScriptPath %>/External/Init.js",
@@ -80,8 +81,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Game/ParticleEmitter.js",
                     "<%= gameScriptPath %>/Game/ParticleHandler.js",
                     "<%= gameScriptPath %>/Game/TerrainHandler.js",
-                    "<%= gameScriptPath %>/Game/LevelEditor.js",
-                    "<%= gameScriptPath %>/ng/app.js"
+                    "<%= gameScriptPath %>/Game/LevelEditor.js"
                 ],
                 dest: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js'
             }

@@ -69,10 +69,8 @@ module.exports = function(app, db) {
         }
 
         results.forEach(function(row) {
-            if(row.special !== 1) {
-                units[row.id] = row;
-                unitTemplates[row.name] = row.id;
-            }
+            units[row.id] = row;
+            unitTemplates[row.name] = row.id;
         });
     });
 
