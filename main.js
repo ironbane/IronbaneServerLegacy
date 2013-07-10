@@ -19,11 +19,9 @@ var config = require('./nconf');
 var isProduction = config.get('isProduction');
 var cryptSalt = config.get('cryptSalt');
 
-if (isProduction) {
-    require('nodetime').profile({
-        accountKey: '02d4f7720345c788c184c7b46609f7f9ba82cb86',
-        appName: 'Ironbane MMO'
-    });
+// profiling...
+if (isProduction && config.get('use_nodetime')) {
+    require('nodetime').profile(config.get('nodetime'));
 }
 
 var pkg = require('./package.json'),

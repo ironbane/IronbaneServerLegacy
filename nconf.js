@@ -23,6 +23,11 @@ nconf.defaults({
     assetDir: 'media',
     cryptSalt: '',
     isProduction: false,
+    use_nodetime: false,
+    nodetime: {
+        accountKey: '1234FOO',
+        appName: 'Ironbane MMO'
+    },
     server_port: 8080,
     session_secret: 'horsehead bookends',
     // game settings
