@@ -85,6 +85,7 @@ var Server = Class.extend({
         app.passport = passport; // convienience
 
         app.configure(function() {
+            app.use(express.favicon(config.get('clientDir') + "favicon.ico"));
             app.use(express.cookieParser());
             app.use(express.bodyParser());
             app.use(express.methodOverride());

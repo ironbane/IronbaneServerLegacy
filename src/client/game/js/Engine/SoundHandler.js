@@ -255,10 +255,15 @@ var SoundHandler = Class.extend({
     },
 
     SetVolume: function(sound, volume) {
-
-        this.sounds[sound].sound.setVolume(volume);
+        if(sound in this.sounds) {
+            this.sounds[sound].sound.setVolume(volume);
+        }
     },
     FadeIn: function(sound, time) {
+        if(!(sound in this.sounds)) {
+            return;
+        }
+
         var self = this;
         this.PlayOnce(sound);
 

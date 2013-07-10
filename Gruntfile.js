@@ -198,6 +198,11 @@ module.exports = function(grunt) {
                     dest: '<%= cfg.get("clientDir") %>',
                     expand: true,
                     cwd: '<%= cfg.get("assetDir") %>'
+                }, {
+                    src: 'favicon.ico',
+                    dest: '<%= cfg.get("clientDir") %>',
+                    expand: true,
+                    cwd: 'src/client/game'
                 }]
             }
         },
