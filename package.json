@@ -38,7 +38,8 @@
     "q": "~0.9.4",
     "hogan-express": "~0.3.3",
     "gm": "~1.10.0",
-    "connect-mysql": "~0.2.7"
+    "connect-mysql": "~0.2.7",
+    "express.io": "~1.1.12"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

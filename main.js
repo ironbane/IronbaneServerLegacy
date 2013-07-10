@@ -123,16 +123,13 @@ var includes = [
 // create game server, do it first so that the other 2 "servers" can query it
 var IronbaneGame = require('./src/server/game');
 
-// create web server
+// create express.io server
 var HttpServer = require('./src/server/http/server').Server,
     httpServer = new HttpServer();
 
-// create socket server
-var SocketServer = require('./src/server/socket/server').Server,
-    socketServer = new SocketServer(httpServer.server, IronbaneGame, mysql);
-
-// for the global access coming...
-var io = socketServer.io;
+// for the global access coming...todo: refactor
+var io = httpServer.server.io,
+    ioApp = httpServer.server;
 
 // load these files AFTER the servers as they rely on some global stuff from them
 for (var f = 0; f < includes.length; f++) {
@@ -215,6 +212,7 @@ var startREPL = function() {
 
     // context variables get attached to "global" of this instance
     serverREPL.context.version = pkg.version;
+    serverREPL.context.httpServer = httpServer;
 };
 // start it up, todo: only per config?
 startREPL();

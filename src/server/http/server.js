@@ -44,7 +44,7 @@ var Server = Class.extend({
         });
 
         // create http api server
-        var express = require('express');
+        var express = require('express.io');
         var MySQLStore = require('connect-mysql')(express);
         var passport = require('passport');
         var LocalStrategy = require('passport-local').Strategy;
@@ -71,7 +71,17 @@ var Server = Class.extend({
                     done(err, false);
                 });
         }));
-        var app = express(); // purposefully global
+
+        var isProduction = config.get('isProduction');
+        var params = {
+            log: 0,
+            'close timeout': isProduction ? (60 * 3) : 86400,
+            'heartbeat timeout': isProduction ? (60 * 3) : 86400,
+            'heartbeat interval': isProduction ? (20 * 3) : 86400,
+            'polling duration': isProduction ? (25 * 3) : 86400
+        };
+
+        var app = express().http().io(params); // purposefully global
         app.passport = passport; // convienience
 
         app.configure(function() {
@@ -154,12 +164,12 @@ var Server = Class.extend({
         // load routes
         require('./routes')(app, db);
 
-        this.server = require('http').createServer(app);
+        this.server = app;
 
         // start api server
-        this.server.listen(config.get('server_port'));
+        app.listen(config.get('server_port'));
 
-        log('http server running on ' + config.get('server_port'));
+        log('express.io server running on ' + config.get('server_port'));
     }
 });
 

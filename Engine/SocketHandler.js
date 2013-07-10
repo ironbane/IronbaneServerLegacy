@@ -25,340 +25,242 @@ var SocketHandler = Class.extend({
 
         this.UpdateBans();
 
-        io.sockets.on("connection", function (socket) {
-            socket.ip = socket.handshake.address.address;
+        // temp until service implemented
+        function loadCharItems(chardata, callback) {
+            chardata.items = [];
+            mysql.query('SELECT * FROM ib_items WHERE owner = ?', [chardata.id], function(err, results) {
+                if (err) {
+                    // todo: we should prolly output the log to a file somewhere to find these issues...
+                    log('error getting items for character ' + chardata.id + ': ' + err);
+                } else {
+                    results.forEach(function(item) {
+                        // if there is custom instance JSON data use it
+                        if (item.data) {
+                            try {
+                                item.data = JSON.parse(item.data);
+                            } catch (e) {
+                                // invalid json? prolly safe to ignore...
+                            }
+                        }
 
-            // Check if we're banned
-            socket.banned = false;
+                        var template = _.find(dataHandler.items, function(t) {
+                            return t.id === item.template;
+                        });
+
+                        if (template) {
+                            chardata.items.push(new Item(template, item));
+                        } else {
+                            log('could not find template for item result: ' + item.template);
+                        }
+                    });
+                }
+
+                // either way, fire the callback, no items won't be fatal, just messy
+                callback(); // since this is internal and temp, dont bother testing it
+            });
+        }
+
+        // another temporary method to reduce code duplication: todo: refactor
+        function createPlayer(req, chardata) {
+            var socket = req.io.socket; // todo: move this, not supposed to use it directly in express.io
+
+            var unit = new Player(chardata);
+            // Link the unit with the player ID
+            unit.playerID = req.user ? req.user.id : 0; // either authenticated user or guest, don't trust the client data
+            unit.isGuest = !!!req.user;
+            unit.editor = (req.user && req.user.editor === 1);
+
+            // Provide a circular reference
+            socket.unit = unit;
+            socket.unit.socket = socket;
+
+            // Update us, and all players that are nearby
+            var cx = unit.cellX;
+            var cz = unit.cellZ;
+            // When we make this unit, it should automatically create a otherUnits list
+            // When this list is created, each unit that is added must be sent to it's socket if it's a player
+            // and also removed when out of range
+            // In addition, we need the units that are near this unit, to add this unit to their otherUnits list
+            // They will in turn tell their socket to add the unit
+
+            chatHandler.JoinGame(unit);
+
+            req.io.respond({
+                id: unit.id,
+                name: unit.name,
+                zone: unit.zone,
+                position: unit.position,
+                rotY: unit.rotation.y,
+                editor: unit.editor,
+                size: unit.size,
+                health: unit.health,
+                armor: unit.armor,
+                healthMax: unit.healthMax,
+                armorMax: unit.armorMax,
+                hair: unit.hair,
+                eyes: unit.eyes,
+                skin: unit.skin,
+                items: unit.items,
+                heartPieces: unit.heartpieces
+            });
+
+            // just before we're added to the list of online players,
+            // announce the others already online
+            req.io.emit('chatMessage', {
+                type: 'welcome',
+                user: {
+                    id: unit.id,
+                    name: unit.name
+                },
+                online: socketHandler.onlinePlayers
+            });
+
+            // add us to the online player list
+            socketHandler.onlinePlayers.push({
+                id: unit.id,
+                name: unit.name,
+                rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
+            });
+
+            if (req.user) {
+                mysql.query('UPDATE bcs_users SET characterused = ? WHERE id = ?', [chardata.id, req.user.id]);
+            }
+        }
+
+        // and another temp method...
+        function loadCharacterData(id, callback) {
+            mysql.query('select * from ib_characters where id=?', [id], function(err, result) {
+                if(err) {
+                    callback('db error loading char! ' + err);
+                    return;
+                }
+
+                if(result.length === 0) {
+                    callback("Character not found.");
+                    return;
+                }
+
+                callback(null, result[0]);
+            });
+        }
+
+        // moving this to express.io (needs refactor) for enhanced security
+        io.route('connectServer', function(req) {
+            var respond = req.io.respond;
+
+            // first thing check for IP bans
             _.each(me.bans, function(ban) {
-                if (ban.ip === socket.ip) {
+                if (ban.ip === req.io.socket.handshake.address.address) {
                     var time = Math.round((new Date()).getTime() / 1000);
                     if (ban.until > time || !ban.until) {
-                        socket.banned = true;
+                        respond({errmsg: 'You have been banned.'});
+                        return;
                     }
                 }
             });
 
-            socket.unit = null;
-
-            socket.on("connectServer", function (data, reply) {
-
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
-
-                if ( socket.unit === null ) {
-                    // log("unit still null, so OK!");
-                }
-                else {
-                    log("unit already exists!");
-                    return;
-                }
-
-                if ( !CheckData(data, ["guest"]) ) {
-                    reply({
-                        errmsg:"Corrupt data"
-                    });
-                    return;
-                }
-
-                if ( shuttingDown ) {
-                    reply({
-                        errmsg:"The server is currently updating to a new version. Please refresh the page in a few seconds."
-                    });
-                    return;
-                }
-
-
-
-                //socket.unitID = characterIDCount++;
-
-                // characterIDCount will become id from db
-                // If no guest, all we need is an ironbane id & password (md5 future)
-                // In addition, we need to know which player they will use, so a player ID
-                // also check if the player ID is available to them
-
-                var unit;
-
-                if ( data.guest ) {
-                    data.id = 0;
-
-                    //data.characterID = 1;
-                    data.pass = "";
-                }
-
-
-                if ( !CheckData(data, ["id","pass","characterID"]) ) {
-                    reply({
-                        errmsg:"Corrupt player data"
-                    });
-                    return;
-                }
-
-
-                log("Client "+data.id +" connecting...");
-
-
-                // TODO: closure ok?
-                console.log('mouth of madness', data);
-                (function(socket, data, reply) {
-                    mysql.query('SELECT pass, editor, banned FROM bcs_users WHERE id = ?', [data.id],
-                        function (err, results, fields) {
-
-                            //log("Initiating connection for ");
-
-                            if (err) throw err;
-
-                            //return;
-
-                            if ( results.length === 0 ) {
-                                reply({
-                                    errmsg:"User does not exist!"
-                                });
-                                return;
-                            }
-
-                            //                            log("inter");
-
-
-                            // Check if the passwords match
-                            // Check the password
-                            var userdata = results[0];
-
-                            if ( userdata.pass !== data.pass ) {
-                                reply({
-                                    errmsg:"Password is incorrect!"
-                                });
-                                return;
-                            }
-
-                            if ( userdata.banned || socket.banned ) {
-                                reply({
-                                    errmsg:"You have been banned."
-                                });
-                                return;
-                            }
-
-
-                            data.editor = userdata.editor;
-
-
-
-                            // Check if there is already a character logged in from this account
-                            for(var z in worldHandler.world) {
-                                for(var cx in worldHandler.world[z]) {
-                                    for(var cz in worldHandler.world[z][cx]) {
-
-                                        if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
-
-                                            var units = worldHandler.world[z][cx][cz].units;
-
-                                            //log(units);
-
-                                            for(var u=0;u<units.length;u++) {
-
-                                                if ( !(units[u] instanceof Player) ) continue;
-
-
-                                                // Check for corrupt units...
-                                                if ( !units[u].socket || units[u].socket.disconnected ) {
-                                                    log("Error: corrupt player found in-game!");
-                                                    log("Begin unit data");
-                                                    console.log(units[u].id);
-                                                    console.log(units[u].name);
-                                                    log("End unit data");
-                                                    log("Forcing disconnect...");
-                                                    // remove them from online list if present
-                                                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
-                                                        return p.id === units[u].id;
-                                                    }));
-                                                    units[u].LeaveGame();
-                                                    continue;
-                                                }
-
-                                                // Except for guests, of course
-                                                if ( units[u].playerID === 0 ) continue;
-
-                                                if ( units[u].playerID === data.id ) {
-                                                    log("Duplicate character found!");
-                                                    log("Begin unit data");
-                                                    console.log(units[u].id);
-                                                    console.log(units[u].name);
-                                                    log("End unit data");
-                                                    reply({
-                                                        errmsg:"You can only play with one character at a time!"
-                                                    });
-                                                    return;
-                                                }
-
-
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Query data and DC if it's not valid
-                            (function(socket, data, reply) {
-                                mysql.query(
-                                    'SELECT * FROM ib_characters WHERE id = ?', [data.characterID],
-                                    function selectCb(err, results, fields) {
-                                        if (err) throw err;
-
-                                        if ( results.length === 0 ) {
-                                            reply({
-                                                errmsg:"No character with ID " + data.characterID+ " found!"
-                                            });
-
-                                            return;
-                                        }
-
-                                        //log("Got character data...");
-
-
-
-                                        // All set! The player wlll use this character's data.
-                                        var chardata = results[0];
-
-                                        // Check if the character belongs to us
-
-                                        if ( chardata.user !== data.id ) {
-                                            reply({
-                                                errmsg:"Character's user ID does not match player ID"
-                                            });
-                                            return;
-                                        }
-
-                                        if ( data.guest ) {
-                                            if ( chardata.user !== 0 ) {
-                                                reply({
-                                                    errmsg:"Character is not allowed for guest use"
-                                                });
-                                                return;
-                                            }
-
-                                            // Check if the character is already being used in the server (since they bypassed the member check)
-                                            var gu = worldHandler.FindUnit(chardata.id);
-
-                                            if ( gu ) {
-                                                reply({
-                                                    errmsg:"There is already a guest playing under your credentials!"
-                                                });
-                                                return;
-                                            }
-
-                                        }
-
-
-                                        if ( !data.guest ) {
-                                            mysql.query('UPDATE bcs_users SET characterused = ? WHERE id = ?', [data.characterID,data.id]);
-                                        }
-
-                                        (function(socket, data, reply, chardata) {
-                                            chardata.items = [];
-                                            mysql.query(
-                                                'SELECT * FROM ib_items WHERE owner = ?', [data.characterID],
-                                                function selectCb(err, results, fields) {
-                                                    if (err) throw err;
-
-                                                    // parse the metadata
-                                                    results.forEach(function(item) {
-                                                        if(item.data) {
-                                                            try {
-                                                                item.data = JSON.parse(item.data);
-                                                            } catch(e) {
-                                                                // invalid json?
-                                                            }
-                                                        }
-                                                        var template = _.find(dataHandler.items, function(t) {
-                                                            return t.id === item.template;
-                                                        });
-                                                        if(template) {
-                                                            chardata.items.push(new Item(template, item));
-                                                        } else {
-                                                            log('could not find template for item result: ' + item.template);
-                                                        }
-                                                    });
-
-                                                    chardata.editor = data.editor;
-
-                                                    var unit = new Player(chardata);
-
-
-                                                    // Link the unit with the player ID
-                                                    unit.playerID = data.id;
-
-                                                    unit.isGuest = data.guest;
-
-                                                    socket.unit = unit;
-
-                                                    // Provide a circular reference
-                                                    socket.unit.socket = socket;
-
-                                                    socket.unit.editor = data.editor === 1;
-
-                                                    // Update us, and all players that are nearby
-                                                    var cx = unit.cellX;
-                                                    var cz = unit.cellZ;
-
-                                                    // When we make this unit, it should automatically create a otherUnits list
-                                                    // When this list is created, each unit that is added must be sent to it's socket if it's a player
-                                                    // and also removed when out of range
-
-                                                    // In addition, we need the units that are near this unit, to add this unit to their otherUnits list
-                                                    // They will in turn tell their socket to add the unit
-
-
-                                                    chatHandler.JoinGame(socket.unit);
-
-                                                    reply({
-                                                        id: socket.unit.id,
-                                                        name: socket.unit.name,
-                                                        zone: socket.unit.zone,
-                                                        position: socket.unit.position,
-                                                        rotY: socket.unit.rotation.y,
-                                                        editor: socket.unit.editor,
-                                                        size: socket.unit.size,
-                                                        health: socket.unit.health,
-                                                        armor: socket.unit.armor,
-                                                        healthMax: socket.unit.healthMax,
-                                                        armorMax: socket.unit.armorMax,
-                                                        hair: socket.unit.hair,
-                                                        eyes: socket.unit.eyes,
-                                                        skin: socket.unit.skin,
-                                                        items: socket.unit.items,
-                                                        heartPieces: socket.unit.heartpieces
-                                                    });
-
-                                                    // just before we're added to the list of online players,
-                                                    // announce the others already online
-                                                    socket.emit('chatMessage', {
-                                                        type: 'welcome',
-                                                        user: {
-                                                            id: socket.unit.id,
-                                                            name: socket.unit.name
-                                                        },
-                                                        online: socketHandler.onlinePlayers
-                                                    });
-
-                                                    // add us to the online player list
-                                                    socketHandler.onlinePlayers.push({
-                                                        id: socket.unit.id,
-                                                        name: socket.unit.name,
-                                                        rank: socket.unit.editor ? 'gm' : 'user'
-                                                    });
-                                                    //chatHandler.AnnouncePersonally(socket.unit, "Hey there, " + socket.unit.name + "!<br>Players online: " + playerList.join(", "), "#01ff46");
-                                                });
-                                        })(socket, data, reply, chardata);
-
-                                    });
-                            })(socket, data, reply);
-
-
+            if(req.data.guest && req.session.passport.user) {
+                respond({errmsg: 'Cannot sign in as guest while authenticated, please log out first.'});
+                return;
+            }
+
+            var character = null;
+
+            if(req.data.guest) {
+                // todo: refactor to Character entity/service
+                // grab the intended character
+                loadCharacterData(req.data.characterID, function(err, data) {
+                    if(err) {
+                        log('db error loading char! ' + err);
+                        respond({errmsg: 'an unexpected error occured, please contact an admin on the forums.'});
+                        return;
+                    }
+
+                    character = data;
+
+                    if(character.user !== 0) {
+                        respond({errmsg: "Character is not allowed for guest use."});
+                        return;
+                    }
+
+                    // Check if the character is already being used in the server (since they bypassed the member check)
+                    var gu = worldHandler.FindUnit(character.id);
+                    if (gu) {
+                        reply({
+                            errmsg: "There is already a guest playing under your credentials!"
                         });
-                })(socket, data, reply);
+                        return;
+                    }
 
+                    loadCharItems(character, function() {
+                        // we should be all good now!
+                        createPlayer(req, character);
+                    });
+                });
+            } else {
+                if(req.session.passport.user && req.session.passport.user === req.data.id) {
+                    // for now use the global ref to passport
+                    ioApp.passport.deserializeUser(req.session.passport.user, function(err, user) {
+                        if(err) {
+                            console.log('error deserializing user in socket', err);
+                            respond({errmsg: 'an unexpected error occured, please contact an admin on the forums.'});
+                            return;
+                        }
 
+                        // pass this along similar to http (todo: middleware)
+                        req.user = user;
 
-            });
+                        if(user.banned) { // todo IP ban test here or earlier?
+                            respond({errmsg: 'You have been banned.'});
+                            return;
+                        }
+
+                        // go time!
+                        loadCharacterData(req.data.characterID, function(err, data) {
+                            if(err) {
+                                log('db error loading char! ' + err);
+                                respond({errmsg: 'an unexpected error occured, please contact an admin on the forums.'});
+                                return;
+                            }
+
+                            character = data;
+
+                            if(character.user !== user.id) {
+                                respond({errmsg: "Character does not belong to you."});
+                                return;
+                            }
+
+                            // Check if the character is already being used in the server
+                            var gu = worldHandler.FindUnit(character.id);
+                            if (gu) {
+                                // duplicate, remove them from online list and force disconnect
+                                socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
+                                    return p.id === gu.id;
+                                }));
+                                gu.LeaveGame();
+                                reply({
+                                    errmsg: "This character is already logged in!"
+                                });
+                                return;
+                            }
+
+                            loadCharItems(character, function() {
+                                // we should be all good now!
+                                createPlayer(req, character);
+                            });
+                        });
+                    });
+                } else {
+                    console.log('failed session', req.session, req.data);
+                    respond({errmsg: 'Please login first.'});
+                }
+            }
+        });
+
+        io.sockets.on("connection", function (socket) {
+            socket.ip = socket.handshake.address.address;
+
+            socket.unit = null;
 
             socket.on("backToMainMenu", function(data, reply) {
                 if (socket.unit) {

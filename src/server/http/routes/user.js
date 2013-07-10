@@ -19,9 +19,6 @@ module.exports = function(app, db) {
                 }
                 // send flag for UI
                 user.authenticated = true;
-                // todo: need this still with passport system?
-                res.cookie('bcs_username', user.name, { maxAge: 900000, httpOnly: true});
-                res.cookie('bcs_password', user.pass, { maxAge: 900000, httpOnly: true});
 
                 return res.send(user);
             });
@@ -31,8 +28,6 @@ module.exports = function(app, db) {
     app.get('/logout', function(req, res) {
         // todo: set last_session on user table? (still needed?)
         req.logout();
-        res.clearCookie('bcs_password');
-        res.clearCookie('bcs_username');
         res.send('OK');
     });
 
