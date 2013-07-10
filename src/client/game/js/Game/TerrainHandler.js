@@ -164,6 +164,8 @@ var TerrainHandler = Class.extend({
     //alphaTest: 0.5
     });
 
+    shaderMaterial.side = THREE.DoubleSide;
+
     this.waterMesh = new THREE.Mesh(planeGeo, shaderMaterial);
     this.waterMesh.rotation.x = -Math.PI/2;
     this.waterMesh.position.y = GetZoneConfig('fluidLevel');

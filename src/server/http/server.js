@@ -45,6 +45,7 @@ var Server = Class.extend({
 
         // create http api server
         var express = require('express');
+        var MySQLStore = require('connect-mysql')(express);
         var passport = require('passport');
         var LocalStrategy = require('passport-local').Strategy;
         var User = require('../entity/user')(db);
@@ -74,13 +75,13 @@ var Server = Class.extend({
         app.passport = passport; // convienience
 
         app.configure(function() {
-            app.use(express.bodyParser());
-            //app.use(express.logger());
             app.use(express.cookieParser());
             app.use(express.bodyParser());
             app.use(express.methodOverride());
             app.use(express.session({
-                secret: config.get('session_secret')
+                secret: config.get('session_secret'),
+                cookie: { maxAge: 3600000 }, // one hour
+                store: new MySQLStore({client: db}) // store sessions in db for "remember me"
             }));
             app.set('view engine', 'html');
             app.set('views', config.get('clientDir'));
@@ -106,19 +107,19 @@ var Server = Class.extend({
             // ALL roles must be present to access
             app.authorize = function(roles) {
                 // array or single...
-                if(typeof roles === 'string') {
+                if (typeof roles === 'string') {
                     roles = [roles];
                 }
 
                 var middle = function(req, res, next) {
-                    if(!req.user.roles || req.user.roles.length === 0) {
-                        next('unauthorized', 403);
+                    if (!req.user.roles || req.user.roles.length === 0) {
+                        next(403, 'unauthorized');
                         return;
                     }
 
-                    for(var i=0;i<roles.length;i++) {
-                        if(req.user.roles.indexOf(roles[i]) < 0) {
-                            next('unauthorized', 403);
+                    for (var i = 0; i < roles.length; i++) {
+                        if (req.user.roles.indexOf(roles[i]) < 0) {
+                            next(403, 'unauthorized');
                             return;
                         }
                     }
@@ -131,24 +132,25 @@ var Server = Class.extend({
             // ANY role may access
             app.authorizeAny = function(roles) {
                 var middle = function(req, res, next) {
-                    if(!req.user.roles || req.user.roles.length === 0) {
-                        next('unauthorized', 403);
+                    if (!req.user.roles || req.user.roles.length === 0) {
+                        next(403, 'unauthorized');
                         return;
                     }
 
-                    for(var i=0;i<roles.length;i++) {
-                        if(req.user.roles.indexOf(roles[i]) >= 0) {
+                    for (var i = 0; i < roles.length; i++) {
+                        if (req.user.roles.indexOf(roles[i]) >= 0) {
                             next();
                             return;
                         }
                     }
-                    next('unauthorized', 403);
+                    next(403, 'unauthorized');
                     return;
                 };
 
                 return middle;
             };
         });
+
         // load routes
         require('./routes')(app, db);
 

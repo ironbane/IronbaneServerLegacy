@@ -43,10 +43,22 @@ module.exports = function(db) {
             }
 
             return deferred.promise;
+        },
+        $initRoles: function() {
+            var user = this;
+
+            user.roles = [];
+            if(user.admin === 1) {
+                user.roles.push('ADMIN');
+            }
+            if(user.editor === 1) {
+                user.roles.push('EDITOR');
+            }
+            if(user.moderator === 1) {
+                user.roles.push('MODERATOR');
+            }
         }
     });
-
-    // static methods
 
     User.getById = function(id) {
         var deferred = Q.defer();
@@ -62,16 +74,8 @@ module.exports = function(db) {
             } else {
                 var user = new User(results[0]);
                 // add in security roles
-                db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                    if(err) {
-                        log('error getting roles!', err);
-                        user.roles = [];
-                    } else {
-                        user.roles = results.map(function(r) { return r.name; });
-                    }
-                    // at this point still send the user, error isn't fatal
-                    deferred.resolve(user);
-                });
+                user.$initRoles();
+                deferred.resolve(user);
             }
         });
 
@@ -102,16 +106,8 @@ module.exports = function(db) {
             } else {
                 var user = new User(results[0]);
                 // add in security roles
-                db.query('select name from bcs_roles where id in (select role_id from bcs_user_roles where user_id = ?)', [user.id], function(err, results) {
-                    if(err) {
-                        log('error getting roles!', err);
-                        user.roles = [];
-                    } else {
-                        user.roles = results.map(function(r) { return r.name; });
-                    }
-                    // at this point still send the user, error isn't fatal
-                    deferred.resolve(user);
-                });
+                user.$initRoles();
+                deferred.resolve(user);
             }
         });
 

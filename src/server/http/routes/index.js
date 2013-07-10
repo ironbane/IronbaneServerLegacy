@@ -110,7 +110,11 @@ module.exports = function(app, db) {
             unitTemplates: JSON.stringify(unitTemplates),
             preMeshes: JSON.stringify(preMeshes),
             modelEnum: JSON.stringify(modelEnum),
-            shaders: shaderFile
+            shaders: shaderFile,
+            userId: req.user ? req.user.id : 0,
+            username: req.user ? req.user.name : '',
+            loggedIn: req.isAuthenticated(),
+            characterUsed: req.user ? req.user.characterused : 0
         };
 
         res.render('index');
