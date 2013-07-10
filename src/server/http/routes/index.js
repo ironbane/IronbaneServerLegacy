@@ -14,6 +14,7 @@ module.exports = function(app, db) {
         items = {},
         units = {},
         unitTemplates = {},
+        preCatsTiles = [],
         preMeshes = {
             0: {
                 id: 0,
@@ -86,6 +87,21 @@ module.exports = function(app, db) {
         });
     });
 
+    db.query('select * from ib_editor_cats', [], function(err, results) {
+        if(err) {
+            log('error loading the cats, meow ' + err);
+            return;
+        }
+
+        results.forEach(function(row) {
+            preCatsTiles.push({
+                name: row.name,
+                range: row.range,
+                limit_x: row.limit_x
+            });
+        });
+    });
+
     // load shader file
     var shaderFile = "";
     fs.readFile('src/client/game/shaders.html', function(err, contents) {
@@ -106,6 +122,7 @@ module.exports = function(app, db) {
             items: JSON.stringify(items),
             units: JSON.stringify(units),
             unitTemplates: JSON.stringify(unitTemplates),
+            preCatsTiles: JSON.stringify(preCatsTiles),
             preMeshes: JSON.stringify(preMeshes),
             modelEnum: JSON.stringify(modelEnum),
             shaders: shaderFile,
