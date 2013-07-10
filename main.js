@@ -67,6 +67,11 @@ var mysql = require('mysql').createConnection({
     //insecureAuth:false
 });
 
+process.on('uncaughtException', function(e) {
+    debugger;
+    console.log(e.stack);
+});
+
 var includes = [
     './Engine/Vector3.js',
     './Engine/Util.js',
