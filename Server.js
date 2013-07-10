@@ -229,14 +229,14 @@ var Server = Class.extend({
 
                                 var packet = {
                                     id:id,
-                                    p:pos
+                                    p:pos.Round(2)
                                     };
 
                                 if ( ud.standingOnUnitId ) {
                                     packet.u = ud.standingOnUnitId;
 
                                     // Send our local position instead!
-                                    packet.p = ud.localPosition;
+                                    packet.p = ud.localPosition.Round(2);
                                 }
 
 
@@ -249,15 +249,15 @@ var Server = Class.extend({
 
                                 }
 
-                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x;
-                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y;
-                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z;
+                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round();
+                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round();
+                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round();
                                 snapshot.push(packet);
 
                             }
 
 
-                            if ( snapshot.length == 0 ) continue;
+                            if ( snapshot.length === 0 ) continue;
 
 
                             units[u].socket.emit("snapshot", snapshot);
