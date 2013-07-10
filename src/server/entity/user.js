@@ -98,7 +98,11 @@ module.exports = function(db) {
             }
 
             if (results.length < 1) {
-                deferred.reject('Unknown user: ' + username);
+                return deferred.reject('Unknown user: ' + username);
+            }
+
+            if(results[0].banned !== 0) {
+                return deferred.reject('User is banned!');
             }
 
             if(hashedPw !== results[0].pass) {
