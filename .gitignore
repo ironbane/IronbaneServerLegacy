@@ -8,3 +8,4 @@ node_modules/
 config.json
 thumbs.db
 deploy/
+media/
