@@ -1207,6 +1207,10 @@ var HUDHandler = Class.extend({
         }
 
         $('#btnPrevChar').click(function() {
+            if(window.chars && window.chars.length === 0) {
+                return;
+            }
+
             if (startdata.characterUsed === 0) {
                 startdata.characterUsed = chars[((chars.length) - 1)].id;
             } else {
@@ -1226,6 +1230,10 @@ var HUDHandler = Class.extend({
         });
 
         $('#btnNextChar').click(function() {
+            if(window.chars && window.chars.length === 0) {
+                return;
+            }
+
             if (startdata.characterUsed === 0) {
                 startdata.characterUsed = chars[0].id;
             } else {
@@ -1390,7 +1398,6 @@ var HUDHandler = Class.extend({
                 .done(function(user) {
                     startdata.loggedIn = true;
                     startdata.name = user.name;
-                    startdata.pass = user.pass;
                     startdata.user = user.id;
                     startdata.characterUsed = user.characterused;
                     window.isEditor = user.editor === 1;
@@ -1429,15 +1436,29 @@ var HUDHandler = Class.extend({
         });
 
         $('#btnRegister').click(function() {
+            if (startdata.loggedIn) {
+                return;
+            }
 
-            if (slotsLeft <= 0) return;
+            var tmpl = [
+                '<label for="username">Username</label>',
+                '<div class="spacersmall"></div>',
+                '<input type="text" id="username" class="iinput" style="width:305px">',
+                '<div class="spacersmall"></div>',
+                '<label for="password">Password</label>',
+                '<div class="spacersmall"></div>',
+                '<input type="password" id="password" class="iinput" style="width:305px">',
+                '<div class="spacersmall"></div>',
+                '<label for="email">E-mail</label>',
+                '<div class="spacersmall"></div>',
+                '<input type="text" id="email" class="iinput" style="width:305px">',
+                '<input type="text" id="url" style="display:none">',
+                '<div class="spacersmall"></div>',
+                '<button id="btnConfirmRegister" class="ibutton_attention" style="width:150px">Register</button>',
+                '<button id="btnBack" class="ibutton" style="width:150px">Back</button>'
+            ].join('');
 
-            var newChar = '';
-
-            newChar += '<label for="username">Username</label><div class="spacersmall"></div><input type="text" id="username" class="iinput" style="width:305px"><div class="spacersmall"></div><label for="password">Password</label><div class="spacersmall"></div><input type="password" id="password" class="iinput" style="width:305px"><div class="spacersmall"></div><label for="email">E-mail</label><div class="spacersmall"></div><input type="text" id="email" class="iinput" style="width:305px"><input type="text" id="url" style="display:none"><div class="spacersmall"></div><button id="btnConfirmRegister" class="ibutton_attention" style="width:150px">Register</button><button id="btnBack" class="ibutton" style="width:150px">Back</button>';
-
-            $('#charSelect').html(newChar);
-
+            $('#charSelect').html(tmpl);
             $('#username').focus();
 
             var confirmRegister = (function() {
@@ -1446,50 +1467,42 @@ var HUDHandler = Class.extend({
                 var email = $('#email').val();
                 var url = $('#url').val();
 
-
                 hudHandler.DisableButtons(['btnConfirmRegister', 'btnBack']);
 
-                $.post('gamehandler.php?action=register', {
+                $.post('/api/user', {
                     Ux466hj8: username,
                     Ed2h18Ks: password,
                     s8HO5oYe: email,
                     url: url
-                }, function(string) {
+                })
+                .done(function(response) {
+                    hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!');
 
-                    if (string.split(';')[0] == 'OK') {
-                        hudHandler.MessageAlert(string.split(';')[1]);
+                    startdata.loggedIn = true;
+                    startdata.name = response.name;
+                    startdata.user = response.id;
+                    startdata.characterUsed = 0; // we just registered, so we have no characters
+                    window.chars = [];
+                    window.charCount = 0;
+                    window.isEditor = response.editor === 1;
 
-                        // todo: replace 0 with actual user id
-                        $.get('/api/user/' + 0 + '/characters', function(data) {
-                            eval(data);
-
-                            startdata.loggedIn = true;
-
-                            //hudHandler.EnableButtons(['btnConfirmLogin','btnBack']);
-                            hudHandler.MakeCharSelectionScreen();
-
-                        });
-                    } else {
-                        hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
-                        hudHandler.MessageAlert(string);
-                    }
-
+                    hudHandler.MakeCharSelectionScreen();
+                })
+                .fail(function(err) {
+                    hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
+                    hudHandler.MessageAlert(err.responseText);
                 });
             });
 
-            (function(confirmRegister) {
-                $('#charSelect').keydown(function(event) {
-                    if (event.keyCode == 13 && !hudHandler.alertBoxActive) {
-                        confirmRegister();
-                    }
-                });
-            })(confirmRegister);
+            $('#charSelect').keydown(function(event) {
+                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                    confirmRegister();
+                }
+            });
             $('#btnConfirmRegister').click(confirmRegister);
 
             $('#btnBack').click(function() {
-
                 hudHandler.MakeCharSelectionScreen();
-
             });
         });
 
