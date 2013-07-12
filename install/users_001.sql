@@ -1,4 +1,4 @@
-UPDATE bcs_users SET email='guest@ironbane.com', password='n0tp4ssw0rd', name='guest' WHERE id=0;
+UPDATE bcs_users SET email='guest@ironbane.com', pass='n0tp4ssw0rd', name='guest' WHERE id=0;
 
 DELETE FROM bcs_users WHERE email = '';
 DELETE FROM bcs_users WHERE name='test8' AND email='info@nickjanssen.com';
