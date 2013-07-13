@@ -119,8 +119,6 @@ var HUDHandler = Class.extend({
 
         this.oldButtonClasses = {};
 
-        this.devNewsScrollPane = $('#devNews').jScrollPane().data('jsp');
-
         setTimeout(function() {
             hudHandler.MakeSlotSpace(false);
             hudHandler.MakeSlotSpace(true);
@@ -129,7 +127,6 @@ var HUDHandler = Class.extend({
                 drop: hudHandler.ItemSwitchEvent
             });
 
-            hudHandler.MakeNewsPage();
             hudHandler.ShowMainMenuHUD();
         }, 0);
 
@@ -184,67 +181,6 @@ var HUDHandler = Class.extend({
     },
     ShowMainMenuHUD: function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
-    },
-    MakeNewsPage: function() {
-        // Fill the side menu
-
-        var content = '';
-
-        content += '<div>';
-        content += '<b>';
-
-        content += '<a href="forum.php" target="_new">Forum</a>';
-        content += ' | ';
-        content += '<a href="https://twitter.com/IronbaneMMO" target="_new">Twitter</a>';
-        content += ' | ';
-        content += '<a href="forum.php?action=topic&topic=353" target="_new">Credits</a>';
-
-
-        //      content += ' | ';
-        //      content += '<a href="https://www.youtube.com/user/IronbaneMMO" target="_new">Youtube</a>';
-
-
-        if (isEditor) {
-            content += '<br>';
-            content += '<a href="editor.php" target="_new">Editor</a>';
-            content += ' | ';
-            content += '<a href="teamwiki.php?action=viewuploads" target="_new">Uploads</a>';
-        }
-
-
-        content += '</b>';
-
-        //      content += '<button id="btnForum" class="ibutton" style="width:100px">Forum</button>';
-        //      content += '<button id="btnTwitter" class="ibutton" style="width:100px">Twitter</button>';
-        //      content += '<hr>';
-
-        content += '<h2>News</h2>';
-
-        content += newsPosts;
-
-        content += '</div>';
-
-        if (isEditor) {
-
-        }
-
-        //      $('#devNews').html(content);
-
-        this.devNewsScrollPane.getContentPane().html(content);
-        this.devNewsScrollPane.reinitialise();
-
-
-        //      $('#sideMenu').jScrollPane();
-
-        //      $('#btnForum').click(function(){
-        //        window.open('forum.php', 'Forum');
-        //        //window.location = 'forum.php';
-        //      });
-        //
-        //      $('#btnTwitter').click(function(){
-        //        window.open('https://twitter.com/IronbaneMMO', 'Twitter');
-        //        //window.location = 'https://twitter.com/IronbaneMMO';
-        //      });
     },
     MakeSlotSpace: function(isLoot) {
         var HUD = this;

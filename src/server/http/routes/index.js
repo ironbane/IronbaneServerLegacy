@@ -8,6 +8,7 @@ module.exports = function(app, db) {
     require('./user')(app, db);
     require('./characters')(app, db);
     require('./books')(app, db);
+    require('./forum')(app, db);
 
     // temp stuff for index until a better spot is thought
     var zones = {},

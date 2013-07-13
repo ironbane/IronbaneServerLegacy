@@ -33,6 +33,7 @@ module.exports = function(grunt) {
                 src: [ // order matters!
                     "src/client/game/shared.js",
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
+                    "<%= gameScriptPath %>/ng/news.js",
                     "<%= gameScriptPath %>/External/seedrandom.js",
                     "<%= gameScriptPath %>/External/ImprovedNoise.js",
                     "<%= gameScriptPath %>/External/Init.js",

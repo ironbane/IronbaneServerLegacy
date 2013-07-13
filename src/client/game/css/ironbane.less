@@ -1,4 +1,7 @@
 
+@textColor: #6DF2C0;
+@borderColor: #06452d;
+
 body {
   margin:0px;
   overflow:hidden;
@@ -8,7 +11,7 @@ body {
 
   font-weight:bold;
   font-size:20px;
-  color:#6DF2C0;
+  color: @textColor;
   /*     text-shadow:2px 2px 1px #06452d; */
 
   background-color: #051d1c;
@@ -539,33 +542,25 @@ label {
 
 }
 
-#devNews li{
-  margin-left:-25px;
-}
-#devNews hr{
-  height:2px;
-  border-style:dashed none none none;
-  border-width:2px;
-  border-color:#6DF2C0;
-}
 #devNews {
-
-  position:absolute;
-  width:250px;
-  height:341px;
-  overflow:auto;
-
-  padding:10px;
-
-  font-size:10px;
-
-  font-weight:normal;
-
-
-  border: 3px solid #06452d;
-
-  background-image:url(../media/images/hud/bgc1_75.png);
-
+    position: absolute;
+    width: 250px;
+    height: 341px;
+    padding: 10px;
+    font-size: 10px;
+    font-weight: normal;
+    border: 3px solid @borderColor;
+    background-color: rgba(16, 60, 50, 0.75);
+    .news-content {
+        height: 280px;
+        .news-post-title, .news-post-time {margin: 0;}
+        hr {
+            height: 2px;
+            border-style: dashed none none none;
+            border-width: 2px;
+            border-color: @textColor;
+        }
+    }
 }
 
 #bogusButton {
