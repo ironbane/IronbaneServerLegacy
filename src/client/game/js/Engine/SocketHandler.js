@@ -44,7 +44,9 @@ var SocketHandler = Class.extend({
 
         if (this.serverOnline) {
 
-            this.socket = io.connect('http://' + ironbane_hostname + ':' + ironbane_port + '/');
+            this.socket = io.connect('http://' + ironbane_hostname + ':' + ironbane_port + '/', {
+                reconnect: false
+            });
 
             this.socket.emit('getStartData', {}, function(reply) {
                 numberOfPlayersOnline = reply.numberOfPlayersOnline;
@@ -345,7 +347,7 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('addProjectile', function(data) {
-            console.log('addProjectile', data);
+            //if ( !socketHandler.loggedIn ) return;
 
             var unit = FindUnit(data['o']);
 

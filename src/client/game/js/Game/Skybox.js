@@ -209,7 +209,7 @@ var Skybox = PhysicsObject.extend({
         this.sunVector.set(0,1,0);
       }
       else if ( (showEditor && levelEditor.editorGUI.chForceNight)
-        || zones[terrainHandler.zone]['type'] == ZoneTypeEnum.DUNGEON ) {
+        || zones[terrainHandler.zone].type == ZoneTypeEnum.DUNGEON ) {
         this.sunVector.set(0,-1,0);
       }
       else {
@@ -239,7 +239,7 @@ var Skybox = PhysicsObject.extend({
       if ( alr > -0.3 && alr < 0.3 ) {
         var mod = alr / 0.3;
         if ( mod > 0 ) {
-          alr += 1.0-mod
+          alr += 1.0-mod;
         }
         else {
           alr += 1.0+mod;

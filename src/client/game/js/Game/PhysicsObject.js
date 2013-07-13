@@ -98,8 +98,6 @@ var PhysicsObject = Class.extend({
         this.unitStandingOn = null;
 
 
-
-
     },
     Destroy: function() {
         if ( !this.unitStandingOn ) {

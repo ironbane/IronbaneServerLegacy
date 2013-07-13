@@ -447,6 +447,7 @@ this.walkSoundTimer = 0.0;
       var swingXamount = 0;
       var swingYamount = 0;
       var swingZamount = 0;
+      var rotTest = 0;
 
       var weaponSpriteIndex = this.spriteIndex;
 
@@ -465,7 +466,7 @@ this.walkSoundTimer = 0.0;
           scaleX = 0.7;
           //                    scaleY = 0.8;
 
-          var rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
+          rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
           rotateZ = -rotTest*20;
 
           swingXamount = -120;
@@ -483,7 +484,7 @@ this.walkSoundTimer = 0.0;
           targetWalkOffsetX3 = -0.15;
           swingZamount = -90;
 
-          var rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
+          rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
           rotateY = 40-rotTest*20;
           break;
         case 2:
@@ -514,7 +515,7 @@ this.walkSoundTimer = 0.0;
           rotateY = -40;
           rotateX = 0;
 
-          offset.z = -0.005
+          offset.z = -0.005;
 
           targetWalkAngleZ1 = -30;
           targetWalkAngleZ3 = 30;
@@ -562,7 +563,7 @@ this.walkSoundTimer = 0.0;
           rotateX = 0;
 
 
-          targetWalkOffsetX1 = -0.05
+          targetWalkOffsetX1 = -0.05;
           targetWalkOffsetX3 = 0.05;
 
           swingZamount = -90;
@@ -582,7 +583,7 @@ this.walkSoundTimer = 0.0;
 
           swingZamount = -90;
 
-          var rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
+          rotTest = pointDirection && this.heading.dot(pointDirection) > 0 ? this.side.dot(pointDirection) : 0;
           rotateY += -20-rotTest*20;
           break;
       }
@@ -668,10 +669,9 @@ this.walkSoundTimer = 0.0;
 
       //this.weaponPivot.rotation.z = Math.cos(time);
 
-      var direct = false;
 
       var speed = 8;
-      if ( this.lastSpriteIndex != this.spriteIndex ) direct = true;
+      var direct = ( this.lastSpriteIndex != this.spriteIndex );
 
       //if ( firstPerson ) direct = true;
 
@@ -1040,7 +1040,7 @@ this.walkSoundTimer = 0.0;
             particleHandler.Add(heal ? ParticleTypeEnum.HEAL2 : ParticleTypeEnum.DAMAGE2, {
               followUnit:victim
             });
-          }, delay)
+          }, delay);
           })(this);
         delay += 100;
         delay -= fullHearts * 2;
@@ -1054,7 +1054,7 @@ this.walkSoundTimer = 0.0;
             particleHandler.Add(heal ? ParticleTypeEnum.HEAL1 : ParticleTypeEnum.DAMAGE1, {
               followUnit:victim
             });
-          }, delay)
+          }, delay);
           })(this);
       }
 
@@ -1104,7 +1104,7 @@ this.walkSoundTimer = 0.0;
             particleHandler.Add(heal ? ParticleTypeEnum.ARMORHEAL2 : ParticleTypeEnum.ARMORHIT2, {
               followUnit:victim
             });
-          }, delay)
+          }, delay);
           })(this);
         delay += 100;
         delay -= fullHearts * 2;
@@ -1118,7 +1118,7 @@ this.walkSoundTimer = 0.0;
             particleHandler.Add(heal ? ParticleTypeEnum.ARMORHEAL1 : ParticleTypeEnum.ARMORHIT1, {
               followUnit:victim
             });
-          }, delay)
+          }, delay);
           })(this);
       }
 

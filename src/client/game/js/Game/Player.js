@@ -26,10 +26,9 @@ var Player = Fighter.extend({
         this._super(position, rotation, id, name, 0,
             socketHandler.playerData.size, socketHandler.playerData.health, socketHandler.playerData.armor,
             socketHandler.playerData.healthMax, socketHandler.playerData.armorMax);
-        this.template = {}
+        this.template = {};
         this.template.type = UnitTypeEnum.PLAYER;
-        console.log(this);
-
+        
         this.drawNameMesh = false;
         this.originalThirdPersonReference = new THREE.Vector3(0, 2.5, -4);
         ironbane.camera.position.copy(position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
@@ -98,8 +97,8 @@ var Player = Fighter.extend({
             var weapon = this.GetEquippedWeapon();
 
             if (weapon) {
-                var template = items[weapon['template']];
-                this.UpdateWeapon(template['id']);
+                var template = items[weapon.template];
+                this.UpdateWeapon(template.id);
             }
         }
     },
@@ -648,8 +647,8 @@ var Player = Fighter.extend({
         var playerToPoint = point.clone().subSelf(this.position);
 
 
-          if ( template['type'] == 'weapon') {
-            if ( template['subtype'] == 'bow' || template['subtype'] == 'staff' ) {
+          if ( template.type == 'weapon') {
+            if ( template.subtype == 'bow' || template.subtype == 'staff' ) {
               this.targetAimTexture = "aim_bow";
             }
             else {
@@ -746,7 +745,7 @@ var Player = Fighter.extend({
 
       this.aimTexture = this.targetAimTexture;
 
-      if ( this.aimTexture != "" ) {
+      if ( this.aimTexture !== "" ) {
         this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
           textureHandler.GetTexture('plugins/game/images/misc/'+this.aimTexture+'.png', false, {
             transparent:true,
@@ -1047,6 +1046,9 @@ var Player = Fighter.extend({
               } else {
                 hudHandler.HideBook();
               }
+
+              // soundHandler.Play(item.equipped ? "equip1" : "equip2");
+
               break;
             case 'map':
 

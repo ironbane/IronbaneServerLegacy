@@ -59,7 +59,7 @@ var Billboard = Unit.extend({
         this._super();
     },
     TryToBuildMesh: function() {
-        if ( this.texture.image.width == 0 ) {
+        if ( this.texture.image.width === 0 ) {
             (function(unit){setTimeout(function(){unit.TryToBuildMesh()}, 1000)})(this);
         }
         else {
@@ -127,5 +127,6 @@ var Billboard = Unit.extend({
         }
     }
 });
+
 
 

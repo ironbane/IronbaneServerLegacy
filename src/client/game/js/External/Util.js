@@ -99,14 +99,14 @@ if ( !SERVER ) {
       uniforms.opacity = {
         type: 'f',
         value: options.opacity
-      }
+      };
     }
 
     if ( options.vertexShader == "vertex_world" ) {
       uniforms.camPos = {
         type: 'v3',
         value: ironbane.camera.position.clone()
-      }
+      };
     }
 
     return new THREE.ShaderMaterial({
@@ -258,6 +258,7 @@ if ( !SERVER ) {
       return "X: "+roundNumber(this.x,2)+", Y: "+roundNumber(this.y,2)+", Z: "+roundNumber(this.z,2)+"";
     }
   });
+
 
   function v(x,y,z){
     return new THREE.Vector3(x,y,z);
@@ -479,11 +480,11 @@ function CellToWorldCoordinates(x, z, cellsize) {
 
   if ( cellsize % 2 != 0 ) console.error("Cellsize not dividable by 2!");
 
-  var cellhalf = cellsize / 2;
+  //var cellhalf = cellsize / 2;
   // 0 * 20 - 10 = -10;
   // 1 * 20 - 10 = 10;
-  x = (x * cellsize);
-  z = (z * cellsize);
+  x = (x * cellsize) ;
+  z = (z * cellsize) ;
 
   return {
     x: x,
@@ -623,9 +624,7 @@ function getRandomInt (min, max) {
 
 // Random float between
 function getRandomFloat(minValue,maxValue,precision){
-  if(typeof(precision) == 'undefined'){
-    precision = 2;
-  }
+  precision = precision || 2;
   return parseFloat(Math.min(minValue + (Math.random() * (maxValue - minValue)),maxValue).toFixed(precision));
 }
 
@@ -701,6 +700,7 @@ function RoundVector(vec, n) {
   return vec;
 }
 
+/*
 Number.prototype.ToBig = function() {
   return this * 100;
 };
@@ -711,7 +711,7 @@ THREE.Vector3.prototype.ToBig = function(n) {
 
   return this;
 };
-
+*/
 THREE.Vector3.prototype.Truncate = function(n) {
   if ( this.length() > n ) {
     return this.normalize().multiplyScalar(n);
@@ -774,7 +774,7 @@ var dateChunks = new Array(
   new Array(1, 'second')
 
   );
-
+/*
 function timeSince(since) {
 
 
@@ -807,11 +807,14 @@ function timeSince(since) {
   return print;
 
 }
+*/
 
+//there is no fixed order for attributes of an object. also this function could return a function...
 function firstOfObject(o) {
   for(var k in o) return o[k];
 }
 
+/*
 function reverseArray(array) {
 
   var length = array.length;
@@ -829,11 +832,11 @@ function reverseArray(array) {
   }
   return array;
 }
+*/
 
-function capitaliseFirstLetter(string)
-{
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+String.prototype.capitaliseFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
 
 //Copyright 2009 Nicholas C. Zakas. All rights reserved.
 //MIT Licensed

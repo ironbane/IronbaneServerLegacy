@@ -27,19 +27,20 @@ var MeshHandler = Class.extend({
   Load: function(model, readyFunc, scale) {
 
     if ( this.geometries[model] ) {
-       readyFunc(THREE.GeometryUtils.clone(this.geometries[model]));
+      setTimeout(function() {
+        readyFunc(THREE.GeometryUtils.clone(meshHandler.geometries[model]));
         // readyFunc(THREE.GeometryUtils.clone(meshHandler.geometries[model]));
-     
+      }, 1000);
       return;
     }
 
 
     var jsonLoader = new THREE.JSONLoader();
 
-    var self = this;
+
 
     jsonLoader.load( model, function( geometry ) {
-      self.geometries[model] = geometry;
+      meshHandler.geometries[model] = geometry;
       readyFunc(THREE.GeometryUtils.clone(geometry));
       // readyFunc(geometry);
     }, null, scale);
