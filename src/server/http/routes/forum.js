@@ -19,7 +19,7 @@ module.exports = function(app, db) {
     });
 
     // create a new board
-    app.post('/api/forum', function(req, res) {
+    app.post('/api/forum', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
         var board = {
             name: req.body.name,
             forumcat: req.body.forumcat || 1,
@@ -120,7 +120,7 @@ module.exports = function(app, db) {
     });
 
     // start a new topic
-    app.post('/api/forum/:boardId/topics', function(req, res) {
+    app.post('/api/forum/:boardId/topics', app.ensureAuthenticated, function(req, res) {
         db.query('insert into forum_topics set board_id = ?, time = ?', [req.params.boardId, req.body.time], function(err, topicResult) {
             if(err) {
                 res.send('error creating topic', 500);
@@ -198,7 +198,7 @@ module.exports = function(app, db) {
     });
 
     // create a new post
-    app.post('/api/forum/topics/:topicId', function(req, res) {
+    app.post('/api/forum/topics/:topicId', app.ensureAuthenticated, function(req, res) {
         var post = {
             topic_id: req.params.topicId,
             title: req.body.title,

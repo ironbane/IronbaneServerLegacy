@@ -1032,26 +1032,21 @@ var Player = Fighter.extend({
 
             case 'book':
 
-              if ( item.equipped ) {
-                $.post('gamehandler.php?action=book&book='+item.attr1, function(string) {
-                  if ( !item.equipped ) return;
-                  data = JSON.parse(string);
+              if (item.equipped) {
+                $.get('/api/books/' + item.attr1)
+                  .done(function(response) {
+                    if (!item.equipped) {
+                      return;
+                    }
 
-                  if ( ISDEF(data.errmsg) ) {
-                    hudHandler.MessageAlert(data.errmsg);
-                    return;
-                  }
-
-                  hudHandler.ShowBook(data.text);
-
-                });
-              }
-              else {
+                    hudHandler.ShowBook(response.text);
+                  })
+                  .fail(function(err) {
+                    hudHandler.MessageAlert(err.responseText);
+                  });
+              } else {
                 hudHandler.HideBook();
               }
-
-              // soundHandler.Play(item.equipped ? "equip1" : "equip2");
-
               break;
             case 'map':
 
