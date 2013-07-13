@@ -18,7 +18,7 @@ var newsPaneTmpl = [
                     '<article ng-repeat="post in posts">',
                         '<header>',
                             '<h4 class="news-post-title"><a ng-href="/forum.php?action=topic&topic={{ post.topic_id }}">{{ post.title }}</a></h4>',
-                            '<p class="news-post-time"><time datetime="{{ post.time * 1000 }}">{{ post.time | timeSince }}</time></p>',
+                            '<p class="news-post-time"><time datetime="{{ post.time * 1000 }}">{{ post.time * 1000 | timeSince }}</time></p>',
                         '</header>',
                         '<p ng-bind-html-unsafe="post.content"></p>',
                         '<footer><hr></footer>',
@@ -88,7 +88,7 @@ IronbaneApp
                 return Math.floor(seconds) + " seconds";
             }
 
-            var since = 'about ' + timeSince(input * 1000) + ' ago';
+            var since = 'about ' + timeSince(input) + ' ago';
 
             return since;
         };
