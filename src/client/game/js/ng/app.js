@@ -91,6 +91,3 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
     };
 }])
 .constant('DEATH_MESSAGES', "slaughtered butchered crushed defeated destroyed exterminated finished massacred mutilated slayed vanquished killed".split(" "));
-
-// manually bootstrapping for now
-angular.bootstrap('#chatBox', ['Ironbane']);
