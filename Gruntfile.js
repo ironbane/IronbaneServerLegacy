@@ -33,6 +33,8 @@ module.exports = function(grunt) {
                 src: [ // order matters!
                     "src/client/game/shared.js",
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
+                    "<%= gameScriptPath %>/ng/chat.js",
+                    "<%= gameScriptPath %>/ng/game.js",
                     "<%= gameScriptPath %>/ng/news.js",
                     "<%= gameScriptPath %>/External/seedrandom.js",
                     "<%= gameScriptPath %>/External/ImprovedNoise.js",
@@ -51,7 +53,6 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/TextureHandler.js",
                     "<%= gameScriptPath %>/Engine/MeshHandler.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
-                    "<%= gameScriptPath %>/Game.js",
                     "<%= gameScriptPath %>/Game/Hud.js",
                     "<%= gameScriptPath %>/Game/PhysicsObject.js",
                     "<%= gameScriptPath %>/Game/Unit.js",
