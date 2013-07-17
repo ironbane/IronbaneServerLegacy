@@ -1,26 +1,33 @@
-Ironbane Server - AngularJS / NodeJS Edition
+Ironbane Server
 ============================================
 
-The server for Ironbane, the open source MMO. 
+The server for Ironbane, the open source MMO.
 Play the game at <http://www.ironbane.com/>.
 
 ## Requirements
+* GraphicsMagick
 * NodeJS
 * Grunt
 * MySql
 
 ## Getting started
 
-* Clone this repository somewhere on your system. Don't put it inside your webserver directory, as anyone can then view your database password.
+* Clone this repository somewhere on your system.
 
 ```
     git clone https://github.com/ironbane/IronbaneServer.git
 ```
 
-* Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/) if you haven't yet
+* Install [GraphicsMagick](http://www.graphicsmagick.org/), make sure the binaries are in your PATH.
+
+* Install [MySql](http://dev.mysql.com/downloads/mysql/)
+
+* Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/)
+
+* Get a copy of the base assets from ????????
 
 * Next, run the following command from the root directory
- 
+
 ```
     npm install
 ```
@@ -31,8 +38,4 @@ Play the game at <http://www.ironbane.com/>.
 
 * Run grunt ``` grunt ```
 
-* Run ```node main.js``` from the root directory.   
-
-## Note
-
-This branch is currently a WIP of rewriting the code base to use all AngularJS and NodeJS.
+* Run ```node main.js``` from the root directory.
