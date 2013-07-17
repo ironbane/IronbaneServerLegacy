@@ -27,10 +27,25 @@ module.exports = function(app, db) {
         })(req, res, next);
     });
 
+    app.io.route('logout', function(req) {
+        // http only
+        if(req.logout) {
+            // how to disconnect the associated socket?
+            req.logout();
+        }
+
+        if(req.io.disconnect) {
+            console.log('from socket', req.io.socket);
+            // req.io.disconnect();
+            // can't do this yet because the client relies on connection
+        }
+
+        req.io.respond('OK');
+    });
+
+    // web logout fwd to socket
     app.get('/logout', function(req, res) {
-        // todo: set last_session on user table? (still needed?)
-        req.logout();
-        res.send('OK');
+        req.io.route('logout');
     });
 
     // get currently signed in user object

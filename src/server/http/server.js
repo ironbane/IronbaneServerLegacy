@@ -85,6 +85,8 @@ var Server = Class.extend({
         app.passport = passport; // convienience
 
         app.configure(function() {
+            var sessionStore = new MySQLStore({client: db});
+
             app.use(express.favicon(config.get('clientDir') + "favicon.ico"));
             app.use(express.cookieParser());
             app.use(express.bodyParser());
@@ -92,7 +94,7 @@ var Server = Class.extend({
             app.use(express.session({
                 secret: config.get('session_secret'),
                 cookie: { maxAge: 3600000 }, // one hour
-                store: new MySQLStore({client: db}) // store sessions in db for "remember me"
+                store: sessionStore // store sessions in db for "remember me"
             }));
             app.set('view engine', 'html');
             app.set('views', config.get('clientDir'));
@@ -101,6 +103,29 @@ var Server = Class.extend({
             // persistent login sessions (recommended).
             app.use(passport.initialize());
             app.use(passport.session());
+
+            // link socket to passport
+            var old_auth;
+            old_auth = app.io.get('authorization');
+
+            app.io.set("authorization", require('passport.socketio').authorize({
+                passport: passport,
+                cookieParser: express.cookieParser,
+                key: 'connect.sid',
+                secret: config.get('session_secret'),
+                store: sessionStore,
+                success: function(data, accept) {
+                    //console.log('auth success');
+                    // this means it was able to pull user data from session
+                    return old_auth(data, accept);
+                },
+                fail: function(data, accept) {
+                    //console.log('auth fail', arguments);
+                    // this means it does not have user data from session, however, it's ok,
+                    // we allow guests
+                    return old_auth(data, accept);
+                }
+            }));
 
             // Simple route middleware to ensure user is authenticated.
             //   Use this route middleware on any resource that needs to be protected.  If

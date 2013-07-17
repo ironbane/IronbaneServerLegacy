@@ -40,7 +40,8 @@
     "gm": "~1.10.0",
     "connect-mysql": "~0.2.7",
     "express.io": "~1.1.12",
-    "nodetime": "~0.8.13"
+    "nodetime": "~0.8.13",
+    "passport.socketio": "~1.2.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
