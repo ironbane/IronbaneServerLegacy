@@ -15,28 +15,45 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 IronbaneApp
-    .factory('socket', ['$window', '$rootScope', 'GAME_HOST', 'GAME_PORT', function($window, $rootScope, GAME_HOST, GAME_PORT) {
-        var socket = {};
+    .factory('socket', ['$q', '$log', '$window', '$rootScope', 'GAME_HOST', 'GAME_PORT', function($q, $log, $window, $rootScope, GAME_HOST, GAME_PORT) {
+        var deferred = $q.defer(),
+            promise = deferred.promise,
+            _socket = null;
 
         return {
             connect: function() {
-                socket = $window.io.connect('http://' + GAME_HOST + ':' + GAME_PORT + '/', {
+                if(_socket !== null) {
+                    $log.warn('socket already exists', _socket);
+                    return;
+                }
+
+                _socket = $window.io.connect('http://' + GAME_HOST + ':' + GAME_PORT + '/', {
                     reconnect: false
                 });
+
+                deferred.resolve(_socket);
             },
             on: function(eventName, callback) {
-                socket.on(eventName, function() {
-                    var args = arguments;
-                    callback.apply(socket, args);
-                    _.throttle(function() { $rootScope.apply(); }, 500)(); // update angular slower than socket
+                // deferred events until we are connected
+                promise.then(function(socket) {
+                    socket.on(eventName, function() {
+                        var args = arguments;
+                        callback.apply(socket, args);
+                        _.throttle(function() { $rootScope.apply(); }, 500)(); // update angular slower than socket
+                    });
                 });
             },
             emit: function(eventName, data, callback) {
-                socket.emit(eventName, data, function() {
+                // emit doesn't need to be deferred, but also can't be called until connected
+                if(_socket === null) {
+                    return;
+                }
+
+                _socket.emit(eventName, data, function() {
                     var args = arguments;
                     $rootScope.$apply(function() {
                         if (callback) {
-                            callback.apply(socket, args);
+                            callback.apply(_socket, args);
                         }
                     });
                 });
