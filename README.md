@@ -32,10 +32,10 @@ Play the game at <http://www.ironbane.com/>.
     npm install
 ```
 
-* Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
+* Run ```ironbane init``` at the prompt OR Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
 
 * Install grunt ``` npm install -g grunt-cli ```
 
 * Run grunt ``` grunt ```
 
-* Run ```node main.js``` from the root directory.
+* Run ```ironbane start``` from the root directory.

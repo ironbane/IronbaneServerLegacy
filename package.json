@@ -41,7 +41,10 @@
     "connect-mysql": "~0.2.7",
     "express.io": "~1.1.12",
     "nodetime": "~0.8.13",
-    "passport.socketio": "~1.2.1"
+    "passport.socketio": "~1.2.1",
+    "commander": "~1.3.0",
+    "prompt": "~0.2.11",
+    "q-io": "~1.9.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

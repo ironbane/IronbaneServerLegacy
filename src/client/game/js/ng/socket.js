@@ -25,12 +25,11 @@ IronbaneApp
                 });
             },
             on: function(eventName, callback) {
-                socket.on(eventName, _.throttle(function() {
+                socket.on(eventName, function() {
                     var args = arguments;
-                    $rootScope.$apply(function() {
-                        callback.apply(socket, args);
-                    });
-                }, 500));
+                    callback.apply(socket, args);
+                    _.throttle(function() { $rootScope.apply(); }, 500)(); // update angular slower than socket
+                });
             },
             emit: function(eventName, data, callback) {
                 socket.emit(eventName, data, function() {
