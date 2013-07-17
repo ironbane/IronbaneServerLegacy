@@ -130,7 +130,7 @@ module.exports = function() {
 
     // create express.io server
     var HttpServer = require('./src/server/http/server').Server,
-        httpServer = new HttpServer();
+        httpServer = new HttpServer({db: mysql});
 
     // for the global access coming...todo: refactor
     var io = httpServer.server.io,

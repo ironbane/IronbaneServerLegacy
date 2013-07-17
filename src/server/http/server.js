@@ -25,6 +25,8 @@ var Server = Class.extend({
     init: function(config) {
         config = config || {};
 
+        this.db = config.db;
+
         // this will allow us to choose whether or not the http server is used,
         // say from cmdline or config
         if(config.autoStart !== false) {
@@ -35,13 +37,7 @@ var Server = Class.extend({
     start: function() {
         log('starting http server...');
 
-        var db = require('mysql').createConnection({
-            host: config.get('mysql_host'),
-            user: config.get('mysql_user'),
-            password: config.get('mysql_password'),
-            database: config.get('mysql_database')
-            //insecureAuth:false
-        });
+        var db = this.db;
 
         // create http api server
         var express = require('express.io');
