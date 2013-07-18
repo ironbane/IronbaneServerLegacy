@@ -310,7 +310,7 @@ var SoundHandler = Class.extend({
         }
         var sounds = this.getAllSounds(soundID);
         if (sounds.length === 0) {
-            console.log("sound " + s + " not found");
+            //console.log("sound " + s + " not found");
             return;
         }
         var sound = ChooseRandom(sounds);
