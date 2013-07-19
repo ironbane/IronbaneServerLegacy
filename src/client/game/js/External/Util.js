@@ -134,6 +134,10 @@ if ( !SERVER ) {
           [options.skin, options.eyes, options.hair, options.feet, options.body, options.head, (options.big ? 1 : 0)].join('_') +
           '.png';
 
+      if(_.every(options, function(p) { return parseInt(p, 10) === 0; })) {
+          cachefile = 'media/images/misc/blank.png';
+      }
+
       return cachefile;
   }
 
