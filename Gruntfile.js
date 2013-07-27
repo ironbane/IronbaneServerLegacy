@@ -221,6 +221,22 @@ module.exports = function(grunt) {
             js: {
                 files: 'src/client/**/*.js',
                 tasks: ['default', 'beep']
+            },
+            assets: {
+                files: '<%= cfg.get("assetDir") %>**/*',
+                tasks: ['default', 'beep']
+            }
+        },
+        three_obj: {
+            options: {
+                /** @optional  - if true the files are converted to binary JSON */
+                minify: false
+            },
+            dist: {
+                /** @required  - string (or array of) including grunt glob variables */
+                src: ['<%= cfg.get("clientDir") %>**/*.obj']
+                /** @optional  - if provided the converted files will be saved in this folder instead */
+                //dest: './assets/'
             }
         }
     });
@@ -236,8 +252,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-three-obj');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
+    grunt.registerTask('default', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
 
 };
