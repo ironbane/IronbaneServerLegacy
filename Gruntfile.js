@@ -211,15 +211,15 @@ module.exports = function(grunt) {
         },
         watch: {
             css: {
-                files: 'src/client/web/css/**/*',
+                files: 'src/client/**/*.less',
                 tasks: ['less', 'beep']
             },
             html: {
-                files: 'src/client/web/**/*.html',
+                files: 'src/client/**/*.html',
                 tasks: ['default', 'beep']
             },
             js: {
-                files: 'src/client/web/**/*.js',
+                files: 'src/client/**/*.js',
                 tasks: ['default', 'beep']
             }
         }
