@@ -1519,6 +1519,10 @@ var SocketHandler = Class.extend({
 
                         data.metadata[key] = "tiles/"+value;
                     });
+
+
+                    chatHandler.AnnouncePersonally(socket.unit,
+                        "The server needs to restart before you will see that texture change applied to all models!.", "cyan");
                 }
 
 

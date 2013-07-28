@@ -561,14 +561,16 @@ var mouseIntervalFunction = function(event){
 
                   var tileToPaint = levelEditor.editorGUI.selectedTile;
 
-                  currentMetadata["t"+materialIndex] = tileToPaint;
+                  // currentMetadata["t"+materialIndex] = tileToPaint;
 
-                  _.extend(currentMetadata, obj.metadata);
+                  // _.extend(currentMetadata, obj.metadata);
+
+                  obj.metadata["t"+materialIndex] = tileToPaint;
 
                   socketHandler.socket.emit('paintModel', {
                     pos: obj.position.clone().Round(2),
                     id: obj.meshData.id,
-                    metadata: le("mpClearMode") ? {} : currentMetadata,
+                    metadata: le("mpClearMode") ? {} : obj.metadata,
                     global : le("mpSetForAllModels") ? true : false
                   });
 
