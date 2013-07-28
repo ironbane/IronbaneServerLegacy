@@ -205,11 +205,12 @@ var Skybox = PhysicsObject.extend({
       rotationMatrix.setRotationFromEuler(new THREE.Vector3((param).ToRadians(), (-30).ToRadians(), 0));
 
 
-      if ( showEditor && levelEditor.editorGUI.chForceDay ) {
+      if ( (showEditor && levelEditor.editorGUI.chForceDay)
+        || GetZoneConfig("lightSystem") === LightSystemEnum.DAYONLY ) {
         this.sunVector.set(0,1,0);
       }
       else if ( (showEditor && levelEditor.editorGUI.chForceNight)
-        || zones[terrainHandler.zone].type == ZoneTypeEnum.DUNGEON ) {
+        || GetZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY ) {
         this.sunVector.set(0,-1,0);
       }
       else {
