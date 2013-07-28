@@ -352,7 +352,14 @@ var TerrainHandler = Class.extend({
     if ( this.waterMesh ) {
       this.waterMesh.material.uniforms.time.value = (new Date().getTime() - ironbane.startTime)/1000.0;
 
-      if ( this.skybox ) this.waterMesh.material.uniforms.vSun.value.copy(this.skybox.sunVector);
+      if ( this.skybox ) {
+        if ( GetZoneConfig("fluidType") === "lava" ) {
+          this.waterMesh.material.uniforms.vSun.value.set(0,1,0);
+        }
+        else {
+          this.waterMesh.material.uniforms.vSun.value.copy(this.skybox.sunVector);
+        }
+      }
 
       var p = this.GetReferenceLocationNoClone();
       var cellPos = WorldToCellCoordinates(p.x, p.z, 10);
