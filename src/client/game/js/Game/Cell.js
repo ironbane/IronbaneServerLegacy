@@ -123,10 +123,7 @@ var Cell = Class.extend({
         // Collision data is now saved to this cell
         this.octree.add(this.models, true);
 
-        ironbane.renderer.shadowMapEnabled = true;
         ironbane.renderer.shadowMapAutoUpdate = true;
-        ironbane.renderer.shadowMapSoft = false;
-
 
         if ( ironbane.shadowMapUpdateTimer ) {
             clearTimeout(ironbane.shadowMapUpdateTimer);
@@ -134,7 +131,7 @@ var Cell = Class.extend({
 
         ironbane.shadowMapUpdateTimer = setTimeout(function() {
             ironbane.renderer.shadowMapAutoUpdate = false;
-        }, 100);
+        }, 1000);
 
 
         this.status = cellStatusEnum.LOADED;

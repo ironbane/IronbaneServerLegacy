@@ -74,7 +74,7 @@ var Skybox = PhysicsObject.extend({
     this.directionalLight = new THREE.DirectionalLight( 0xcccccc );
     ironbane.scene.add( this.directionalLight );
 
-    this.shadowLight = new THREE.DirectionalLight( 0x000000 );
+    this.shadowLight = new THREE.DirectionalLight( 0xffffff, 1);
     this.shadowLight.onlyShadow = true;
     this.shadowLight.shadowMapWidth = 2048;
     this.shadowLight.shadowMapHeight = 2048;

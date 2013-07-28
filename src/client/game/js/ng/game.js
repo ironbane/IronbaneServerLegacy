@@ -71,6 +71,9 @@ IronbaneApp
                 clearAlpha: 1,
                 maxLights: 20
             });
+            this.renderer.shadowMapEnabled = true;
+            this.renderer.shadowMapAutoUpdate = true;
+            this.renderer.shadowMapSoft = false;            
             // this.renderer.sortObjects = false;
             this.renderer.setSize($window.innerWidth, $window.innerHeight);
 
