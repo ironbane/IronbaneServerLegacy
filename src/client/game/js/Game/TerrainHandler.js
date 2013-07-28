@@ -350,7 +350,7 @@ var TerrainHandler = Class.extend({
   Tick: function(dTime) {
 
     if ( this.waterMesh ) {
-      this.waterMesh.material.uniforms.time.value = (new Date().getTime() - ironbane.startTime)/1000.0;
+      this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
       if ( this.skybox ) {
         if ( GetZoneConfig("fluidType") === "lava" ) {
