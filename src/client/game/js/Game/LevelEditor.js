@@ -1283,7 +1283,7 @@ var LevelEditor = Class.extend({
         if ( le("mpGridSnap") ) {
 
           this.previewMesh.localPosition.x = Math.round(this.previewMesh.localPosition.x);
-          this.previewMesh.localPosition.y = Math.round(this.previewMesh.localPosition.y);
+          //this.previewMesh.localPosition.y = Math.round(this.previewMesh.localPosition.y);
           this.previewMesh.localPosition.z = Math.round(this.previewMesh.localPosition.z);
 
         }
