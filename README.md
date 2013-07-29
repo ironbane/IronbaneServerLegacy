@@ -24,7 +24,7 @@ Play the game at <http://www.ironbane.com/>.
 
 * Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/)
 
-* Get a copy of the base assets from ????????
+* Get a copy of the base assets from http://www.ironbane.com/data.tar
 
 * Next, run the following command from the root directory
 
