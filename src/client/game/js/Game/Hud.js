@@ -1061,7 +1061,7 @@ var HUDHandler = Class.extend({
         }
 
         if (startdata.loggedIn) {
-            charSelect += '<button id="btnPrevChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="float:left;width:40px">&#9664;</button>';
+            charSelect += '<button id="btnPrevChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="float:left;width:40px">←</button>';
         }
 
         if (startdata.loggedIn) {
@@ -1077,7 +1077,7 @@ var HUDHandler = Class.extend({
         }
 
         if (startdata.loggedIn) {
-            charSelect += '<button id="btnNextChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="width:40px">&#9654;</button><br>';
+            charSelect += '<button id="btnNextChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="width:40px">→</button><br>';
         }
 
         if (startdata.loggedIn) {
