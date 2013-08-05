@@ -1,3 +1,5 @@
+#!/usr/bin/node
+
 var program = require('commander'),
     pkg = require('./package.json'),
     config = require('./nconf'),
