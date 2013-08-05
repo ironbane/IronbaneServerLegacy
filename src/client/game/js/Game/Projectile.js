@@ -629,7 +629,7 @@ var Projectile = Unit.extend({
 
         if ( this.impactDone ) return;
 
-        if ( this.velocity.isZero() ) this.impactDone = true;
+        if ( this.velocity.lengthSq() < 0.25 ) this.impactDone = true;
 
         //this.type.rotationSpeed.set(0,0,0);
 
