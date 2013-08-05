@@ -1306,7 +1306,7 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-
+                var reason = data.reason ? data.reason : "";
 
                 switch (parseInt(data.action)) {
                     case UserManagementTypeEnum.LIGHTWARN:
