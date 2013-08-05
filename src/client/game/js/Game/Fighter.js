@@ -918,13 +918,13 @@ this.walkSoundTimer = 0.0;
 
     if ( this.health <= 0 ) {
 
-      this.playSound("die");
+      this.playSound("battle/die");
 
       this.Die();
 
     }
     else {
-      this.playSound("hit");
+      this.playSound("battle/hit");
     }
 
 
