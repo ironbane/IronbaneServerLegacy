@@ -1353,6 +1353,9 @@ var HUDHandler = Class.extend({
                 .fail(function(err) {
                     hudHandler.MessageAlert(err.responseText);
                     hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
+                    if(err.responseText === "Invalid username or password!") {
+                        $('#password').val("");
+                    }
                 });
             });
 
@@ -1369,7 +1372,7 @@ var HUDHandler = Class.extend({
             $('#btnBack').click(function() {
                 hudHandler.MakeCharSelectionScreen();
             });
-        });
+        })
 
         $('#btnRegister').click(function() {
             if (startdata.loggedIn) {

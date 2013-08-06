@@ -107,8 +107,10 @@ module.exports = function(db) {
                 return deferred.reject(err);
             }
 
+            var genericMessage = "Invalid username or password!";
+
             if (results.length < 1) {
-                return deferred.reject('Unknown user: ' + username);
+                return deferred.reject(genericMessage);
             }
 
             if(results[0].banned !== 0) {
@@ -116,7 +118,7 @@ module.exports = function(db) {
             }
 
             if(hashedPw !== results[0].pass) {
-                deferred.reject('invalid password!');
+                deferred.reject(genericMessage);
             } else {
                 var user = new User(results[0]);
                 // add in security roles
