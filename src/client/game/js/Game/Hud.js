@@ -1353,6 +1353,9 @@ var HUDHandler = Class.extend({
                 .fail(function(err) {
                     hudHandler.MessageAlert(err.responseText);
                     hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
+                    if(err.responseText === "invalid password!") {
+                        $('#password').val("");
+                    }
                 });
             });
 
