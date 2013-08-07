@@ -99,7 +99,16 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
         'fag',
         'anus',
         'pussy',
-        'tits'
+        'tits',
+        'fuck',
+        'nigger',
+        'nigga',
+        'piss',
+        'cocksucker',
+        'cock',
+        'motherfucker',
+        'twat',
+        'clit'
     ];
 
     return function(input) {
