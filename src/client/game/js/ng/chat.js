@@ -49,6 +49,10 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
         "default": '<div class="message">{{ data.message }}</div>'
     };
 
+    var _profanity = [
+        "hitler"
+    ];
+
     function getTemplate(type) {
         //$log.log('getTemplate', type);
         if(!(type in templates)) {
@@ -82,6 +86,17 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
                     scope.data.online.push({name: 'None', rank: 'fool'});
                 }
             }
+            if(scope.data.type && scope.data.type === 'say'){
+                var words = scope.data.message.split(" ");
+                angular.forEach(words, function(word) {
+                    if(_profanity.indexOf(word)>-1) {
+
+                        scope.data.message = "Your chat contains forbidden words";
+
+                    }
+                });
+            }
+    
 
             el.html(getTemplate(scope.type));
 
