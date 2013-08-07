@@ -42,11 +42,11 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
         died: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by <span class="name {{ data.killer.rank }}">{{ data.killer.name }}.</span>',
         diedspecial: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by {{ data.cause }}.',
         leave: '<div><span class="name {{ data.user.rank }}">{{ data.user.name }}</span> has left the game.</div>',
-        say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message"></span></div>',
-        "announce": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text"></div>',
-        "announce:personal": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text"></div>',
-        "announce:mods": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text"></div>',
-        "default": '<div class="message">{{ data.message }}</div>'
+        say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
+        "announce": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
+        "announce:personal": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
+        "announce:mods": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.tex | mouthwasht"></div>',
+        "default": '<div class="message">{{ data.message | mouthwash }}</div>'
     };
 
     function getTemplate(type) {
@@ -87,6 +87,33 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
 
             $compile(el.contents())(scope);
         }
+    };
+}])
+.filter('mouthwash', [function() {
+    var badWords = [
+        'shit',
+        'asshole',
+        'dick',
+        'cunt',
+        'faggot',
+        'fag',
+        'anus',
+        'pussy',
+        'tits'
+    ];
+
+    return function(input) {
+        if(!input) {
+            return;
+        }
+
+        var clean = input;
+
+        angular.forEach(badWords, function(word) {
+            clean = clean.replace(word, '****');
+        });
+
+        return clean;
     };
 }])
 .constant('DEATH_MESSAGES', "slaughtered butchered crushed defeated destroyed exterminated finished massacred mutilated slayed vanquished killed".split(" "));
