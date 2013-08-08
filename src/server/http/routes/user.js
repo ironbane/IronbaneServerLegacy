@@ -12,8 +12,9 @@ module.exports = function(app, db) {
             }
             if (!user) {
                 req.session.messages = [info.message];
-                return res.send(404, info);
+                return res.send(404, "Please fill in both username and password");
             }
+
             req.login(user, function(err) {
                 if (err) {
                     log('error logging in user', err);
