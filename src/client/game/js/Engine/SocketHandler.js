@@ -445,6 +445,7 @@ var SocketHandler = Class.extend({
 
 
                         socketHandler.readyToReceiveUnits = false;
+                        ironbane.player.UpdateWeapon(0);
 
                         terrainHandler.ChangeZone(data.z);
 
