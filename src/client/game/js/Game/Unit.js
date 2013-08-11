@@ -410,7 +410,7 @@ var Unit = PhysicsObject.extend({
       if ( this instanceof Player ) {
         this.unitStandingOn = null;
       }
-      else {
+      else if ( !(this instanceof Projectile) ) {
         if ( !this.InRangeOfUnit(ironbane.player, 15) ) {
           this.allowCheckGround = false;
           this.enableGravity = false;
