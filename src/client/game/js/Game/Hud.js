@@ -1361,17 +1361,21 @@ var HUDHandler = Class.extend({
                     url: url
                 })
                 .done(function(response) {
-                    hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!');
+                    hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function () {
+                        location.reload();
+                    });
 
-                    startdata.loggedIn = true;
-                    startdata.name = response.name;
-                    startdata.user = response.id;
-                    startdata.characterUsed = 0; // we just registered, so we have no characters
-                    window.chars = [];
-                    window.charCount = 0;
-                    window.isEditor = response.editor === 1;
+                    // startdata.loggedIn = true;
+                    // startdata.name = response.name;
+                    // startdata.user = response.id;
+                    // startdata.characterUsed = 0; // we just registered, so we have no characters
+                    // window.chars = [];
+                    // window.charCount = 0;
+                    // window.isEditor = response.editor === 1;
 
-                    hudHandler.MakeCharSelectionScreen();
+                    // hudHandler.MakeCharSelectionScreen();
+
+
                 })
                 .fail(function(err) {
                     hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
