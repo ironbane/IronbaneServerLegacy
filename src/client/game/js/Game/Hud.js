@@ -1341,10 +1341,12 @@ var HUDHandler = Class.extend({
                     // get characters for user
                     $.get('/api/user/' + user.id + '/characters')
                         .done(function(data) {
-                            window.chars = data;
-                            window.charCount = window.chars.length;
 
-                            hudHandler.MakeCharSelectionScreen();
+                            location.reload();
+
+                            // window.chars = data;
+                            // window.charCount = window.chars.length;
+                            // hudHandler.MakeCharSelectionScreen();
                         })
                         .fail(function(err) {
                             console.error('error getting chars...', err);
