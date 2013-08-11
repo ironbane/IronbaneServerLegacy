@@ -480,30 +480,9 @@ var Player = Fighter.extend({
     }
 
 
-    // Rotate input velocity with our current terrain angle
-    //        var rotationMatrix = new THREE.Matrix4();
-    //        rotationMatrix.setRotationFromQuaternion((new THREE.Quaternion).setFromAxisAngle(this.side, (this.terrainAngle).ToRadians()));
-    //        inputVelocity = rotationMatrix.multiplyVector3(inputVelocity);
-    //
-
-
-
-    //        debug.DrawVector(this.side.clone(), this.position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
-    //        debug.DrawVector(this.heading.clone(), this.position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
-    //        debug.DrawVector(inputVelocity, this.position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
-    //
     this.velocity.addSelf(inputVelocity);
 
 
-
-    //        debug.SetWatch('Math.sin(radians)', Math.sin(radians));
-    //        debug.SetWatch('Math.cos(radians)', Math.cos(radians));
-    //
-    //        debug.SetWatch('velocity', this.velocity.ToString());
-
-
-    //}
-    //&& this.slopeAngle <= 60
     if ( this.canMove ) {
       if(keyTracker[32]){
 
@@ -543,7 +522,13 @@ var Player = Fighter.extend({
     this.velocity.y = 0;
     var vlength =  this.velocity.length();
 
-    var frictionLength = 6.5 * dTime;
+    var frictionLength = 16.5;
+
+    if ( inputVelocity.lengthSq() > 0.1 ) {
+      frictionLength = 2.5;
+    }
+
+    frictionLength *= dTime;
 
     var rotTest = this.heading.dot(this.velocity.clone().normalize());
     //debug.SetWatch("rotTest", rotTest);
