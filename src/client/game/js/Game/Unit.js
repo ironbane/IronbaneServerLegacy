@@ -90,6 +90,7 @@ var Unit = PhysicsObject.extend({
     this.visible = true;
 
     this.waterSplashTimeout = 0.0;
+    this.waterSplashSoundTimeout = 0.0;
 
     this.allowCheckGround = true;
 
@@ -451,9 +452,11 @@ var Unit = PhysicsObject.extend({
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.addSelf(new THREE.Vector3(0, dTime*15, 0));
-
+          if ( this.waterSplashSoundTimeout >= 0 ) this.waterSplashSoundTimeout -= dTime;
+          else {
+            this.waterSplashSoundTimeout = 0.5;
             soundHandler.Play("splash", this.position);
-
+          }
           }
 
 

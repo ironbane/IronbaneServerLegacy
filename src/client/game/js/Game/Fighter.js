@@ -847,7 +847,7 @@ this.walkSoundTimer = 0.0;
       this.velocity.y = 2;
     }
 
-    this.lastJumpTimer = 1.0;
+    this.lastJumpTimer += 1.0;
 
     this.allowCheckGround = false;
 

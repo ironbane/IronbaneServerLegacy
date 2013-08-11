@@ -28,7 +28,7 @@ var Player = Fighter.extend({
             socketHandler.playerData.healthMax, socketHandler.playerData.armorMax);
         this.template = {};
         this.template.type = UnitTypeEnum.PLAYER;
-        
+
         this.drawNameMesh = false;
         this.originalThirdPersonReference = new THREE.Vector3(0, 2.5, -4);
         ironbane.camera.position.copy(position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
@@ -510,15 +510,23 @@ var Player = Fighter.extend({
         if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
           this.localPosition.y += dTime * 5;
         }
-        else if ( this.lastJumpTimer <= 0 && this.isTouchingGround ) {
+        else if ( this.lastJumpTimer <= 0 &&
+          (this.isTouchingGround ||
+            (this.position.y < GetZoneConfig('fluidLevel')
+              && this.position.y > GetZoneConfig('fluidLevel') - 0.5 ) ) ) {
+
+          if ( this.position.y < GetZoneConfig('fluidLevel') ) {
+            this.position.y = GetZoneConfig('fluidLevel');
+
+            this.lastJumpTimer = 2.0;
+          }
+
           this.Jump();
           socketHandler.socket.emit('doJump', {});
+
+
         }
-        else if(this.position.y < GetZoneConfig('fluidLevel')) {
-          this.Jump();
-          //not sure how I should send the vertical velocity?
-          socketHandler.socket.emit('doJump', {});
-        }
+
       }
       if(keyTracker[16]){
 
