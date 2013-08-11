@@ -76,6 +76,8 @@ var Player = Fighter.extend({
         this.isLookingAround = false;
 
         this.onChangeZone(terrainHandler.zone);
+
+        this.lastFoundLootBag = null;
     },
     getTotalCoins: function() {
         //console.log('getTotalCoins', socketHandler.playerData.items);
@@ -201,12 +203,22 @@ var Player = Fighter.extend({
           hudHandler.ReloadInventory();
           hudHandler.HideAlert();
         }
+
+        if ( this.lastFoundLootBag && this.lastFoundLootBag.id === -267 ) {
+          this.HideTutorial(1);
+        }
       }
     }
     else {
       if ( found ) {
         // Show the loot bag
         $('#lootBag').show();
+
+        // Check for tutorial #1
+        if ( found.id === -267 ) {
+          this.ShowTutorial(1);
+        }
+
 
         // Make a request for the items and update the UI when we receive them
         socketHandler.socket.emit('loot', found.id, function (reply) {
@@ -240,7 +252,7 @@ var Player = Fighter.extend({
 
 
 
-
+    this.lastFoundLootBag = found;
 
 
 
@@ -1175,5 +1187,11 @@ var Player = Fighter.extend({
       levelEditor.BuildPreviewBuildMesh();
     }
 
+  },
+  ShowTutorial:function(id) {
+    $(".ib-tutorial").addClass("tut"+id);
+  },
+  HideTutorial:function(id) {
+    $(".ib-tutorial").removeClass("tut"+id);
   }
 });
