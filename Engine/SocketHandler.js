@@ -618,7 +618,9 @@ var SocketHandler = Class.extend({
                 // Add the item to the lootbag
                 bag.loot.push(item);
 
-                reply("OK");
+                reply({
+                    items: player.items
+                });
             });
 
             socket.on("lootItem", function (data, reply) {
@@ -783,14 +785,12 @@ var SocketHandler = Class.extend({
 
                     // It's now our property, so remove the price tag
                     delete item.price;
-
-                    // send back full items as money bags may have changed
-                    reply({
-                        items: player.items
-                    });
-                } else {
-                    reply("OK");
                 }
+
+                reply({
+                    items: player.items,
+                    loot: bag.loot
+                });
             });
 
             socket.on("putItem", function (data, reply) {
@@ -917,14 +917,12 @@ var SocketHandler = Class.extend({
 
                 player.EmitNearby("lootFromBag", {bag: data.npcID, loot: bag.loot}, 20, true);
 
-                if (data.acceptOffer) {
-                    reply({
-                        // we may have received a new money bag
-                        items: player.items
-                    });
-                } else {
-                    reply("OK");
-                }
+
+                reply({
+                    // we may have received a new money bag
+                    items: player.items,
+                    loot: bag.loot
+                });
             });
 
             // swapping items, which also will handle combining/stacking
@@ -970,7 +968,15 @@ var SocketHandler = Class.extend({
                         return i.slot === data.slotNumber;
                     });
 
+
                     if (!_.isUndefined(switchItem)) {
+
+                        // Do nothing if the target is the same as the start item
+                        if ( item.slot === switchItem.slot ) {
+                            reply({});
+                            return;
+                        }
+
                         // stackables
                         if(switchItem.getType() === 'cash' && item.getType() === 'cash') {
                             item.value += switchItem.value;
@@ -981,6 +987,10 @@ var SocketHandler = Class.extend({
                         }
                     }
                     item.slot = data.slotNumber;
+
+                    reply({
+                        items: player.items
+                    });
 
                 } else {
 
@@ -1040,12 +1050,14 @@ var SocketHandler = Class.extend({
                     item.slot = data.slotNumber;
 
                     socket.unit.EmitNearby("lootFromBag", {bag: data.npcID, loot: bag.loot}, 20, true);
+
+                    reply({
+                        items: player.items,
+                        loot: bag.loot
+                    });
                 }
 
-                // because we might have stacked something, let's sync up with the client now
-                reply({
-                    items: player.items
-                });
+
             });
 
             socket.on("loot", function(npcID, reply) {

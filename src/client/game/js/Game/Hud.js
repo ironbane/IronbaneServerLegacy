@@ -416,18 +416,8 @@ var HUDHandler = Class.extend({
                 return;
             }
 
-            // Remove the DOM, remove from item array and send a request to the server to drop the item on the ground
-            //alert('remove');
-            $('#' + itemID).remove();
-
             // Hide the tooltip
             $('#tooltip').hide();
-
-            for (var i = 0; i < socketHandler.playerData.items.length; ++i) {
-                if (socketHandler.playerData.items[i].id === itemNumber) {
-                    socketHandler.playerData.items.splice(i--, 1);
-                }
-            }
 
             // If it was armor, update our appearance
             if (startItem.equipped) {
@@ -438,14 +428,20 @@ var HUDHandler = Class.extend({
                     items[startItem.template].type === 'tool') {
                     ironbane.player.UpdateWeapon(0);
                 }
+            }
+            else {
                 if(items[startItem.template].type === 'cash') {
                     hudHandler.MakeCoinBar(true);
                 }
             }
 
-            startItem.equipped = 0;
+            if ( reply.items ) {
+                socketHandler.playerData.items = reply.items;
+            }
+
+            hudHandler.ReloadInventory();
             hudHandler.UpdateEquippedItems();
-            soundHandler.Play(ChooseRandom(["bag1"]));
+
         });
     },
     SwitchItem: function(slotNumber, startItem, itemID, slotID, inLoot) {
@@ -473,35 +469,18 @@ var HUDHandler = Class.extend({
                 return;
             }
 
-            // a "good" response should include the server's items
-            if(reply.items) {
+            if ( reply.items ) {
                 socketHandler.playerData.items = reply.items;
-                hudHandler.ReloadInventory();
-                hudHandler.UpdateEquippedItems();
-
-                soundHandler.Play(ChooseRandom(["bag1"]));
             }
 
-            var switchItem = hudHandler.FindItemBySlot(slotNumber, inLoot);
-            if (switchItem) {
-                switchItem.slot = startItem.slot;
-
-                if (inLoot) {
-                    TeleportElement('li' + switchItem.id, 'ls' + startItem.slot);
-                } else {
-                    TeleportElement('ii' + switchItem.id, 'is' + startItem.slot);
-                }
+            if ( reply.loot ) {
+                ironbane.player.lootItems = reply.loot;
             }
 
-            // To an inventory slot
-            startItem.slot = slotNumber;
-
-            // Perform the UI
-            TeleportElement(itemID, slotID);
-
+            hudHandler.ReloadInventory();
+            hudHandler.MakeCoinBar(true);
             hudHandler.UpdateEquippedItems();
 
-            soundHandler.Play(ChooseRandom(["bag1"]));
         });
     },
     LootItem: function(switchItem, startItem, slotNumber, slotID) {
@@ -521,27 +500,19 @@ var HUDHandler = Class.extend({
                 return;
             }
 
-            // because money bags may have been adjusted, entire inventory is sync'd up
-            if (_.isArray(reply.items)) {
+            if ( reply.items ) {
                 socketHandler.playerData.items = reply.items;
-                hudHandler.ReloadInventory();
-                hudHandler.MakeCoinBar(true);
             }
 
+            if ( reply.loot ) {
+                ironbane.player.lootItems = reply.loot;
+            }
+
+            hudHandler.ReloadInventory();
+            hudHandler.MakeCoinBar(true);
+            hudHandler.UpdateEquippedItems();
+
             if (switchItem) {
-                switchItem.slot = startItem.slot;
-
-                TeleportElement('ii' + switchItem.id, 'ls' + startItem.slot);
-
-                // Change the name to something temporarily
-                $('#ii' + switchItem.id).attr('id', 'temp' + switchItem.id);
-
-                // Unequip it first
-                socketHandler.playerData.items = _.without(socketHandler.playerData.items, switchItem);
-
-                // Add to lootitems
-                ironbane.player.lootItems.push(switchItem);
-
                 // If it was armor, update our appearance
                 if (switchItem.equipped) {
                     if (items[switchItem.template].type === 'armor') {
@@ -551,36 +522,9 @@ var HUDHandler = Class.extend({
                         ironbane.player.UpdateWeapon(0);
                     }
                 }
-
-                switchItem.equipped = 0;
             }
 
-            // Delete from lootitems
-            ironbane.player.lootItems = _.without(ironbane.player.lootItems, startItem);
 
-            // Remove the pricetag if present
-            if (!_.isUndefined(startItem.price)) {
-                delete startItem.price;
-
-                hudHandler.MakeItemHover('li' + startItem.id, startItem);
-            }
-
-            socketHandler.playerData.items.push(startItem);
-
-            startItem.slot = slotNumber;
-
-            // Adjust the DOM element's name from li to ii
-            $('#li' + startItem.id).attr('id', 'ii' + startItem.id);
-
-            if (switchItem) {
-                // Change the name to the loot slot
-                $('#temp' + switchItem.id).attr('id', 'li' + switchItem.id);
-            }
-
-            // Do the UI actions
-            TeleportElement('ii' + startItem.id, slotID);
-
-            hudHandler.UpdateEquippedItems();
 
             soundHandler.Play(ChooseRandom(["bag1"]));
 
