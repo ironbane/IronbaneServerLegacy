@@ -1,19 +1,22 @@
 module.exports = function(grunt) {
 
-    var webScriptPath = 'src/client/web/js';
     var conf = require('./nconf');
 
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         cfg: require('./nconf'),
+
+        // these are the paths in the source, not the deployment, so they are OK to hard code
+        webScriptPath: 'src/client/web/js',
         gameScriptPath: 'src/client/game/js',
+
         clean: {
-            web: ['deploy/web'],
+            web: ['<%= cfg.get("webclientDir") %>'],
             game: ['<%= cfg.get("clientDir") %>']
         },
         jshint: {
-            files: ['src/client/web/js/**/*.js', 'Game/**/*.js']
+            files: ['src/client/web/js/**/*.js', 'src/client/game/js/**/*.js']
         },
         jasmine: {
             pivotal: {
@@ -26,8 +29,11 @@ module.exports = function(grunt) {
         },
         concat: {
             web: {
-                src: [webScriptPath + '/app.js', webScriptPath + '/**/*.js'],
-                dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js'
+                src: [
+                    '<%= webScriptPath %>/app.js',
+                    '<%= webScriptPath %>/**/*.js'
+                ],
+                dest: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js'
             },
             game: {
                 src: [ // order matters!
@@ -94,8 +100,8 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             web: {
-                src: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.js',
-                dest: 'deploy/web/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+                src: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             },
             game: {
                 src: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js',
@@ -108,7 +114,7 @@ module.exports = function(grunt) {
                     yuicompress: true
                 },
                 files: {
-                    'deploy/web/css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
+                    '<%= cfg.get("webclientDir") %>css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
                 }
             },
             game: {
@@ -124,11 +130,14 @@ module.exports = function(grunt) {
             web: {
                 options: {
                     variables: {
-                        root: '<%= cfg.get("root") %>'
+                        root: '<%= cfg.get("root") %>',
+                        appName: '<%= pkg.name %>',
+                        appVersion: '<%= pkg.version %>',
+                        gameVersion: 'v<%= pkg.version %> Alpha' //todo: have alpha/beta stored in config?
                     }
                 },
                 files: [
-                    {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: 'deploy/web/'}
+                    {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: '<%= cfg.get("webclientDir") %>'}
                 ]
             },
             game: {
@@ -154,27 +163,27 @@ module.exports = function(grunt) {
             web: {
                 files: [{
                     src: 'src/client/web/views/*',
-                    dest: 'deploy/web/views/',
+                    dest: '<%= cfg.get("webclientDir") %>views/',
                     expand: true,
                     flatten: true
                 }, {
                     src: 'src/client/web/partials/*',
-                    dest: 'deploy/web/partials/',
+                    dest: '<%= cfg.get("webclientDir") %>partials/',
                     expand: true,
                     flatten: true
                 }, {
                     src: 'images/**/*',
-                    dest: 'deploy/web/',
+                    dest: '<%= cfg.get("webclientDir") %>',
                     cwd: 'src/client/web',
                     expand: true
                 }, {
                     src: 'font/**/*',
-                    dest: 'deploy/web/',
+                    dest: '<%= cfg.get("webclientDir") %>',
                     cwd: 'src/client/web',
                     expand: true
                 }, { // TODO: setup lib to copy only certain files?
                     src: 'lib/**/*',
-                    dest: 'deploy/web/',
+                    dest: '<%= cfg.get("webclientDir") %>',
                     expand: true,
                     cwd: 'src/client/web'
                 }]
@@ -209,6 +218,7 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        // TODO: make less agressive?
         watch: {
             css: {
                 files: 'src/client/**/*.less',
@@ -227,6 +237,7 @@ module.exports = function(grunt) {
                 tasks: ['default', 'beep']
             }
         },
+        // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
             options: {
                 /** @optional  - if true the files are converted to binary JSON */
@@ -255,6 +266,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-three-obj');
 
     // Default task(s).
-    grunt.registerTask('default', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
+    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
+    grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
+    // when ready do both
+    grunt.registerTask('default', ['game']);
 };

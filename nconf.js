@@ -20,6 +20,7 @@ nconf.defaults({
     mysql_password: '',
     mysql_database: 'ironbane',
     clientDir: 'deploy/game/',
+    webclientDir: 'deploy/web/',
     assetDir: 'media',
     cryptSalt: '',
     isProduction: false,
