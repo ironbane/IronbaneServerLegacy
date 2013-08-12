@@ -80,7 +80,7 @@ var ChaseEnemy = State.extend({
 
       npc.stateMachine.ChangeState(new ExploreAndLookForEnemies());
     }
-    else if ( distance < Math.pow(WeaponRanges[npc.weapon.subtype], 2)+1 ) {
+    else if ( distance < Math.pow(WeaponRanges[npc.weapon.subtype], 2) ) {
     // else if ( distance < 9 ) {
 
       this.chaseTimeBeforeGivingUp = 8;
