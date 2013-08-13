@@ -137,9 +137,28 @@ module.exports = function(app, db) {
         res.render('game/index');
     });
 
+    app.get('/', function(req, res){
+
+        res.render('web/index');
+    })
+
+   
+
+    app.get('/views/home', function(req, res){
+        res.render('web/views/home');
+    });
+
+    app.get('/views/forum', function(req, res){
+        res.render('web/views/forum');
+    });
+
+    app.get('/views/login', function(req, res){
+        res.render('web/views/login');
+    });
+
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
         // todo: use config for subfolder
-        res.render('web/index');
+        log('missing: ' +req.path );
     });
 };
