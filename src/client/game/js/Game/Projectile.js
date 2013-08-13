@@ -87,7 +87,7 @@ var ProjectileTypeEnum = {
         lifeTime: 8,
         parabolic: true,
         meshType: ProjectileMeshTypeEnum.ARROW,
-        impactSound: function(){ return ChooseRandom(["arrowHit1","arrowHit2","arrowHit3"]); }
+        impactSound: "arrowhit"
     },
     MELEE: {
         speed: 6,

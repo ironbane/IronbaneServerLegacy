@@ -18,7 +18,7 @@
 var SoundHandler = Class.extend({
     DEFAULT_VOLUME: 0.3,
     soundList: [{
-            file: "music/ib_theme.mp3",
+            file: "music/maintheme.mp3",
             volume: 0.5,
             loops: 999,
             preload: true
@@ -30,16 +30,16 @@ var SoundHandler = Class.extend({
             volume: 0.5
         }, {
             file: "music/ironbane2.mp3",
-            preload: true,
+            //preload: true,
             volume: 0.5
         }, {
             file: "music/ironbane4.mp3",
-            volume: 0.5,
-            preload: true
+            volume: 0.5
+            //preload: true
         }, {
             file: "music/ironbane5.mp3",
             volume: 0.5,
-            preload: true,
+            //preload: true,
             loops: 1
         }, {
             file: "music/ironbane6.mp3",
@@ -62,108 +62,158 @@ var SoundHandler = Class.extend({
             volume: 0.5,
             loops: 1
         },
+
         "ui/click.mp3",
         "ui/blip.mp3",
         "ui sound/uisound1.mp3",
 
-        "misc/switch.wav",
-        "misc/switch2.wav",
-        "misc/bag1.wav",
-        "misc/bag2.wav",
-        "misc/drop.wav",
-        "misc/enterGame.wav",
+        {
+            file: "misc/switch.wav",
+            preload: true
+        },
 
+        {
+            file: "misc/bag1.wav",
+            preload: true
+        },
+        {
+            file: "misc/bag2.wav",
+            preload: true
+        },
+        {
+            file: "misc/drop.ogg",
+            preload: true
+        },
 
-        "equip/equipSword1.wav",
-        "equip/equipSword2.wav",
-        "equip/equipSword3.wav",
-        "equip/equip1.wav",
-        "equip/equip2.wav",
+        {
+            file: "equip/equipsword1.wav",
+            preload: true
+        },
+        {
+            file: "equip/equipsword2.wav",
+            preload: true
+        },
+        {
+            file: "equip/equipsword3.wav",
+            preload: true
+        },
+        {
+            file: "equip/equip1.wav",
+            preload: true
+        },
+        {
+            file: "equip/equip2.wav",
+            preload: true
+        },
 
         "environment/splash1.wav",
         "environment/splash2.wav",
 
-        "battle/arrowHit1.wav",
-        "battle/arrowHit2.wav",
-        "battle/arrowHit3.wav",
+        {
+            file: "battle/arrowhit1.wav",
+            preload: true
+        },
+        {
+            file: "battle/arrowhit2.wav",
+            preload: true
+        },
+        {
+            file: "battle/arrowhit3.wav",
+            preload: true
+        },
 
-        "battle/swing1.wav",
-        "battle/swing2.wav",
-        "battle/swing3.wav",
+        {
+            file: "battle/swing1.wav",
+            preload: true
+        },
+        {
+            file: "battle/swing2.wav",
+            preload: true
+        },
+        {
+            file: "battle/swing3.wav",
+            preload: true
+        },
 
-        "battle/hit1.wav",
-        "battle/hit2.wav",
-        "battle/hit3.wav",
+        {
+            file: "battle/hit1.wav",
+            preload: true
+        },
+        {
+            file: "battle/hit2.wav",
+            preload: true
+        },
+        {
+            file: "battle/hit3.wav",
+            preload: true
+        },
 
-        "battle/die1.wav",
-        "battle/die2.wav",
-        "battle/die3.wav",
+        {
+            file: "battle/die1.wav",
+            preload: true
+        },
+        {
+            file: "battle/die2.wav",
+            preload: true
+        },
+        {
+            file: "battle/die3.wav",
+            preload: true
+        },
 
-        //"mutant" : "die/mutant.wav",
+        {
+            file: "battle/firestaff.wav",
+            preload: true
+        },
+        {
+            file: "battle/firearrow.wav",
+            preload: true
+        },
+        {
+            file: "battle/firearrow2.wav",
+            preload: true
+        },
 
-        "battle/fireStaff.wav",
-        "battle/fireArrow.wav",
-        "battle/fireArrow2.wav",
+        "player/getcoin1.wav",
+        "player/getcoin2.wav",
+        "player/getitem1.wav",
+        "player/getitem2.wav",
+        "player/regenhealth.wav",
 
-        // "jump1": "player/jump/Player_Jump_01.wav",
-        // "jump2": "player/jump/Player_Jump_02.wav",
-        // "jump3": "player/jump/Player_Jump_03.wav",
-        // "jump4": "player/jump/Player_Jump_04.wav",
-        // "jump5": "player/jump/Player_Jump_05.wav",
+        // "weapons/weapon_long_bow_01.wav",
+        // "weapons/weapon_acid_staff_02.wav",
 
-        "player/GetItem/PLAYER_GET_ITEM_01.wav",
-        "player/RegenHealth/PLAYER_REGEN_HEALTH_03.wav",
-        "player/GetCoins/PLAYER_GET_COINS_01.wav",
-        "player/GetCoins/PLAYER_GET_COINS_01.wav",
-        "player/GetCoins/PLAYER_GET_COINS_01.wav",
-        "player/TakeDamage/PLAYER_TAKE_DAMAGE_03.wav",
+        // "atmos/atmos_world_day.wav",
+        // "atmos/atmos_world_night.wav",
 
-        "NPCs/GreenSlime/01.wav",
-        "NPCs/GreenSlime/02.wav",
-        "NPCs/GreenSlime/03.wav",
-
-        "Weapons/WEAPON_LONG_BOW_01.wav",
-        "Weapons/WEAPON_ACID_STAFF_02.wav",
-
-        "Atmos/ATMOS_WORLD_DAY.wav",
-        "Atmos/ATMOS_WORLD_NIGHT.wav",
-
-        "footsteps/Dirt1.wav",
-        "footsteps/Dirt2.wav",
-        "footsteps/Dirt3.wav",
-        "footsteps/Dirt4.wav",
-        "footsteps/Dirt5.wav",
-        "footsteps/Dirt6.wav",
-        "footsteps/Grass1.wav",
-        "footsteps/Grass2.wav",
-        "footsteps/Grass3.wav",
-        "footsteps/Grass4.wav",
-        "footsteps/Grass5.wav",
-        "footsteps/Grass6.wav",
-        "footsteps/Wood1.wav",
-        "footsteps/Wood2.wav",
-        "footsteps/Wood3.wav",
-        "footsteps/Wood4.wav",
-        "footsteps/Wood5.wav",
-        "footsteps/Wood6.wav",
-        "footsteps/Stone1.wav",
-        "footsteps/Stone2.wav",
-        "footsteps/Stone3.wav",
-        "footsteps/Stone4.wav",
-        "footsteps/Stone5.wav",
-        "footsteps/Stone6.wav",
+        "footsteps/dirt1.wav",
+        "footsteps/dirt2.wav",
+        "footsteps/dirt3.wav",
+        "footsteps/dirt4.wav",
+        "footsteps/dirt5.wav",
+        "footsteps/dirt6.wav",
+        "footsteps/grass1.wav",
+        "footsteps/grass2.wav",
+        "footsteps/grass3.wav",
+        "footsteps/grass4.wav",
+        "footsteps/grass5.wav",
+        "footsteps/grass6.wav",
+        "footsteps/wood1.wav",
+        "footsteps/wood2.wav",
+        "footsteps/wood3.wav",
+        "footsteps/wood4.wav",
+        "footsteps/wood5.wav",
+        "footsteps/wood6.wav",
+        "footsteps/stone1.wav",
+        "footsteps/stone2.wav",
+        "footsteps/stone3.wav",
+        "footsteps/stone4.wav",
+        "footsteps/stone5.wav",
+        "footsteps/stone6.wav",
         "inventory/bubble1.wav",
         "inventory/bubble2.wav",
         "inventory/bubble3.wav",
 
-        "NPCs/ironbane/Fireattack.wav",
-        "NPCs/ironbane/breath1.wav",
-        "NPCs/ironbane/breath2.wav",
-        "NPCs/ironbane/growl3.wav",
-        "NPCs/ironbane/attack2.wav",
-
-        // "step1": "step/grass1.wav",
-        // "step2": "step/grass2.wav",
         "step/water1.wav",
         "step/water2.wav",
 
@@ -171,30 +221,6 @@ var SoundHandler = Class.extend({
             file: "fighter/jump.wav",
             preload:true
         },
-
-
-        "npcs/rat/die",
-
-        "monster/deathb.wav",
-        "monster/deathd.wav",
-        "monster/deathe.wav",
-        "monster/deathr.wav",
-        "monster/deaths.wav",
-        "monster/grunt1.wav",
-        "monster/grunt2.wav",
-
-        "monster/painb.wav",
-        "monster/paind.wav",
-        "monster/paine.wav",
-        "monster/painp.wav",
-        "monster/painr.wav",
-        "monster/pains.wav",
-
-        "monster/piggrunt1",
-        "monster/piggrunt2",
-
-        //      "race": "battle/02_-_rage_racer.mp3",
-        //      "splash": "battle/splash.ogg",
 
         "placeholder"
     ],
@@ -216,6 +242,11 @@ var SoundHandler = Class.extend({
         });
     },
     Preload: function() {
+
+        // TODO: Add a list of all NPC sounds using unitTemplates
+        // Check if the sounds exist and load em
+
+
         var self = this;
         _.each(self.soundList, function(sound) {
             if (!_.isObject(sound)) {
