@@ -45,7 +45,7 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
         say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
         "announce": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
         "announce:personal": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
-        "announce:mods": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.tex | mouthwash"></div>',
+        "announce:mods": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
         "default": '<div class="message">{{ data.message | mouthwash }}</div>'
     };
 
