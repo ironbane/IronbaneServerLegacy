@@ -18,9 +18,9 @@ var setupWizard = function() {
                 type: 'string',
                 "default": config.get('assetDir')
             },
-            clientDir: {
+            buildTarget: {
                 type: 'string',
-                "default": config.get('clientDir')
+                "default": config.get('buildTarget')
             },
             server_port: {
                 type: 'number',

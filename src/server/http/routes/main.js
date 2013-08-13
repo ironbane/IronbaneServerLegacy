@@ -7,10 +7,32 @@ var express = require('express'),
     Q = require('q');
 
 module.exports = function(app, db) {
+    var gamePath = config.get('buildTarget') + 'game/',
+        webPath = config.get('buildTarget') + 'web/';
+
+    // legacy media
+    app.use('/game/plugins', express.static(gamePath + 'plugins'));
+
+    app.use('/game/css', express.static(gamePath + 'css'));
+    app.use('/game/flash', express.static(gamePath + 'flash'));
+    app.use('/game/media', express.static(gamePath + 'media'));
+    app.use('/game/js', express.static(gamePath + 'js'));
+    app.use('/game/lib', express.static(gamePath + 'lib'));
+
+    app.use('/css', express.static(webPath + 'css'));
+    app.use('/font', express.static(webPath + 'font'));
+    app.use('/images', express.static(webPath + 'images'));
+    app.use('/js', express.static(webPath + 'js'));
+    app.use('/lib', express.static(webPath + 'lib'));
+    app.use('/partials', express.static(webPath + 'partials'));
+    app.use('/views', express.static(webPath + 'views'));
+
+    app.use(app.router);
+
     // define special routes prior to statics
-    app.get('/plugins/game/images/items/big.php', function(req, res) {
+    app.get('/game/plugins/game/images/items/big.php', function(req, res) {
         var imageId = req.query.i,
-            path = config.get('clientDir') + 'plugins/game/images/items/' + imageId;
+            path = gamePath + 'plugins/game/images/items/' + imageId;
 
         if(!imageId) {
             res.send(500, 'missing required param i');
@@ -35,9 +57,9 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/plugins/game/images/items/medium.php', function(req, res) {
+    app.get('/game/plugins/game/images/items/medium.php', function(req, res) {
         var imageId = req.query.i,
-            path = config.get('clientDir') + 'plugins/game/images/items/' + imageId;
+            path = gamePath + 'plugins/game/images/items/' + imageId;
 
         if(!imageId) {
             res.send(500, 'missing required param i');
@@ -63,10 +85,10 @@ module.exports = function(app, db) {
     });
 
     // armors grab the front and center and blow it up
-    app.get('/plugins/game/images/characters/base/:subtype/big.php', function(req, res) {
+    app.get('/game/plugins/game/images/characters/base/:subtype/big.php', function(req, res) {
         var imageId = req.query.i,
             subtype = req.params.subtype,
-            path = config.get('clientDir') + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
+            path = gamePath + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
             cutpoint = [16, 76]; // for body
 
         if(subtype === 'head') {
@@ -101,10 +123,10 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/plugins/game/images/characters/base/:subtype/medium.php', function(req, res) {
+    app.get('/game/plugins/game/images/characters/base/:subtype/medium.php', function(req, res) {
         var imageId = req.query.i,
             subtype = req.params.subtype,
-            path = config.get('clientDir') + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
+            path = gamePath + 'plugins/game/images/characters/base/' + subtype + '/' + imageId,
             cutpoint = [16, 76]; // for body
 
         if(subtype === 'head') {
@@ -143,8 +165,8 @@ module.exports = function(app, db) {
     // character cache
     function createCharacterHeadImage(id, isHead) {
         var deferred = Q.defer(),
-            basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
-            cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
+            basePath = gamePath + 'plugins/game/images/characters/base/',
+            cachePath = gamePath + 'plugins/game/images/characters/cache/',
             headType = isHead ? 'head' : 'hair';
 
         // easier to just pass in 0 than have even more conditional logic below
@@ -185,8 +207,8 @@ module.exports = function(app, db) {
     // $character, $skin, $hair, $head, $body, $feet, $big=false
     function createFullCharacterImage($skin, $eyes, $hair, $feet, $body, $head, $big) {
         var deferred = Q.defer(),
-            basePath = config.get('clientDir') + 'plugins/game/images/characters/base/',
-            cachePath = config.get('clientDir') + 'plugins/game/images/characters/cache/',
+            basePath = gamePath + 'plugins/game/images/characters/base/',
+            cachePath = gamePath + 'plugins/game/images/characters/cache/',
             outSmall = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 0].join('_') + '.png',
             outBig = cachePath + [$skin, $eyes, $hair, $feet, $body, $head, 1].join('_') + '.png';
 
@@ -251,7 +273,7 @@ module.exports = function(app, db) {
         return deferred.promise;
     }
 
-    app.get('/plugins/game/images/characters/cache/*', function(req, res) {
+    app.get('/game/plugins/game/images/characters/cache/*', function(req, res) {
         var path = require('path'),
             filename = path.basename(req.url, '.png');
 
@@ -267,15 +289,4 @@ module.exports = function(app, db) {
                 res.send(500, err);
             });
     });
-
-    // legacy media
-    app.use('/plugins', express.static(config.get('clientDir') + 'plugins'));
-
-    app.use('/css', express.static(config.get('clientDir') + 'css'));
-    app.use('/flash', express.static(config.get('clientDir') + 'flash'));
-    app.use('/media', express.static(config.get('clientDir') + 'media'));
-    app.use('/js', express.static(config.get('clientDir') + 'js'));
-    app.use('/lib', express.static(config.get('clientDir') + 'lib'));
-
-    app.use(app.router);
 };

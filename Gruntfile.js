@@ -12,8 +12,9 @@ module.exports = function(grunt) {
         gameScriptPath: 'src/client/game/js',
 
         clean: {
-            web: ['<%= cfg.get("webclientDir") %>'],
-            game: ['<%= cfg.get("clientDir") %>']
+            common: ['<%= cfg.get("buildTarget") %>'],
+            web: ['<%= cfg.get("buildTarget") %>web/'],
+            game: ['<%= cfg.get("buildTarget") %>game/']
         },
         jshint: {
             files: ['src/client/web/js/**/*.js', 'src/client/game/js/**/*.js']
@@ -33,7 +34,7 @@ module.exports = function(grunt) {
                     '<%= webScriptPath %>/app.js',
                     '<%= webScriptPath %>/**/*.js'
                 ],
-                dest: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js'
+                dest: '<%= cfg.get("buildTarget") %>web/js/<%= pkg.name %>-<%= pkg.version %>.js'
             },
             game: {
                 src: [ // order matters!
@@ -92,7 +93,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Game/TerrainHandler.js",
                     "<%= gameScriptPath %>/Game/LevelEditor.js"
                 ],
-                dest: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js'
+                dest: '<%= cfg.get("buildTarget") %>game/js/<%= pkg.name %>-<%= pkg.version %>.js'
             }
         },
         uglify: {
@@ -100,12 +101,12 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             web: {
-                src: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js',
-                dest: '<%= cfg.get("webclientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+                src: '<%= cfg.get("buildTarget") %>web/js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: '<%= cfg.get("buildTarget") %>web/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             },
             game: {
-                src: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.js',
-                dest: '<%= cfg.get("clientDir") %>js/<%= pkg.name %>-<%= pkg.version %>.min.js'
+                src: '<%= cfg.get("buildTarget") %>game/js/<%= pkg.name %>-<%= pkg.version %>.js',
+                dest: '<%= cfg.get("buildTarget") %>game/js/<%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
         less: {
@@ -114,7 +115,7 @@ module.exports = function(grunt) {
                     yuicompress: true
                 },
                 files: {
-                    '<%= cfg.get("webclientDir") %>css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
+                    '<%= cfg.get("buildTarget") %>web/css/<%= pkg.name %>.css': 'src/client/web/css/ironbane.less'
                 }
             },
             game: {
@@ -122,10 +123,11 @@ module.exports = function(grunt) {
                     yuicompress: true
                 },
                 files: {
-                    '<%= cfg.get("clientDir") %>css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
+                    '<%= cfg.get("buildTarget") %>game/css/<%= pkg.name %>.css': 'src/client/game/css/ironbane.less'
                 }
             }
         },
+        // we must move the index files into common area for server rendering
         replace: {
             web: {
                 options: {
@@ -137,13 +139,13 @@ module.exports = function(grunt) {
                     }
                 },
                 files: [
-                    {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: '<%= cfg.get("webclientDir") %>'}
+                    {expand: true, flatten: true, src: ['src/client/web/index.html'], dest: '<%= cfg.get("buildTarget") %>web/'}
                 ]
             },
             game: {
                 options: {
                     variables: {
-                        root: '<%= cfg.get("root") %>',
+                        root: '<%= cfg.get("game_root") %>',
                         host: '<%= cfg.get("game_host") %>',
                         port: '<%= cfg.get("server_port") %>',
                         appName: '<%= pkg.name %>',
@@ -152,7 +154,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: [
-                    {expand: true, flatten: true, src: ['src/client/game/index.html'], dest: '<%= cfg.get("clientDir") %>'}
+                    {expand: true, flatten: true, src: ['src/client/game/index.html'], dest: '<%= cfg.get("buildTarget") %>game/'}
                 ]
             }
         },
@@ -160,30 +162,33 @@ module.exports = function(grunt) {
             options: {
                 processContentExclude: ['**/*.{png,gif,jpg,ico,psd}']
             },
+            common: {
+                // todo: move lib files into common
+            },
             web: {
                 files: [{
                     src: 'src/client/web/views/*',
-                    dest: '<%= cfg.get("webclientDir") %>views/',
+                    dest: '<%= cfg.get("buildTarget") %>web/views/',
                     expand: true,
                     flatten: true
                 }, {
                     src: 'src/client/web/partials/*',
-                    dest: '<%= cfg.get("webclientDir") %>partials/',
+                    dest: '<%= cfg.get("buildTarget") %>web/partials/',
                     expand: true,
                     flatten: true
                 }, {
                     src: 'images/**/*',
-                    dest: '<%= cfg.get("webclientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>web/',
                     cwd: 'src/client/web',
                     expand: true
                 }, {
                     src: 'font/**/*',
-                    dest: '<%= cfg.get("webclientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>web/',
                     cwd: 'src/client/web',
                     expand: true
                 }, { // TODO: setup lib to copy only certain files?
                     src: 'lib/**/*',
-                    dest: '<%= cfg.get("webclientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>web/',
                     expand: true,
                     cwd: 'src/client/web'
                 }]
@@ -192,27 +197,27 @@ module.exports = function(grunt) {
                 files: [{
                     // this is the folder structure only? get actual game data elsewhere?
                     src: 'media/**/*',
-                    dest: '<%= cfg.get("clientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
                     cwd: 'src/client/game',
                     expand: true
                 }, {
                     src: 'lib/**/*',
-                    dest: '<%= cfg.get("clientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: 'src/client/game'
                 }, {
                     src: 'flash/**/*',
-                    dest: '<%= cfg.get("clientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: 'src/client/game'
                 }, {
                     src: ['**/*'],
-                    dest: '<%= cfg.get("clientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: '<%= cfg.get("assetDir") %>'
                 }, {
                     src: 'favicon.ico',
-                    dest: '<%= cfg.get("clientDir") %>',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: 'src/client/game'
                 }]
@@ -245,7 +250,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 /** @required  - string (or array of) including grunt glob variables */
-                src: ['<%= cfg.get("clientDir") %>**/*.obj']
+                src: ['<%= cfg.get("buildTarget") %>game/**/*.obj']
                 /** @optional  - if provided the converted files will be saved in this folder instead */
                 //dest: './assets/'
             }
@@ -270,5 +275,5 @@ module.exports = function(grunt) {
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
     // when ready do both
-    grunt.registerTask('default', ['game']);
+    grunt.registerTask('default', ['website', 'game']);
 };

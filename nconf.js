@@ -13,14 +13,15 @@ nconf.argv()
 // if not provided use these values
 nconf.defaults({
     root: '',
-    game_root: '/game',
+    game_root: 'game',
     game_host: 'localhost',
     mysql_host: 'localhost',
     mysql_user: 'root',
     mysql_password: '',
     mysql_database: 'ironbane',
-    clientDir: 'deploy/game/',
-    webclientDir: 'deploy/web/',
+
+    buildTarget: 'deploy/', // replaces old clientDir
+
     assetDir: 'media',
     cryptSalt: '',
     isProduction: false,

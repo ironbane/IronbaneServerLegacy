@@ -115,8 +115,7 @@ module.exports = function(app, db) {
         shaderFile = contents;
     });
 
-    // catchall - no 404 as angular will handle
-    app.use(function(req, res) {
+    app.get(['/game', '/game/*'], function(req, res) {
         // add in all of the stuff that was from game.php
         res.locals = {
             zones: JSON.stringify(zones),
@@ -134,6 +133,13 @@ module.exports = function(app, db) {
             characterUsed: req.user ? req.user.characterused : 0
         };
 
-        res.render('index');
+        // todo: use config for subfolder
+        res.render('game/index');
+    });
+
+    // catchall - no 404 as angular will handle
+    app.use(function(req, res) {
+        // todo: use config for subfolder
+        res.render('web/index');
     });
 };

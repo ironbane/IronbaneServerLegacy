@@ -83,7 +83,7 @@ var Server = Class.extend({
         app.configure(function() {
             var sessionStore = new MySQLStore({client: db});
 
-            app.use(express.favicon(config.get('clientDir') + "favicon.ico"));
+            app.use(express.favicon(config.get('buildTarget') + "game/favicon.ico")); // todo: move to common
             app.use(express.cookieParser());
             app.use(express.bodyParser());
             app.use(express.methodOverride());
@@ -93,7 +93,7 @@ var Server = Class.extend({
                 store: sessionStore // store sessions in db for "remember me"
             }));
             app.set('view engine', 'html');
-            app.set('views', config.get('clientDir'));
+            app.set('views', config.get('buildTarget'));
             app.engine('html', require('hogan-express'));
             // Initialize Passport!  Also use passport.session() middleware, to support
             // persistent login sessions (recommended).

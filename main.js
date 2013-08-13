@@ -29,7 +29,7 @@ module.exports = function() {
     var pkg = require('./package.json'),
         log = require('util').log; // built in timestampped logger
 
-    var clientDir = config.get('clientDir');
+    var clientDir = config.get('buildTarget') + 'game/';
 
     if (!cryptSalt) {
         throw "No password hash set!";

@@ -6,31 +6,31 @@
 
     <base href="@@root/" />
 
-    <link rel="stylesheet" type="text/css" href="@@root/css/@@appName.css">
-    <link rel="stylesheet" type="text/css" href="@@root/lib/jquery/plugins/jquery.jscrollpane.css">
+    <link rel="stylesheet" type="text/css" href="css/@@appName.css">
+    <link rel="stylesheet" type="text/css" href="lib/jquery/plugins/jquery.jscrollpane.css">
 
     <!-- todo: automate libs? -->
-    <script src="@@root/lib/game_shim/game-shim.js"></script>
-    <script src="@@root/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
-    <script src="@@root/lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
-    <script src="@@root/lib/jquery/plugins/jquery.mousewheel.js"></script>
-    <script src="@@root/lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
-    <script src="@@root/lib/angular/1.1.5/angular.min.js"></script>
-    <script src="@@root/lib/angular/1.1.5/angular-sanitize.min.js"></script>
-    <script src="@@root/lib/three/Three_r52.js"></script>
-    <script src="@@root/lib/three/ThreeOctree.js"></script>
-    <script src="@@root/lib/sound_manager_2/soundmanager2-nodebug-jsmin.js"></script>
-    <script src="@@root/lib/dat_gui/dat.gui.js"></script>
-    <script src="@@root/lib/three/Detector.js"></script>
-    <script src="@@root/lib/underscore/underscore-min.js"></script>
-    <script src="@@root/lib/tween/tween.min.js"></script>
+    <script src="lib/game_shim/game-shim.js"></script>
+    <script src="lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
+    <script src="lib/jquery/plugins/jquery.mousewheel.js"></script>
+    <script src="lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
+    <script src="lib/angular/1.1.5/angular.min.js"></script>
+    <script src="lib/angular/1.1.5/angular-sanitize.min.js"></script>
+    <script src="lib/three/Three_r52.js"></script>
+    <script src="lib/three/ThreeOctree.js"></script>
+    <script src="lib/sound_manager_2/soundmanager2-nodebug-jsmin.js"></script>
+    <script src="lib/dat_gui/dat.gui.js"></script>
+    <script src="lib/three/Detector.js"></script>
+    <script src="lib/underscore/underscore-min.js"></script>
+    <script src="lib/tween/tween.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body ng-app="Ironbane">
     <!-- contents of frame.html from old client -->
     <div id="loadingBar" style="display:none">
-        <img src="@@root/media/images/misc/loading.gif"><div class="spacersmall"></div>Loading...
+        <img src="media/images/misc/loading.gif"><div class="spacersmall"></div>Loading...
     </div>
     <div id="gameFrame" style="opacity:0">
         <div id="dropItemsBox"></div>
@@ -121,7 +121,7 @@
 
         var ironbane_hostname = "@@host";
         var ironbane_port = "@@port";
-        var ironbane_root_directory = "@@root";
+        var ironbane_root_directory = "";
 
         var hquote = "Sweet llamas of the Bahamas!";
 
@@ -142,6 +142,6 @@
         var chars = [];
     </script>
     {{{shaders}}}
-    <script src="@@root/js/@@appName-@@appVersion.js"></script>
+    <script src="js/@@appName-@@appVersion.js"></script>
 </body>
 </html>
