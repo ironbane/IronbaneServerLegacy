@@ -31,23 +31,41 @@ module.exports = function(app, db) {
         });
     });
 
-
-
-
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
-        db.query('select * from forum_boards where id = ?', [req.params.boardId], function(err, results) {
-            if(err) {
-                res.end('error', err);
-                return;
-            }
+        if(req.params.boardId === 'news') {
+            db.query('SELECT a.* from (SELECT * FROM forum_posts ORDER BY time ASC) as a, (SELECT * FROM forum_topics where board_id = 7) as b WHERE a.topic_id = b.id GROUP BY topic_id ORDER BY time DESC LIMIT 10', function(err, results) {
+                if(err) {
+                    log('SQL error getting news: ' + err);
+                    res.send(500, 'Error getting news posts!');
+                    return;
+                }
 
-            if(results.length > 0) {
-                res.send(results[0]);
-            } else {
-                res.send("no board found with id" + req.params.boardId, 404);
-            }
-        });
+                var posts = [];
+                results.forEach(function(p) {
+                    bbcode.parse(p.content, function(html) {
+                        p.content = html;
+                    });
+                    posts.push(p);
+                });
+
+                res.send(posts);
+            });
+        } else {
+            db.query('select * from forum_boards where id = ?', [req.params.boardId], function(err, results) {
+                if(err) {
+                    res.send(500, 'DB Error getting posts!');
+                    console.log('DB error getting posts: ', err);
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.send(results[0]);
+                } else {
+                    res.send(404, "no board found with id " + req.params.boardId);
+                }
+            });
+        }
     });
 
     // get all topics for a board
@@ -216,28 +234,6 @@ module.exports = function(app, db) {
                 return;
             }
             res.send(result);
-        });
-    });
-
-
-    // get news (for login page...)
-    app.get('/api/forum/news', function(req, res) {
-        db.query('SELECT a.* from (SELECT * FROM forum_posts ORDER BY time ASC) as a, (SELECT * FROM forum_topics where board_id = 7) as b WHERE a.topic_id = b.id GROUP BY topic_id ORDER BY time DESC LIMIT 10', function(err, results) {
-            if(err) {
-                log('SQL error getting news: ' + err);
-                res.send(500, 'Error getting news posts!');
-                return;
-            }
-
-            var posts = [];
-            results.forEach(function(p) {
-                bbcode.parse(p.content, function(html) {
-                    p.content = html;
-                });
-                posts.push(p);
-            });
-
-            res.send(posts);
         });
     });
 };

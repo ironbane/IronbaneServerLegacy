@@ -29,7 +29,7 @@ module.exports = function(app, db) {
         modelEnum = {};
 
     db.query('select * from ib_item_templates', [], function(err, results) {
-        if(err) {
+        if (err) {
             log('error loading item template data' + err);
             return;
         }
@@ -50,7 +50,7 @@ module.exports = function(app, db) {
     });
 
     db.query('SELECT * FROM ib_zones', [], function(err, results) {
-        if(err) {
+        if (err) {
             log('error loading zone data' + err);
             return;
         }
@@ -66,7 +66,7 @@ module.exports = function(app, db) {
     });
 
     db.query('SELECT id, name, type, health, armor, param, size, special, weaponoffsetmultiplier, friendly FROM ib_unit_templates', [], function(err, results) {
-        if(err) {
+        if (err) {
             log('error loading unit template data' + err);
             return;
         }
@@ -78,7 +78,7 @@ module.exports = function(app, db) {
     });
 
     db.query('SELECT * FROM ib_meshes ORDER BY category, name', [], function(err, results) {
-        if(err) {
+        if (err) {
             log('error loading mesh data' + err);
             return;
         }
@@ -90,7 +90,7 @@ module.exports = function(app, db) {
     });
 
     db.query('select * from ib_editor_cats', [], function(err, results) {
-        if(err) {
+        if (err) {
             log('error loading the cats, meow ' + err);
             return;
         }
@@ -107,7 +107,7 @@ module.exports = function(app, db) {
     // load shader file
     var shaderFile = "";
     fs.readFile('src/client/game/shaders.html', function(err, contents) {
-        if(err) {
+        if (err) {
             log('error loading shaders ' + err);
             return;
         }
@@ -137,22 +137,18 @@ module.exports = function(app, db) {
         res.render('game/index');
     });
 
-    app.get('/', function(req, res){
-
+    app.get('/', function(req, res) {
         res.render('web/index');
-    })
-
-   
-
-    app.get('/views/*', function(req, res){
-        log(req.path);
-        res.render('web'+req.path);
     });
 
+    app.get('/views/*', function(req, res) {
+        log('views: ' + req.path);
+        res.render('web' + req.path);
+    });
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
         // todo: use config for subfolder
-        log('missing: ' +req.path );
+        log('missing: ' + req.path);
     });
 };

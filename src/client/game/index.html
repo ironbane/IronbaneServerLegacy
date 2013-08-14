@@ -6,24 +6,24 @@
 
     <base href="@@root/" />
 
-    <link rel="stylesheet" type="text/css" href="css/@@appName.css">
-    <link rel="stylesheet" type="text/css" href="lib/jquery/plugins/jquery.jscrollpane.css">
+    <link rel="stylesheet" type="text/css" href="/game/css/@@appName.css">
+    <link rel="stylesheet" type="text/css" href="/game/lib/jquery/plugins/jquery.jscrollpane.css">
 
     <!-- todo: automate libs? -->
-    <script src="lib/game_shim/game-shim.js"></script>
-    <script src="lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
-    <script src="lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
-    <script src="lib/jquery/plugins/jquery.mousewheel.js"></script>
-    <script src="lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
-    <script src="lib/angular/1.1.5/angular.min.js"></script>
-    <script src="lib/angular/1.1.5/angular-sanitize.min.js"></script>
-    <script src="lib/three/Three_r52.js"></script>
-    <script src="lib/three/ThreeOctree.js"></script>
-    <script src="lib/sound_manager_2/soundmanager2-nodebug-jsmin.js"></script>
-    <script src="lib/dat_gui/dat.gui.js"></script>
-    <script src="lib/three/Detector.js"></script>
-    <script src="lib/underscore/underscore-min.js"></script>
-    <script src="lib/tween/tween.min.js"></script>
+    <script src="/game/lib/game_shim/game-shim.js"></script>
+    <script src="/game/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+    <script src="/game/lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
+    <script src="/game/lib/jquery/plugins/jquery.mousewheel.js"></script>
+    <script src="/game/lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
+    <script src="/game/lib/angular/1.1.5/angular.min.js"></script>
+    <script src="/game/lib/angular/1.1.5/angular-sanitize.min.js"></script>
+    <script src="/game/lib/three/Three_r52.js"></script>
+    <script src="/game/lib/three/ThreeOctree.js"></script>
+    <script src="/game/lib/sound_manager_2/soundmanager2-nodebug-jsmin.js"></script>
+    <script src="/game/lib/dat_gui/dat.gui.js"></script>
+    <script src="/game/lib/three/Detector.js"></script>
+    <script src="/game/lib/underscore/underscore-min.js"></script>
+    <script src="/game/lib/tween/tween.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -111,10 +111,10 @@
 
     <script>
         var startdata = {
-            user: {{userId}},
-            name: "{{username}}",
-            loggedIn: {{loggedIn}},
-            characterUsed: {{characterUsed}},
+            user: <% userId %>,
+            name: "<% username %>",
+            loggedIn: <% loggedIn %>,
+            characterUsed: <% characterUsed %>,
             using_ie: false,
             using_safari: false
         };
@@ -128,20 +128,20 @@
         var isEditor = false;
         var debugging = true;
 
-        var preCatsTiles = {{{preCatsTiles}}};
-        var items = {{{items}}};
-        var units = {{{units}}};
-        var unitTemplates = {{{unitTemplates}}};
-        var ModelEnum = {{{modelEnum}}};
-        var preMeshes = {{{preMeshes}}};
-        var zones = {{{zones}}};
-        var zoneSelection = {{{zoneSelection}}};
+        var preCatsTiles = <%& preCatsTiles %>;
+        var items = <%& items %>;
+        var units = <%& units %>;
+        var unitTemplates = <%& unitTemplates %>;
+        var ModelEnum = <%& modelEnum %>;
+        var preMeshes = <%& preMeshes %>;
+        var zones = <%& zones %>;
+        var zoneSelection = <%& zoneSelection %>;
 
         var newsPosts = '';
         var charCount = 0;
         var chars = [];
     </script>
-    {{{shaders}}}
-    <script src="js/@@appName-@@appVersion.js"></script>
+    <%& shaders %>
+    <script src="/game/js/@@appName-@@appVersion.js"></script>
 </body>
 </html>
