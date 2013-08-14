@@ -211,7 +211,7 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'src/client/game'
                 }, {
-                    src: ['**/*'],
+                    src: ['**/*', '!**/*.php'],
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: '<%= cfg.get("assetDir") %>'
