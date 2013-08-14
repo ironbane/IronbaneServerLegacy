@@ -126,8 +126,9 @@
 
         var hquote = "Sweet llamas of the Bahamas!";
 
-        var isEditor = false;
-        var debugging = true;
+        var isProduction = <%& isProduction %>;
+        var isEditor =  !isProduction;
+        var debugging = !isProduction;
 
         var preCatsTiles = <%& preCatsTiles %>;
         var items = <%& items %>;
