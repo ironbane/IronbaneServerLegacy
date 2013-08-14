@@ -38,7 +38,7 @@ angular.module('IronbaneApp')
                 });
                 // push the last cat, meow!
                 cats.push(cat);
-
+                console.log(cats);
                 return cats;
             });
     };
@@ -89,6 +89,7 @@ angular.module('IronbaneApp')
 
             boards.forEach(function(board, i) {
                 boards[i] = new Board(board);
+                console.log(boards[i]);
             });
 
             return boards;
