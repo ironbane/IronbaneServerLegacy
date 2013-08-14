@@ -9,6 +9,7 @@ module.exports = function(app, db) {
     require('./characters')(app, db);
     require('./books')(app, db);
     require('./forum')(app, db);
+    require('./articles')(app, db);
 
     // temp stuff for index until a better spot is thought
     var zones = {},
@@ -137,18 +138,16 @@ module.exports = function(app, db) {
         res.render('game/index');
     });
 
-    app.get('/', function(req, res) {
-        res.render('web/index');
-    });
-
-    app.get('/views/*', function(req, res) {
-        log('views: ' + req.path);
+    // templates for website
+    app.get(['/views/*', '/partials/*'], function(req, res) {
+        log('requesting web template: ' + req.path);
         res.render('web' + req.path);
     });
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
         // todo: use config for subfolder
-        log('missing: ' + req.path);
+        log('no server route (web index redirect): ' + req.path);
+        res.render('web/index');
     });
 };

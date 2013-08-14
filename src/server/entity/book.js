@@ -40,7 +40,7 @@ module.exports = function(db) {
                 return;
             }
 
-            deferred.resolve(results[0]);
+            deferred.resolve(new Book(results[0]));
         });
 
         return deferred.promise;

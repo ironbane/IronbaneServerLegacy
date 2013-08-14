@@ -1,69 +1,38 @@
 // article.js - dynamic web pages, stored in markdown
-var util = require('util'),
-    marked = require('marked');
+var util = require('util');
 
 module.exports = function(app, db) {
+    var Article = require('../../entity/article')(db);
+
     // get a list of articles, minus content
     app.get('/api/article', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
-        db.query('select articleId, title, author, created, views from bcs_articles', function(err, results) {
-            if(err) {
-                res.send(err, 500);
-                return;
-            }
-
-            res.send(results);
+        Article.get({$fields: ['articleId', 'title', 'author', 'created', 'views']}).then(function(articles) {
+            res.send(articles);
+        }, function(err) {
+            res.send(500, err);
         });
     });
 
     // create article
     app.post('/api/article', app.ensureAuthenticated, app.authorizeAny(['ADMIN', 'EDITOR']), function(req, res) {
-        db.query('insert into bcs_articles set ?', req.body, function(err, result) {
-            if(err) {
-                res.send(err, 500);
-                return;
-            }
-
-            res.send(result);
+        Article.create(req.body).then(function(article) {
+            // send back the completed details
+            res.send(article);
+        }, function(err) {
+            res.send(500, err);
         });
     });
 
     // get specific article (public view)
     app.get('/api/article/:articleId', function(req, res) {
-        db.query('select * from bcs_articles where articleId = ?', [req.params.articleId], function(err, result) {
-            if(err) {
-                res.send(err, 500);
-                return;
-            }
-
-            if(result.length === 0) {
-                res.send('no article found with id ' + req.params.articleId, 404);
-                return;
-            }
-
-            // found it, return the json
-            var article = result[0];
-            // convert body into html
-            article.body = marked(article.body);
-            // convert dates to JS
-            article.created *= 1000;
-
-            if(article.author === 0) {
-                // system author
-                article.authorName = 'Ironbane';
-                res.send(article);
+        Article.get(req.params.articleId).then(function(article) {
+            res.send(article);
+        }, function(err) {
+            if(err.code === 404) {
+                res.send(err.code, err.msg);
             } else {
-                // grab author name from db
-                db.query("select username from bcs_users where id = ?", [article.author], function(err, result) {
-                    if(err || result.length === 0) {
-                        util.log('article - error getting user data!');
-                        article.authorName = 'Unknown';
-                    } else {
-                        article.authorName = result;
-                    }
-
-                    // now send the article to client
-                    res.send(article);
-                });
+                // unknown server error
+                res.send(500, err);
             }
         });
     });

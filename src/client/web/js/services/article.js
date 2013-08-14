@@ -1,6 +1,6 @@
 // article.js
 angular.module('IronbaneApp')
-.factory('Article', ['$http', '$log', '$templateCache', function($http, $log, $templateCache) {
+.factory('Article', ['$http', '$log', '$templateCache', '$q', function($http, $log, $templateCache, $q) {
     var Article = function(json) {
         angular.copy(json || {}, this);
     };
@@ -17,6 +17,8 @@ angular.module('IronbaneApp')
                 return article;
             }, function(err) {
                 $log.error('error retreiving article', err);
+
+                return $q.reject('error retreiving article', err);
             });
     };
 
