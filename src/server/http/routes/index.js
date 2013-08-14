@@ -144,17 +144,11 @@ module.exports = function(app, db) {
 
    
 
-    app.get('/views/home', function(req, res){
-        res.render('web/views/home');
+    app.get('/views/*', function(req, res){
+        log(req.path);
+        res.render('web'+req.path);
     });
 
-    app.get('/views/forum', function(req, res){
-        res.render('web/views/forum');
-    });
-
-    app.get('/views/login', function(req, res){
-        res.render('web/views/login');
-    });
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
