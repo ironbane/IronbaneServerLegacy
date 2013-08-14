@@ -771,9 +771,6 @@ var HUDHandler = Class.extend({
         $('#map').css('left', (halfWidth - 250) + 'px');
         $('#map').css('top', (halfHeight - 250) + 'px');
 
-        $('#loadingBar').css('left', (halfWidth - 100) + 'px');
-        $('#loadingBar').css('top', (halfHeight - 50) + 'px');
-
         $('#alertBox').css('left', (halfWidth - 250) + 'px');
         $('#alertBox').css('top', (halfHeight - 75) + 'px');
         $('#alertBox').hide();

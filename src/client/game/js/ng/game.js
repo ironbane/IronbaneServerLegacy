@@ -37,6 +37,40 @@ IronbaneApp
             this.unitList = [];
             this.showingGame = false;
 
+            this.loadingMessages = _.shuffle([
+                "Spawning random annoying monsters",
+                "Setting a higher gravity just for you",
+                "Testing your patience",
+                "Insert funny message here",
+                "Is this even helping?",
+                "We lost Ironbane",
+                "Making cool swords and daggers",
+                "I hate this job",
+                "Laying bridges",
+                "Painting signs",
+                "Brewing potions",
+                "Making cheese",
+                "Unleashing rats",
+                "Plucking apples",
+                "Mowing grass",
+                "Making spooky dungeons",
+                "Recording scary sounds",
+                "Pixelating the sun",
+                "Annoying developers",
+                "Are your shoelaces tied?",
+                "Telling Ironbane where to hide",
+                "Spawning overpowered equipment",
+                "Painting castle walls",
+                "Feeding the staff",
+                "Teleporting you above lava",
+                "Chasing Ironbane",
+                "Showing a random guy walking on the screen"
+            ]);
+
+            this.currentLoadingMessage = "Initializing";
+            this.currentLoadingTickTimer = 0.0;
+            this.currentLoadingStepCount = 0;
+
             // Used for dynamically added objects
             this.waypointOffset = -1000000;
         };
@@ -174,10 +208,27 @@ IronbaneApp
             $window.sw("THREE.MaterialLibrary.length", $window.THREE.MaterialLibrary.length);
             $window.sw("THREE.TextureLibrary.length", $window.THREE.TextureLibrary.length);
 
-            if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
-                !$window.terrainHandler.IsLoadingCells() && $window.soundHandler.loadedMainMenuMusic &&
-                !game.showingGame) {
 
+
+            // Keep track of what's going with the loading of the game
+            var doneLoading = true;
+
+            if ( !$window.isProduction ) game.currentLoadingMessage = "All set";
+
+            if ( $window.terrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
+                doneLoading = false;
+                if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Terrain";
+            }
+            else if ( $window.terrainHandler.IsLoadingCells() ) {
+                doneLoading = false;
+                if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Cells";
+            }
+            else if ( !$window.soundHandler.loadedMainMenuMusic ) {
+                doneLoading = false;
+                if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Music";
+            }
+
+            if ( !game.showingGame && doneLoading ) {
                 if (!$window.socketHandler.inGame) {
                     $window.hudHandler.MakeSoundButton();
                 }
@@ -192,6 +243,32 @@ IronbaneApp
                         $("#loadingBar").hide();
                     });
                 }, 500);
+            }
+
+            if ( !doneLoading ) {
+                game.currentLoadingTickTimer -= dTime;
+
+                if ( game.currentLoadingTickTimer <= 0.0 ) {
+
+
+
+                        // Change the message on production
+                        if ( $window.isProduction ) {
+                            game.currentLoadingTickTimer = getRandomFloat(0.5, 3.0);
+                            game.currentLoadingMessage = ChooseSequenced(game.loadingMessages);
+                        }
+                        else {
+                            game.currentLoadingTickTimer = 0.5;
+                        }
+
+
+
+                    //for (var i = 0; i < game.currentLoadingStepCount; i++) {
+                        //game.currentLoadingMessage += ".";
+                    //}
+
+                    $("#loadingBarMessage").text(game.currentLoadingMessage);
+                }
             }
 
             $window.relativeMouse = $window.mouse.clone().subSelf($window.lastMouse);
