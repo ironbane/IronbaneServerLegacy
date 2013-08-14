@@ -73,7 +73,7 @@ IronbaneApp
             });
             this.renderer.shadowMapEnabled = true;
             this.renderer.shadowMapAutoUpdate = true;
-            this.renderer.shadowMapSoft = false;            
+            this.renderer.shadowMapSoft = false;
             // this.renderer.sortObjects = false;
             this.renderer.setSize($window.innerWidth, $window.innerHeight);
 
@@ -189,7 +189,7 @@ IronbaneApp
                         opacity: 1.00
                     }, 1000, function() {
                         $("#gameFrame").css('opacity', '');
-                        // $("#loadingBar").hide();
+                        $("#loadingBar").hide();
                     });
                 }, 500);
             }

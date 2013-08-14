@@ -608,7 +608,7 @@ var HUDHandler = Class.extend({
         if(template.type === 'cash') {
             var valueHTML = [
                     '<span class="amount" style="color:gold;padding-left: 16px;',
-                    'background-image:url(/plugins/game/images/misc/coin_full.png);',
+                    'background-image:url(plugins/game/images/misc/coin_full.png);',
                     'background-repeat:no-repeat;">',
                     'x ', item.value,
                     '</span>'

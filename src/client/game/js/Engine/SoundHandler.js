@@ -314,7 +314,7 @@ var SoundHandler = Class.extend({
         }).start();
     },
     OnLoad: function(sound) {
-        if (sound === "music/ib_theme") {
+        if (sound === "music/maintheme") {
             this.loadedMainMenuMusic = true;
         }
     },
