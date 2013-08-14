@@ -163,7 +163,7 @@ var HUDHandler = Class.extend({
                 $("#btnToggleSound").html("&#9834;");
                 $("#btnToggleSound").css("color", "");
 
-                soundHandler.Play("music/ib_theme");
+                soundHandler.Play("music/maintheme");
             } else {
                 $("#btnToggleSound").html("<del>&#9834;</del>");
                 $("#btnToggleSound").css("color", "red");
@@ -962,12 +962,12 @@ var HUDHandler = Class.extend({
     HideMenuScreen: function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
         $('#chatBox, #itemBar, #coinBar, #statBar').show();
-        soundHandler.FadeOut("music/ib_theme", 5000);
+        soundHandler.FadeOut("music/maintheme", 5000);
     },
     ShowMenuScreen: function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('#chatBox, #itemBar, #lootBag, #coinBar, #statBar').hide();
-        soundHandler.FadeIn("music/ib_theme", 5000);
+        soundHandler.FadeIn("music/maintheme", 5000);
     },
     MakeCharSelectionScreen: function() {
         var slotsLeft = slotsAvailable - charCount;
