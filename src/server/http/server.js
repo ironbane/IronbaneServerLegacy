@@ -95,6 +95,7 @@ var Server = Class.extend({
             app.set('view engine', 'html');
             app.set('views', config.get('buildTarget'));
             app.engine('html', require('hogan-express'));
+            app.locals.delimiters = '[[ ]]';
             // Initialize Passport!  Also use passport.session() middleware, to support
             // persistent login sessions (recommended).
             app.use(passport.initialize());
