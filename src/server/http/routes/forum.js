@@ -1,22 +1,18 @@
 // forum.js
 module.exports = function(app, db) {
-    var bbcode = require('bbcode'),
-        log = require('util').log;
+    var log = require('util').log,
+        Forum = require('../../entity/forum')(db),
+        Board = require('../../entity/board')(db);
 
 
         app.get('/api/forum', function(req, res) {
-        var topicQ = ' (select count(*) from forum_topics where board_id = fb.id) as topicCount, ',
-            postsQ = ' (select count(*) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ';
+            Forum.get().then(function(forum) {
 
-        db.query('SELECT ' + topicQ + postsQ + 'fb.*, fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
-            function(err, results) {
-            if (err) {
-                res.end('error', err);
-                return;
-            }
-            res.send(results);
+                res.send(forum);
+            }, function(error){
+                res.send(error, 500);
+            });
         });
-    });
 
     // create a new board
     app.post('/api/forum', function(req, res) {
@@ -70,75 +66,13 @@ module.exports = function(app, db) {
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
-        var posts = [];
+         Board.getTopics(req.params.boardId).then(function(topics) {
 
-        db.query('select * from forum_topics where board_id = ?', [req.params.boardId], function(err, results) {
-            if (err) {
-                res.end('error', err);
-                return;
-            }
-
-            if(results.length === 0) {
-                res.send(posts);
-                return;
-            }
-
-            // loop through topics and grab the titles of the first posts
-            var topicIds = [];
-            for(var i=0;i<results.length;i++) {
-                topicIds.push(results[i].id);
-            }
-
-            // better with a join?
-            db.query('select * from forum_posts where topic_id in (?) group by topic_id order by time', [topicIds], function(err, pResults) {
-                if(err) {
-                    res.end('error', err);
-                    return;
-                }
-
-                // skip authors phase if there aren't any results
-                if(pResults.length === 0) {
-                    res.send([]);
-                    return;
-                }
-
-                var authors = [];
-
-                posts = pResults;
-
-                posts.forEach(function(post) {
-                    authors.push(post.user);
-                    post.bbcontent = post.content;
-                    bbcode.parse(post.content, function(html) {
-                        post.content = html;
-                    });
-                });
-
-                // grab author details to populate
-                db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
-                    if(err) {
-                        res.send('error loading users: ' + err, 500);
-                        return;
-                    }
-
-                    // loop through posts and nest author
-                    posts.forEach(function(post) {
-                        for(var i=0;i<users.length;i++) {
-                            if(post.user === users[i].id) {
-                                post.author = users[i];
-                                // don't send password or activationkey
-                                delete post.author.pass;
-                                delete post.author.activationkey;
-                                break;
-                            }
-                        }
-                    });
-
-                    res.send(posts);
-                });
+                res.send(topics);
+            }, function(error){
+                res.send(error, 500);
             });
         });
-    });
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
