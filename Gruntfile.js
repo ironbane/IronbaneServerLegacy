@@ -44,14 +44,17 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/game.js",
                     "<%= gameScriptPath %>/ng/news.js",
                     "<%= gameScriptPath %>/ng/socket.js",
-                    "<%= gameScriptPath %>/External/seedrandom.js",
-                    "<%= gameScriptPath %>/External/ImprovedNoise.js",
+
+                    // Shared between client and server
+                    "Shared/Util.js",
+                    "Shared/Shared.js",
+                    "Shared/NodeHandler.js",
+                    "Shared/seedrandom.js",
+
                     "<%= gameScriptPath %>/External/Init.js",
-                    "<%= gameScriptPath %>/External/Util.js",
-                    "<%= gameScriptPath %>/External/Shared.js",
                     "<%= gameScriptPath %>/External/Stats.js",
                     "<%= gameScriptPath %>/External/SteeringBehaviourLight.js",
-                    "<%= gameScriptPath %>/External/NodeHandler.js",
+
 
                     "<%= gameScriptPath %>/Engine/Debug.js",
                     "<%= gameScriptPath %>/Engine/Events.js",
