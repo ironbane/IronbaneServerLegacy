@@ -80,7 +80,7 @@ module.exports = function(app, db) {
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
         var func = arguments;
-         db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_posts.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [req.params.boardId], function(err, results){
+         db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [req.params.boardId], function(err, results){
                 log(func.callee.name);
                 res.send(results);
             }, function(error){

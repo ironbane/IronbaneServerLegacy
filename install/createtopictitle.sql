@@ -1,0 +1,1 @@
+UPDATE forum_topics t INNER JOIN forum_posts p ON p.topic_id = t.id SET t.title = p.title WHERE p.time = (SELECT MIN(TIME) FROM (SELECT * FROM forum_posts) AS temp WHERE temp.topic_id = t.id)

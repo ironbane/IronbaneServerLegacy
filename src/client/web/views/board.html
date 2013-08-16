@@ -6,14 +6,23 @@
         <a href = "/forum">back</a>
         <section class="forum-group">
             <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
-            <ul class="board-list">
-                <li class="board" ng-repeat="topic in topics">
-                    <a class="thread-post" href="/forum/{{board.id}}/topics/{{ topic.id }}">
-                        <time class="thread-time" datetime="{{ topic.firstposttime * 1000 | date }}">{{ topic.firstposttime * 1000 | date:'medium' }}</time>
-                    </a>
-                    <em class="thread-replies">{{topic.postcount}}</em>
-                    <strong class="thread-author">{{ topic.username }}</strong>
-                    <a class="thread-name" href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a>
+           
+               
+                <table>
+                <tr>
+                <th>replies</th><th>title</th><th>author</th><th>start</th></tr>
+                    <tr ng-repeat="topic in topics">
+                        
+                        <td>
+                        <em class="thread-replies">{{topic.postcount}}</em></td>
+                        <td><a class="thread-name" href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a></td>
+                        
+                        <td><strong class="thread-author">{{ topic.username }}</strong></td>
+                        <td><a class="thread-post" href="/forum/{{board.id}}/topics/{{ topic.id }}">
+                            <time class="thread-time" datetime="{{ topic.firstposttime * 1000 | date }}">{{ topic.firstposttime * 1000 | date:'medium' }}</time>
+                        </a>
+                        </td>
+                    </tr>
                 </li>
             </ul>
         </section>
