@@ -1,6 +1,6 @@
 // board.js
 angular.module('IronbaneApp')
-.factory('ForumCategory', ['$http', 'Board', '$log', function($http, Board, $log) {
+.factory('Category', ['$http', 'Board', '$log', function($http, Board, $log) {
     var Category = function(json) {
         angular.copy(json || {}, this);
     };
@@ -22,26 +22,7 @@ angular.module('IronbaneApp')
         return promise;
     };
 
-    // get an array of forum categories with the boards sorted
-    Category.getAllWithBoards = function() {
-        var cats = [];
-
-        return Board.getAll()
-            .then(function(boards) {
-                var cat = null;
-                boards.forEach(function(board) {
-                    if(cat === null || cat.name !== board.category) {
-                        if(cat) { cats.push(cat); }
-                        cat = new Category({name: board.category, id: board.forumcat, boards: []});
-                    }
-                    cat.boards.push(board);
-                });
-                // push the last cat, meow!
-                cats.push(cat);
-                console.log(cats);
-                return cats;
-            });
-    };
+    
 
     return Category;
 }]);

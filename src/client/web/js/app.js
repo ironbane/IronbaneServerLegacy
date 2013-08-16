@@ -58,7 +58,7 @@ angular.module('IronbaneApp', [])
 
                     $q.all([Board.get(boardId), Topic.getTopics(boardId)])
                         .then(function(results) {
-                            deferred.resolve({board: results[0], posts: results[1]});
+                            deferred.resolve({board: results[0], topics: results[1]});
                         }, function(err) {
                             deferred.reject(err);
                         });

@@ -27,6 +27,19 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get('/api/onlineusers', function(req, res) {
+        log('getting online users');
+        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
+             if(err) {
+                    log('SQL error getting onlineusers: ' + err);
+                    res.send(500, 'Error getting onlineusers!');
+                    return;
+                }
+                log("online users: "+ results);
+            res.send(results);
+        });
+    })
+
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
         if(req.params.boardId === 'news') {
@@ -66,9 +79,10 @@ module.exports = function(app, db) {
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
-         Board.getTopics(req.params.boardId).then(function(topics) {
-
-                res.send(topics);
+        var func = arguments;
+         db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_posts.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [req.params.boardId], function(err, results){
+                log(func.callee.name);
+                res.send(results);
             }, function(error){
                 res.send(error, 500);
             });

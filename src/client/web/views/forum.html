@@ -1,4 +1,5 @@
 <div class="content-body forum-listing">
+Also seen today: <span ng-repeat="user in users">{{user.name}} , </span>
     <section class="forum-category" ng-repeat="cat in cats">
         <h2>{{ cat.name }}</h2>
         <ul class="board-list">

@@ -1,12 +1,14 @@
 angular.module('IronbaneApp')
-.factory('Topic', ['$log','$http', 'Post', 'User',function($log, $http, Post, User) {
+.factory('Topic', ['$log','$http', 'Post', 'User', '$q', function($log, $http, Post, User, $q) {
     var Topic = function(json) {
         angular.copy(json || {}, this);
     };
 
     Topic.getTopics = function(boardId) {
-        var promise = $http.get('/api/forum/' + boardId + '/topics')
+        var deferred = $q.defer();
+        $http.get('/api/forum/' + boardId + '/topics')
             .then(function(response) {
+                $log.log(response);
                 var topics = response.data;
 
                 // upgrade objects
@@ -15,10 +17,10 @@ angular.module('IronbaneApp')
                     topics[i] = new Topic(topic);
                 });
 
-                return topics;
+                deferred.resolve(topics);
             });
 
-        return promise;
+        return deferred.promise;
     };
     return Topic;
 
