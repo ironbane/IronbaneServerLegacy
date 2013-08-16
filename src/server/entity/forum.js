@@ -27,6 +27,18 @@ module.exports = function(db) {
         }
     });
 
+    Forum.getOnlineUsersLastDay = function() {
+        var deferred = Q.defer();
+        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
+             if(err) {
+                    deferred.reject();
+                    return;
+                }
+                deferred.resolve(results);
+        });
+        return deferred.promise;
+    };
+
     Forum.get = function() {
         var deferred = Q.defer();
         var topicQ = ' (select count(id) from forum_topics where board_id = fb.id) as topicCount, ',

@@ -30,24 +30,27 @@ module.exports = function(db) {
     });
 
     Board.getTopics = function(boardId){
-        log('getting topics');
+        log('getting topics for ' +boardId);
         var deferred = Q.defer();
-        db.query('select * from forum_topics where board_id = ?', [boardId], function(err, results) {
+        db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [boardId], function(err, results) {
             if (err) {
+                log('error getting topics');
                 deferred.reject(err);
                 return;
             }
 
             if(results.length === 0) {
+                log('no topics found');
                 deferred.resolve([]);
             }
-           _.each(results, function(data, i) {
-                results[i] = new Topic(data);
+            var topics = []
+           _.each(results, function(data) {
+                topics.push(data);
             });
 
             // loop through topics and grab the titles of the first posts
             
-            deferred.resolve(results);
+            deferred.resolve(topics);
         });
         return deferred.promise;
     };

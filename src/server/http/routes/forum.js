@@ -2,7 +2,8 @@
 module.exports = function(app, db) {
     var log = require('util').log,
         Forum = require('../../entity/forum')(db),
-        Board = require('../../entity/board')(db);
+        Board = require('../../entity/board')(db),
+        winston = require('../../logging/winston');
 
 
         app.get('/api/forum', function(req, res) {
@@ -28,15 +29,11 @@ module.exports = function(app, db) {
     });
 
     app.get('/api/onlineusers', function(req, res) {
-        log('getting online users');
-        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
-             if(err) {
-                    log('SQL error getting onlineusers: ' + err);
-                    res.send(500, 'Error getting onlineusers!');
-                    return;
-                }
-                log("online users: "+ results);
-            res.send(results);
+        winston.log("info","message");
+        Forum.getOnlineUsersLastDay().then(function(users) {
+            res.send(users);
+        }, function(error){
+            res.send(error, 500);
         });
     })
 
@@ -80,9 +77,8 @@ module.exports = function(app, db) {
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
         var func = arguments;
-         db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [req.params.boardId], function(err, results){
-                log(func.callee.name);
-                res.send(results);
+         Board.getTopics(req.params.boardId).then(function(results) {
+               res.send(results);
             }, function(error){
                 res.send(error, 500);
             });
@@ -116,7 +112,7 @@ module.exports = function(app, db) {
     });
 
     // get all posts for topic
-    app.get('/api/forum/topics/:topicId', function(req, res) {
+    app.get('/api/forum/:boardId/topics/:topicId', function(req, res) {
         db.query('select * from forum_posts where topic_id = ? order by time asc', [req.params.topicId], function(err, results) {
             if(err) {
                 res.end('error', err);
