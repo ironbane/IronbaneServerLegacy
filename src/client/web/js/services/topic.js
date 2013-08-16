@@ -4,6 +4,25 @@ angular.module('IronbaneApp')
         angular.copy(json || {}, this);
     };
 
+    Topic.getTopic = function(topidId){
+        var deferred = $q.defer();
+        $http.get('/api/forum/topics/'+topidId)
+            .then(function(response) {
+                $log.log(response);
+                var topics = response.data;
+
+                // upgrade objects
+                topics.forEach(function(topic, i) {
+                    //post.author = new User(post.author);
+                    topics[i] = new Topic(topic);
+                });
+
+                deferred.resolve(topics);
+            });
+
+        return deferred.promise;
+    };
+
     Topic.getTopics = function(boardId) {
         var deferred = $q.defer();
         $http.get('/api/forum/' + boardId + '/topics')

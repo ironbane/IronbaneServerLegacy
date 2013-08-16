@@ -3,6 +3,7 @@ module.exports = function(app, db) {
     var log = require('util').log,
         Forum = require('../../entity/forum')(db),
         Board = require('../../entity/board')(db),
+        bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
 
@@ -29,7 +30,6 @@ module.exports = function(app, db) {
     });
 
     app.get('/api/onlineusers', function(req, res) {
-        winston.log("info","message");
         Forum.getOnlineUsersLastDay().then(function(users) {
             res.send(users);
         }, function(error){
@@ -112,7 +112,7 @@ module.exports = function(app, db) {
     });
 
     // get all posts for topic
-    app.get('/api/forum/:boardId/topics/:topicId', function(req, res) {
+    app.get('/api/forum/topics/:topicId', function(req, res) {
         db.query('select * from forum_posts where topic_id = ? order by time asc', [req.params.topicId], function(err, results) {
             if(err) {
                 res.end('error', err);
@@ -137,28 +137,9 @@ module.exports = function(app, db) {
                 });
             });
 
-            // grab author details to populate
-            db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
-                if(err) {
-                    res.send('error loading users: ' + err, 500);
-                    return;
-                }
-
-                // loop through posts and nest author
-                posts.forEach(function(post) {
-                    for(var i=0;i<users.length;i++) {
-                        if(post.user === users[i].id) {
-                            post.author = users[i];
-                            // don't send password or activationkey
-                            delete post.author.pass;
-                            delete post.author.activationkey;
-                            break;
-                        }
-                    }
-                });
+            
 
                 res.send(posts);
-            });
         });
     });
 
