@@ -1,6 +1,8 @@
 // index.js
 module.exports = function(app, db) {
     var config = require('../../../../nconf'),
+        Q = require('q'),
+        _ = require('underscore'),
         log = require('util').log,
         fs = require('fs');
 
@@ -12,13 +14,24 @@ module.exports = function(app, db) {
     require('./articles')(app, db);
 
     // temp stuff for index until a better spot is thought
-    var zones = {},
-        zoneSelection = {},
-        items = {},
-        units = {},
-        unitTemplates = {},
-        preCatsTiles = [],
-        preMeshes = {
+    var gameModel = {
+        zones: {},
+        zoneSelection: {},
+        items: {},
+        units: {},
+        unitTemplates: {},
+        // hard coded cats, are these used?
+        preCatsTiles: [{
+            name: 'Alpha tiles',
+            range: '1-100',
+            limit_x: 10
+        },
+        {
+            name: 'Special',
+            range: '1650-1700',
+            limit_x: 10
+        }],
+        preMeshes: {
             0: {
                 id: 0,
                 name: "ERROR",
@@ -27,115 +40,100 @@ module.exports = function(app, db) {
                 t1: "tiles/402"
             }
         },
-        modelEnum = {};
+        modelEnum: {},
+        shaderFile: ''
+    };
 
-    db.query('select * from ib_item_templates', [], function(err, results) {
-        if (err) {
-            log('error loading item template data' + err);
-            return;
-        }
+    // some async badassery
+    var getGameModel = function() {
+        var tasks = [],
+            Zone = require('../../entity/zone')(db),
+            UnitTemplate = require('../../entity/unitTemplate')(db),
+            ItemTemplate = require('../../entity/itemTemplate')(db),
+            Mesh = require('../../entity/mesh')(db);
 
-        results.forEach(function(row) {
-            items[row.id] = {
-                id: row.id,
-                name: row.name,
-                type: row.type,
-                image: row.image,
-                delay: row.delay,
-                attr1: row.attr1,
-                particle: row.particle,
-                subtype: row.subtype,
-                baseValue: row.basevalue
-            };
-        });
-    });
-
-    db.query('SELECT * FROM ib_zones', [], function(err, results) {
-        if (err) {
-            log('error loading zone data' + err);
-            return;
-        }
-
-        results.forEach(function(zone) {
-            zones[zone.id] = {
-                id: zone.id,
-                name: zone.name,
-                type: zone.type
-            };
-            zoneSelection[zone.name] = zone.id;
-        });
-    });
-
-    db.query('SELECT id, name, type, health, armor, param, size, special, weaponoffsetmultiplier, friendly FROM ib_unit_templates', [], function(err, results) {
-        if (err) {
-            log('error loading unit template data' + err);
-            return;
-        }
-
-        results.forEach(function(row) {
-            units[row.id] = row;
-            unitTemplates[row.name] = row.id;
-        });
-    });
-
-    db.query('SELECT * FROM ib_meshes ORDER BY category, name', [], function(err, results) {
-        if (err) {
-            log('error loading mesh data' + err);
-            return;
-        }
-
-        results.forEach(function(row) {
-            preMeshes[row.id] = row;
-            modelEnum[row.category + ': ' + row.name] = row.id;
-        });
-    });
-
-    db.query('select * from ib_editor_cats', [], function(err, results) {
-        if (err) {
-            log('error loading the cats, meow ' + err);
-            return;
-        }
-
-        results.forEach(function(row) {
-            preCatsTiles.push({
-                name: row.name,
-                range: row.range,
-                limit_x: row.limit_x
+        tasks.push(Zone.getAll().then(function(zones) {
+            _.each(zones, function(zone) {
+                gameModel.zones[zone.id] = {
+                    id: zone.id,
+                    name: zone.name,
+                    type: zone.type
+                };
+                gameModel.zoneSelection[zone.name] = zone.id;
             });
-        });
-    });
 
-    // load shader file
-    var shaderFile = "";
-    fs.readFile('src/client/game/shaders.html', function(err, contents) {
-        if (err) {
-            log('error loading shaders ' + err);
-            return;
-        }
+            return zones;
+        }, function(err) { return Q.reject(err); }));
 
-        shaderFile = contents;
+        tasks.push(UnitTemplate.get({$fields: ['id', 'name', 'type', 'health', 'armor', 'param', 'size', 'special', 'weaponoffsetmultiplier', 'friendly']}).then(function(templates) {
+            _.each(templates, function(t) {
+                gameModel.units[t.id] = t;
+                gameModel.unitTemplates[t.name] = t.id;
+            });
+
+            return templates;
+        }, function(err) { return Q.reject(err); }));
+
+        tasks.push(ItemTemplate.getAll().then(function(templates) {
+            // front end is expecting a map
+            // there's prolly an underscore method for this
+            _.each(templates, function(t) {
+                gameModel.items[t.id] = t;
+            });
+
+            return templates;
+        }, function(err) { return Q.reject(err); }));
+
+        tasks.push(Mesh.get({$orderBy: ['category', 'name']}).then(function(meshes) {
+            _.each(meshes, function(mesh) {
+                gameModel.preMeshes[mesh.id] = mesh;
+                gameModel.modelEnum[mesh.category + ': ' + mesh.name] = mesh.id;
+            });
+
+            return meshes;
+        }, function(err) { return Q.reject(err); }));
+
+        tasks.push(Q.nfcall(fs.readFile, 'src/client/game/shaders.html', 'utf-8').then(function(contents) {
+            gameModel.shaderFile = contents;
+            return contents;
+        }, function(err) { return Q.reject('error loading sharder file', err); }));
+
+        return Q.all(tasks);
+    };
+
+    // now we do this immediately
+    var gameModelPromise = getGameModel().then(function(results) {
+        console.log('gameModel Promise success: ', results);
+
+        return results; // pass thru
+    }, function(err) {
+        console.error('gameModel Promise error: ', err);
+        return Q.reject(err);
     });
 
     app.get(['/game', '/game/*'], function(req, res) {
-        // add in all of the stuff that was from game.php
-        res.locals = {
-            zones: JSON.stringify(zones),
-            zoneSelection: JSON.stringify(zoneSelection),
-            items: JSON.stringify(items),
-            units: JSON.stringify(units),
-            unitTemplates: JSON.stringify(unitTemplates),
-            preCatsTiles: JSON.stringify(preCatsTiles),
-            preMeshes: JSON.stringify(preMeshes),
-            modelEnum: JSON.stringify(modelEnum),
-            shaders: shaderFile,
-            userId: req.user ? req.user.id : 0,
-            username: req.user ? req.user.name : '',
-            loggedIn: req.isAuthenticated(),
-            characterUsed: req.user ? req.user.characterused : 0
-        };
+        gameModelPromise.then(function(stuff) {
+            // add in all of the stuff that was from game.php
+            res.locals = {
+                zones: JSON.stringify(gameModel.zones),
+                zoneSelection: JSON.stringify(gameModel.zoneSelection),
+                items: JSON.stringify(gameModel.items),
+                units: JSON.stringify(gameModel.units),
+                unitTemplates: JSON.stringify(gameModel.unitTemplates),
+                preCatsTiles: JSON.stringify(gameModel.preCatsTiles),
+                preMeshes: JSON.stringify(gameModel.preMeshes),
+                modelEnum: JSON.stringify(gameModel.modelEnum),
+                shaders: gameModel.shaderFile,
+                userId: req.user ? req.user.id : 0,
+                username: req.user ? req.user.name : '',
+                loggedIn: req.isAuthenticated(),
+                characterUsed: req.user ? req.user.characterused : 0
+            };
 
-        // todo: use config for subfolder
-        res.render('game/index');
+            res.render('game/index');
+        }, function(err) {
+            res.send(500, err);
+        });
     });
 
     // templates for website
