@@ -29,17 +29,29 @@ angular.module('IronbaneApp')
             });
     };
 
+    User.getByName = function(username) {
+        $log.log("getting user");
+        return $http.get('/api/user/' + username)
+            .then(function(response) {
+                return response;
+            }, function(err) {
+                $log.error('error retreiving user', err);
+
+                return $q.reject('error retreiving user', err);
+            });
+    };
+
+
     // get currently signed in user if exists or guest account
     User.getCurrentUser = function() {
-        var deferred = $q.defer();
 
-        $http.get('/api/session/user')
+        return $http.get('/api/session/user')
             .then(function(response) {
                 $log.log('get user success', response);
 
                 var user = new User(response.data);
                 user.authenticated = true; // todo: move to server?
-                deferred.resolve(user);
+                return user;
             }, function(err) {
                 if(err.status === 404) {
                     // this just means not logged in
@@ -49,14 +61,13 @@ angular.module('IronbaneApp')
                         authenticated: false
                     });
 
-                    deferred.resolve(user);
+                    return user;
                 } else {
                     //$log.error('error retreiving user session', err);
-                    deferred.reject(err);
+                    $q.reject(err);
                 }
             });
 
-        return deferred.promise;
     };
 
     return User;

@@ -5,41 +5,34 @@ angular.module('IronbaneApp')
     };
 
     Topic.getTopic = function(topidId){
-        var deferred = $q.defer();
-        $http.get('/api/forum/topics/'+topidId)
+        return $http.get('/api/forum/topics/'+topidId)
             .then(function(response) {
                 $log.log(response);
-                var topics = response.data;
-
-                // upgrade objects
-                topics.forEach(function(topic, i) {
-                    //post.author = new User(post.author);
-                    topics[i] = new Topic(topic);
-                });
-
-                deferred.resolve(topics);
+                
+                return new Topic(response.data);
+            }, function(error){
+                return $q.reject(error);
             });
 
-        return deferred.promise;
     };
 
     Topic.getTopics = function(boardId) {
-        var deferred = $q.defer();
-        $http.get('/api/forum/' + boardId + '/topics')
+        return $http.get('/api/forum/' + boardId + '/topics')
             .then(function(response) {
-                $log.log(response);
-                var topics = response.data;
+                $log.log(response.data);
+                var topics = [];
 
                 // upgrade objects
-                topics.forEach(function(topic, i) {
+                angular.forEach(response.data,function(topic) {
                     //post.author = new User(post.author);
-                    topics[i] = new Topic(topic);
+                    topics.push(new Topic(topic));
                 });
+                return topics;
 
-                deferred.resolve(topics);
+            }, function(error){
+                return $q.reject(error);
             });
 
-        return deferred.promise;
     };
     return Topic;
 

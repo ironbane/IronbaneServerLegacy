@@ -26,18 +26,28 @@ angular.module('IronbaneApp')
             });
     };
 
+    Forum.getStatistics = function() {
+        return $http.get('/api/statistics')
+        .then(function(response){
+            $log.log("returned from server");
+            $log.log(response);
+            return response;
+        }, function(err){
+            $log.error('Error getting statistics from the server', err);
+            $q.reject(err);
+        });
+    };
+
     Forum.getLatestOnlineUsers = function(){
 
-        var deferred = $q.defer();
-        $http.get('/api/onlineusers' )
+        return $http.get('/api/onlineusers' )
             .then(function(response) {
-                deferred.resolve(response);
+                return response;
             }, function(err) {
                 $log.error('Error getting board from server', err);
-                deferred.reject(err);
+                $q.reject(err);
             });
 
-        return deferred.promise;
     };
 
     return Forum;

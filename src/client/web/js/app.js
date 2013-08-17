@@ -58,6 +58,7 @@ angular.module('IronbaneApp', [])
 
                     $q.all([Board.get(boardId), Topic.getTopics(boardId)])
                         .then(function(results) {
+                            console.log(results);
                             deferred.resolve({board: results[0], topics: results[1]});
                         }, function(err) {
                             deferred.reject(err);
@@ -101,6 +102,25 @@ angular.module('IronbaneApp', [])
             resolve: {
                 location: '$location'
             }
+        })
+        .when('/user/profile/:username' , {
+            templateUrl: '/views/profile',
+            controller: 'ProfileCtrl',
+             resolve: {
+                profile: ['User', '$q', '$route', function(User, $q, $route) {
+                    
+                    return User.getByName($route.current.params.username)
+                        .then(function(userprofile) {
+                            // should be processed already
+                            return userprofile;
+                        }, function(err) {
+                            // can't find such article, reject route change
+                           return $q.reject();
+                        });
+
+                }]
+            }
+
         })
         .when('/editor/mainMenu', {
             templateUrl: '/views/editMainMenu',

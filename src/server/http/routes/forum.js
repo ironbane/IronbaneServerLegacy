@@ -1,8 +1,10 @@
 // forum.js
 module.exports = function(app, db) {
     var log = require('util').log,
+    _ = require('underscore'),
         Forum = require('../../entity/forum')(db),
         Board = require('../../entity/board')(db),
+        User = require('../../entity/user')(db)
         bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
@@ -30,12 +32,30 @@ module.exports = function(app, db) {
     });
 
     app.get('/api/onlineusers', function(req, res) {
-        Forum.getOnlineUsersLastDay().then(function(users) {
+        User.getOnlineUsersLastDay().then(function(users) {
             res.send(users);
         }, function(error){
             res.send(error, 500);
         });
     })
+
+    app.get('/api/statistics', function(req, res) {
+        Forum.getStatistics().then(function(statistics){
+            res.send(statistics);
+        }, function(error){
+            res.send(error, 500);
+        });
+    });
+
+    app.get('/api/user/:username', function(req, res) {
+        User.getUserByName().then(function(user) {
+            res.send(user);
+        }, function(error){
+            log("oops");
+            res.send(error, 500);
+        });
+
+    });
 
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
@@ -78,7 +98,9 @@ module.exports = function(app, db) {
     app.get('/api/forum/:boardId/topics', function(req, res) {
         var func = arguments;
          Board.getTopics(req.params.boardId).then(function(results) {
+            
                res.send(results);
+            
             }, function(error){
                 res.send(error, 500);
             });
@@ -125,11 +147,10 @@ module.exports = function(app, db) {
                 return;
             }
 
-            var authors = [];
 
             var posts = results;
 
-            posts.forEach(function(post) {
+            /*posts.forEach(function(post) {
                 authors.push(post.user);
                 post.bbcontent = post.content;
                 bbcode.parse(post.content, function(html) {
@@ -137,7 +158,7 @@ module.exports = function(app, db) {
                 });
             });
 
-            
+            */
 
                 res.send(posts);
         });

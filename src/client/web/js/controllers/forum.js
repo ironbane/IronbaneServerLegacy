@@ -8,10 +8,20 @@ angular.module('IronbaneApp')
 		});
     	
     Forum.getLatestOnlineUsers().then(function(users){
-    	$log.log(users);
+
     	$scope.users = users.data;
+        $log.log($scope.users);
     }, function(error) { 
     	$log.log(error);
+    });
+
+    Forum.getStatistics().then(function(statistics) {
+        //is there a workaround for this data[0] and do statistics or statistics.data?
+        $scope.statistics = statistics.data;
+        $log.log($scope.statistics);
+
+    }, function(error) {
+        $log.log(error);
     });
         
 }]);

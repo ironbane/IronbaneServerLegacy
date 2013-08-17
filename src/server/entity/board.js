@@ -32,7 +32,8 @@ module.exports = function(db) {
     Board.getTopics = function(boardId){
         log('getting topics for ' +boardId);
         var deferred = Q.defer();
-        db.query('SELECT forum_topics.id, MIN(forum_posts.time) AS firstposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id ', [boardId], function(err, results) {
+        // to do: make an extra join and alias for the last poster (nasty query....)
+        db.query('SELECT forum_topics.sticky, forum_topics.locked, forum_topics.id, forum_topics.views as viewcount, MIN(forum_posts.time) AS firstposttime, MAX(forum_posts.time) as lastposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id order by sticky desc, lastposttime desc', [boardId], function(err, results) {
             if (err) {
                 log('error getting topics');
                 deferred.reject(err);
@@ -43,71 +44,16 @@ module.exports = function(db) {
                 log('no topics found');
                 deferred.resolve([]);
             }
-            var topics = []
-           _.each(results, function(data) {
-                topics.push(data);
-            });
+            //_.each(results, function(result){
+              //  result = new Topic(result);
+            //});
 
-            // loop through topics and grab the titles of the first posts
             
-            deferred.resolve(topics);
+            deferred.resolve(results);
         });
         return deferred.promise;
     };
-            /*
-
-            // better with a join?
-            db.query('select * from forum_posts where topic_id in (?) group by topic_id order by time', [topicIds], function(err, pResults) {
-                if(err) {
-                deferred.reject(err);
-                    return;
-                }
-
-                // skip authors phase if there aren't any results
-                if(pResults.length === 0) {
-                    deferred.resolve([]);
-                    return;
-                }
-
-                var authors = [];
-
-                posts = pResults;
-
-                posts.forEach(function(post) {
-                    authors.push(post.user);
-                    post.bbcontent = post.content;
-                    bbcode.parse(post.content, function(html) {
-                        post.content = html;
-                    });
-                });
-
-                // grab author details to populate
-                db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
-                    if(err) {
-                        deferred.reject(err);
-                        return;
-                    }
-
-                    // loop through posts and nest author
-                    posts.forEach(function(post) {
-                        for(var i=0;i<users.length;i++) {
-                            if(post.user === users[i].id) {
-                                post.author = users[i];
-                                // don't send password or activationkey
-                                delete post.author.pass;
-                                delete post.author.activationkey;
-                                break;
-                            }
-                        }
-                    });
-
-                });
-            });
-
-        });
-        return deferred.promise;
-    };
-*/
+           
     Board.get = function(boardId) {
         var deferred = Q.defer();
 

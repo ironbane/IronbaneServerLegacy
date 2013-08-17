@@ -26,10 +26,27 @@ module.exports = function(db) {
         }
     });
 
-    Topic.get = function(topidId) {
+    Topic.getPosts = function(topicId) {
+        var deferred = Q.defer();
+        db.query('select * from forum_posts where topic_id = ?', [topicId], function(err, results) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+
+            if(results.length === 0) {
+                deferred.reject('Topic not found.');
+                return;
+            }
+            deferred.resolve(results);
+        })
+
+    }
+
+    Topic.get = function(topicId) {
         var deferred = Q.defer();
 
-        db.query('select * from forum_topics where id=?', [topidId], function(err, results) {
+        db.query('select * from forum_topics where id=?', [topicId], function(err, results) {
             if(err) {
                 deferred.reject(err);
                 return;

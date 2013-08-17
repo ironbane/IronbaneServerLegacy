@@ -26,20 +26,20 @@ angular.module('IronbaneApp')
     // get a single board
     Board.get = function(boardId) {
         // cache this call, unlikely board will change during a session
-        var promise = $http.get('/api/forum/' + boardId, {cache: true})
+        return $http.get('/api/forum/' + boardId, {cache: true})
             .then(function(response) {
                 var board = new Board(response.data);
 
                 return board;
             }, function(err) {
                 $log.error('Error getting board from server', err);
+                return $q.reject(err);
             });
 
-        return promise;
     };
 
     Board.getAll = function() {
-        var promise = $http.get('/api/forum').then(function(response) {
+        return $http.get('/api/forum').then(function(response) {
             var boards = response.data;
 
             boards.forEach(function(board, i) {
@@ -50,9 +50,9 @@ angular.module('IronbaneApp')
             return boards;
         }, function(err) {
             $log.error('Error getting boards from server', err);
+            return $q.reject(err);
         });
 
-        return promise;
     };
 
     // return all boards for a specific category

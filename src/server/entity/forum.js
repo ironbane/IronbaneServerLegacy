@@ -27,17 +27,22 @@ module.exports = function(db) {
         }
     });
 
-    Forum.getOnlineUsersLastDay = function() {
+    Forum.getStatistics = function() {
         var deferred = Q.defer();
-        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
-             if(err) {
-                    deferred.reject();
-                    return;
-                }
-                deferred.resolve(results);
+        var postQ = ' (select count(id) from forum_posts) as totalposts,',
+            userQ = ' (select count(id) from bcs_users) as totalusers,'
+           
+        db.query('SELECT ' +postQ + userQ + 'name as lastregistered from bcs_users  ORDER BY reg_date DESC LIMIT 1', function(err, results) {
+            if(err){
+                deferred.reject(err);
+                return
+            }
+            deferred.resolve(results[0]);
         });
         return deferred.promise;
     };
+
+    
 
     Forum.get = function() {
         var deferred = Q.defer();
@@ -47,7 +52,7 @@ module.exports = function(db) {
         db.query('SELECT ' + topicQ + postsQ + 'fb.*, fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
             function(err, results) {
             if (err) {
-                deferred.reject();
+                deferred.reject(err);
                 return;
             }
             deferred.resolve(results);
