@@ -778,7 +778,7 @@ var dateChunks = new Array(
   new Array(1, 'second')
 
   );
-/*
+
 function timeSince(since) {
 
 
@@ -811,7 +811,7 @@ function timeSince(since) {
   return print;
 
 }
-*/
+
 
 //there is no fixed order for attributes of an object. also this function could return a function...
 function firstOfObject(o) {
@@ -863,3 +863,7 @@ function timedChunk(items, process, context, callback){
     }, 25);
 }
 
+function roundNumber(num, dec) {
+    var result = Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+    return result;
+}
