@@ -240,7 +240,8 @@ IronbaneApp
                         opacity: 1.00
                     }, 1000, function() {
                         $("#gameFrame").css('opacity', '');
-                        $("#loadingBar").hide();
+
+                        $("#loadingBarMessage").text("Loading area");
                     });
                 }, 500);
             }
@@ -250,23 +251,20 @@ IronbaneApp
 
                 if ( game.currentLoadingTickTimer <= 0.0 ) {
 
-
-
-                        // Change the message on production
-                        if ( $window.isProduction ) {
-                            game.currentLoadingTickTimer = getRandomFloat(0.5, 3.0);
-                            game.currentLoadingMessage = ChooseSequenced(game.loadingMessages);
-                        }
-                        else {
-                            game.currentLoadingTickTimer = 0.5;
-                        }
-
-
+                    // Change the message on production
+                    if ( $window.isProduction ) {
+                        game.currentLoadingTickTimer = getRandomFloat(0.5, 3.0);
+                        game.currentLoadingMessage = ChooseSequenced(game.loadingMessages);
+                    }
+                    else {
+                        game.currentLoadingTickTimer = 0.5;
+                    }
 
                     //for (var i = 0; i < game.currentLoadingStepCount; i++) {
                         //game.currentLoadingMessage += ".";
                     //}
 
+                    // TODO convert to angular
                     $("#loadingBarMessage").text(game.currentLoadingMessage);
                 }
             }
