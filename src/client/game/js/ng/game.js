@@ -108,8 +108,20 @@ IronbaneApp
             this.renderer.shadowMapEnabled = true;
             this.renderer.shadowMapAutoUpdate = true;
             this.renderer.shadowMapSoft = false;
+
+            this.shadowLight = new THREE.DirectionalLight( 0xffffff, 1);
+            this.shadowLight.onlyShadow = true;
+            this.shadowLight.shadowMapWidth = 2048;
+            this.shadowLight.shadowMapHeight = 2048;
+            this.shadowLight.shadowCameraNear   = 5.1;
+            this.shadowLight.castShadow   = true;
+            this.shadowLight.shadowDarkness   = 0.3;
+            ironbane.scene.add( this.shadowLight );
+
             // this.renderer.sortObjects = false;
             this.renderer.setSize($window.innerWidth, $window.innerHeight);
+
+
 
             $('#gameFrame').append(this.renderer.domElement);
 

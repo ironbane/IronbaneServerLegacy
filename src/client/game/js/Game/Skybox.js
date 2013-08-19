@@ -74,14 +74,6 @@ var Skybox = PhysicsObject.extend({
     this.directionalLight = new THREE.DirectionalLight( 0xcccccc );
     ironbane.scene.add( this.directionalLight );
 
-    this.shadowLight = new THREE.DirectionalLight( 0xffffff, 1);
-    this.shadowLight.onlyShadow = true;
-    this.shadowLight.shadowMapWidth = 2048;
-    this.shadowLight.shadowMapHeight = 2048;
-    this.shadowLight.shadowCameraNear		= 5.1;
-    this.shadowLight.castShadow		= true;
-    this.shadowLight.shadowDarkness		= 0.3;
-    ironbane.scene.add( this.shadowLight );
 
     // Add terrain
     //if ( zones[terrainHandler.zone]['type'] == ZoneTypeEnum.WORLD ) {
@@ -172,10 +164,6 @@ var Skybox = PhysicsObject.extend({
       ironbane.scene.remove(this.directionalLight);
       releaseMesh(this.directionalLight);
     }
-    if ( this.shadowLight ) {
-      ironbane.scene.remove(this.shadowLight);
-      releaseMesh(this.shadowLight);
-    }
 
     this.isLoaded = false;
   },
@@ -190,8 +178,8 @@ var Skybox = PhysicsObject.extend({
 
     this.directionalLight.target.position.copy( this.sunVector.clone().multiplyScalar(-450) );
 
-    this.shadowLight.position.copy( new THREE.Vector3(0, 100, 0) );
-    this.shadowLight.target.position.copy( new THREE.Vector3(0, -100, 0) );
+    ironbane.shadowLight.position.copy( new THREE.Vector3(0, 100, 0) );
+    ironbane.shadowLight.target.position.copy( new THREE.Vector3(0, -100, 0) );
 
     var time = (new Date()).getTime();
     var param = (((time/1000.0))* 3.6 * 100 / dayTime)%360;
