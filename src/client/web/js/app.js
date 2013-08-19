@@ -77,9 +77,9 @@ angular.module('IronbaneApp', [])
                         boardId = $route.current.params.boardId,
                         topicId = $route.current.params.topicId;
 
-                    $q.all([Board.get(boardId), Topic.getTopic(topicId)])
+                    $q.all([Board.get(boardId), Topic.getTopic(topicId), Topic.get(topicId)])
                         .then(function(results) {
-                            deferred.resolve({board: results[0], posts: results[1]});
+                            deferred.resolve({board: results[0], posts: results[1], topic: results[2]});
                         }, function(err) {
                             deferred.reject(err);
                         });
@@ -107,17 +107,17 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/profile',
             controller: 'ProfileCtrl',
              resolve: {
-                profile: ['User', '$q', '$route', function(User, $q, $route) {
-                    
-                    return User.getByName($route.current.params.username)
+                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
+                    var deferred = $q.defer();
+                    User.getByName($route.current.params.username)
                         .then(function(userprofile) {
                             // should be processed already
-                            return userprofile;
+                            deferred.resolve({profile: userprofile});
                         }, function(err) {
                             // can't find such article, reject route change
-                           return $q.reject();
+                           deferred.reject();
                         });
-
+                        return deferred.promise;
                 }]
             }
 

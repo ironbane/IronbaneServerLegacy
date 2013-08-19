@@ -4,14 +4,15 @@ module.exports = function(app, db) {
     _ = require('underscore'),
         Forum = require('../../entity/forum')(db),
         Board = require('../../entity/board')(db),
-        User = require('../../entity/user')(db)
+        User = require('../../entity/user')(db),
+        Topic = require('../../entity/topic')(db),
+        Article = require('../../entity/article')(db),
         bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
 
         app.get('/api/forum', function(req, res) {
             Forum.get().then(function(forum) {
-
                 res.send(forum);
             }, function(error){
                 res.send(error, 500);
@@ -38,6 +39,14 @@ module.exports = function(app, db) {
             res.send(error, 500);
         });
     })
+
+    app.get('/api/frontpage', function(req, res){
+        Article.getFrontPage().then(function(frontpage){
+            res.send(frontpage);
+        }, function(error){
+            res.send(error, 500);
+        });
+    });
 
     app.get('/api/statistics', function(req, res) {
         Forum.getStatistics().then(function(statistics){
@@ -97,10 +106,8 @@ module.exports = function(app, db) {
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
         var func = arguments;
-         Board.getTopics(req.params.boardId).then(function(results) {
-            
-               res.send(results);
-            
+         Board.getTopics(req.params.boardId).then(function(results) {            
+               res.send(results);            
             }, function(error){
                 res.send(error, 500);
             });
@@ -108,59 +115,32 @@ module.exports = function(app, db) {
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
-        db.query('insert into forum_topics set board_id = ?, time = ?', [req.params.boardId, req.body.time], function(err, topicResult) {
-            if(err) {
-                res.send('error creating topic', 500);
-                return;
-            }
+        var post = { boardId:req.params.boardId, 
+            time:req.body.time, 
+            title:req.body.title, 
+            content:req.body.bbcontent,
+            user:req.body.user }
+        Topic.newPost(post)
+        .then(function(){
 
-            var topicId = topicResult.insertId,
-                post = {
-                    topic_id: topicId,
-                    title: req.body.title,
-                    content: req.body.bbcontent,
-                    time: req.body.time,
-                    user: req.body.user
-                };
-
-            db.query('insert into forum_posts set ?', post, function(err, result) {
-                if(err) {
-                    res.send('error creating post', 500);
-                    return;
-                }
-                res.send(result);
-            });
         });
+       
     });
 
     // get all posts for topic
+    app.get('/api/forum/topics/:topicId/posts', function(req, res) {
+        Topic.getPosts(req.params.topicId).then(function(results){
+            res.send(results);
+        }, function(error){
+            res.send(error);
+        });
+    });
+
     app.get('/api/forum/topics/:topicId', function(req, res) {
-        db.query('select * from forum_posts where topic_id = ? order by time asc', [req.params.topicId], function(err, results) {
-            if(err) {
-                res.end('error', err);
-                return;
-            }
-
-            // skip authors phase if there aren't any results
-            if(results.length === 0) {
-                res.send([]); // send 404 instead?
-                return;
-            }
-
-
-            var posts = results;
-
-            /*posts.forEach(function(post) {
-                authors.push(post.user);
-                post.bbcontent = post.content;
-                bbcode.parse(post.content, function(html) {
-                    post.content = html;
-                });
-            });
-
-            */
-
-                res.send(posts);
+        Topic.get(req.params.topicId).then(function(results){
+            res.send(results);
+        }, function(error){
+            res.send(error);
         });
     });
 
@@ -168,18 +148,15 @@ module.exports = function(app, db) {
     app.post('/api/forum/topics/:topicId', function(req, res) {
         var post = {
             topic_id: req.params.topicId,
-            title: req.body.title,
             content: req.body.bbcontent,
             time: req.body.time,
             user: req.body.user
         };
+        Post.save(post).then(function(result){
 
-        db.query('insert into forum_posts set ?', post, function(err, result) {
-            if(err) {
-                res.send('error creating post', 500);
-                return;
-            }
-            res.send(result);
+        }, function(error){
+            res.send(error);
         });
+        
     });
 };

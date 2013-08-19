@@ -4,5 +4,5 @@ angular.module('IronbaneApp')
     $scope.board = ResolveData.board;
 
     $scope.posts = ResolveData.posts;
-    $scope.topic = ResolveData.topic;
+    $scope.topic = ResolveData.topic.data;
 }]);

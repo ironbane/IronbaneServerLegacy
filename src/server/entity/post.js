@@ -18,6 +18,7 @@ var Class = require('../../common/class');
 
 module.exports = function(db) {
     var Q = require('q'),
+    log = require('util').log,
         _ = require('underscore');
 
     var Post = Class.extend({
@@ -25,6 +26,18 @@ module.exports = function(db) {
             _.extend(this, json || {});
         }
     });
+
+    Post.save = function(post){
+        var deferred = Q.defer();
+        db.query('insert into forum_posts set ?', post, function(err, result) {
+            if(err) {
+                deferred.reject('error creating post');
+                return;
+            }
+            deferred.resolve();
+        });
+        return deferred.promise;
+    };
 
     Post.get = function(postId) {
         var deferred = Q.defer();

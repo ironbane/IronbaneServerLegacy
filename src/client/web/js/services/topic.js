@@ -4,19 +4,31 @@ angular.module('IronbaneApp')
         angular.copy(json || {}, this);
     };
 
-    Topic.getTopic = function(topidId){
-        return $http.get('/api/forum/topics/'+topidId)
+    Topic.getTopic = function(topicId){
+        $log.log("getting topic " + topicId)
+        return $http.get('/api/forum/topics/'+topicId+'/posts')
             .then(function(response) {
-                $log.log(response);
-                
-                return new Topic(response.data);
+                var posts = [];
+                angular.forEach(response.data, function(post){
+                    posts.push(new Post(post));
+                });
+                return posts;
             }, function(error){
                 return $q.reject(error);
             });
 
     };
 
+    Topic.get = function(topicId) {
+        return $http.get('/api/forum/topics/'+topicId)
+        .then(function(response){
+            return response;
+        });
+
+    };
+
     Topic.getTopics = function(boardId) {
+        $log.log("getting topics for " +boardId)
         return $http.get('/api/forum/' + boardId + '/topics')
             .then(function(response) {
                 $log.log(response.data);

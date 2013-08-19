@@ -8,7 +8,7 @@ angular.module('IronbaneApp')
         var url = '/api/forum/' + boardId + '/topics';
 
         if(topicId && topicId > 0) {
-            url = '/api/forum/'+boardId+'topics/' + topicId;
+            url = '/api/forum/topics/' + topicId;
         }
 
         var promise = $http.post(url, this)

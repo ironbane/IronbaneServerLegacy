@@ -10,7 +10,6 @@ angular.module('IronbaneApp')
             bbcontent: $scope.content,
             user: 1 // temp for now
         });
-        $log.log('about to save post', post);
         post.$save($scope.board.id);
     };
 }]);

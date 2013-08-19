@@ -28,9 +28,8 @@ angular.module('IronbaneApp')
         // cache this call, unlikely board will change during a session
         return $http.get('/api/forum/' + boardId, {cache: true})
             .then(function(response) {
-                var board = new Board(response.data);
+                return new Board(response.data);
 
-                return board;
             }, function(err) {
                 $log.error('Error getting board from server', err);
                 return $q.reject(err);
@@ -44,7 +43,6 @@ angular.module('IronbaneApp')
 
             boards.forEach(function(board, i) {
                 boards[i] = new Board(board);
-                console.log(boards[i]);
             });
 
             return boards;

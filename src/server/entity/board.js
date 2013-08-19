@@ -19,7 +19,6 @@ var Class = require('../../common/class');
 module.exports = function(db) {
     var Q = require('q'),
         _ = require('underscore'),
-        bbcode = require('bbcode'),
         log = require('util').log,
         Topic = require('./topic');
 
@@ -44,10 +43,6 @@ module.exports = function(db) {
                 log('no topics found');
                 deferred.resolve([]);
             }
-            //_.each(results, function(result){
-              //  result = new Topic(result);
-            //});
-
             
             deferred.resolve(results);
         });

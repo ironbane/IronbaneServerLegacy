@@ -5,10 +5,9 @@
         </div>
         Users browsing this forum: <span ng-repeat="user in users"><userlink name="user.name"/></span><br>
         <a href = "/forum">Ironbane forum</a> - {{board.name}}
-        <section class="forum-group">
+        <section  class="forum-group">
             <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
            
-               
                 <table>
                 <tr>
                 <th></th><th>title</th><th>replies</th><th>views</th><th>last posted by</th></tr>

@@ -18,7 +18,6 @@ angular.module('IronbaneApp')
     Forum.getStatistics().then(function(statistics) {
         //is there a workaround for this data[0] and do statistics or statistics.data?
         $scope.statistics = statistics.data;
-        $log.log($scope.statistics);
 
     }, function(error) {
         $log.log(error);
