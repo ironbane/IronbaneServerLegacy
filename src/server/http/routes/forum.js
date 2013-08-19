@@ -1,22 +1,23 @@
 // forum.js
 module.exports = function(app, db) {
-    var bbcode = require('bbcode'),
-        log = require('util').log;
+    var log = require('util').log,
+    _ = require('underscore'),
+        Forum = require('../../entity/forum')(db),
+        Board = require('../../entity/board')(db),
+        User = require('../../entity/user')(db),
+        Topic = require('../../entity/topic')(db),
+        Article = require('../../entity/article')(db),
+        bbcode = require('bbcode'),
+        winston = require('../../logging/winston');
 
 
         app.get('/api/forum', function(req, res) {
-        var topicQ = ' (select count(*) from forum_topics where board_id = fb.id) as topicCount, ',
-            postsQ = ' (select count(*) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ';
-
-        db.query('SELECT ' + topicQ + postsQ + 'fb.*, fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
-            function(err, results) {
-            if (err) {
-                res.end('error', err);
-                return;
-            }
-            res.send(results);
+            Forum.get().then(function(forum) {
+                res.send(forum);
+            }, function(error){
+                res.send(error, 500);
+            });
         });
-    });
 
     // create a new board
     app.post('/api/forum', function(req, res) {
@@ -29,6 +30,40 @@ module.exports = function(app, db) {
         db.query('insert into forum_boards set ?', board, function(err, results) {
             res.send(results);
         });
+    });
+
+    app.get('/api/onlineusers', function(req, res) {
+        User.getOnlineUsersLastDay().then(function(users) {
+            res.send(users);
+        }, function(error){
+            res.send(error, 500);
+        });
+    })
+
+    app.get('/api/frontpage', function(req, res){
+        Article.getFrontPage().then(function(frontpage){
+            res.send(frontpage);
+        }, function(error){
+            res.send(error, 500);
+        });
+    });
+
+    app.get('/api/statistics', function(req, res) {
+        Forum.getStatistics().then(function(statistics){
+            res.send(statistics);
+        }, function(error){
+            res.send(error, 500);
+        });
+    });
+
+    app.get('/api/user/:username', function(req, res) {
+        User.getUserByName().then(function(user) {
+            res.send(user);
+        }, function(error){
+            log("oops");
+            res.send(error, 500);
+        });
+
     });
 
     // get a single board
@@ -70,151 +105,42 @@ module.exports = function(app, db) {
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
-        var posts = [];
-
-        db.query('select * from forum_topics where board_id = ?', [req.params.boardId], function(err, results) {
-            if (err) {
-                res.end('error', err);
-                return;
-            }
-
-            if(results.length === 0) {
-                res.send(posts);
-                return;
-            }
-
-            // loop through topics and grab the titles of the first posts
-            var topicIds = [];
-            for(var i=0;i<results.length;i++) {
-                topicIds.push(results[i].id);
-            }
-
-            // better with a join?
-            db.query('select * from forum_posts where topic_id in (?) group by topic_id order by time', [topicIds], function(err, pResults) {
-                if(err) {
-                    res.end('error', err);
-                    return;
-                }
-
-                // skip authors phase if there aren't any results
-                if(pResults.length === 0) {
-                    res.send([]);
-                    return;
-                }
-
-                var authors = [];
-
-                posts = pResults;
-
-                posts.forEach(function(post) {
-                    authors.push(post.user);
-                    post.bbcontent = post.content;
-                    bbcode.parse(post.content, function(html) {
-                        post.content = html;
-                    });
-                });
-
-                // grab author details to populate
-                db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
-                    if(err) {
-                        res.send('error loading users: ' + err, 500);
-                        return;
-                    }
-
-                    // loop through posts and nest author
-                    posts.forEach(function(post) {
-                        for(var i=0;i<users.length;i++) {
-                            if(post.user === users[i].id) {
-                                post.author = users[i];
-                                // don't send password or activationkey
-                                delete post.author.pass;
-                                delete post.author.activationkey;
-                                break;
-                            }
-                        }
-                    });
-
-                    res.send(posts);
-                });
+        var func = arguments;
+         Board.getTopics(req.params.boardId).then(function(results) {            
+               res.send(results);            
+            }, function(error){
+                res.send(error, 500);
             });
         });
-    });
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
-        db.query('insert into forum_topics set board_id = ?, time = ?', [req.params.boardId, req.body.time], function(err, topicResult) {
-            if(err) {
-                res.send('error creating topic', 500);
-                return;
-            }
+        var post = { boardId:req.params.boardId, 
+            time:req.body.time, 
+            title:req.body.title, 
+            content:req.body.bbcontent,
+            user:req.body.user }
+        Topic.newPost(post)
+        .then(function(){
 
-            var topicId = topicResult.insertId,
-                post = {
-                    topic_id: topicId,
-                    title: req.body.title,
-                    content: req.body.bbcontent,
-                    time: req.body.time,
-                    user: req.body.user
-                };
-
-            db.query('insert into forum_posts set ?', post, function(err, result) {
-                if(err) {
-                    res.send('error creating post', 500);
-                    return;
-                }
-                res.send(result);
-            });
         });
+       
     });
 
     // get all posts for topic
+    app.get('/api/forum/topics/:topicId/posts', function(req, res) {
+        Topic.getPosts(req.params.topicId).then(function(results){
+            res.send(results);
+        }, function(error){
+            res.send(error);
+        });
+    });
+
     app.get('/api/forum/topics/:topicId', function(req, res) {
-        db.query('select * from forum_posts where topic_id = ? order by time asc', [req.params.topicId], function(err, results) {
-            if(err) {
-                res.end('error', err);
-                return;
-            }
-
-            // skip authors phase if there aren't any results
-            if(results.length === 0) {
-                res.send([]); // send 404 instead?
-                return;
-            }
-
-            var authors = [];
-
-            var posts = results;
-
-            posts.forEach(function(post) {
-                authors.push(post.user);
-                post.bbcontent = post.content;
-                bbcode.parse(post.content, function(html) {
-                    post.content = html;
-                });
-            });
-
-            // grab author details to populate
-            db.query('select * from bcs_users where id in (?)', [authors], function(err, users) {
-                if(err) {
-                    res.send('error loading users: ' + err, 500);
-                    return;
-                }
-
-                // loop through posts and nest author
-                posts.forEach(function(post) {
-                    for(var i=0;i<users.length;i++) {
-                        if(post.user === users[i].id) {
-                            post.author = users[i];
-                            // don't send password or activationkey
-                            delete post.author.pass;
-                            delete post.author.activationkey;
-                            break;
-                        }
-                    }
-                });
-
-                res.send(posts);
-            });
+        Topic.get(req.params.topicId).then(function(results){
+            res.send(results);
+        }, function(error){
+            res.send(error);
         });
     });
 
@@ -222,18 +148,15 @@ module.exports = function(app, db) {
     app.post('/api/forum/topics/:topicId', function(req, res) {
         var post = {
             topic_id: req.params.topicId,
-            title: req.body.title,
             content: req.body.bbcontent,
             time: req.body.time,
             user: req.body.user
         };
+        Post.save(post).then(function(result){
 
-        db.query('insert into forum_posts set ?', post, function(err, result) {
-            if(err) {
-                res.send('error creating post', 500);
-                return;
-            }
-            res.send(result);
+        }, function(error){
+            res.send(error);
         });
+        
     });
 };

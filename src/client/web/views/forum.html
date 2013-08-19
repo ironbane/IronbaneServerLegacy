@@ -1,4 +1,5 @@
 <div class="content-body forum-listing">
+Also seen today: <span ng-repeat="user in users"><userlink name={{user.name}}/>, </span>
     <section class="forum-category" ng-repeat="cat in cats">
         <h2>{{ cat.name }}</h2>
         <ul class="board-list">
@@ -8,5 +9,12 @@
                 <p class="board-descr">{{ board.description }}</p>
             </li>
         </ul>
+    </section>
+    <section>
+        Statistics:<br>
+        In total, our players have made about {{statistics.totalposts}} forum posts.<br>
+We have {{statistics.totalusers}} registered players!<br>
+The newest registered player is <userlink name="{{statistics.lastregistered}}"/>.<br>
+
     </section>
 </div>
