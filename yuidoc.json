@@ -1,0 +1,14 @@
+{
+	"name" : "Ironbane API",
+	"version" : "0.3",
+	"options" : {
+		"paths" : [
+		  "./src/client/web/js/",
+		  "./src/client/game/js/",
+		  "./src/server/"
+
+		]
+	}
+
+
+}

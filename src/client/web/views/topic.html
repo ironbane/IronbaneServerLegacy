@@ -10,7 +10,6 @@
                     <a class="thread-post" ng-href="{{ topic.url + '#' + topic.id }}">
                         <time class="thread-time" datetime="{{ topic.time * 1000 | date }}">{{ topic.time * 1000 | date:'medium' }}</time>
                     </a>
-                    <strong class="thread-author">{{ topic.author.username }}</strong>
                 </header>
                 <div class="post-body">
                     <p ng-bind-html-unsafe="topic.content"></p>
@@ -23,11 +22,10 @@
                         <a class="thread-post" ng-href="{{ post.url + '#' + post.id }}">
                             <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
                         </a>
-                        <strong class="thread-author">{{ post.author.username }}</strong>
                         <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
                     </header>
-                    <div class="post-body">
-                        <p ng-bind-html-unsafe="post.content"></p>
+                    <div class="postcontent">
+                    <userpost content="{{post.content}}"/>
                     </div>
                 </li>
             </ul>

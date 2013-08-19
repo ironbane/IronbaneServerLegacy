@@ -22,7 +22,7 @@ module.exports = function(db) {
         log = require('util').log,
         marked = require('marked'),
         User = require('./user');
-
+        
     var getById = function(articleId) {
         var deferred = Q.defer();
 
@@ -83,7 +83,10 @@ module.exports = function(db) {
 
         return deferred.promise;
     };
-
+/*
+@class MyClass
+@constructor
+*/
     var Article = Class.extend({
         init: function(json) {
             _.extend(this, json || {});
@@ -112,7 +115,6 @@ module.exports = function(db) {
                 return;
             }
 
-            log('article created: ' + result);
             // update article with new ID?
             deferred.resolve(article);
         });
@@ -128,6 +130,18 @@ module.exports = function(db) {
             return getAll(query);
         }
     };
+
+    Article.getFrontPage = function(){
+        var deferred = Q.defer();
+        db.query('Select * from forum_topics where board_id = 7 order by time desc', function(err, results){
+            if(err){
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(results);
+        });
+        return deferred.promise;
+    }
 
     return Article;
 };

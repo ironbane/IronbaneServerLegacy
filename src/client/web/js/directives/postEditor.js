@@ -18,7 +18,7 @@ angular.module('IronbaneApp')
                     bbcontent: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
-                $log.log('post data to save', post);
+
 
                 var savePromise;
                 // has a topic? reply else new topic

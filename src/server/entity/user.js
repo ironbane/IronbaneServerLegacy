@@ -70,6 +70,19 @@ module.exports = function(db) {
         }
     });
 
+
+    User.getOnlineUsersLastDay = function() {
+        var deferred = Q.defer();
+        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
+             if(err) {
+                    deferred.reject();
+                    return;
+                }
+                deferred.resolve(results);
+        });
+        return deferred.promise;
+    };
+
     User.getById = function(id) {
         var deferred = Q.defer();
 
@@ -128,6 +141,22 @@ module.exports = function(db) {
         });
 
         return deferred.promise;
+    };
+
+    User.getUserByName = function(username) {
+        var deferred = Q.defer();
+        db.query('select * from bcs_users where name=?', [username], function(err, results) {
+            if(err){
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(results);
+        });
+        return deferred.promise;
+
+
+        
+
     };
 
     // test if username is already taken
