@@ -89,7 +89,7 @@ var Server = Class.extend({
             app.use(express.methodOverride());
             app.use(express.session({
                 secret: config.get('session_secret'),
-                cookie: { maxAge: 3600000 }, // one hour
+                cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 }, // one month
                 store: sessionStore // store sessions in db for "remember me"
             }));
             app.set('view engine', 'html');
