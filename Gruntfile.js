@@ -272,6 +272,7 @@ module.exports = function(grunt) {
                 }
             },
             prod: {
+                src: ['install/**/*.sql'],
                 options: {
                     database: 'ironbane'
                 }

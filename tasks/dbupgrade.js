@@ -86,9 +86,11 @@ module.exports = function(grunt) {
             return deferred.promise;
         }
 
+        // TODO: test if the current DB revision script is missing?
         function findDelta(rev) {
-            var path = require('path');
-            var delta = [];
+            var path = require('path'),
+                delta = {},
+                ordered = [];
 
             task.filesSrc.forEach(function(file) {
                 var parts = path.basename(file, '.sql').split('_'),
@@ -96,11 +98,27 @@ module.exports = function(grunt) {
 
                 grunt.verbose.writeln('found script: ' + fRev + ' :: ' + file);
                 if(fRev > parseInt(rev, 10)) {
-                    delta[fRev] = file;
+                    delta[fRev-1] = file;
                 }
             });
 
-            return Q(delta.sort());
+            // we need to validate that the scripts are in logical order or else we fail!
+            var keys = Object.keys(delta).sort(),
+                prev = 0,
+                good = true;
+            keys.forEach(function(index) {
+                if(index !== prev) {
+                    good = false;
+                }
+                ordered.push(delta[index]);
+                prev++;
+            });
+
+            if(!good) {
+                return Q.reject('invalid script sequence!');
+            }
+
+            return Q(ordered);
         }
 
         function getMergeFunction(script) {
@@ -108,9 +126,22 @@ module.exports = function(grunt) {
 
             var sql = grunt.file.read(script);
 
-            grunt.verbose.writeln('applying script ' + script + ' ...');
+            grunt.verbose.write('Applying script ' + script + '...');
+            mysql.query(sql, function(err, results) {
+                if(err) {
+                    deferred.reject('error with script: ' + err);
+                    return;
+                }
 
-            deferred.resolve('w00t');
+                mysql.query('UPDATE db_revision SET revision_number=revision_number+1, last_update=UNIX_TIMESTAMP(now())', function(err) {
+                    if(err) {
+                        deferred.reject('error updating revision number! ' + err);
+                        return;
+                    }
+
+                    deferred.resolve(results);
+                });
+            });
 
             return deferred.promise;
         }
@@ -142,6 +173,8 @@ module.exports = function(grunt) {
                             grunt.fail.warn('merge error: ' + err);
                             taskDone(false);
                         });
+                    }, function(err) {
+                        grunt.fail.warn(err);
                     });
                 }, function(err) {
                     grunt.fail.warn(err);
