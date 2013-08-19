@@ -257,10 +257,31 @@ module.exports = function(grunt) {
                 /** @optional  - if provided the converted files will be saved in this folder instead */
                 //dest: './assets/'
             }
+        },
+        // db script mgmt
+        dbupgrade: {
+            options: {
+                host: '<%= cfg.get("mysql_host") %>',
+                user: '<%= cfg.get("mysql_user") %>',
+                password: '<%= cfg.get("mysql_password") %>'
+            },
+            dev: {
+                src: ['install/**/*.sql'],
+                options: {
+                    database: 'ironbane_dev'
+                }
+            },
+            prod: {
+                options: {
+                    database: 'ironbane'
+                }
+            }
         }
     });
 
     // load tasks
+    grunt.loadTasks('tasks');
+
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
