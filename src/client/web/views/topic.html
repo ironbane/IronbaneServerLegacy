@@ -24,9 +24,7 @@
                         </a>
                         <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
                     </header>
-                    <div class="postcontent">
-                    <userpost content="{{post.content}}"/>
-                    </div>
+                    <article class="postcontent" ng-bind-html-unsafe="post.content"></article>
                 </li>
             </ul>
         </section>

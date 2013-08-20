@@ -33,7 +33,7 @@ module.exports = function(db) {
         log(JSON.stringify(params));
         var deferred = Q.defer();
         db.query('insert into forum_topics set board_id = ?, time = ?, title = ?', [params.boardId, params.time, params.title], function(err, topicResult) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
@@ -45,59 +45,59 @@ module.exports = function(db) {
                     time: params.time,
                     user: params.user
                 };
-                log("topic id :" +post.topic_id);
-                log("content : " + post.content);
-                log("time : " + post.time);
-                log("user : " + post.user);
+            log("topic id :" + post.topic_id);
+            log("content : " + post.content);
+            log("time : " + post.time);
+            log("user : " + post.user);
 
             db.query('insert into forum_posts set ?', [post], function(err, result) {
-                if(err) {
+                if (err) {
                     deferred.reject(err);
                     log(err + ' while inserting post');
                     return;
                 }
-               deferred.resolve(result);
+                deferred.resolve(result);
             });
         });
-        return deferred.promise;
 
-    }
+        return deferred.promise;
+    };
 
     Topic.getPosts = function(topicId) {
         var deferred = Q.defer();
         db.query('select * from forum_posts where topic_id = ?', [topicId], function(err, results) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
 
-            if(results.length === 0) {
+            if (results.length === 0) {
                 deferred.reject(results);
                 return;
             }
-            _.each(results, function(p){
+
+            _.each(results, function(p) {
                 bbcode.parse(p.content, function(html) {
-                        p.content = html;
-                    });
+                    p.content = html;
+                });
             });
 
             deferred.resolve(results);
         });
-        return deferred.promise;
 
-    }
+        return deferred.promise;
+    };
 
     Topic.get = function(topicId) {
         var deferred = Q.defer();
 
-
         db.query('select * from forum_topics where id=?', [topicId], function(err, results) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
 
-            if(results.length === 0) {
+            if (results.length === 0) {
                 deferred.reject('Topic not found.');
                 return;
             }

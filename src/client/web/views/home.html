@@ -1,5 +1,22 @@
 <div class="content-body">
-   <section ng-repeat="post in posts">
-   		{{post.title}} .....<br>
-   </section>
+    <section>
+        <div class="ib-news-banner">
+            <div class="ib-news-banner-text">Ironbane is an open source 3D online role-playing game!</div>
+            <div class="ib-news-banner-play">
+                <button class="ibutton_attention" ng-click="navTo('/game')">Play it now!</button>
+                <span>
+                    Ironbane runs straight from any modern browser!
+                </span>
+            </div>
+            <div class="ib-news-banner-get-involved">
+                <span>
+                    We're always looking for motivated people!
+                </span>
+                <button class="ibutton_attention2" ng-click="navTo('/article/get-involved')">Get involved!</button>
+            </div>
+        </div>
+    </section>
+    <section ng-repeat="post in posts">
+        <h2><a ng-href="/forum/{{ post.board_id }}/topics/{{ post.id }}">{{post.title}}</a></h2>
+    </section>
 </div>

@@ -9,7 +9,7 @@ angular.module('IronbaneApp')
         this.url = '/forum/' + this.id;
 
         if(!this.icon) {
-            this.$setIcon('beer-stein');
+            this.$setIcon('news');
         } else {
             this.$setIcon(this.icon);
         }
@@ -18,7 +18,7 @@ angular.module('IronbaneApp')
     Board.prototype.$setIcon = function(icon) {
         this.icon = icon;
         this.iconStyle = {
-            'background-image': 'url("/images/icons/svg/'+ icon + '.svg")',
+            'background-image': 'url("/images/icons/forum/'+ icon + '.png")',
             'background-size': '32px 32px'
         };
     };
