@@ -277,6 +277,13 @@ module.exports = function(grunt) {
                     database: 'ironbane'
                 }
             }
+        },
+        download: {
+            assets: {
+                url: 'http://ironbane.com/data.tar',
+                manifest: false,
+                filename: '<%= cfg.get("assetDir") %>'
+            }
         }
     });
 
@@ -294,6 +301,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-three-obj');
+    grunt.loadNpmTasks('grunt-download');
 
     // Default task(s).
     grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);

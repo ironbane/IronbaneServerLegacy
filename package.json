@@ -46,7 +46,8 @@
     "prompt": "~0.2.11",
     "supervisor": "~0.5.3",
     "q-io": "~1.9.1",
-    "winston": "~0.7.2"
+    "winston": "~0.7.2",
+    "grunt-download": "~0.2.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
