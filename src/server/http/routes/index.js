@@ -104,7 +104,7 @@ module.exports = function(app, db) {
 
     // now we do this immediately
     var gameModelPromise = getGameModel().then(function(results) {
-        console.log('gameModel Promise success: ', results);
+        //console.log('gameModel Promise success: ', results);
 
         return results; // pass thru
     }, function(err) {

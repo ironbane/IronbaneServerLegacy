@@ -54,11 +54,11 @@ module.exports = function(app, db) {
         if(req.user) {
             // send only needed info for UI, NOT password
             res.send({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                characterused: user.characterused || 0,
-                roles: user.roles || []
+                id: req.user.id,
+                name: req.user.name,
+                email: req.user.email,
+                characterused: req.user.characterused || 0,
+                roles: req.user.roles || []
             });
         } else {
             res.send(404, 'no user signed in');
