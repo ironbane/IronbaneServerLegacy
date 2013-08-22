@@ -37,6 +37,7 @@ angular.module('IronbaneApp')
                 // upgrade objects
                 angular.forEach(response.data,function(topic) {
                     //post.author = new User(post.author);
+                    topic.board_id = boardId; // for news section...
                     topics.push(new Topic(topic));
                 });
                 return topics;

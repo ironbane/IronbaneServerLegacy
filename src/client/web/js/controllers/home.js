@@ -1,7 +1,7 @@
 // controllers - home.js
 angular.module('IronbaneApp')
-    .controller('HomeCtrl', ['$scope', 'Article', '$log', '$location', '$window',
-        function($scope, Article, $log, $location, $window) {
+    .controller('HomeCtrl', ['$scope', 'Topic', '$log', '$location', '$window',
+        function($scope, Topic, $log, $location, $window) {
             $scope.navTo = function(path) {
                 // better way to do this?
                 if(path === '/game') {
@@ -11,11 +11,11 @@ angular.module('IronbaneApp')
                 }
             };
 
-            Article.getFrontPage()
-                .then(function(results) {
-                    $scope.posts = results;
-                }, function(error) {
-                    $log.log('error getting frontpage ' + error);
-                });
+            // todo: config boardId and/or config via server
+            Topic.getTopics(7).then(function(results) {
+                $scope.posts = results;
+            }, function(err) {
+                $log.error('error getting news topics', err);
+            });
         }
     ]);
