@@ -37,3 +37,5 @@ Play the game at <http://www.ironbane.com/>.
 * Run grunt ```grunt```
 
 * Run ```ironbane start``` from the root directory.
+
+* Open ```http://localhost:8080/``` to try out your installation.
