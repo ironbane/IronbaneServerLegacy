@@ -106,7 +106,26 @@ module.exports = function(app, db) {
             });
     });
 
-    // add a friend
+    // get all friends for currently signed in user
+    app.get('/api/user/friends', app.ensureAuthenticated, function(req, res) {
+        Friend.getForUser(req.user.id).then(function(friends) {
+            // damn, should be character!
+            User.getFriendsData(friends).then(function(fdata) {
+                _.each(fdata, function(f) {
+                    var friend = _.findWhere(friends, {friend_id: f.id});
+                    if(friend) {
+                        friend.name = f.name;
+                    }
+                });
+
+                res.send(friends);
+            });
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
+    // add a friend (currently signed in user!)
     app.post('/api/user/friends', app.ensureAuthenticated, function(req, res) {
         Friend.add(req.user.id, req.body.friendId, req.body.tags).then(function(friend) {
             res.send(friend);

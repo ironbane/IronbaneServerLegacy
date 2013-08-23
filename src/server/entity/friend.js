@@ -52,7 +52,22 @@ module.exports = function(db) {
     };
 
     Friend.getForUser = function(userId) {
+        var deferred = Q.defer();
 
+        db.query('select * from users_friends where user_id = ?', [userId], function(err, results) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+
+            results.forEach(function(row, i) {
+                results[i] = new Friend(row);
+            });
+
+            deferred.resolve(results);
+        });
+
+        return deferred.promise;
     };
 
     // add a friend record, tags is an optional string array
