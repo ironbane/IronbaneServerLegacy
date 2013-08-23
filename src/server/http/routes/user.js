@@ -104,4 +104,13 @@ module.exports = function(app, db) {
                 res.send(500, err);
             });
     });
+
+    // add a friend
+    app.post('/api/user/friends', app.ensureAuthenticated, function(req, res) {
+        Friend.add(req.user.id, req.body.friendId, req.body.tags).then(function(friend) {
+            res.send(friend);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
 };
