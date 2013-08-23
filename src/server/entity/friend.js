@@ -59,11 +59,15 @@ module.exports = function(db) {
     Friend.add = function(userId, friendId, tags) {
         var deferred = Q.defer();
 
-        var obj = {user_id: userId, friend_id: friendId};
+        var obj = {
+            user_id: userId,
+            friend_id: friendId,
+            date_added: (new Date()).valueOf() / 1000
+        };
 
         // tags should be an array
         if(tags) {
-            obj.tags = tags;
+            obj.tags = JSON.stringify(tags);
         }
 
         db.query('insert into users_friends SET ?', obj, function(err, results) {
