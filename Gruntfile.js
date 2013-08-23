@@ -302,5 +302,5 @@ module.exports = function(grunt) {
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
     // when ready do both
-    grunt.registerTask('default', ['website', 'game']);
+    grunt.registerTask('default', ['dbupgrade', 'website', 'game']);
 };
