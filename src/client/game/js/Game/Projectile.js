@@ -192,6 +192,10 @@ var Projectile = Unit.extend({
 
         this._super(position, 0, GetNewProjectileID(), 'Projectile', 0, this.size);
 
+        if ( !this.type.parabolic ) {
+            this.restrictToGround = false;
+        }
+
 
 
         // Overwrite the default of '5'

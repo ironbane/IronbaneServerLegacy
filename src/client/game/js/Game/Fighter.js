@@ -847,9 +847,15 @@ this.walkSoundTimer = 0.0;
       this.velocity.y = 2;
     }
 
-    this.lastJumpTimer += 1.0;
+    this.lastJumpTimer += 0.5;
 
-    this.allowCheckGround = false;
+    this.restrictToGround = false;
+
+    var me = this;
+
+    setTimeout(function() {
+      me.restrictToGround = true;
+    }, 100);
 
     this.allowJump = false;
 

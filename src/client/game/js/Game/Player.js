@@ -808,7 +808,7 @@ var Player = Fighter.extend({
 
 
     if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
-      this.allowCheckGround = false;
+      this.allowRaycastGround = false;
     }
 
 
