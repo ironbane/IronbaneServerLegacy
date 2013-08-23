@@ -32,7 +32,9 @@ module.exports = function() {
     var clientDir = config.get('buildTarget') + 'game/';
 
     if (!cryptSalt) {
-        throw "No password hash set!";
+        setInterval(function() {
+            console.log("Warning: no password hash set! Edit config.json and set the cryptSalt variable.");
+        }, 1000);
     }
 
     // System start
