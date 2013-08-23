@@ -1,0 +1,1 @@
+ALTER TABLE `forum_topics` CHANGE COLUMN `locked` TINYINT(1) NOT NULL DEFAULT 0;
