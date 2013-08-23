@@ -507,9 +507,9 @@ var Player = Fighter.extend({
               && this.position.y > GetZoneConfig('fluidLevel') - 0.5 ) ) ) {
 
           if ( this.position.y < GetZoneConfig('fluidLevel') ) {
-            this.position.y = GetZoneConfig('fluidLevel');
+            //this.position.y = GetZoneConfig('fluidLevel');
 
-            this.lastJumpTimer = 2.0;
+            this.lastJumpTimer = 1.0;
           }
 
           this.Jump();

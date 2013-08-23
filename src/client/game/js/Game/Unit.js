@@ -420,15 +420,16 @@ var Unit = PhysicsObject.extend({
           }
         }
 
-        if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
-          this.velocity.addSelf(grav.clone().multiplyScalar(dTime));
-        }
-        else {
-          this.velocity.lerpSelf(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
+        if ( !(this instanceof Fighter && this.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
+          if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
+            this.velocity.addSelf(grav.clone().multiplyScalar(dTime));
+          }
+          else {
+            this.velocity.lerpSelf(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
 
-          soundHandler.Play("stepWater", this.position);
+            soundHandler.Play("stepWater", this.position);
+          }
         }
-
 
       }
 
