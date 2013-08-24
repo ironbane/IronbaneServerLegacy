@@ -59,6 +59,8 @@ var Debugger = Class.extend({
     Clear: function() {
         for(var h=0;h<this.arrowHelpers.length;h++) {
             ironbane.scene.remove(this.arrowHelpers[h]);
+            this.arrowHelpers[h].deallocate();
+            ironbane.renderer.deallocateObject( this.arrowHelpers[h] );
         }
         this.arrowHelpers = [];
     },
