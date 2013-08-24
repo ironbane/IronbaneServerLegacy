@@ -166,7 +166,7 @@ var SoundHandler = Class.extend({
             preload: true
         },
         {
-            file: "battle/firearrow.wav",
+            file: "battle/firearrow1.wav",
             preload: true
         },
         {
