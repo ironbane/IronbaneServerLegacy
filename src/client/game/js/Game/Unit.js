@@ -563,6 +563,7 @@ var Unit = PhysicsObject.extend({
                 }
 
                 if ( (this instanceof Projectile) && this.type.parabolic ) {
+                  this.velocity.set(0,0,0);
                   this.Impact(true);
                 }
 
