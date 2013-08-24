@@ -893,7 +893,7 @@ this.walkSoundTimer = 0.0;
       if ( this.dead ) return;
 
 
-      attacker.SwingWeapon(this.position, attacker.weaponTemplate);
+      if ( attacker !== ironbane.player ) attacker.SwingWeapon(this.position, attacker.weaponTemplate);
 
 
       power = power || 0.3;
