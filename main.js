@@ -30,6 +30,8 @@ module.exports = function() {
         log = require('util').log; // built in timestampped logger
 
     var clientDir = config.get('buildTarget') + 'game/';
+    var assetDir = config.get('assetDir');
+    var persistentWorldChanges = config.get('persistentWorldChanges');
 
     if (!cryptSalt) {
         setInterval(function() {
