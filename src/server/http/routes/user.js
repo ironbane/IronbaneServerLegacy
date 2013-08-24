@@ -58,7 +58,6 @@ module.exports = function(app, db) {
                 id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
-                characterused: req.user.characterused || 0,
                 roles: req.user.roles || []
             });
         } else {

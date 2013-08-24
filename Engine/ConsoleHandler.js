@@ -86,7 +86,6 @@ var ConsoleHandler = Class.extend({
         });
       });
 
-      mysql.query('UPDATE bcs_users SET characterused = 0');
       mysql.query('TRUNCATE TABLE ib_characters');
 
       log("All characters cleared!");

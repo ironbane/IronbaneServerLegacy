@@ -227,6 +227,8 @@ $(document).keydown(function(event){
                     window.chars = data;
                     window.charCount = window.chars.length;
 
+                    startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
+
                     hudHandler.ShowMenuScreen();
                     hudHandler.MakeCharSelectionScreen();
                 })

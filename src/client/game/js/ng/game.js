@@ -153,6 +153,9 @@ IronbaneApp
                     $log.error('error loading character data! ', response);
                 })
                 .then(function() {
+
+                    $window.startdata.characterUsed = $window.hudHandler.GetLastCharacterPlayed();
+
                     $window.hudHandler.MakeCharSelectionScreen();
                     $window.terrainHandler.Tick(0.1);
 

@@ -89,10 +89,6 @@ module.exports = function(app, db) {
                 // double check character and user match
                 if(character.user === userId) {
                     character.$delete().then(function() {
-                        if(req.user.characterused === character.id) {
-                            req.user.characterused = 0;
-                            // todo: persist!
-                        }
                         res.send('OK');
                     }, function(err) {
                         res.send(500, 'error deleting character! ' + err);

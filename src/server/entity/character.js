@@ -106,10 +106,11 @@ module.exports = function(db) {
             createObj = {
                 name: self.name,
                 user: self.user || 0, // all characters must have a user, reject based on this instead?
-                creationtime: (new Date()).valueOf() / 1000,
+                creationtime: Math.round(new Date().getTime() / 1000),
                 skin: self.skin,
                 eyes: self.eyes,
-                hair: self.hair
+                hair: self.hair,
+                lastplayed: Math.round(new Date().getTime() / 1000)
             };
 
         // validation (todo: skin, hair, eyes, max characters)

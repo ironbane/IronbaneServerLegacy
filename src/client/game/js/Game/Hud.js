@@ -969,6 +969,17 @@ var HUDHandler = Class.extend({
         $('#chatBox, #itemBar, #lootBag, #coinBar, #statBar').hide();
         soundHandler.FadeIn("music/maintheme", 5000);
     },
+    GetLastCharacterPlayed: function() {
+        var lastChar = 0;
+        var lastTimeFound = 0;
+        _.each(chars, function(char) {
+            if ( char.lastplayed > lastTimeFound ) {
+                lastTimeFound = char.lastplayed;
+                lastChar = char.id;
+            }
+        });
+        return lastChar;
+    },
     MakeCharSelectionScreen: function() {
         var slotsLeft = slotsAvailable - charCount;
 
@@ -1276,7 +1287,6 @@ var HUDHandler = Class.extend({
                     startdata.loggedIn = true;
                     startdata.name = user.name;
                     startdata.user = user.id;
-                    startdata.characterUsed = user.characterused;
                     window.isEditor = user.editor === 1;
 
                     // get characters for user
