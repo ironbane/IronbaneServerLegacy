@@ -833,7 +833,8 @@ var Player = Fighter.extend({
 
 
         var dir = unit.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0)).subSelf( ourpos );
-        var distance = dir.length();
+        // With a small offset to account for NPCs stuck in walls
+        var distance = dir.length() - 0.5;
         var ray = new THREE.Ray( ourpos, dir.clone().normalize(), 0, distance );
 
 
