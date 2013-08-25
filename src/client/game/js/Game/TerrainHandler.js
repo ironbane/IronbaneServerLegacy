@@ -222,7 +222,7 @@ var TerrainHandler = Class.extend({
     if ( ironbane.player ) {
       ironbane.player.onChangeZone(newZone);
     }
-    
+
 
     if ( socketHandler.loggedIn ) {
       this.targetMusic = ChooseRandom(GetZoneConfig("music"));
@@ -428,6 +428,10 @@ var TerrainHandler = Class.extend({
         }
 
         _.each(this.cells, function(cell) {
+
+            // Fake the Y coordinate, otherwise cells won't load if we are high/low
+            cell.worldPosition.setY(p.y);
+
             if ( !p.InRangeOf(cell.worldPosition, cellLoadRange+16)) {
               cell.Destroy();
             }
