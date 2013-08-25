@@ -54,6 +54,7 @@ module.exports = function(db) {
 
             return deferred.promise;
         },
+        // at some point using this it would be possible to define other roles in a DB table
         $initRoles: function() {
             var user = this;
 
@@ -67,6 +68,20 @@ module.exports = function(db) {
             if (user.moderator === 1) {
                 user.roles.push('MODERATOR');
             }
+        },
+        $hasRole: function(role) {
+            return this.roles.indexOf(role) >= 0;
+        },
+        // having these getters allows for additional future business logic to be added if needed
+        // i.e. return this.$hasRole('ADMIN') || this.id === 1
+        $isAdmin: function() {
+            return this.$hasRole('ADMIN');
+        },
+        $isEditor: function() {
+            return this.$hasRole('EDITOR');
+        },
+        $isModerator: function() {
+            return this.$hasRole('MODERATOR');
         },
         $addFriend: function(friendId, tags) {
             var deferred = Q.defer();

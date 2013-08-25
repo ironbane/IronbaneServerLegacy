@@ -104,4 +104,36 @@ module.exports = function(app, db) {
                 }
             });
     });
+
+    // FRIENDSHIP API
+
+    app.get('/api/user/:userId/characters/:characterId/friends', app.ensureAuthenticated, function(req, res) {
+        var userId = parseInt(req.params.userId, 10),
+            characterId = parseInt(req.params.characterId, 10);
+
+        if(req.user.id !== userId && !req.user.$isAdmin()) {
+            res.send(403, 'You do not own this character!');
+            return;
+        }
+
+        Character.get(characterId)
+            .then(function(character) {
+                // double check character and user match
+                if(character.user === userId || req.user.$isAdmin()) {
+                    character.$getFriends().then(function(friends) {
+                        res.send(friends);
+                    }, function(err) {
+                        res.send(500, err);
+                    });
+                } else {
+                    res.send(403, 'You do not own this character!');
+                }
+            }, function(err) {
+                if(err === 'not found') {
+                    res.send(404, err);
+                } else {
+                    res.send(500, err);
+                }
+            });
+    });
 };

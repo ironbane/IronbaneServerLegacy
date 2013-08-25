@@ -53,6 +53,82 @@ module.exports = function(db) {
             this.equipment = "";
 
             _.extend(this, json || {});
+        },
+        $addFriend: function(friendId, tags) {
+            var deferred = Q.defer();
+
+            var obj = {
+                character_id: this.id,
+                friend_id: friendId,
+                date_added: (new Date()).valueOf() / 1000
+            };
+
+            // tags should be an array
+            if(tags) {
+                obj.tags = JSON.stringify(tags);
+            }
+
+            db.query('insert into characters_friends SET ?', obj, function(err, results) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                // modify the input for the output
+                obj.id = results.insertId;
+
+                deferred.resolve(obj);
+            });
+
+            return deferred.promise;
+        },
+        $removeFriend: function(friendId) {
+            var deferred = Q.defer();
+
+            db.query('delete from characters_friends where character_id = ? and friend_id = ?', [this.id, friendId], function(err, results) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                deferred.resolve(results);
+            });
+
+            return deferred.promise;
+        },
+        $getFriends: function() {
+            var deferred = Q.defer();
+
+            db.query('select * from characters_friends where character_id = ?', [this.id], function(err, friends) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                if(friends.length < 1) {
+                    deferred.resolve([]);
+                    return; // no friends!
+                }
+
+                // add more columns? for characters prolly can send almost everything? location, clothes (render pic), etc.
+                db.query("select id, name from ib_characters WHERE id IN (" + _.pluck(friends, 'friend_id').join(',') + ")", function(err, results) {
+                    if(err) {
+                        deferred.reject(err);
+                        return;
+                    }
+
+                    _.each(results, function(friend) {
+                        var f = _.findWhere(friends, {friend_id: friend.id});
+                        if(f) {
+                            f.name = friend.name;
+                        }
+                    });
+
+                    deferred.resolve(friends);
+                });
+            });
+
+            return deferred.promise;
         }
     });
 
