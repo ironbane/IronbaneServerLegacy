@@ -1,24 +1,6 @@
 
 if ( !SERVER ) {
 
-
-  function loadTerrainTexture( path ) {
-
-    var image = new Image();
-    image.onload = function () {
-      texture.needsUpdate = true;
-    };
-    image.src = path;
-
-    var texture  = new THREE.Texture( image, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
-
-    return new THREE.MeshLambertMaterial( {
-      map: texture,
-      ambient: 0xbbbbbb
-    } );
-
-  }
-
   function loadTexture( path, textureOnly, options) {
 
 
@@ -72,7 +54,10 @@ if ( !SERVER ) {
 
       if ( options.transparent ) config.transparent = options.transparent;
 
-      return new THREE.MeshLambertMaterial( config ) ;
+      var mat = new THREE.MeshPhongMaterial( config );
+      mat.perPixel = true;
+
+      return mat;
 
     }
 
