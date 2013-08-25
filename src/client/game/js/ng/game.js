@@ -256,7 +256,7 @@ IronbaneApp
                     }, 1000, function() {
                         $("#gameFrame").css('opacity', '');
 
-                        $("#loadingBarMessage").text("Loading area");
+                        $("#loadingBarMessage").text("Loading Area");
                     });
                 }, 500);
             }

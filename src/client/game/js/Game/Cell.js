@@ -118,6 +118,13 @@ var Cell = Class.extend({
         // Load all 3D models that belong to this group
         this.models = new THREE.Mesh(this.modelGeometry, new THREE.MeshFaceMaterial());
         this.models.castShadow = true;
+
+        this.models.material.side = THREE.DoubleSide;
+
+        _.each(this.modelGeometry.materials, function(material) {
+          material.side = THREE.DoubleSide;
+        });
+
         ironbane.scene.add(this.models);
 
         // Collision data is now saved to this cell
