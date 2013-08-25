@@ -104,11 +104,21 @@ var MeshHandler = Class.extend({
     // Only push materials that are actually inside the materials
     for (var i=0; i<geometry.jsonMaterials.length; i++) {
 
-      // // Check if there's a map inside the material, and if it contains a sourceFile
-      // if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
-      //   // Extract the tile!
-      //   tiles[i] = "tiles/"+(geometry.jsonMaterials[i]["mapDiffuse"].split("."))[0];
-      // }
+      // Check if there's a map inside the material, and if it contains a sourceFile
+      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
+        // Extract the tile!
+        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
+        texture = texture[texture.length-1].split(".")[0];
+
+        if ( !_.isNaN(parseInt(texture,10)) ) {
+          tiles[i] = "tiles/"+texture;
+        }
+        else {
+          tiles[i] = "textures/"+texture;
+        }
+
+
+      }
 
       if ( drawNameMesh ) {
         materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
