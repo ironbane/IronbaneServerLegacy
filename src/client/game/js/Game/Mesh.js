@@ -115,48 +115,6 @@ var Mesh = Unit.extend({
       me.object3D.add(light);
 
 
-      // Update materials that are nearby:
-
-      // Update cells & objects that are nearby
-
-
-
-      _.each(terrainHandler.cells, function(cell) {
-
-        if ( cell.modelMesh ) {
-          _.each(cell.modelMesh.geometry.materials, function(material) {
-            material.needsUpdate = true;
-          });
-        }
-
-
-        _.each(cell.objects, function(obj) {
-
-          if ( me.InRangeOfPosition(obj.position, light.distance) ) {
-            if ( obj.mesh ) {
-              if ( ISDEF(obj.mesh.material.needsUpdate) ) {
-                obj.mesh.material.needsUpdate = true;
-              }
-
-              if ( ISDEF(obj.mesh.geometry.materials) ) {
-                _.each(obj.mesh.geometry.materials, function(material) {
-                  material.needsUpdate = true;
-                });
-              }
-            }
-          }
-
-
-        }, cell);
-
-
-      });
-
-      terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
-
-      _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
-        material.needsUpdate = true;
-      });
 
 
     }, this);
