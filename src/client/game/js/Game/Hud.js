@@ -984,7 +984,7 @@ var HUDHandler = Class.extend({
         var slotsLeft = slotsAvailable - charCount;
 
         var text = '';
-        text += '<div id="charSelect"></div>';
+        text += '<div id="charSelect" class="dialog"></div>';
 
         $('#loginContent').html(text);
 

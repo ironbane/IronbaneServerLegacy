@@ -44,7 +44,7 @@
             <div class="spacer"></div>
             <div id="loginContainer">
                 <div id="loginContent"></div>
-                <div id="noWebGL">
+                <div id="noWebGL" class="dialog">
                     <div id="hquote"></div>
                     <div class="spacersmall"></div>
                     <div class="gen">It appears your browser does not support WebGL, or it is not enabled.<div class="spacersmall"></div><div id="webglsolution"></div></div>
@@ -58,7 +58,7 @@
             <div class="spacer"></div>
         </div>
 
-        <div id="alertBox" style="display:none">
+        <div id="alertBox" class="dialog" style="display:none">
             <div id="alertImage"></div>
             <div id="alertMessage">Sample alert message</div>
             <div id="alertOK">
@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <news-pane id="devNews" style="display:none;"></news-pane>
+        <news-pane id="devNews" class="dialog" style="display:none;"></news-pane>
 
         <div id="chatBox">
             <chat-window id="chatContent"></chat-window>
@@ -102,7 +102,7 @@
             <div id="tileList" style="background-color:gray"></div>
         </div>
         <button id="bogusButton">Bogus</button>
-        <div id="tooltip"></div>
+        <div id="tooltip" class="dialog"></div>
         <div id="black-bar-top"></div>
         <div id="black-bar-bottom"></div>
         <div id="editorControls"></div>
