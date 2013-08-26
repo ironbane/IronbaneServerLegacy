@@ -181,11 +181,7 @@ var Cell = Class.extend({
             }
         }, this);
 
-        _.each(this.waypointMeshes, function(waypointMesh) {
-            ironbane.scene.remove(waypointMesh);
-        });
-
-        this.waypointMeshes = [];
+        this.ClearWaypoints();
 
         this.LoadObjects(true);
     },
@@ -198,10 +194,7 @@ var Cell = Class.extend({
             ironbane.unitList = _.without(ironbane.unitList, this.objects[o]);
         }
 
-        for(var m=0;m<this.waypointMeshes.length;m++) {
-            ironbane.scene.remove(this.waypointMeshes[m]);
-        }
-        this.waypointMeshes = [];
+        this.ClearWaypoints();
 
         this.objects = [];
 
@@ -210,6 +203,13 @@ var Cell = Class.extend({
     Reload: function() {
         this.Destroy();
         this.status = cellStatusEnum.INIT;
+    },
+    ClearWaypoints: function() {
+        _.each(this.waypointMeshes, function(waypointMesh) {
+            ironbane.scene.remove(waypointMesh);
+            waypointMesh.deallocate();
+            ironbane.renderer.deallocateObject( waypointMesh );
+        });
     },
     LoadObjects: function(waypointsOnly) {
 

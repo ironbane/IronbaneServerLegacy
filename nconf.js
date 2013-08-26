@@ -23,6 +23,11 @@ nconf.defaults({
     buildTarget: 'deploy/', // replaces old clientDir
 
     assetDir: 'media',
+
+    // Set to true to allow the game to modify the files in the assetDir directly.
+    // Otherwise, next time you run grunt all changes will be lost.
+    persistentWorldChanges: false,
+
     cryptSalt: '',
     isProduction: false,
     use_nodetime: false,

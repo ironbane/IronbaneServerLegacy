@@ -89,16 +89,44 @@ module.exports = function(app, db) {
                 // double check character and user match
                 if(character.user === userId) {
                     character.$delete().then(function() {
-                        if(req.user.characterused === character.id) {
-                            req.user.characterused = 0;
-                            // todo: persist!
-                        }
                         res.send('OK');
                     }, function(err) {
                         res.send(500, 'error deleting character! ' + err);
                     });
                 } else {
                     res.send(403, 'Cannot delete another user\'s character!');
+                }
+            }, function(err) {
+                if(err === 'not found') {
+                    res.send(404, err);
+                } else {
+                    res.send(500, err);
+                }
+            });
+    });
+
+    // FRIENDSHIP API
+
+    app.get('/api/user/:userId/characters/:characterId/friends', app.ensureAuthenticated, function(req, res) {
+        var userId = parseInt(req.params.userId, 10),
+            characterId = parseInt(req.params.characterId, 10);
+
+        if(req.user.id !== userId && !req.user.$isAdmin()) {
+            res.send(403, 'You do not own this character!');
+            return;
+        }
+
+        Character.get(characterId)
+            .then(function(character) {
+                // double check character and user match
+                if(character.user === userId || req.user.$isAdmin()) {
+                    character.$getFriends().then(function(friends) {
+                        res.send(friends);
+                    }, function(err) {
+                        res.send(500, err);
+                    });
+                } else {
+                    res.send(403, 'You do not own this character!');
                 }
             }, function(err) {
                 if(err === 'not found') {

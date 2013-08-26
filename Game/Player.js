@@ -176,12 +176,14 @@ var Player = Fighter.extend({
         // No updating for guests
         // Update MYSQL and set the character data
         mysql.query('UPDATE ib_characters SET ' +
+            'lastplayed = ?,' +
             'x = ?,' +
             'y = ?,' +
             'z = ?,' +
             'zone = ?,' +
             'roty = ?' +
             ' WHERE id = ?', [
+            Math.round(new Date().getTime() / 1000),
             this.position.x,
             this.position.y,
             this.position.z,

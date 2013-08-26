@@ -268,20 +268,14 @@ module.exports = function(grunt) {
             options: {
                 host: '<%= cfg.get("mysql_host") %>',
                 user: '<%= cfg.get("mysql_user") %>',
-                password: '<%= cfg.get("mysql_password") %>'
+                password: '<%= cfg.get("mysql_password") %>',
+                database: '<%= cfg.get("mysql_database") %>'
             },
-            dev: {
-                src: ['install/**/*.sql'],
-                options: {
-                    database: 'ironbane_dev'
-                }
-            },
-            prod: {
-                src: ['install/**/*.sql'],
-                options: {
-                    database: 'ironbane'
-                }
-            }
+            // Nick: doesn't really make sense to me to make two configurations for dev and prod here
+            // since they will have their own repository set with their own gruntfile, db config, etc
+            //dev: {
+                src: ['install/**/*.sql']
+            //}
         },
         download: {
             assets: {
@@ -314,5 +308,5 @@ module.exports = function(grunt) {
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
     // when ready do both
-    grunt.registerTask('default', ['website', 'game']);
+    grunt.registerTask('default', ['dbupgrade', 'website', 'game']);
 };

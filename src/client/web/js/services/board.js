@@ -9,7 +9,8 @@ angular.module('IronbaneApp')
         this.url = '/forum/' + this.id;
 
         if(!this.icon) {
-            this.$setIcon('news');
+            // todo: some fallback in the css?
+            this.$setIcon(this.name.toLowerCase());
         } else {
             this.$setIcon(this.icon);
         }

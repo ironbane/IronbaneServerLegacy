@@ -123,8 +123,8 @@ var Mesh = Unit.extend({
 
       _.each(terrainHandler.cells, function(cell) {
 
-        if ( cell.mesh ) {
-          _.each(cell.mesh.geometry.materials, function(material) {
+        if ( cell.modelMesh ) {
+          _.each(cell.modelMesh.geometry.materials, function(material) {
             material.needsUpdate = true;
           });
         }
@@ -152,7 +152,11 @@ var Mesh = Unit.extend({
 
       });
 
+      terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
 
+      _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
+        material.needsUpdate = true;
+      });
 
 
     }, this);

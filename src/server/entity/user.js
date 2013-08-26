@@ -19,7 +19,7 @@ module.exports = function(db) {
                 aHash = crypto.createHash('md5'),
                 cryptSalt = config.get('cryptSalt');
 
-            if(self.id && self.id > 0) {
+            if (self.id && self.id > 0) {
                 // then this is an update
                 // TODO: perform update (currently update done on php site)
                 deferred.resolve(self);
@@ -33,9 +33,9 @@ module.exports = function(db) {
                 self.activationkey = aHash.digest('hex');
 
                 db.query('insert into bcs_users set ?', self, function(err, result) {
-                    if(err) {
+                    if (err) {
                         // the DB should be setup to catch duplicates, specifically call them out
-                        if(err.code === 'ER_DUP_ENTRY') {
+                        if (err.code === 'ER_DUP_ENTRY') {
                             deferred.reject('Duplicate username or email');
                         } else {
                             log('SQL error during user save: ' + JSON.stringify(err));
@@ -54,31 +54,121 @@ module.exports = function(db) {
 
             return deferred.promise;
         },
+        // at some point using this it would be possible to define other roles in a DB table
         $initRoles: function() {
             var user = this;
 
             user.roles = [];
-            if(user.admin === 1) {
+            if (user.admin === 1) {
                 user.roles.push('ADMIN');
             }
-            if(user.editor === 1) {
+            if (user.editor === 1) {
                 user.roles.push('EDITOR');
             }
-            if(user.moderator === 1) {
+            if (user.moderator === 1) {
                 user.roles.push('MODERATOR');
             }
+        },
+        $hasRole: function(role) {
+            return this.roles.indexOf(role) >= 0;
+        },
+        // having these getters allows for additional future business logic to be added if needed
+        // i.e. return this.$hasRole('ADMIN') || this.id === 1
+        $isAdmin: function() {
+            return this.$hasRole('ADMIN');
+        },
+        $isEditor: function() {
+            return this.$hasRole('EDITOR');
+        },
+        $isModerator: function() {
+            return this.$hasRole('MODERATOR');
+        },
+        $addFriend: function(friendId, tags) {
+            var deferred = Q.defer();
+
+            var obj = {
+                user_id: this.id,
+                friend_id: friendId,
+                date_added: (new Date()).valueOf() / 1000
+            };
+
+            // tags should be an array
+            if(tags) {
+                obj.tags = JSON.stringify(tags);
+            }
+
+            db.query('insert into users_friends SET ?', obj, function(err, results) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                // modify the input for the output
+                obj.id = results.insertId;
+
+                deferred.resolve(obj);
+            });
+
+            return deferred.promise;
+        },
+        $removeFriend: function(friendId) {
+            var deferred = Q.defer();
+
+            db.query('delete from users_friends where user_id = ? and friend_id = ?', [this.id, friendId], function(err, results) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                deferred.resolve(results);
+            });
+
+            return deferred.promise;
+        },
+        $getFriends: function() {
+            var deferred = Q.defer();
+
+            db.query('select * from users_friends where user_id = ?', [this.id], function(err, friends) {
+                if(err) {
+                    deferred.reject(err);
+                    return;
+                }
+
+                if(friends.length < 1) {
+                    deferred.resolve([]);
+                    return; // no friends!
+                }
+
+                db.query("select id, name from bcs_users WHERE id IN (" + _.pluck(friends, 'friend_id').join(',') + ")", function(err, results) {
+                    if(err) {
+                        deferred.reject(err);
+                        return;
+                    }
+
+                    // todo: check some flag like "allow my friends to see my email"?
+                    _.each(results, function(friend) {
+                        var f = _.findWhere(friends, {friend_id: friend.id});
+                        if(f) {
+                            f.name = friend.name;
+                        }
+                    });
+
+                    deferred.resolve(friends);
+                });
+            });
+
+            return deferred.promise;
         }
     });
 
-
     User.getOnlineUsersLastDay = function() {
         var deferred = Q.defer();
-        db.query('SELECT name from bcs_users WHERE last_session > '+  (Date.now()/1000 - 86400) + ' ORDER BY last_session', function(err,results) {
-             if(err) {
-                    deferred.reject();
-                    return;
-                }
-                deferred.resolve(results);
+        db.query('SELECT name from bcs_users WHERE last_session > ' + (Date.now() / 1000 - 86400) + ' ORDER BY last_session', function(err, results) {
+            if (err) {
+                deferred.reject();
+                return;
+            }
+            deferred.resolve(results);
         });
         return deferred.promise;
     };
@@ -87,12 +177,12 @@ module.exports = function(db) {
         var deferred = Q.defer();
 
         db.query('select * from bcs_users where id = ?', [id], function(err, results) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
 
-            if(results.length === 0) {
+            if (results.length === 0) {
                 deferred.reject("no user found");
             } else {
                 var user = new User(results[0]);
@@ -126,11 +216,11 @@ module.exports = function(db) {
                 return deferred.reject(genericMessage);
             }
 
-            if(results[0].banned !== 0) {
+            if (results[0].banned !== 0) {
                 return deferred.reject('User is banned!');
             }
 
-            if(hashedPw !== results[0].pass) {
+            if (hashedPw !== results[0].pass) {
                 deferred.reject(genericMessage);
             } else {
                 var user = new User(results[0]);
@@ -146,17 +236,13 @@ module.exports = function(db) {
     User.getUserByName = function(username) {
         var deferred = Q.defer();
         db.query('select * from bcs_users where name=?', [username], function(err, results) {
-            if(err){
+            if (err) {
                 deferred.reject(err);
                 return;
             }
             deferred.resolve(results);
         });
         return deferred.promise;
-
-
-        
-
     };
 
     // test if username is already taken
@@ -164,11 +250,11 @@ module.exports = function(db) {
         var deferred = Q.defer();
 
         db.query('select name from bcs_users where name=?', [name], function(err, results) {
-            if(err) {
+            if (err) {
                 return deferred.reject('db error ' + err);
             }
 
-            if(results.length > 0) {
+            if (results.length > 0) {
                 return deferred.reject('name already taken: ' + name);
             }
 
@@ -203,7 +289,7 @@ module.exports = function(db) {
         var deferred = Q.defer();
 
         // default to send registration confirmation
-        if(_.isUndefined(sendEmail)) {
+        if (_.isUndefined(sendEmail)) {
             sendEmail = true;
         }
 
@@ -211,19 +297,19 @@ module.exports = function(db) {
             eValid = User.validateEmail(email),
             pValid = User.validatePassword(password);
 
-        if(!uValid) {
+        if (!uValid) {
             deferred.reject('Username is invalid!');
         }
 
-        if(!eValid) {
+        if (!eValid) {
             deferred.reject('Email is invalid!');
         }
 
-        if(!pValid) {
+        if (!pValid) {
             deferred.reject('Password is invalid!');
         }
 
-        if(uValid && eValid && pValid) {
+        if (uValid && eValid && pValid) {
             var user = new User({
                 name: username,
                 pass: password,
@@ -231,7 +317,7 @@ module.exports = function(db) {
             });
 
             user.$save().then(function(ref) {
-                if(sendEmail) {
+                if (sendEmail) {
                     // TODO: actually send email for registration, activationkey isn't currently checked for login either.
                     // https://github.com/andris9/Nodemailer
                 }

@@ -507,9 +507,9 @@ var Player = Fighter.extend({
               && this.position.y > GetZoneConfig('fluidLevel') - 0.5 ) ) ) {
 
           if ( this.position.y < GetZoneConfig('fluidLevel') ) {
-            this.position.y = GetZoneConfig('fluidLevel');
+            //this.position.y = GetZoneConfig('fluidLevel');
 
-            this.lastJumpTimer = 2.0;
+            this.lastJumpTimer = 1.0;
           }
 
           this.Jump();
@@ -808,7 +808,7 @@ var Player = Fighter.extend({
 
 
     if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
-      this.allowCheckGround = false;
+      this.allowRaycastGround = false;
     }
 
 
@@ -833,7 +833,8 @@ var Player = Fighter.extend({
 
 
         var dir = unit.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0)).subSelf( ourpos );
-        var distance = dir.length();
+        // With a small offset to account for NPCs stuck in walls
+        var distance = dir.length() - 0.5;
         var ray = new THREE.Ray( ourpos, dir.clone().normalize(), 0, distance );
 
 

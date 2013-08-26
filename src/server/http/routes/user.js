@@ -57,7 +57,6 @@ module.exports = function(app, db) {
                 id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
-                characterused: req.user.characterused || 0,
                 roles: req.user.roles || []
             });
         } else {
@@ -100,6 +99,26 @@ module.exports = function(app, db) {
                         characterused: 0
                     });
                 });
+            }, function(err) {
+                res.send(500, err);
+            });
+    });
+
+    // get all friends for currently signed in user
+    app.get('/api/user/friends', app.ensureAuthenticated, function(req, res) {
+        req.user.$getFriends()
+            .then(function(friends) {
+                res.send(friends);
+            }, function(err) {
+                res.send(500, err);
+            });
+    });
+
+    // add a friend (currently signed in user!)
+    app.post('/api/user/friends', app.ensureAuthenticated, function(req, res) {
+        req.user.$addFriend(req.body.friendId, req.body.tags)
+            .then(function(friend) {
+                res.send(friend);
             }, function(err) {
                 res.send(500, err);
             });

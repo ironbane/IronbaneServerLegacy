@@ -92,7 +92,8 @@ var Unit = PhysicsObject.extend({
     this.waterSplashTimeout = 0.0;
     this.waterSplashSoundTimeout = 0.0;
 
-    this.allowCheckGround = true;
+    this.allowRaycastGround = true;
+    this.restrictToGround = true;
 
     this.isTouchingGround = false;
 
@@ -186,33 +187,13 @@ var Unit = PhysicsObject.extend({
       this.debugMesh = new THREE.Line(lineGeo, lineMat);
       this.debugMesh.type = THREE.Lines;
 
-
       ironbane.scene.add(this.debugMesh);
 
     }
 
-    //if ( ((this instanceof Fighter) && !(this instanceof Player) && this.id > 0) ) {
     if (this.drawNameMesh) {
         this.renderNameMesh(this.name);
     }
-
-
-    // Add lights
-    // for (var i = this.lightsToMaintain.length - 1; i >= 0; i--) {
-    //   this.object3D.add(this.lightsToMaintain[i]);
-    // }
-
-
-
-
-    // (function(unit){
-    //   setTimeout(function(){
-    //     unit.AddShadow();
-    //   },0);
-    // })(this);
-
-  //        this.renderOffset.y += 1.5;
-  //        this.renderOffsetMultiplier = 1.0;
 
     this.AddShadow();
   },
@@ -252,42 +233,12 @@ var Unit = PhysicsObject.extend({
   },
   AddShadow: function() {
     if ( this.enableShadow ) {
-      //            var map = textureHandler.GetTexture('plugins/game/images/misc/shadow.png', true );
-      //
-      //            var planeGeo = new THREE.PlaneGeometry(this.size, this.size, 1, 1);
-      //
-      //
-      //            var uniforms = {
-      //                uvScale : {
-      //                    type: 'v2',
-      //                    value: new THREE.Vector2(1,1)
-      //                },
-      //                texture1 : {
-      //                    type: 't',
-      //                    value: 0,
-      //                    texture: map
-      //                }
-      //            };
-      //
-      //            var shaderMaterial = new THREE.ShaderMaterial({
-      //                uniforms : uniforms,
-      //                vertexShader : $('#vertex').text(),
-      //                fragmentShader : $('#fragment_fullbright').text(),
-      //                transparent: true,
-      //                alphaTest: 0.1
-      //            //depthWrite: false,
-      //            //depthTest: false
-      //            });
-
-
-      //            this.shadowMesh = new THREE.Mesh(planeGeo, shaderMaterial);
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
         textureHandler.GetTexture('plugins/game/images/misc/shadow.png', false, {
           transparent:true,
           alphaTest:0.1
         }));
-      //this.shadowMesh.geometry.dynamic = true;
 
       this.shadowMesh.rotation.x = -Math.PI/2;
 
@@ -311,8 +262,6 @@ var Unit = PhysicsObject.extend({
 
         this.mesh.traverse( function ( object ) {
 
-
-          //object.material.deallocate();
 
           if ( !_.isUndefined(object.geometry) ) {
             _.each(object.geometry.materials, function(material) {
@@ -412,7 +361,7 @@ var Unit = PhysicsObject.extend({
       }
       else if ( !(this instanceof Projectile) ) {
         if ( !this.InRangeOfUnit(ironbane.player, 15) ) {
-          this.allowCheckGround = false;
+          this.allowRaycastGround = false;
           this.enableGravity = false;
         }
         else {
@@ -471,15 +420,16 @@ var Unit = PhysicsObject.extend({
           }
         }
 
-        if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
-          this.velocity.addSelf(grav.clone().multiplyScalar(dTime));
-        }
-        else {
-          this.velocity.lerpSelf(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
+        if ( !(this instanceof Fighter && this.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
+          if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
+            this.velocity.addSelf(grav.clone().multiplyScalar(dTime));
+          }
+          else {
+            this.velocity.lerpSelf(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
 
-          soundHandler.Play("stepWater", this.position);
+            soundHandler.Play("stepWater", this.position);
+          }
         }
-
 
       }
 
@@ -492,15 +442,12 @@ var Unit = PhysicsObject.extend({
 
 
 
-      if ( this.allowCheckGround && cellStandingOn ) {
+      if ( this.allowRaycastGround && cellStandingOn ) {
         // Handle collisions
-
-        var isSimpleProjectile = (this instanceof Projectile) && !this.type.parabolic;
-
 
         // Collide against meshes sideways
         // Only for the player to reduce performance
-        // NPC's use waypoints and other players should do their own local collisiond detection
+        // NPC's use waypoints and other players should do their own local collision detection
         // Will make cheaters easier to spot
         if ( (this instanceof Player) || (this instanceof Projectile) ) {
           var tVel = this.velocity.clone();
@@ -517,20 +464,12 @@ var Unit = PhysicsObject.extend({
             unitRayName: "colside"
           });
 
-
           if ( intersects.length > 0 && intersects[0].distance < 0.5) {
-
-            //debug.SetWatch("collision distance", intersects[0].distance);
 
             raycastNormal = intersects[0].face.normal;
             raycastGroundPosition = intersects[0].point;
 
-            //                        this.position.y += intersects[0].distance;
-            //                        this.velocity.y = 0;
-
             if ( this instanceof Projectile ) this.Impact(true);
-
-
 
             var distanceInside = 0.5-intersects[0].distance;
 
@@ -538,30 +477,19 @@ var Unit = PhysicsObject.extend({
 
             this.velocity.addSelf(raycastNormal.clone().multiplyScalar(-this.velocity.clone().dot(raycastNormal)));
 
-          //this.isTouchingGround = true;
           }
-        //          }
+
         }
 
-        // We don't like to cast rays when we're at 0,0, causes glitches
-        if ( this.position.x % 1 === 0 ) this.localPosition.x += 0.001;
-        if ( this.position.z % 1 === 0 ) this.localPosition.z += 0.001;
-
-
         // Stand on top of terrain and meshes
-        if ( !isSimpleProjectile ) {
-
-
+        if ( true ) {
 
           this.terrainAngle = 0;
-
 
           // Again, increase by performance for other units by reducing raycasts
           var rayList = (this instanceof Player) ? this.rayOffsetList : this.rayOffsetList;
 
           for ( var ro=0;ro<rayList.length;ro++ ) {
-
-            //if ( GetZoneConfig("enableFluid") && this.position.y < GetZoneConfig('fluidLevel')-0.5 ) continue;
 
             var rayCastPos = this.position.clone().addSelf(rayList[ro]);
 
@@ -572,7 +500,7 @@ var Unit = PhysicsObject.extend({
             var succesfulRays = 0;
             var struckUnit = null;
 
-              var distanceCheck = 0.5;
+            var distanceCheck = 0.5;
 
 
             var intersects = terrainHandler.RayTest(ray, {
@@ -582,53 +510,30 @@ var Unit = PhysicsObject.extend({
               unitRayName: "colground"
             });
 
-
-
-            //if ( intersects.length > 0 ) {
             for(var i=0;i<intersects.length;i++){
               normal = intersects[i].face.normal;
               point = intersects[i].point;
               distance = intersects[i].distance;
-              //                succesfulRays++;
+
               struckUnit = intersects[i].object.unit;
-              //              }
-              //            //}
-              //
-              //
-              //            if ( succesfulRays > 0 ) {
-              //debug.SetWatch("collision distance", intersects[0].distance);
+
 
               raycastNormal = normal;
               raycastGroundPosition = point;
 
-              //sw("raycastGroundPosition", raycastGroundPosition);
-
-             // raycastNormal = normal.divideScalar(succesfulRays);
-             // raycastGroundPosition = point.divideScalar(succesfulRays);
-             // distance = distance / succesfulRays;
-
-             //  debug.DrawVector(raycastNormal, raycastGroundPosition, 0xFF0099);
-             //                         this.position.y += intersects[0].distance;
-             //                         this.velocity.y = 0;
 
                if ( (this instanceof Player || this instanceof Projectile) ) {
                  if ( struckUnit instanceof DynamicMesh ) {
 
-                     //bm("unitStandingOn to struckUnit");
                      this.unitStandingOn = struckUnit;
 
                  }
                }
 
-
-
               distance = distance.Round(2);
 
-              // 0.4 <= 0.5
-              if ( distance <= distanceCheck ) {
+              if ( distance <= distanceCheck && this.restrictToGround ) {
 
-                // 0.5 - 0.4
-                // 0.1
                 var distanceInside = distanceCheck-distance;
 
                 var normalCopy = raycastNormal.clone();
@@ -637,14 +542,11 @@ var Unit = PhysicsObject.extend({
 
                 this.terrainAngle = Math.acos(raycastNormal.dot(vec)).ToDegrees();
 
-                //debug.SetWatch("SET this.terrainAngle", this.terrainAngle);
-
                 if ( showEditor && levelEditor.editorGUI.chClimb ) this.terrainAngle = 0;
 
                 if ( this.terrainAngle < 45 ) {
                   normalCopy.set(0,1,0);
                 }
-
 
                 var dvec = normalCopy.clone().multiplyScalar(distanceInside);
 
@@ -656,24 +558,19 @@ var Unit = PhysicsObject.extend({
 
                 this.localPosition.addSelf(dvec);
 
-
                 if ( !(this instanceof Projectile) ) {
                   this.velocity.subSelf(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
                 }
 
                 if ( (this instanceof Projectile) && this.type.parabolic ) {
+                  this.velocity.set(0,0,0);
                   this.Impact(true);
                 }
 
                 this.isTouchingGround = true;
-
-
               }
             }
-
-
           }
-
 
           // If nothing is found, check if we are underneath the terrain. There is never a possiblity that
           // we are underneath the terrain
@@ -706,7 +603,6 @@ var Unit = PhysicsObject.extend({
           }
         }
 
-        //debug.SetWatch("this.terrainAngle", this.terrainAngle);
 
 
         // Collide against meshes to the top
@@ -722,20 +618,11 @@ var Unit = PhysicsObject.extend({
 
           if ( intersects.length > 0 && intersects[0].distance < 0.5) {
 
-            //debug.SetWatch("collision distance", intersects[0].distance);
-
             var topNormal = intersects[0].face.normal;
 
 
-            //raycastGroundPosition = intersects[0].point;
-
-            //                        this.position.y += intersects[0].distance;
-            //                        this.velocity.y = 0;
-
             if ( this instanceof Projectile ) this.Impact(true);
 
-
-            //                        ba(topNormal.ToString());
 
             var distanceInside = 0.5-intersects[0].distance;
 
@@ -748,61 +635,18 @@ var Unit = PhysicsObject.extend({
               moveVector.multiplyScalar(2);
             }
 
-
-            //                        this.velocity.addSelf(topNormal.clone().multiplyScalar(-this.velocity.clone().dot(topNormal)));
             this.velocity.addSelf(moveVector);
 
-          //bm(this.velocity.ToString());
-
-          //this.isTouchingGround = true;
           }
 
         }
 
 
-      //                // Server controlled units don't have Y coordinate, so update it manually
-      //                if ( !(this instanceof Projectile) && raycastGroundPosition ) {
-      //                    this.targetPosition.y = raycastGroundPosition.y;
-      //                }
-
-      // Todo cast a reversed ray from down to up (only for terrain)
-
-
-
 
       }
       else {
-        this.allowCheckGround = true;
+          this.allowRaycastGround = true;
       }
-
-
-
-      // sw("this.position", this.position);
-      // sw("this.velocity", this.velocity);
-
-    // Check collisions with Billboards
-    //      for(var u=0;u<ironbane.unitList.length;u++) {
-    //        var unit = ironbane.unitList[u];
-    //
-    //        if ( !(unit instanceof Billboard) ) continue;
-    //        if ( (unit instanceof Waypoint) ) continue;
-    //
-    //        if ( unit == this ) continue;
-    //
-    //        if ( unit.InRangeOfUnit(this, 0.5) ) {
-    //
-    //          var normal = this.position.clone().subSelf(unit.position);
-    //
-    //          var distanceInside = 0.5-normal.length();
-    //          normal.normalize();
-    //
-    //          this.localPosition.addSelf(normal.clone().multiplyScalar(distanceInside));
-    //
-    //          this.velocity.addSelf(normal.clone().multiplyScalar(-this.velocity.clone().dot(normal)));
-    //        }
-    //
-    //      }
-
 
     }
 

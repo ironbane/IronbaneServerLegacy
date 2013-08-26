@@ -121,10 +121,6 @@ var SocketHandler = Class.extend({
                 name: unit.name,
                 rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
             });
-
-            if (req.user) {
-                mysql.query('UPDATE bcs_users SET characterused = ? WHERE id = ?', [chardata.id, req.user.id]);
-            }
         }
 
         // and another temp method...

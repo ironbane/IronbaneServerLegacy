@@ -17,6 +17,8 @@
 
 
 var dataPath = clientDir + 'plugins/game/data';
+var dataPathPersistent = assetDir + 'plugins/game/data';
+
 
 var WorldHandler = Class.extend({
   Init: function() {
@@ -426,7 +428,7 @@ var WorldHandler = Class.extend({
   },
   LoadCell: function(zone, cellX, cellZ) {
     // Query the entry
-    var path = dataPath+"/"+zone+"/"+cellX+"/"+cellZ;
+    var path = (persistentWorldChanges ? dataPathPersistent : dataPath)+"/"+zone+"/"+cellX+"/"+cellZ;
 
     fsi.mkdirSync(path, 0777, true, function (err) {
       if (err) {
@@ -639,6 +641,7 @@ var WorldHandler = Class.extend({
 
     // Query the entry
     var path = dataPath+"/"+zone+"/"+cellX+"/"+cellZ;
+    var pathPersistent = dataPathPersistent+"/"+zone+"/"+cellX+"/"+cellZ;
 
     fsi.mkdirSync(path, 0777, true, function (err) {
       if (err) {
@@ -649,8 +652,23 @@ var WorldHandler = Class.extend({
     });
 
 
+    // Same for persistent data
+    if ( persistentWorldChanges ) {
+      fsi.mkdirSync(pathPersistent, 0777, true, function (err) {
+        if (err) {
+          log("Error:" +err);
+        } else {
+          log('Directory created');
+        }
+      });
+    }
+
     var str = JSON.stringify(this.world[zone][cellX][cellZ].objects);
     fs.writeFileSync(path+"/objects.json", str);
+
+    if ( persistentWorldChanges ) {
+      fs.writeFileSync(pathPersistent+"/objects.json", str);
+    }
 
     // Clean up the nodes first
     astar.cleanUp(this.world[zone][cellX][cellZ].graph);
@@ -660,6 +678,11 @@ var WorldHandler = Class.extend({
 
     str = JSON.stringify(this.world[zone][cellX][cellZ].graph);
     fs.writeFileSync(path+"/graph.json", str);
+
+
+    if ( persistentWorldChanges ) {
+      fs.writeFileSync(pathPersistent+"/graph.json", str);
+    }
 
     log("Saved cell ("+cellX+","+cellZ+") in zone "+zone+"");
 
