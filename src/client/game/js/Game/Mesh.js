@@ -79,13 +79,30 @@ var Mesh = Unit.extend({
   Decorate: function() {
      this.particleEmitters = [];
 
-
     // Initialize events
     switch (this.meshData.name) {
       case "Lantern 1":
 
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FIRESMALL,
+          data: {
+            followUnit:this,
+            spawnOffset: new THREE.Vector3(0, 1.0, 0)
+          }
+        });
+
+        this.flickerTime = 0.0;
+
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 1.0, 0);
+        this.lightsToMaintain.push(pointLight);
+
+        break;
+      case "Campfire":
+
+        this.particleEmitters.push({
+          particle: ParticleTypeEnum.FIREMEDIUM,
           data: {
             followUnit:this,
             spawnOffset: new THREE.Vector3(0, 1.0, 0)
@@ -415,6 +432,20 @@ var Mesh = Unit.extend({
           this.flickerTime = getRandomFloat(0.1, 0.2);
           this.lightsToMaintain[0].intensity =
             this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
+        }
+
+
+
+        break;
+      case "Campfire":
+
+        this.flickerTime -= dTime;
+
+        if ( this.flickerTime <= 0 ) {
+          // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
+          this.flickerTime = getRandomFloat(0.1, 0.2);
+          this.lightsToMaintain[0].intensity =
+            this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.2, 0.2);
         }
 
 
