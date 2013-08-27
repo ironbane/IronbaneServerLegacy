@@ -104,6 +104,16 @@ module.exports = function(app, db) {
             });
     });
 
+    app.get('/api/user/:username', function(req, res) {
+        User.getUserByName(req.params.username).then(function(user) {
+            res.send(user);
+        }, function(error){
+            log("oops");
+            res.send(error, 500);
+        });
+
+    });
+
     // get all friends for currently signed in user
     app.get('/api/user/friends', app.ensureAuthenticated, function(req, res) {
         req.user.$getFriends()

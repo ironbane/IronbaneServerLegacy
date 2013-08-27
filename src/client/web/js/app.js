@@ -112,7 +112,7 @@ angular.module('IronbaneApp', [])
                     User.getByName($route.current.params.username)
                         .then(function(userprofile) {
                             // should be processed already
-                            deferred.resolve({profile: userprofile});
+                            deferred.resolve({profile: userprofile.data[0]});
                         }, function(err) {
                             // can't find such article, reject route change
                            deferred.reject();
