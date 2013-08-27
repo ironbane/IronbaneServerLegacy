@@ -79,13 +79,30 @@ var Mesh = Unit.extend({
   Decorate: function() {
      this.particleEmitters = [];
 
-
     // Initialize events
     switch (this.meshData.name) {
       case "Lantern 1":
 
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FIRESMALL,
+          data: {
+            followUnit:this,
+            spawnOffset: new THREE.Vector3(0, 1.0, 0)
+          }
+        });
+
+        this.flickerTime = 0.0;
+
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 1.0, 0);
+        this.lightsToMaintain.push(pointLight);
+
+        break;
+      case "Campfire":
+
+        this.particleEmitters.push({
+          particle: ParticleTypeEnum.FIREMEDIUM,
           data: {
             followUnit:this,
             spawnOffset: new THREE.Vector3(0, 1.0, 0)
@@ -115,48 +132,6 @@ var Mesh = Unit.extend({
       me.object3D.add(light);
 
 
-      // Update materials that are nearby:
-
-      // Update cells & objects that are nearby
-
-
-
-      _.each(terrainHandler.cells, function(cell) {
-
-        if ( cell.modelMesh ) {
-          _.each(cell.modelMesh.geometry.materials, function(material) {
-            material.needsUpdate = true;
-          });
-        }
-
-
-        _.each(cell.objects, function(obj) {
-
-          if ( me.InRangeOfPosition(obj.position, light.distance) ) {
-            if ( obj.mesh ) {
-              if ( ISDEF(obj.mesh.material.needsUpdate) ) {
-                obj.mesh.material.needsUpdate = true;
-              }
-
-              if ( ISDEF(obj.mesh.geometry.materials) ) {
-                _.each(obj.mesh.geometry.materials, function(material) {
-                  material.needsUpdate = true;
-                });
-              }
-            }
-          }
-
-
-        }, cell);
-
-
-      });
-
-      terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
-
-      _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
-        material.needsUpdate = true;
-      });
 
 
     }, this);
@@ -269,11 +244,22 @@ var Mesh = Unit.extend({
     // Only push materials that are actually inside the materials
     for (var i=0; i<geometry.jsonMaterials.length; i++) {
 
-      // // Check if there's a map inside the material, and if it contains a sourceFile
-      // if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
-      //   // Extract the tile!
-      //   tiles[i] = "tiles/"+(geometry.jsonMaterials[i]["mapDiffuse"].split("."))[0];
-      // }
+      // Check if there's a map inside the material, and if it contains a sourceFile
+      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
+        // Extract the tile!
+        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
+        texture = texture[texture.length-1].split(".")[0];
+
+        if ( !_.isNaN(parseInt(texture,10)) ) {
+          tiles[i] = "tiles/"+texture;
+        }
+        else {
+          tiles[i] = "textures/"+texture;
+        }
+
+
+      }
+
 
       if ( this.drawNameMesh ) {
         materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
@@ -446,6 +432,20 @@ var Mesh = Unit.extend({
           this.flickerTime = getRandomFloat(0.1, 0.2);
           this.lightsToMaintain[0].intensity =
             this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
+        }
+
+
+
+        break;
+      case "Campfire":
+
+        this.flickerTime -= dTime;
+
+        if ( this.flickerTime <= 0 ) {
+          // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
+          this.flickerTime = getRandomFloat(0.1, 0.2);
+          this.lightsToMaintain[0].intensity =
+            this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.2, 0.2);
         }
 
 

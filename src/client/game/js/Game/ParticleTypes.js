@@ -629,6 +629,28 @@ var ParticleTypeEnum = {
         },
         particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.2, 0.8);}
     },
+    FIREMEDIUM: {
+        texture: function(){
+            return ChooseRandom(['particles/flame1medium','particles/flame2medium','particles/flame3medium']);
+        },
+        particleSpawnOffset: new THREE.Vector3(0, -0.7, 0),
+        particleStartPosition: function(p){
+            return GetRandomVector().multiplyScalar(0.1).setY(0.0);
+        },
+        particleStartVelocity: function(p){
+             return new THREE.Vector3(0, 0.4, 0);
+        },
+        particleStartScale: function() {
+            return new THREE.Vector2(getRandomFloat(2.5, 3.0), getRandomFloat(2.5, 3.0));
+        },
+        // particleStartRotation: function(p) { return (getRandomInt(-10,10)).ToRadians() },
+        particleDelay: 0.08,
+        particleLifeTime: 0.5,
+        particleScaleVelocity : function(p){
+            return new THREE.Vector2(getRandomFloat(0.0, 0.03), getRandomFloat(0.0, 0.03));
+        },
+        particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.2, 0.8);}
+    },
     HEALSPARKS: {
         texture: function(){
             return ChooseRandom(['particles/spark1','particles/spark2','particles/spark3'])+"_green";

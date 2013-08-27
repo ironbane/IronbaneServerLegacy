@@ -118,6 +118,13 @@ var Cell = Class.extend({
         // Load all 3D models that belong to this group
         this.models = new THREE.Mesh(this.modelGeometry, new THREE.MeshFaceMaterial());
         this.models.castShadow = true;
+
+        this.models.material.side = THREE.DoubleSide;
+
+        _.each(this.modelGeometry.materials, function(material) {
+          material.side = THREE.DoubleSide;
+        });
+
         ironbane.scene.add(this.models);
 
         // Collision data is now saved to this cell
@@ -133,6 +140,45 @@ var Cell = Class.extend({
             ironbane.renderer.shadowMapAutoUpdate = false;
         }, 1000);
 
+        // Update materials that are nearby:
+
+        // Update cells & objects that are nearby
+
+        var cell = this;
+
+        setTimeout(function() {
+
+            if ( cell.modelMesh ) {
+              _.each(cell.modelMesh.geometry.materials, function(material) {
+                material.needsUpdate = true;
+              });
+            }
+
+
+            _.each(cell.objects, function(obj) {
+
+                if ( obj.mesh ) {
+                  if ( ISDEF(obj.mesh.material.needsUpdate) ) {
+                    obj.mesh.material.needsUpdate = true;
+                  }
+
+                  if ( ISDEF(obj.mesh.geometry.materials) ) {
+                    _.each(obj.mesh.geometry.materials, function(material) {
+                      material.needsUpdate = true;
+                    });
+                  }
+                }
+
+            }, cell);
+
+
+          terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
+
+          _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
+            material.needsUpdate = true;
+          });
+
+        }, 2000);
 
         this.status = cellStatusEnum.LOADED;
 

@@ -54,8 +54,10 @@ if ( !SERVER ) {
 
       if ( options.transparent ) config.transparent = options.transparent;
 
-      var mat = new THREE.MeshPhongMaterial( config );
-      mat.perPixel = true;
+      // var mat = new THREE.MeshPhongMaterial( config );
+      // mat.perPixel = true;
+      var mat = new THREE.MeshLambertMaterial( config );
+      //mat.perPixel = true;
 
       return mat;
 
