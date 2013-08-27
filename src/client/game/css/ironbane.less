@@ -1,4 +1,3 @@
-
 @textColor: #6DF2C0;
 @borderColor: #06452d;
 
@@ -250,11 +249,14 @@ a {
     }
     .messages {
         list-style-type: none;
-        .name.gm {
-            color: #e21bee;
-        }
-        .name.user {
-            color: #1beee7;
+        .name {
+            color: #fff; // replace non ranked name color
+            &.gm {
+                color: #e21bee;
+            }
+            &.user {
+                color: #1beee7;
+            }
         }
         .delim {
             margin-right: 4px;
