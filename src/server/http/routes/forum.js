@@ -12,7 +12,7 @@ module.exports = function(app, db) {
 
 
         app.get('/api/forum', function(req, res) {
-            Forum.get().then(function(forum) {
+            Forum.getForumView().then(function(forum) {
                 res.send(forum);
             }, function(error){
                 res.send(error, 500);
@@ -38,7 +38,7 @@ module.exports = function(app, db) {
         }, function(error){
             res.send(error, 500);
         });
-    })
+    });
 
     app.get('/api/frontpage', function(req, res){
         Article.getFrontPage().then(function(frontpage){
@@ -56,15 +56,7 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/api/user/:username', function(req, res) {
-        User.getUserByName().then(function(user) {
-            res.send(user);
-        }, function(error){
-            log("oops");
-            res.send(error, 500);
-        });
-
-    });
+    
 
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
@@ -119,7 +111,7 @@ module.exports = function(app, db) {
             time:req.body.time, 
             title:req.body.title, 
             content:req.body.bbcontent,
-            user:req.body.user }
+            user:req.body.user };
         Topic.newPost(post)
         .then(function(){
 
