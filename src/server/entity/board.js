@@ -28,7 +28,7 @@ module.exports = function(db) {
         }
     });
 
-    Board.getTopics = function(boardId){
+    Board.getView = function(boardId){
         log('getting topics for ' +boardId);
         var deferred = Q.defer();
         // to do: make an extra join and alias for the last poster (nasty query....)
@@ -52,7 +52,7 @@ module.exports = function(db) {
     Board.get = function(boardId) {
         var deferred = Q.defer();
 
-        db.query('select * from forum_boards where id=?', [defer], function(err, results) {
+        db.query('select * from forum_boards where id=?', [boardId], function(err, results) {
             if(err) {
                 deferred.reject(err);
                 return;

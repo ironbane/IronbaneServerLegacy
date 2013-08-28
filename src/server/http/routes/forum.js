@@ -7,6 +7,7 @@ module.exports = function(app, db) {
         User = require('../../entity/user')(db),
         Topic = require('../../entity/topic')(db),
         Article = require('../../entity/article')(db),
+        Post = require('../../entity/post')(db),
         bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
@@ -79,26 +80,19 @@ module.exports = function(app, db) {
                 res.send(posts);
             });
         } else {
-            db.query('select * from forum_boards where id = ?', [req.params.boardId], function(err, results) {
-                if(err) {
-                    res.send(500, 'DB Error getting posts!');
-                    console.log('DB error getting posts: ', err);
-                    return;
-                }
-
-                if(results.length > 0) {
-                    res.send(results[0]);
-                } else {
-                    res.send(404, "no board found with id " + req.params.boardId);
-                }
+            Board.get(req.params.boardId).then(function(results) {            
+               res.send(results);            
+            }, function(error){
+                res.send(error, 500);
             });
         }
+        
     });
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
         var func = arguments;
-         Board.getTopics(req.params.boardId).then(function(results) {            
+         Board.getView(req.params.boardId).then(function(results) {            
                res.send(results);            
             }, function(error){
                 res.send(error, 500);
