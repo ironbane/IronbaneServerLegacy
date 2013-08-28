@@ -8,24 +8,29 @@ angular.module('IronbaneApp')
         },
         restrict: 'AE',
         templateUrl: '/partials/postEditor.html',
-        controller: ['$scope', 'Post', '$log', function($scope, Post, $log) {
+        controller: ['$scope', 'Post', '$log', '$route', function($scope, Post, $log, $route) {
             $scope.save = function() {
                 // todo: validate form
-
+                $log.log($scope);
+                    $log.log("saving post");
                 var post = new Post({
-                    title: $scope.post.subject,
                     time: (new Date()).valueOf() / 1000, // convert to mysql unix_timestamp
                     bbcontent: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
+                if($scope.topic===null ){
+
+                    post.title = $scope.post.title;
+                }
 
 
                 var savePromise;
+                $log.log("scope: "+ $scope.board);
                 // has a topic? reply else new topic
-                if($scope.topic && $scope.topic.id) {
-                    savePromise = post.$save($scope.board.id, $scope.topic.topic_id);
+                if($scope.topic) {
+                    savePromise = post.$save($scope.board, $scope.topic);
                 } else {
-                    savePromise = post.$save($scope.board.id);
+                    savePromise = post.$save($scope.board);
                 }
 
                 savePromise.then(function(result) {
@@ -34,6 +39,7 @@ angular.module('IronbaneApp')
                     // clear the form
                     delete $scope.post;
                     $scope.postEditorForm.$setPristine();
+                    $route.reload();
                 });
             };
         }]
