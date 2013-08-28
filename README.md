@@ -34,6 +34,8 @@ Play the game at <http://www.ironbane.com/>.
 
 * Install grunt ``` npm install -g grunt-cli ```
 
+* (Optional) If you want to make new 3d models and test them out, you will need to have [Python 2.7.x](http://www.python.org/download/) installed. Do not use the latest version of Python, only 2.7.x currently works with the script that converts our 3d models to be used in-game.
+
 * Run grunt ```grunt```
 
 * Run ```ironbane start``` from the root directory.

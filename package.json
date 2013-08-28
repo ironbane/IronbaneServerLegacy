@@ -47,6 +47,7 @@
     "supervisor": "~0.5.3",
     "q-io": "~1.9.1",
     "winston": "~0.7.2",
+    "shelljs": "~0.2.1",
     "grunt-download": "~0.2.0"
   },
   "devDependencies": {
@@ -60,7 +61,6 @@
     "grunt-replace": "~0.4.4",
     "grunt-contrib-jasmine": "~0.4.2",
     "grunt-contrib-watch": "~0.4.3",
-    "grunt-beep": "~0.2.0",
-    "grunt-three-obj": "~0.3.0"
+    "grunt-beep": "~0.2.0"
   }
 }
