@@ -88,15 +88,6 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
-        .when('/forum/:boardId/post', {
-            templateUrl: '/views/postEdit',
-            controller: 'PostEditCtrl',
-            resolve: {
-                BoardData: ['Board', '$route', function(Board, $route) {
-                    return Board.get($route.current.params.boardId);
-                }]
-            }
-        })
         .when('/editor', {
             templateUrl: '/views/editorMenu',
             resolve: {
@@ -109,7 +100,7 @@ angular.module('IronbaneApp', [])
              resolve: {
                 ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
                     var deferred = $q.defer();
-                    User.getByName($route.current.params.username)
+                    User.getProfile($route.current.params.username)
                         .then(function(userprofile) {
                             // should be processed already
                             deferred.resolve({profile: userprofile.data[0]});

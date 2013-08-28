@@ -104,8 +104,8 @@ module.exports = function(app, db) {
             });
     });
 
-    app.get('/api/user/:username', function(req, res) {
-        User.getUserByName(req.params.username).then(function(user) {
+    app.get('/api/profile/:username', function(req, res) {
+        User.getUserByNameView(req.params.username).then(function(user) {
             res.send(user);
         }, function(error){
             log("oops");

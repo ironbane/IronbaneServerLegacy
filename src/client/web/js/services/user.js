@@ -3,6 +3,8 @@ angular.module('IronbaneApp')
 .factory('User', ['DEFAULT_AVATAR', '$http', '$log', '$q', '$rootScope', function(DEFAULT_AVATAR, $http, $log, $q, $rootScope) {
     var User = function(json) {
         angular.copy(json || {}, this);
+        $log.log(this);
+        
     };
 
     User.prototype.roles = [];
@@ -29,9 +31,8 @@ angular.module('IronbaneApp')
             });
     };
 
-    User.getByName = function(username) {
-        $log.log("getting user");
-        return $http.get('/api/user/' + username)
+    User.getProfile = function(username) {
+        return $http.get('/api/profile/' + username)
             .then(function(response) {
                 return response;
             }, function(err) {
