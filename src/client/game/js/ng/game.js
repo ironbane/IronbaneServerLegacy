@@ -1,6 +1,6 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', function($log, $window, $http, $timeout) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', function($log, $window, $http, $timeout, $filter) { // using $window to reveal the globals
         // make this private so that it can't be called directly
         var loop = function(game) {
             if(!game.isRunning) {
@@ -23,6 +23,9 @@ IronbaneApp
         };
 
         var Game = function() {
+            // cheap hack to get mouthwash on the chat bubble
+            this.mouthwash = $filter('mouthwash');
+
             // adjustable framerate
             this._lastFrameTime = 0;
             this._maxFrameTime = 0.1;

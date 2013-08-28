@@ -32,7 +32,7 @@ var ChatBubble = PhysicsObject.extend({
         this.textMesh = null;
 
 
-        this.MakeTextMesh(text);
+        this.MakeTextMesh(ironbane.mouthwash(text));
 
         this.text = text;
 
