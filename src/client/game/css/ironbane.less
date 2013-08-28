@@ -250,12 +250,15 @@ a {
     .messages {
         list-style-type: none;
         .name {
-            color: #fff; // replace non ranked name color
+            color: #fff; // should never happen...(no rank)
             &.gm {
                 color: #e21bee;
             }
             &.user {
                 color: #1beee7;
+            }
+            &.guest {
+                color: orange;
             }
         }
         .delim {
