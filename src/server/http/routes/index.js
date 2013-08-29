@@ -112,6 +112,13 @@ module.exports = function(app, db) {
         return Q.reject(err);
     });
 
+    // templates for game (HUD)
+    app.get('/game/templates/*', function(req, res) {
+        var path = require('path');
+        log('requesting game template: ' + path.basename(req.path));
+        res.render('game/templates/' + path.basename(req.path));
+    });
+
     app.get(['/game', '/game/*'], function(req, res) {
         gameModelPromise.then(function(stuff) {
             // add in all of the stuff that was from game.php

@@ -44,6 +44,8 @@ module.exports = function(grunt) {
             game: {
                 src: [ // order matters!
                     "src/client/game/shared.js",
+                    "<%= gameScriptPath %>/ng/user.js", // required module for app (move to common)
+                    "<%= gameScriptPath %>/ng/friends.js", // required module for app (move to common)
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     "<%= gameScriptPath %>/ng/chat.js",
                     "<%= gameScriptPath %>/ng/game.js",
@@ -208,6 +210,11 @@ module.exports = function(grunt) {
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     cwd: 'src/client/game',
                     expand: true
+                }, {
+                    src: 'src/client/game/js/ng/templates/*',
+                    dest: '<%= cfg.get("buildTarget") %>game/templates/',
+                    expand: true,
+                    flatten: true
                 }, {
                     src: 'lib/**/*',
                     dest: '<%= cfg.get("buildTarget") %>game/',
