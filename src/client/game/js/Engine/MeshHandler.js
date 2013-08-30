@@ -71,16 +71,32 @@ var MeshHandler = Class.extend({
     geometry.dynamic = true;
 
     var tiles = [];
-    for(var x=1;x<=10;x++){
-      if ( ISDEF(metadata["t"+x]) ) {
-        tiles.push("tiles/"+metadata["t"+x]);
+    for (var i=0; i<geometry.jsonMaterials.length; i++) {
+      var tileIndex = i+1;
+      var tile = "tiles/1";
+
+      if ( ISDEF(meshData["t"+tileIndex]) ) {
+        tile = meshData["t"+tileIndex];
       }
-      else if ( ISDEF(meshData["t"+x]) ) {
-        tiles.push(meshData["t"+x]);
+      if ( ISDEF(metadata["t"+tileIndex]) ) {
+        tile = "tiles/"+metadata["t"+tileIndex];
       }
-      else {
-        tiles.push(1);
+
+      // Check if there's a map inside the material, and if it contains a sourceFile
+      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tile === "tiles/1" ) {
+        // Extract the tile!
+        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
+        texture = texture[texture.length-1].split(".")[0];
+
+        if ( !_.isNaN(parseInt(texture,10)) ) {
+          tile = "tiles/"+texture;
+        }
+        else {
+          tile = "textures/"+texture;
+        }
       }
+
+      tiles.push(tile);
     }
 
     var uvscale = [];
@@ -103,22 +119,6 @@ var MeshHandler = Class.extend({
 
     // Only push materials that are actually inside the materials
     for (var i=0; i<geometry.jsonMaterials.length; i++) {
-
-      // Check if there's a map inside the material, and if it contains a sourceFile
-      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
-        // Extract the tile!
-        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
-        texture = texture[texture.length-1].split(".")[0];
-
-        if ( !_.isNaN(parseInt(texture,10)) ) {
-          tiles[i] = "tiles/"+texture;
-        }
-        else {
-          tiles[i] = "textures/"+texture;
-        }
-
-
-      }
 
       if ( drawNameMesh ) {
         materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {

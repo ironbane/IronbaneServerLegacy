@@ -84,6 +84,33 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get('/game/plugins/game/images/tiles/medium.php', function(req, res) {
+        var imageId = req.query.i,
+            path = gamePath + 'plugins/game/images/tiles/' + imageId;
+
+        if(!imageId) {
+            res.send(500, 'missing required param i');
+            return;
+        }
+
+        fs.exists(path + '_medium.png', function(exists) {
+            if(exists) {
+                res.sendfile(path + '_medium.png');
+            } else {
+                gm(path + '.png')
+                    .filter('point')
+                    .resize(24, 24)
+                    .write(path + '_medium.png', function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path + '_medium.png');
+                        }
+                    });
+            }
+        });
+    });
+
     // armors grab the front and center and blow it up
     app.get('/game/plugins/game/images/characters/base/:subtype/big.php', function(req, res) {
         var imageId = req.query.i,
