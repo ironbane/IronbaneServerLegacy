@@ -116,6 +116,7 @@ var Mesh = Unit.extend({
         pointLight.position.set(0, 1.0, 0);
         this.lightsToMaintain.push(pointLight);
 
+        break;
       case "Fountain":
 
         this.particleEmitters.push({
@@ -154,6 +155,43 @@ var Mesh = Unit.extend({
     }, this);
 
 
+  },
+  UpdateLighting: function() {
+      var cell = terrainHandler.GetCellByWorldPosition(this.position);
+
+      setTimeout(function() {
+
+          if ( cell.modelMesh ) {
+            _.each(cell.modelMesh.geometry.materials, function(material) {
+              material.needsUpdate = true;
+            });
+          }
+
+
+          _.each(cell.objects, function(obj) {
+
+              if ( obj.mesh ) {
+                if ( ISDEF(obj.mesh.material.needsUpdate) ) {
+                  obj.mesh.material.needsUpdate = true;
+                }
+
+                if ( ISDEF(obj.mesh.geometry.materials) ) {
+                  _.each(obj.mesh.geometry.materials, function(material) {
+                    material.needsUpdate = true;
+                  });
+                }
+              }
+
+          }, cell);
+
+
+        terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
+
+        _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
+          material.needsUpdate = true;
+        });
+
+      }, 1);
   },
   Destroy: function() {
 
@@ -350,6 +388,8 @@ var Mesh = Unit.extend({
     //   }, 10000);
     // })(this);
     this.Decorate();
+
+    this.UpdateLighting();
   //this.UpdateRotation();
   },
   // OnLoad: function(mesh) {
