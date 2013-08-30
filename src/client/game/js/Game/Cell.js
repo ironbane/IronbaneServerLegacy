@@ -320,8 +320,8 @@ var Cell = Class.extend({
                 (function(cell, pos, rotation, metadata, meshData, param){
                 meshHandler.Load(model, function(geometry) {
 
-                        var geometry = meshHandler.SpiceGeometry(geometry, rotation,
-                            metadata, meshData, param, false);
+                        var geometry = meshHandler.ProcessGeometry(geometry, rotation,
+                            metadata, meshData, false);
 
                         _.each(geometry.vertices, function(v) {
                             v.addSelf(pos);

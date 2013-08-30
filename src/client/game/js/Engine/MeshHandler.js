@@ -48,7 +48,7 @@ var MeshHandler = Class.extend({
 
 
   },
-  SpiceGeometry: function(geometry, rotation, metadata, meshData, param, drawNameMesh) {
+  ProcessGeometry: function(geometry, rotation, metadata, meshData, drawNameMesh) {
 
 
 
