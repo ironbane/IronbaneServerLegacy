@@ -116,6 +116,16 @@ var Mesh = Unit.extend({
         pointLight.position.set(0, 1.0, 0);
         this.lightsToMaintain.push(pointLight);
 
+      case "Fountain":
+
+        this.particleEmitters.push({
+          particle: ParticleTypeEnum.FOUNTAINSIDE,
+          data: {
+            followUnit:this,
+            spawnOffset: new THREE.Vector3(0.0, 1.5, 0.5)
+          }
+        });
+
         break;
     }
 
