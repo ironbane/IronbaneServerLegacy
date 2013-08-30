@@ -79,7 +79,12 @@ var MeshHandler = Class.extend({
         tile = meshData["t"+tileIndex];
       }
       if ( ISDEF(metadata["t"+tileIndex]) ) {
-        tile = "tiles/"+metadata["t"+tileIndex];
+        if ( !_.isNaN(parseInt(metadata["t"+tileIndex],10)) ) {
+          tile = "tiles/"+metadata["t"+tileIndex];
+        }
+        else {
+          tile = "textures/"+metadata["t"+tileIndex];
+        }
       }
 
       // Check if there's a map inside the material, and if it contains a sourceFile

@@ -421,42 +421,6 @@ var EditorGUI = function() {
 
 
 
-
-
-var Cat = Class.extend({
-  Init: function(range, title, amountoftilesperline) {
-
-    if ( !amountoftilesperline ) amountoftilesperline = 10;
-
-    this.tilelist = [];
-    this.title = title;
-    this.amountoftilesperline = amountoftilesperline;
-
-    // Make a tile list based on the range
-    var ar = range.split(',');
-    for(var i=0;i<ar.length;i++){
-      var subar = ar[i].split('-');
-
-      var start = parseInt(subar[0]);
-      if ( subar.length == 1 ) {
-        this.tilelist.push(start);
-      }
-      else {
-        var end = parseInt(subar[1]);
-        for(var j=start;j<=end;j++){
-          this.tilelist.push(j);
-        }
-      }
-    }
-
-
-  }
-});
-
-
-
-
-
 var LevelEditor = Class.extend({
   Init: function() {
 
@@ -466,11 +430,28 @@ var LevelEditor = Class.extend({
 
     this.terrainMode = true;
 
-    this.cats = new Array();
+    this.cats = [];
 
-    for(var c=0;c<preCatsTiles.length;c++) {
-      this.cats.push(new Cat(preCatsTiles[c].range, preCatsTiles[c].name, preCatsTiles[c].limit_x, true));
-    }
+    this.cats.push({
+      title: "Tiles",
+      tilelist: (function() {
+        var tiles = [];
+        for (var i = 0; i < 100; i++) {
+          tiles.push(i);
+        }
+        return tiles;
+      })()
+    },
+    {
+      title: "Items",
+      tilelist: (function() {
+        var tiles = [];
+        for (var i = 0; i < 100; i++) {
+          tiles.push("item_"+i);
+        }
+        return tiles;
+      })()
+    });
 
     this.ready = false;
 
@@ -611,11 +592,6 @@ var LevelEditor = Class.extend({
       // Build tiles
       levelEditor.UpdateCatLinks();
 
-
-      // for(var i=0;i<this.cats.length;i++){
-      //   levelEditor.LoadCat(i, true);
-      // }
-
       levelEditor.LoadCat(0);
 
 
@@ -647,35 +623,27 @@ var LevelEditor = Class.extend({
     var result = '';
     var first;
 
+    var amountoftilesperline = 10;
 
     if ( this.isPaddingTileIDs ) {
-      var width = ((cat.amountoftilesperline * 33) + 40);
+      var width = ((amountoftilesperline * 33) + 40);
     }
     else {
-      var width = ((cat.amountoftilesperline * 32) + 40);
+      var width = ((amountoftilesperline * 32) + 40);
     }
 
     $('#tileSelectBox').css('width', width+'px');
-
-
 
     for (var i = 0; i < cat.tilelist.length; i++) {
 
       var tile = cat.tilelist[i];
 
-      //if ( !window.opener.tileTypeList[tile] ) continue;
-
       var uid = tile;
       if ( i == 0 ) first = uid;
 
-      result += '<div id="tiletype'+uid+'" class=tile onclick="levelEditor.SetTile('+uid+')"><div class=tileid style=display:none>'+uid+'</div></div>';
+      result += '<div id="tiletype'+uid+'" class=tile onclick="levelEditor.SetTile(\''+uid+'\')"><div class=tileid style=display:none>'+uid+'</div></div>';
 
-    //        if ( (i+1) % 8 == 0 ) {
-    //            result += "</div><div style=\"height:36px;width:1px\">&nbsp;</div><div>";
-    //        }
     }
-
-    //    result += "</div>";
 
     result += '<div style="clear:both"></div>';
 
@@ -683,55 +651,35 @@ var LevelEditor = Class.extend({
 
     for (var i = 0; i < cat.tilelist.length; i++) {
 
-
       var tile = cat.tilelist[i];
 
       var uid = tile;
-
-
 
       $('#tiletype'+uid).css('width', 32+'px');
       $('#tiletype'+uid).css('height', 32+'px');
 
 
-      //            if ( cat.usedForTerrain ) {
-      $('#tiletype'+uid).css('background-image', 'url('+tilesPath+'medium.php?i='+uid+')');
-      //            }
-      //            else {
-      //                if ( !ISDEF(preGameObjects[uid]) ) continue;
-      //                var gObject = preGameObjects[uid];
-      //
-      //                switch (gObject.type) {
-      //                    case UnitTypeEnum.BILLBOARD:
-      //                        $('#tiletype'+uid).css('background-image', 'url('+billboardSpritePath+''+gObject.param+'.'+tilesExt+')');
-      //                        break;
-      //                }
-      //
-      //            }
+
+      if ( !_.isNaN(parseInt(uid,10)) ) {
+        $('#tiletype'+uid).css('background-image', 'url('+tilesPath+'medium.php?i='+uid+')');
+      }
+      else {
+        $('#tiletype'+uid).css('background-image', 'url('+texturesPath+'medium.php?i='+uid+')');
+      }
+
 
       $('#tiletype'+uid).css('background-position', 'center');
       $('#tiletype'+uid).css('background-repeat', 'no-repeat');
 
-      //if ( (i+1) % 8 != 0 ) {
       $('#tiletype'+uid).css('float', 'left');
-      //}
 
       if ( this.isPaddingTileIDs ) $('#tiletype'+uid).css('margin', '1px 1px 0px 0px');
-      //        $('#tiletype'+uid).css('border-color', 'orange');
-      //        $('#tiletype'+uid).css('border-width', '1px');
-      //        $('#tiletype'+uid).css('border-style', 'solid');
+
       $('#tiletype'+uid).css('outline', '1px solid orange');
 
     }
 
 
-
-    //$('#tileList').html('<textarea style="width:600px;height:600px">'+$('#tileList').html()+'</textarea>');
-
-
-    //alert($('#tileList').html());
-
-    //window.opener.SetEditorTileType(first);
     this.SetTile(first);
 
   },
@@ -753,13 +701,11 @@ var LevelEditor = Class.extend({
 
     for(var i=0;i<this.cats.length;i++){
 
-      //            if ( this.cats[i].usedForTerrain != this.terrainMode ) continue;
-
       if ( i == this.currentCat ) {
         $('#selectRange').append('[<b>'+this.cats[i].title+'</b>] ');
       }
       else {
-        $('#selectRange').append('<a href=# onclick=levelEditor.LoadCat('+i+')>'+this.cats[i].title+'</a> ');
+        $('#selectRange').append('<a href=# onclick="levelEditor.LoadCat('+i+');return false;">'+this.cats[i].title+'</a> ');
       }
 
     }
@@ -801,14 +747,6 @@ var LevelEditor = Class.extend({
 
     var fPlayerManagement = this.editorGUI.gui.addFolder('Player Management');
 
-    //        guiControls['enableObjectPlacer'] = fObjectPlacer.add(this.editorGUI, 'enableObjectPlacer');
-    //
-    //        guiControls['opMode'] = fObjectPlacer.add(this.editorGUI, 'opMode', {
-    //            Place: ObjectPlacerModeEnum.PLACE,
-    //            Delete: ObjectPlacerModeEnum.DELETE
-    //            });
-    //
-    //        fObjectPlacer.add(this.editorGUI, 'selectObject');
 
     guiControls['enablePathPlacer'] = fPathPlacer.add(this.editorGUI, 'enablePathPlacer');
 
@@ -892,15 +830,6 @@ var LevelEditor = Class.extend({
     fLootableMeshes.addFolder('Note: Amount of seconds before respawning (restocking the items)');
     guiControls['eplmRespawnTime'] = fLootableMeshes.add(this.editorGUI, 'eplmRespawnTime');
     guiControls['eplmAdd'] = fLootableMeshes.add(this.editorGUI, 'eplmAdd');
-
-    // var fHeartPieces = fEntityPlacer.addFolder('Heart Pieces');
-    // guiControls['ephpAdd'] = fHeartPieces.add(this.editorGUI, 'ephpAdd');
-
-    // var fMusicPlayer = fEntityPlacer.addFolder('Music Player');
-    // guiControls['epmpMusicPiece'] = fMusicPlayer.add(this.editorGUI, 'epmpMusicPiece');
-    // guiControls['epmpRange'] = fMusicPlayer.add(this.editorGUI, 'epmpRange');
-    // guiControls['epmpAdd'] = fMusicPlayer.add(this.editorGUI, 'epmpAdd');
-
 
     guiControls['enableNPCEditor'] = fNPCEditor.add(this.editorGUI, 'enableNPCEditor');
     guiControls['neDeleteMode'] = fNPCEditor.add(this.editorGUI, 'neDeleteMode');

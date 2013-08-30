@@ -20,17 +20,6 @@ module.exports = function(app, db) {
         items: {},
         units: {},
         unitTemplates: {},
-        // hard coded cats, are these used?
-        preCatsTiles: [{
-            name: 'Alpha tiles',
-            range: '1-100',
-            limit_x: 10
-        },
-        {
-            name: 'Special',
-            range: '1650-1700',
-            limit_x: 10
-        }],
         preMeshes: {
             0: {
                 id: 0,
@@ -128,7 +117,6 @@ module.exports = function(app, db) {
                 items: JSON.stringify(gameModel.items),
                 units: JSON.stringify(gameModel.units),
                 unitTemplates: JSON.stringify(gameModel.unitTemplates),
-                preCatsTiles: JSON.stringify(gameModel.preCatsTiles),
                 preMeshes: JSON.stringify(gameModel.preMeshes),
                 modelEnum: JSON.stringify(gameModel.modelEnum),
                 shaders: gameModel.shaderFile,
