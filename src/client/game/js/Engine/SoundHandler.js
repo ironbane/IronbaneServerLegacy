@@ -353,7 +353,7 @@ var SoundHandler = Class.extend({
         var distance = 0;
 
         if (position) {
-            distance = terrainHandler.GetReferenceLocation().subSelf(position).length();
+            distance = terrainHandler.GetReferenceLocation().sub(position).length();
             distance = Math.pow(distance, 1);
         }
 

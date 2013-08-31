@@ -118,7 +118,7 @@ var SocketHandler = Class.extend({
     Connect: function(abortConnect) {
         if (!this.serverOnline) return;
 
-        if (!ISDEF(startdata.characterUsed)) return;
+        if (_.isUndefined(startdata.characterUsed)) return;
 
         if (socketHandler.inGame) {
             //alert('Already in game!');
@@ -145,7 +145,7 @@ var SocketHandler = Class.extend({
         $('#gameFrame').focus();
 
         this.socket.emit('connectServer', data, function(reply) {
-            if (ISDEF(reply.errmsg)) {
+            if (!_.isUndefined(reply.errmsg)) {
                 hudHandler.MessageAlert(reply.errmsg);
                 abortConnect();
                 hudHandler.ShowMenuScreen();
@@ -274,7 +274,7 @@ var SocketHandler = Class.extend({
                 if (unit instanceof Fighter) {
                     unit.UpdateClothes();
 
-                    if (ISDEF(data['weapon'])) {
+                    if (!_.isUndefined(data['weapon'])) {
                         unit.UpdateWeapon(data['weapon']);
                     }
                 }
@@ -327,17 +327,17 @@ var SocketHandler = Class.extend({
 
 
 
-            if (ISDEF(data['fu'])) {
+            if (!_.isUndefined(data['fu'])) {
                 var unit = FindUnit(data['fu']);
                 particleHandler.Add(ParticleTypeEnum[data['p']], {
                     followUnit: unit
                 });
-            } else if (ISDEF(data['pfu'])) {
+            } else if (!_.isUndefined(data['pfu'])) {
                 var unit = FindUnit(data['pfu']);
                 particleHandler.Add(ParticleTypeEnum[data['p']], {
                     particleFollowUnit: unit
                 });
-            } else if (ISDEF(data['pos'])) {
+            } else if (!_.isUndefined(data['pos'])) {
                 particleHandler.Add(ParticleTypeEnum[data['p']], {
                     position: ConvertVector3(data['pos'])
                 });
@@ -351,7 +351,7 @@ var SocketHandler = Class.extend({
 
             var unit = FindUnit(data['o']);
 
-            // if ( !data['p'] || !ISDEF(ProjectileTypeEnum[data['p']]) ) ba('Bad projectile type');
+            // if ( !data['p'] || _.isUndefined(ProjectileTypeEnum[data['p']]) ) ba('Bad projectile type');
 
             if (unit) {
                 // Alter the start position to cope with lag
@@ -361,7 +361,7 @@ var SocketHandler = Class.extend({
                 data.s.y += unit.size * 0.5;
             }
 
-            var weapon = ISDEF(data.w) ? items[data.w] : null;
+            var weapon = !_.isUndefined(data.w) ? items[data.w] : null;
 
             var target = ConvertVector3(data['t']);
 
@@ -371,7 +371,7 @@ var SocketHandler = Class.extend({
 
             var particle = new Projectile(ConvertVector3(data['s']), target, unit, data['w']);
 
-            particle.velocity.addSelf(unit.fakeVelocity);
+            particle.velocity.add(unit.fakeVelocity);
 
 
 
@@ -483,7 +483,7 @@ var SocketHandler = Class.extend({
         // this.socket.on('swingWeapon', function (data) {
         //     var attacker = FindUnit(data.id);
 
-        //     var weapon = ISDEF(data.w) ? items[data.w] : null;
+        //     var weapon = !_.isUndefined(data.w) ? items[data.w] : null;
 
         //     if ( data['p'] == null ) {
         //         attacker.SwingWeapon(null, weapon);
@@ -786,7 +786,7 @@ var SocketHandler = Class.extend({
                 if (unit) {
                     if (unit != ironbane.player) {
 
-                        if (ISDEF(unitdata.p)) {
+                        if (!_.isUndefined(unitdata.p)) {
                             unit.targetPosition.x = unitdata.p.x;
                             unit.targetPosition.z = unitdata.p.z;
                             unit.targetPosition.y = unitdata.p.y;
@@ -797,12 +797,12 @@ var SocketHandler = Class.extend({
 
 
 
-                        if (ISDEF(unitdata.rx)) unit.targetRotation.x = unitdata.rx;
-                        if (ISDEF(unitdata.ry)) unit.targetRotation.y = unitdata.ry;
-                        if (ISDEF(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
+                        if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx;
+                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y = unitdata.ry;
+                        if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
 
 
-                        if (ISDEF(unitdata.u)) {
+                        if (!_.isUndefined(unitdata.u)) {
                             unit.unitStandingOn = FindUnit(unitdata.u);
                         } else {
                             unit.unitStandingOn = null;
@@ -813,7 +813,7 @@ var SocketHandler = Class.extend({
 
                         //						// If players are still too far away from their target we can't set their speed to 0
                         //						// Do some prediction
-                        //						var distance = unit.targetPosition.clone().subSelf(unit.position).length();
+                        //						var distance = unit.targetPosition.clone().sub(unit.position).length();
                         ////						player.tSpeed = Math.max(player.tSpeed, distance * 10);
                         ////                                                player.tSpeed = Math.min(player.tSpeed, distance * 10);
                         //

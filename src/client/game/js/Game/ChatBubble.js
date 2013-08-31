@@ -19,8 +19,6 @@
  * and open the template in the editor.
  */
 
-var billboardSpritePath = 'plugins/game/images/billboards/';
-
 var ChatBubble = PhysicsObject.extend({
     Init: function(unit, text) {
 
@@ -142,7 +140,7 @@ var ChatBubble = PhysicsObject.extend({
         }
         var offset = ((this.unit == ironbane.player || this.unit.id < 0) ? 1.5 : 2.0) + (count * 0.6);
 
-        this.localPosition = this.unit.position.clone().addSelf(new THREE.Vector3(0, offset, 0));
+        this.localPosition = this.unit.position.clone().add(new THREE.Vector3(0, offset, 0));
 
         this.lifeTime -= dTime;
 
@@ -153,7 +151,7 @@ var ChatBubble = PhysicsObject.extend({
         if ( this.textMesh ) {
             this.textMesh.position.copy(this.localPosition);
 
-            this.textMesh.LookAt(ironbane.camera.position);
+            this.textMesh.LookFlatAt(ironbane.camera.position);
 
         }
 

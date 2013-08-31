@@ -252,11 +252,11 @@ var ParticleTypeEnum = {
 
                 indexV = numberOfSpritesV-indexV-1;
 
-                particle.sprite.uvScale.x = amountU;
-                particle.sprite.uvScale.y = amountV;
+                particle.sprite.material.uvScale.x = amountU;
+                particle.sprite.material.uvScale.y = amountV;
 
-                particle.sprite.uvOffset.x = amountU * indexH;
-                particle.sprite.uvOffset.y = amountV * indexV;
+                particle.sprite.material.uvOffset.x = amountU * indexH;
+                particle.sprite.material.uvOffset.y = amountV * indexV;
 
             }
 
@@ -690,7 +690,7 @@ var ParticleTypeEnum = {
         delay: 0,
         particleSpawnOffset: new THREE.Vector3(0, 0.5, 0),
         particleStartPosition: function(p){
-            return GetRandomVector().multiplyScalar(0.2).addSelf(new THREE.Vector3(0, 1.0, 0));
+            return GetRandomVector().multiplyScalar(0.2).add(new THREE.Vector3(0, 1.0, 0));
         },
         particleStartVelocity: function(p){
             return p.localStartPosition.clone().multiplyScalar(1.0);

@@ -108,7 +108,7 @@ var NPC = Fighter.extend({
 
                 if (item) {
 
-                    if (!ISDEF(dataHandler.items[item])) {
+                    if (_.isUndefined(dataHandler.items[item])) {
                         log("Warning! item " + item + " not found for NPC " + this.id + "!");
                         continue;
                     }

@@ -181,7 +181,7 @@ var Cutscenes = {
 
 
             var backToChar = {
-                target: ironbane.player.position.clone().addSelf(ironbane.player.heading.clone().multiplyScalar(2)).addSelf(new THREE.Vector3(0, 2, 0)),
+                target: ironbane.player.position.clone().add(ironbane.player.heading.clone().multiplyScalar(2)).add(new THREE.Vector3(0, 2, 0)),
                 lookTarget: ironbane.player.position,
                 transitionTime: 10000,
                 holdTime:0,

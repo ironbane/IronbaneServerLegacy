@@ -48,7 +48,9 @@ var Cell = Class.extend({
 
         this.filesToLoad = 0;
 
-        this.octree = new THREE.Octree();
+        this.octree = new THREE.Octree({undeferred: true});
+
+
 
     },
     Tick: function(dTime) {
@@ -70,6 +72,7 @@ var Cell = Class.extend({
     Load: function() {
         var me = this;
 
+        this.totalMaterials = [];
 
         // Todo: switch to promises
         this.filesToLoad++;
@@ -115,20 +118,20 @@ var Cell = Class.extend({
 
         if ( this.modelsToBuild ) return;
 
+        _.each(this.totalMaterials, function(material) {
+          material.side = THREE.DoubleSide;
+        });
+
         // Load all 3D models that belong to this group
-        this.models = new THREE.Mesh(this.modelGeometry, new THREE.MeshFaceMaterial());
+        this.models = new THREE.Mesh(this.modelGeometry, new THREE.MeshFaceMaterial(this.totalMaterials));
         this.models.castShadow = true;
 
         this.models.material.side = THREE.DoubleSide;
 
-        _.each(this.modelGeometry.materials, function(material) {
-          material.side = THREE.DoubleSide;
-        });
-
         ironbane.scene.add(this.models);
 
         // Collision data is now saved to this cell
-        this.octree.add(this.models, true);
+        this.octree.add(this.models, {useFaces:true});
 
         ironbane.renderer.shadowMapAutoUpdate = true;
 
@@ -140,46 +143,6 @@ var Cell = Class.extend({
             ironbane.renderer.shadowMapAutoUpdate = false;
         }, 1000);
 
-        // Update materials that are nearby:
-
-        // Update cells & objects that are nearby
-
-        // var cell = this;
-
-        // setTimeout(function() {
-
-        //     if ( cell.modelMesh ) {
-        //       _.each(cell.modelMesh.geometry.materials, function(material) {
-        //         material.needsUpdate = true;
-        //       });
-        //     }
-
-
-        //     _.each(cell.objects, function(obj) {
-
-        //         if ( obj.mesh ) {
-        //           if ( ISDEF(obj.mesh.material.needsUpdate) ) {
-        //             obj.mesh.material.needsUpdate = true;
-        //           }
-
-        //           if ( ISDEF(obj.mesh.geometry.materials) ) {
-        //             _.each(obj.mesh.geometry.materials, function(material) {
-        //               material.needsUpdate = true;
-        //             });
-        //           }
-        //         }
-
-        //     }, cell);
-
-
-        //   terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
-
-        //   _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
-        //     material.needsUpdate = true;
-        //   });
-
-        // }, 2000);
-
         this.status = cellStatusEnum.LOADED;
 
         terrainHandler.RebuildOctree();
@@ -187,18 +150,18 @@ var Cell = Class.extend({
     Destroy: function() {
 
         if ( this.modelGeometry ) {
-            _.each(this.modelGeometry.materials, function(material) {
-              material.deallocate();
-            });
+            this.modelGeometry.dispose();
 
-            this.modelGeometry.deallocate();
+            this.totalMaterials = [];
         }
 
         if ( this.models ) {
-            //terrainHandler.skybox.terrainOctree.remove(this.models);
+            // TODO Possible mem leak suspect? but removing manually is too slow...
+            this.octree = new THREE.Octree({undeferred: true});
 
-            // Possible mem leak suspect
-            this.octree = new THREE.Octree();
+            _.each(this.totalMaterials, function(material) {
+                material.dispose();
+            });
 
             ironbane.scene.remove(this.models);
         }
@@ -253,8 +216,7 @@ var Cell = Class.extend({
     ClearWaypoints: function() {
         _.each(this.waypointMeshes, function(waypointMesh) {
             ironbane.scene.remove(waypointMesh);
-            waypointMesh.deallocate();
-            ironbane.renderer.deallocateObject( waypointMesh );
+            releaseMesh(waypointMesh);
         });
     },
     LoadObjects: function(waypointsOnly) {
@@ -286,14 +248,12 @@ var Cell = Class.extend({
 
             var meshData = preMeshes[param] ? preMeshes[param] : null;
 
-            var rotation = new THREE.Vector3(gObject.rX, gObject.rY, gObject.rZ);
+            var rotation = new THREE.Euler(gObject.rX, gObject.rY, gObject.rZ);
 
+            // Special meshes do not get "baked" into the cell modelGeometry
             if ( meshData && (meshData.special || le("globalEnable")) ) {
 
                 switch (gObject.t) {
-                    case UnitTypeEnum.BILLBOARD:
-                        unit = new Billboard(pos, gObject.r, 0, gObject.p);
-                        break;
                     case UnitTypeEnum.MESH:
                         unit = new Mesh(pos, rotation, 0, gObject.p, metadata);
                         break;
@@ -318,26 +278,42 @@ var Cell = Class.extend({
                 var model = meshPath + filename;
 
                 (function(cell, pos, rotation, metadata, meshData, param){
-                meshHandler.Load(model, function(geometry) {
+                meshHandler.Load(model, function(geometry, jsonMaterials) {
 
-                        var geometry = meshHandler.ProcessGeometry(geometry, rotation,
-                            metadata, meshData, false);
+                        // Geometry cannot be instanced here as me modify it directly,
+                        // so it must be cloned! We therefore pass true to the third param of
+                        // meshHandler.Load()
+
+                        var result = meshHandler.ProcessMesh({
+                            geometry: geometry,
+                            jsonMaterials: jsonMaterials,
+                            rotation: rotation,
+                            metadata: metadata,
+                            meshData: meshData
+                        });
+
+                        var materials = result.materials;
+                        geometry = result.geometry;
+
+
+
+                        //cell.totalMaterials = cell.totalMaterials.concat(materials);
 
                         _.each(geometry.vertices, function(v) {
-                            v.addSelf(pos);
+                            v.add(pos);
                         });
 
                         // // Merge it with the cell geometry we have so far
-                        THREE.GeometryUtils.merge( cell.modelGeometry, geometry );
+                        mergeMaterials( cell.modelGeometry, cell.totalMaterials, geometry, materials );
 
-                        geometry.deallocate();
+                        geometry.dispose();
 
                         // Ready! Decrease modelsToBuild
                         cell.modelsToBuild--;
 
                         cell.AddMesh();
 
-                }, meshData.scale);
+                }, true);
                 })(this, pos, rotation, metadata, meshData, param);
 
             }
@@ -390,9 +366,9 @@ var Cell = Class.extend({
 
                                         if ( edge == subnodes[sn].id ) {
                                             var subpos = ConvertVector3(subnodes[sn].pos);
-                                            var vec = subpos.subSelf(pos);
-                                            if ( !vec.isZero() ) {
-                                                var aH = new THREE.ArrowHelper(vec, pos.clone().addSelf(new THREE.Vector3(0, 0.5, 0)), vec.length()-1, 0x00FFFF);
+                                            var vec = subpos.sub(pos);
+                                            if ( !(vec.lengthSq() < 0.0001) ) {
+                                                var aH = new THREE.ArrowHelper(vec, pos.clone().add(new THREE.Vector3(0, 0.5, 0)), vec.length()-1, 0x00FFFF);
                                                 this.waypointMeshes.push(aH);
                                                 ironbane.scene.add(aH);
                                             }

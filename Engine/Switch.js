@@ -23,10 +23,10 @@ var Switch = Class.extend({
 
             this.outputs = [];
 
-            if ( ISDEF(output1) ) this.outputs.push(output1);
-            if ( ISDEF(output2) ) this.outputs.push(output2);
-            if ( ISDEF(output3) ) this.outputs.push(output3);
-            if ( ISDEF(output4) ) this.outputs.push(output4);
+            if ( !_.isUndefined(output1) ) this.outputs.push(output1);
+            if ( !_.isUndefined(output2) ) this.outputs.push(output2);
+            if ( !_.isUndefined(output3) ) this.outputs.push(output3);
+            if ( !_.isUndefined(output4) ) this.outputs.push(output4);
 
 	},
     Trigger: function() {

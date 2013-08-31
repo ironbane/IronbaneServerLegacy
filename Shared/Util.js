@@ -57,7 +57,6 @@ if ( !SERVER ) {
       // var mat = new THREE.MeshPhongMaterial( config );
       // mat.perPixel = true;
       var mat = new THREE.MeshLambertMaterial( config );
-      //mat.perPixel = true;
 
       return mat;
 
@@ -129,7 +128,120 @@ if ( !SERVER ) {
   }
 
 
+  function mergeMaterials(geometry1, materials1, geometry2, materials2) {
 
+    var matrix, matrixRotation,
+    vertexOffset = geometry1.vertices.length,
+    uvPosition = geometry1.faceVertexUvs[ 0 ].length,
+    vertices1 = geometry1.vertices,
+    vertices2 = geometry2.vertices,
+    faces1 = geometry1.faces,
+    faces2 = geometry2.faces,
+    uvs1 = geometry1.faceVertexUvs[ 0 ],
+    uvs2 = geometry2.faceVertexUvs[ 0 ];
+
+    var geo1MaterialsMap = {};
+
+    for ( var i = 0; i < materials1.length; i ++ ) {
+
+      var id = materials1[ i ].id;
+
+      geo1MaterialsMap[ id ] = i;
+
+    }
+
+    // vertices
+
+    for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
+
+      var vertex = vertices2[ i ];
+
+      var vertexCopy = vertex.clone();
+
+      if ( matrix ) matrix.multiplyVector3( vertexCopy );
+
+      vertices1.push( vertexCopy );
+
+    }
+
+    // faces
+
+    for ( i = 0, il = faces2.length; i < il; i ++ ) {
+
+      var face = faces2[ i ], faceCopy, normal, color,
+      faceVertexNormals = face.vertexNormals,
+      faceVertexColors = face.vertexColors;
+
+
+      faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+
+      faceCopy.normal.copy( face.normal );
+
+      if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+
+      for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
+
+        normal = faceVertexNormals[ j ].clone();
+
+        if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+
+        faceCopy.vertexNormals.push( normal );
+
+      }
+
+      faceCopy.color.copy( face.color );
+
+      for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+
+        color = faceVertexColors[ j ];
+        faceCopy.vertexColors.push( color.clone() );
+
+      }
+
+      if ( face.materialIndex !== undefined ) {
+
+        var material2 = materials2[ face.materialIndex ];
+        var materialId2 = material2.id;
+
+        var materialIndex = geo1MaterialsMap[ materialId2 ];
+
+        if ( materialIndex === undefined ) {
+
+          materialIndex = materials1.length;
+          geo1MaterialsMap[ materialId2 ] = materialIndex;
+
+          materials1.push( material2 );
+
+        }
+
+        faceCopy.materialIndex = materialIndex;
+
+      }
+
+      faceCopy.centroid.copy( face.centroid );
+      if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
+
+      faces1.push( faceCopy );
+
+    }
+
+    // uvs
+
+    for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+
+      var uv = uvs2[ i ], uvCopy = [];
+
+      for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+        uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+
+      }
+
+      uvs1.push( uvCopy );
+
+    }
+
+  }
 
 
 //    function loadTexture( path, textureOnly, materialOptions, textureOptions) {
@@ -180,75 +292,32 @@ if ( !SERVER ) {
   console.error = console.error || function(){};
   console.info = console.info || function(){};
 
-  $(document).ready(function(){
-    THREE.Object3D.prototype.LookAt = function (position, lockX, lockY, lockZ, billboardStyle) {
 
-      var target = position.clone();
+  THREE.Object3D.prototype.LookFlatAt = function (position, billboardStyle) {
 
-      billboardStyle = billboardStyle || false;
+    var target = position.clone();
 
-      if ( billboardStyle ) {
-        target.y = this.position.y;
-      }
+    billboardStyle = billboardStyle || false;
 
-      this.matrix.lookAt( target, this.position, this.up );
-
-      lockX = lockX || 0;
-      lockY = lockY || 0;
-      lockZ = lockZ || 0;
-
-
-      if ( lockX != 0 ) this.matrix.rotateX(lockX);
-      if ( lockY != 0 ) this.matrix.rotateY(lockY);
-      if ( lockZ != 0 ) this.matrix.rotateZ(lockZ);
-
-      if ( this.rotationAutoUpdate ) {
-
-        this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
-
-      }
-
-      //this.matrix.rotateY(Math.PI);
-
-      return;
-      var target = position.clone();
-      //            var vector = new THREE.Vector3(lookat.x, this.position.y, lookat.z)
-      //
-      //
-      //            // TODO: Add hierarchy support.
-      //
-      //            this.matrix.lookAt( vector, this.position, this.up );
-      //
-      //            if ( mirror ) {
-      //                this.matrix.rotateY(Math.PI);
-      //            }
-      //
-      //            this.matrix.rotateZ(rotation);
-      //
-      //            if ( this.rotationAutoUpdate ) {
-      //
-      //                this.rotation.setEulerFromRotationMatrix( this.matrix );
-      //
-      //            }
-
-      var inverse = new THREE.Matrix4().getInverse( this.matrixWorld );
-      inverse.multiplyVector3( target );
-
-      this.matrix.lookAt( target, new THREE.Vector3(), new THREE.Vector3(0,1,0) );
-
-      if ( this.rotationAutoUpdate ) {
-
-        this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
-
-      }
-
-
+    if ( billboardStyle ) {
+      target.y = this.position.y;
     }
 
-    THREE.Vector3.prototype.ToString = function ( ) {
-      return "X: "+roundNumber(this.x,2)+", Y: "+roundNumber(this.y,2)+", Z: "+roundNumber(this.z,2)+"";
+    this.matrix.lookAt( target, this.position, this.up );
+
+    if ( this.rotationAutoUpdate ) {
+      this.rotation.setFromRotationMatrix( this.matrix, this.rotation.order );
     }
-  });
+
+    return;
+    var target = position.clone();
+
+  }
+
+  THREE.Vector3.prototype.ToString = function ( ) {
+    return "X: "+roundNumber(this.x,2)+", Y: "+roundNumber(this.y,2)+", Z: "+roundNumber(this.z,2)+"";
+  }
+
 
 
   function v(x,y,z){
@@ -283,7 +352,7 @@ if ( !SERVER ) {
   }
 
   function GetZoneConfig(string) {
-    if ( !ISDEF(zoneTypeConfig[zones[terrainHandler.zone]['type']][string]) ) {
+    if ( _.isUndefined(zoneTypeConfig[zones[terrainHandler.zone]['type']][string]) ) {
       bm('Error: \''+string+'\' not defined for zone '+zones[terrainHandler.zone].name+'!');
       return 0;
     }
@@ -346,76 +415,101 @@ if ( !SERVER ) {
     var amountU = (1/numberOfSpritesH);
     var amountV = (1/numberOfSpritesV);
 
-    // Y = inverted
-    indexV -= 1;
-    if ( indexV < 0 ) indexV = numberOfSpritesV-1;
+    var uvs1 = mesh.geometry.faceVertexUvs[0][0];
+    var uvs2 = mesh.geometry.faceVertexUvs[0][1];
 
-    var faceuv;
+    if ( !mirror ) {
+      uvs1[0].x = amountU*indexH;
+      uvs1[0].y = 1-(amountV*indexV);
 
-    if ( mirror ) {
-      faceuv = [
-      new THREE.UV(amountU*(indexH+0), amountV*(indexV+1)), //bottomright
-      new THREE.UV(amountU*(indexH+0), amountV*(indexV+0)), //topright
-      new THREE.UV(amountU*(indexH+1), amountV*(indexV+0)),  //topleft
-      new THREE.UV(amountU*(indexH+1), amountV*(indexV+1)) //bottomleft
-      ];
+      uvs1[1].x = uvs1[0].x;
+      uvs1[1].y = uvs1[0].y - amountV;
+
+      uvs1[2].x = uvs1[0].x + amountU;
+      uvs1[2].y = uvs1[0].y;
     }
     else {
-      faceuv = [
-      new THREE.UV(amountU*(indexH+1), amountV*(indexV+1)), //bottomright
-      new THREE.UV(amountU*(indexH+1), amountV*(indexV+0)), //topright
-      new THREE.UV(amountU*(indexH+0), amountV*(indexV+0)),  //topleft
-      new THREE.UV(amountU*(indexH+0), amountV*(indexV+1)) //bottomleft
-      ];
+      uvs1[0].x = amountU*(indexH+1);
+      uvs1[0].y = 1-(amountV*indexV);
+
+      uvs1[1].x = uvs1[0].x;
+      uvs1[1].y = uvs1[0].y - amountV;
+
+      uvs1[2].x = uvs1[0].x - amountU;
+      uvs1[2].y = uvs1[0].y;
     }
 
-    mesh.geometry.faceVertexUvs[0][0] = faceuv;
+    uvs2[0].x = uvs1[1].x;
+    uvs2[0].y = uvs1[1].y;
+
+    uvs2[1].x = uvs1[2].x;
+    uvs2[1].y = uvs1[1].y;
+
+    uvs2[2].x = uvs1[2].x;
+    uvs2[2].y = uvs1[2].y;
 
     mesh.geometry.uvsNeedUpdate = true;
-  };
+  }
 
 
   function GetRandomVector() {
     var vec = new THREE.Vector3(1, 0, 0);
     var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.setRotationFromEuler(new THREE.Vector3(getRandomFloat(0, Math.PI*2), getRandomFloat(0, Math.PI*2), getRandomFloat(0, Math.PI*2)));
-    return rotationMatrix.multiplyVector3(vec);
+    rotationMatrix.makeRotationFromEuler(
+      new THREE.Euler(
+        getRandomFloat(0, Math.PI*2),
+        getRandomFloat(0, Math.PI*2),
+        getRandomFloat(0, Math.PI*2)
+        )
+      );
+    return vec.applyMatrix4(rotationMatrix);
   }
 
-  function releaseMesh(mesh) {
+
+  function releaseMesh(mesh, options) {
+
+    options = options || {};
+
+    var removeMaterials = options.removeMaterials || false;
+
     if ( mesh ) {
         mesh.traverse( function ( object ) {
 
-
-          //object.material.deallocate();
-
           if ( !_.isUndefined(object.geometry) ) {
-            _.each(object.geometry.materials, function(material) {
-              material.deallocate();
-            });
-
-            object.geometry.deallocate();
+            object.geometry.dispose();
           }
 
-          if ( !_.isUndefined(object.material) ) {
-            if ( !(object.material instanceof THREE.MeshFaceMaterial) ) {
-              object.material.deallocate();
+          if ( object.material && removeMaterials ) {
+            if ( object.material instanceof THREE.MeshFaceMaterial ) {
+              _.each(object.material.materials, function(material) {
+                material.dispose();
+              });
+            }
+            else {
+              object.material.dispose();
             }
           }
 
+        });
 
+        if ( !_.isUndefined(mesh.geometry) ) {
+          mesh.geometry.dispose();
+        }
 
-          object.deallocate();
+        if ( mesh.material && removeMaterials ) {
+          if ( mesh.material instanceof THREE.MeshFaceMaterial ) {
+            _.each(mesh.material.materials, function(material) {
+              material.dispose();
+            });
+          }
+          else {
+            mesh.material.dispose();
+          }
+        }
 
-          ironbane.renderer.deallocateObject( object );
-        } );
-
-        mesh.deallocate();
-        ironbane.renderer.deallocateObject( mesh );
     }
     mesh = null;
   }
-
 
 }
 
@@ -433,12 +527,12 @@ function SetDataAll(obj, data) {
 }
 
 function CheckData(obj, names) {
-  if ( !ISDEF(obj) ) return false;
+  if ( _.isUndefined(obj) ) return false;
   if ( !obj ) return false;
 
   //for(var n in names) {
   for(var n=0;n<names.length;n++){
-    if ( !ISDEF(obj[names[n]]) ) return false;
+    if ( _.isUndefined(obj[names[n]]) ) return false;
   }
   return true;
 }
@@ -627,7 +721,7 @@ var sequencedTimers = {};
 function ChooseSequenced(a) {
   var uid = "";
   for (var b in a) uid += b;
-  if ( !ISDEF(sequencedTimers[uid]) ) sequencedTimers[uid] = 0;
+  if ( _.isUndefined(sequencedTimers[uid]) ) sequencedTimers[uid] = 0;
   var value = a[sequencedTimers[uid]];
   sequencedTimers[uid]++;
   if ( sequencedTimers[uid] >= a.length ) sequencedTimers[uid] = 0;
@@ -640,12 +734,6 @@ function ConvertVector3(vec) {
 function RawVector3(vec) {
   return {x:vec.x, y:vec.y, z:vec.z};
 }
-
-
-function ISDEF(o) {
-  return typeof o !== "undefined";
-};
-
 
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -673,7 +761,7 @@ THREE.Vector3.prototype.ToRadians = function(n) {
 };
 
 THREE.Vector3.prototype.InRangeOf = function(vector, range) {
-    return vector.clone().subSelf(this).lengthSq() < range*range;
+    return vector.clone().sub(this).lengthSq() < range*range;
 };
 
 THREE.Vector3.prototype.ToDegrees = function(n) {
@@ -711,14 +799,14 @@ THREE.Vector3.prototype.Truncate = function(n) {
 };
 
 THREE.Vector3.prototype.Perp = function() {
-  return this.crossSelf(new THREE.Vector3(0, 1, 0));
+  return this.cross(new THREE.Vector3(0, 1, 0));
 };
 
 function VectorDistance(a,b) {
-  return a.clone().subSelf(b).length();
+  return a.clone().sub(b).length();
 }
 function VectorDistanceSq(a,b) {
-  return a.clone().subSelf(b).lengthSq();
+  return a.clone().sub(b).lengthSq();
 }
 
 

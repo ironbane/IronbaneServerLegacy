@@ -30,7 +30,7 @@ var Train = DynamicMesh.extend({
     },
     Tick: function(dTime) {
 
-        //var newvel = this.targetPosition.clone().subSelf(this.position);
+        //var newvel = this.targetPosition.clone().sub(this.position);
 
 //        var dist = newvel.lengthSq();
 //
@@ -45,7 +45,7 @@ var Train = DynamicMesh.extend({
         // sw("this.targetRotation", this.targetRotation.ToString());
         // sw("this.rotation", this.rotation.ToString());
 
-        this.rotation.lerpSelf(this.targetRotation, dTime*4);
+        this.rotation.lerp(this.targetRotation, dTime*4);
 
         this._super(dTime);
 

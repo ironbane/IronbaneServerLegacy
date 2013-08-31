@@ -14,29 +14,27 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
-var billboardSpritePath = 'plugins/game/images/billboards/';
- 
 var Waypoint = Billboard.extend({
-    Init: function(position, nodeData) {	
-                
-        this.nodeData = nodeData;
-        
+    Init: function(position, nodeData) {
 
-        id = ironbane.waypointOffset-nodeData.id;        
-        
+        this.nodeData = nodeData;
+
+
+        id = ironbane.waypointOffset-nodeData.id;
+
         var texture = "misc/waypoint";
         if ( levelEditor.selectedNode && levelEditor.selectedNode.id == this.nodeData.id ) {
-            texture = "misc/waypoint_red"; 
+            texture = "misc/waypoint_red";
         }
-        
+
         this.drawNameMesh = true;
 
         this._super(position, 0, id, texture, true, this.nodeData.id);
-        
+
     }
 });

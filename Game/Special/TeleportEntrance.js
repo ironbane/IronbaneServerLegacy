@@ -34,7 +34,7 @@ var TeleportEntrance = Unit.extend({
     },
     FindTargetExit: function() {
 
-        if (this.data && ISDEF(this.data.targetExit) ) {
+        if (this.data && !_.isUndefined(this.data.targetExit) ) {
 
             this.data.targetExit = -Math.abs(this.data.targetExit);
 

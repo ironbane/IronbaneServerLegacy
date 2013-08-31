@@ -39,19 +39,19 @@ var PathPlacerModeEnum = {
 
 var EditorGUI = function() {
 
-  this.globalEnable = ISDEF(localStorage.globalEnable) ? (localStorage.globalEnable === 'true') : false;
+  this.globalEnable = !_.isUndefined(localStorage.globalEnable) ? (localStorage.globalEnable === 'true') : false;
   this.globalEnable = false;
 
   this.tbEnableTransparency = false;
 
-  this.chFlyMode = ISDEF(localStorage.chFlyMode) ? (localStorage.chFlyMode === 'true') : false;
-  this.chClimb = ISDEF(localStorage.chClimb) ? (localStorage.chClimb === 'true') : false;
-  this.chSpeed = ISDEF(localStorage.chSpeed) ? (localStorage.chSpeed === 'true') : false;
-  this.chGodMode = ISDEF(localStorage.chGodMode) ? (localStorage.chGodMode === 'true') : false;
-  this.chInvisibleByMonsters = ISDEF(localStorage.chInvisibleByMonsters) ? (localStorage.chInvisibleByMonsters === 'true') : false;
-  this.ch999Damage = ISDEF(localStorage.ch999Damage) ? (localStorage.ch999Damage === 'true') : false;
-  this.chForceDay = ISDEF(localStorage.chForceDay) ? (localStorage.chForceDay === 'true') : false;
-  this.chForceNight = ISDEF(localStorage.chForceNight) ? (localStorage.chForceNight === 'true') : false;
+  this.chFlyMode = !_.isUndefined(localStorage.chFlyMode) ? (localStorage.chFlyMode === 'true') : false;
+  this.chClimb = !_.isUndefined(localStorage.chClimb) ? (localStorage.chClimb === 'true') : false;
+  this.chSpeed = !_.isUndefined(localStorage.chSpeed) ? (localStorage.chSpeed === 'true') : false;
+  this.chGodMode = !_.isUndefined(localStorage.chGodMode) ? (localStorage.chGodMode === 'true') : false;
+  this.chInvisibleByMonsters = !_.isUndefined(localStorage.chInvisibleByMonsters) ? (localStorage.chInvisibleByMonsters === 'true') : false;
+  this.ch999Damage = !_.isUndefined(localStorage.ch999Damage) ? (localStorage.ch999Damage === 'true') : false;
+  this.chForceDay = !_.isUndefined(localStorage.chForceDay) ? (localStorage.chForceDay === 'true') : false;
+  this.chForceNight = !_.isUndefined(localStorage.chForceNight) ? (localStorage.chForceNight === 'true') : false;
   this.chSunOffset = 0;
   this.chFOV = 75;
 
@@ -69,7 +69,7 @@ var EditorGUI = function() {
     });
   };
 
-  this.opShowDebug = ISDEF(localStorage.opShowDebug) ? (localStorage.opShowDebug === 'true') : true;
+  this.opShowDebug = !_.isUndefined(localStorage.opShowDebug) ? (localStorage.opShowDebug === 'true') : true;
 
   this.opRestartServer = function() {
     socketHandler.socket.emit('shutdown');
@@ -107,8 +107,8 @@ var EditorGUI = function() {
 
 
 
-  this.camDistance = ISDEF(localStorage.camDistance) ? parseFloat(localStorage.camDistance) : 20.0;
-  this.camHeight = ISDEF(localStorage.camHeight) ? parseFloat(localStorage.camHeight) : 20.0;
+  this.camDistance = !_.isUndefined(localStorage.camDistance) ? parseFloat(localStorage.camDistance) : 20.0;
+  this.camHeight = !_.isUndefined(localStorage.camHeight) ? parseFloat(localStorage.camHeight) : 20.0;
 
   this.enableWorldPainter = false;
 
@@ -335,7 +335,7 @@ var EditorGUI = function() {
       targetName: levelEditor.editorGUI.tpTargetPlayerName,
       zone: levelEditor.editorGUI.tpZone
     }, function(reply) {
-      if ( ISDEF(reply.errmsg) ) {
+      if ( !_.isUndefined(reply.errmsg) ) {
         hudHandler.MessageAlert(reply.errmsg);
         return;
       }
@@ -466,45 +466,14 @@ var LevelEditor = Class.extend({
   BuildPreviewBuildMesh: function() {
 
     if ( this.previewBuildMesh ) {
-        this.previewBuildMesh.traverse( function ( object ) {
-
-
-          //object.material.deallocate();
-
-          if ( !_.isUndefined(object.geometry) ) {
-            _.each(object.geometry.materials, function(material) {
-              material.deallocate();
-            });
-
-            object.geometry.deallocate();
-          }
-
-          if ( !_.isUndefined(object.material) ) {
-            if ( !(object.material instanceof THREE.MeshFaceMaterial) ) {
-              object.material.deallocate();
-            }
-          }
-
-
-
-          object.deallocate();
-
-          ironbane.renderer.deallocateObject( object );
-        } );
-
-
-      ironbane.scene.remove(this.previewBuildMesh);
-
-      this.previewBuildMesh.deallocate();
-
-      ironbane.renderer.deallocateObject( this.previewBuildMesh );
+        releaseMesh(this.previewBuildMesh);
     }
 
     if ( !currentMouseToWorldData ) return;
 
     this.previewBuildMesh = new THREE.Object3D();
 
-   if ( levelEditor.editorGUI.enablePathPlacer ) {
+    if ( levelEditor.editorGUI.enablePathPlacer ) {
 
       var ix = (currentMouseToWorldData.point.x);
       var iz = (currentMouseToWorldData.point.z);
@@ -512,8 +481,6 @@ var LevelEditor = Class.extend({
       if ( levelEditor.editorGUI.ppMode == PathPlacerModeEnum.NODES ) {
 
           //this.AddPreviewCircleToMesh(ix, iz, levelEditor.editorGUI.ppAutoConnectWithin, 0xffffff);
-
-
 
       }
     }
@@ -1203,7 +1170,7 @@ var LevelEditor = Class.extend({
           offset.z *= normal.z;
 
           if ( !le("mpIgnoreBoundingBox") ) {
-            this.previewMesh.localPosition.addSelf(offset);
+            this.previewMesh.localPosition.add(offset);
           }
         }
 
@@ -1238,14 +1205,14 @@ var LevelEditor = Class.extend({
     //   //            debug.SetWatch("currentMouseToWorldData.normal", ConvertVector3(currentMouseToWorldData.face.normal).ToString());
     //   //            debug.SetWatch("currentMouseToWorldData.rotation", ConvertVector3(currentMouseToWorldData.object.rotation).ToString());
     //   //
-    //   //            if ( ISDEF(currentMouseToWorldData.object.unit) ) {
+    //   //            if ( !_.isUndefined(currentMouseToWorldData.object.unit) ) {
     //   //                debug.SetWatch("currentMouseToWorldData.unit.name", currentMouseToWorldData.object.unit.name);
     //   //            }
 
     //   // Alter the normal to rotate with the mesh;
     //   var normal = currentMouseToWorldData.face.normal;
     //   var rotationMatrix = (new THREE.Matrix4()).extractRotation(currentMouseToWorldData.object.matrix);
-    //   //matrixRotationWorld
+
     //   normal = rotationMatrix.multiplyVector3(normal);
     // //debug.SetWatch("altered normal", normal.Round(2).ToString());
 

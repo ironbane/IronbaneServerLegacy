@@ -43,12 +43,12 @@ var Unit = PhysicsObject.extend({
     this.name = name || 'Unnamed';
     this.id = id;
 
-    if ( ISDEF(this.overrideName) ) this.name = this.overrideName;
+    if ( !_.isUndefined(this.overrideName) ) this.name = this.overrideName;
 
     // Used to get the image/mesh
     this.param = param;
 
-    this.rotation = rotation || new THREE.Vector3();
+    this.rotation = rotation || new THREE.Euler();
     this.speed = 0.0;
 
 
@@ -73,9 +73,9 @@ var Unit = PhysicsObject.extend({
     this.weaponOrigin = null;
 
 
-    this.drawNameMesh = ISDEF(this.drawNameMesh) ? this.drawNameMesh : false;
+    this.drawNameMesh = !_.isUndefined(this.drawNameMesh) ? this.drawNameMesh : false;
 
-    this.enableShadow = ISDEF(this.enableShadow) ? this.enableShadow : true;
+    this.enableShadow = !_.isUndefined(this.enableShadow) ? this.enableShadow : true;
 
 
     this.terrainAngle = 0;
@@ -122,7 +122,7 @@ var Unit = PhysicsObject.extend({
 
     // We need a vector from the unit to the camera
     var uc = ironbane.camera.position.clone();
-    uc.subSelf(this.position);
+    uc.sub(this.position);
     var rotrad = this.rotation.y * (Math.PI/180);
     // Rotate vector with our own rotation
     var tx = ((uc.x * Math.cos(rotrad)) - (uc.z * Math.sin(rotrad)));
@@ -258,71 +258,38 @@ var Unit = PhysicsObject.extend({
 
     if ( this.mesh ) {
 
-      if (!(this instanceof Mesh)) {
+      var me = this;
 
-        this.mesh.traverse( function ( object ) {
-
-
-          if ( !_.isUndefined(object.geometry) ) {
-            _.each(object.geometry.materials, function(material) {
-              material.deallocate();
-            });
-
-            object.geometry.deallocate();
-          }
-
-          if ( !_.isUndefined(object.material) ) {
-            if ( !(object.material instanceof THREE.MeshFaceMaterial) ) {
-              object.material.deallocate();
-            }
-          }
-
-          object.deallocate();
-
-          ironbane.renderer.deallocateObject( object );
-        } );
-
-      }
-      else {
-        var me = this;
-
+      if ( this instanceof Mesh) {
         this.mesh.traverse( function ( object ) {
           me.octree.remove( object );
         } );
-
       }
 
+      releaseMesh(this.mesh);
+
       ironbane.scene.remove(this.mesh);
-      this.mesh.deallocate();
 
     }
 
     if ( this.debugMesh ) {
       ironbane.scene.remove(this.debugMesh);
-      this.debugMesh.deallocate();
-      this.debugMesh.geometry.deallocate();
-      this.debugMesh.material.deallocate();
-      ironbane.renderer.deallocateObject( this.debugMesh );
+      releaseMesh(this.debugMesh);
     }
 
     if ( this.nameMesh ) {
       ironbane.scene.remove(this.nameMesh);
-      this.nameMesh.deallocate();
-      ironbane.renderer.deallocateObject( this.nameMesh );
+      releaseMesh(this.nameMesh);
     }
 
     if ( this.shadowMesh ) {
       ironbane.scene.remove(this.shadowMesh);
-      this.shadowMesh.deallocate();
-      this.shadowMesh.geometry.deallocate();
-      ironbane.renderer.deallocateObject( this.shadowMesh );
+      releaseMesh(this.shadowMesh);
     }
 
     _.each(this.particleEmittersToMaintain, function(pEmitter) {
       pEmitter.removeNextTick = true;
     });
-
-
 
     this._super();
 
@@ -391,7 +358,7 @@ var Unit = PhysicsObject.extend({
 
       var cp = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
-      var cellStandingOn = ISDEF(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
+      var cellStandingOn = !_.isUndefined(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
 
       if ( this.enableGravity ) {
 
@@ -400,7 +367,7 @@ var Unit = PhysicsObject.extend({
         if ( GetZoneConfig("enableFluid") && this.position.y < GetZoneConfig('fluidLevel')-0.5 ) {
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
-            this.velocity.addSelf(new THREE.Vector3(0, dTime*15, 0));
+            this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
           if ( this.waterSplashSoundTimeout >= 0 ) this.waterSplashSoundTimeout -= dTime;
           else {
             this.waterSplashSoundTimeout = 0.5;
@@ -422,10 +389,10 @@ var Unit = PhysicsObject.extend({
 
         if ( !(this instanceof Fighter && this.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
           if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
-            this.velocity.addSelf(grav.clone().multiplyScalar(dTime));
+            this.velocity.add(grav.clone().multiplyScalar(dTime));
           }
           else {
-            this.velocity.lerpSelf(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
+            this.velocity.lerp(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
 
             soundHandler.Play("stepWater", this.position);
           }
@@ -454,7 +421,7 @@ var Unit = PhysicsObject.extend({
           tVel.y = 0;
           tVel.normalize();
 
-          var ray = new THREE.Ray( this.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0)), tVel);
+          var ray = new THREE.Raycaster( this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), tVel);
 
 
           var intersects = terrainHandler.RayTest(ray, {
@@ -473,9 +440,9 @@ var Unit = PhysicsObject.extend({
 
             var distanceInside = 0.5-intersects[0].distance;
 
-            this.localPosition.addSelf(raycastNormal.clone().multiplyScalar(distanceInside));
+            this.localPosition.add(raycastNormal.clone().multiplyScalar(distanceInside));
 
-            this.velocity.addSelf(raycastNormal.clone().multiplyScalar(-this.velocity.clone().dot(raycastNormal)));
+            this.velocity.add(raycastNormal.clone().multiplyScalar(-this.velocity.clone().dot(raycastNormal)));
 
           }
 
@@ -491,9 +458,9 @@ var Unit = PhysicsObject.extend({
 
           for ( var ro=0;ro<rayList.length;ro++ ) {
 
-            var rayCastPos = this.position.clone().addSelf(rayList[ro]);
+            var rayCastPos = this.position.clone().add(rayList[ro]);
 
-            var ray = new THREE.Ray( rayCastPos, new THREE.Vector3(0, -1, 0));
+            var ray = new THREE.Raycaster( rayCastPos, new THREE.Vector3(0, -1, 0));
             var normal = new THREE.Vector3();
             var point = new THREE.Vector3();
             var distance = 0;
@@ -556,13 +523,13 @@ var Unit = PhysicsObject.extend({
                 if ( this.unitStandingOn ) {
                   var rotationMatrix = new THREE.Matrix4();
                   rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
-                  rotationMatrix.multiplyVector3(dvec);
+                  dvec.applyMatrix4(rotationMatrix);
                 }
 
-                this.localPosition.addSelf(dvec);
+                this.localPosition.add(dvec);
 
                 if ( !(this instanceof Projectile) ) {
-                  this.velocity.subSelf(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
+                  this.velocity.sub(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
                 }
 
                 if ( (this instanceof Projectile) && this.type.parabolic ) {
@@ -587,7 +554,7 @@ var Unit = PhysicsObject.extend({
             if ( !raycastGroundPosition ) {
               // We didn't find anything for our shadow
               // Reverse a raycast
-              ray = new THREE.Ray( this.position, new THREE.Vector3(0, 1, 0));
+              ray = new THREE.Raycaster( this.position, new THREE.Vector3(0, 1, 0));
 
               var intersects = terrainHandler.RayTest(ray, {
                 testMeshesNearPosition:this.position,
@@ -611,7 +578,7 @@ var Unit = PhysicsObject.extend({
         // Collide against meshes to the top
         // Only for the player
         if ( (this instanceof Player) || (this instanceof Projectile) ) {
-          ray = new THREE.Ray(this.position.clone().addSelf(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
+          ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
           var intersects = terrainHandler.RayTest(ray, {
             testMeshesNearPosition:this.position,
@@ -629,16 +596,16 @@ var Unit = PhysicsObject.extend({
 
             var distanceInside = 0.5-intersects[0].distance;
 
-            this.localPosition.addSelf(topNormal.clone().multiplyScalar(distanceInside));
+            this.localPosition.add(topNormal.clone().multiplyScalar(distanceInside));
 
             var moveVector = topNormal.clone();
 
             if ( this.isTouchingGround ) {
-              moveVector.addSelf(raycastNormal);
+              moveVector.add(raycastNormal);
               moveVector.multiplyScalar(2);
             }
 
-            this.velocity.addSelf(moveVector);
+            this.velocity.add(moveVector);
 
           }
 
@@ -671,7 +638,7 @@ var Unit = PhysicsObject.extend({
 
 
 
-    var renderPosition = this.position.clone().addSelf(offset);
+    var renderPosition = this.position.clone().add(offset);
 
 
     if ( this.nameMesh ) {
@@ -679,7 +646,7 @@ var Unit = PhysicsObject.extend({
       this.nameMesh.position.z = renderPosition.z;
       this.nameMesh.position.y = renderPosition.y + (1.5*this.size);
 
-      this.nameMesh.LookAt(ironbane.camera.position);
+      this.nameMesh.LookFlatAt(ironbane.camera.position);
     }
     if ( this.debugMesh ) {
       this.debugMesh.position.x = renderPosition.x;
@@ -698,11 +665,11 @@ var Unit = PhysicsObject.extend({
       }
 
       if ( raycastNormal ) {
-        this.shadowMesh.LookAt(raycastNormal.clone().addSelf(this.shadowMesh.position));
+        this.shadowMesh.LookFlatAt(raycastNormal.clone().add(this.shadowMesh.position));
       }
 
       this.shadowMesh.rotation.z = this.rotation.y * (Math.PI/180);
-    //this.shadowMesh.LookAt(ironbane.camera.position, 0);
+    //this.shadowMesh.LookFlatAt(ironbane.camera.position, 0);
     }
     else if ( this.shadowMesh && !raycastGroundPosition ) {
       this.shadowMesh.position.y = -1000;
@@ -729,7 +696,7 @@ var Unit = PhysicsObject.extend({
     return this.InRangeOfPosition(unit.position, range);
   },
   InRangeOfPosition: function(position, range) {
-    return position.clone().subSelf(this.position).lengthSq() < range*range;
+    return position.clone().sub(this.position).lengthSq() < range*range;
   },
   RotateTowardsTargetPosition: function(dTime) {
     var side = true;

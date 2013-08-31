@@ -30,7 +30,7 @@ var PhysicsObject = Class.extend({
 
         // These values are READ-ONLY! Will be written by the object3D world matrix
         this.position = (position || new THREE.Vector3(0.0, 0.0, 0.0)).clone();
-        this.rotation = rotation || new THREE.Vector3(0.0, 0.0, 0.0);
+        this.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
         this.scale = (scale || new THREE.Vector3(1.0, 1.0, 1.0)).clone();
 
 
@@ -56,7 +56,7 @@ var PhysicsObject = Class.extend({
 
         // Can be written to!
         this.object3D.position = (position || new THREE.Vector3(0.0, 0.0, 0.0)).clone();
-        this.object3D.rotation = rotation || new THREE.Vector3(0.0, 0.0, 0.0);
+        this.object3D.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
         this.object3D.scale = (scale || new THREE.Vector3(1.0, 1.0, 1.0)).clone();
 
         this.localPosition = this.object3D.position;
@@ -104,9 +104,7 @@ var PhysicsObject = Class.extend({
             ironbane.scene.remove(this.object3D);
         }
 
-        this.object3D.deallocate();
-
-        ironbane.renderer.deallocateObject( this.object3D );
+        releaseMesh(this.object3D);
     },
     Tick: function(dTime) {
 
@@ -161,15 +159,15 @@ var PhysicsObject = Class.extend({
 //                    str += "localPosition was: "+this.localPosition.ToString();
 
                     // Change the local position!
-                    this.localPosition.copy(this.position.clone().subSelf(this.unitStandingOn.position));
+                    this.localPosition.copy(this.position.clone().sub(this.unitStandingOn.position));
 
                     var rotationMatrix = new THREE.Matrix4();
                     rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
 //                    var rot = new THREE.Vector3((this.unitStandingOn.rotation.x).ToRadians(),
 //                    (this.unitStandingOn.rotation.y).ToRadians(), (this.unitStandingOn.rotation.z).ToRadians()).multiplyScalar(-1);
-//                    rotationMatrix.setRotationFromEuler(rot);
+//                    rotationMatrix.makeRotationFromEuler(rot);
 
-                    rotationMatrix.multiplyVector3(this.localPosition);
+                    this.localPosition.applyMatrix4(rotationMatrix);
 
                     if ( this instanceof Player ) {
                         // Add the object's rotation to rotY
@@ -245,7 +243,7 @@ var PhysicsObject = Class.extend({
 
         var acceleration = this.steeringForce.multiplyScalar(this.mass);
 
-        this.velocity.addSelf(acceleration.multiplyScalar(dTime));
+        this.velocity.add(acceleration.multiplyScalar(dTime));
 
 
 
@@ -258,22 +256,17 @@ var PhysicsObject = Class.extend({
         var vel = this.velocity.clone();
 
         if ( this.unitStandingOn ) {
-//            var rotationMatrix = new THREE.Matrix4();
-//            var rot = new THREE.Vector3((this.unitStandingOn.rotation.x).ToRadians(),
-//            (this.unitStandingOn.rotation.y).ToRadians(), (this.unitStandingOn.rotation.z).ToRadians()).multiplyScalar(-1);
-//            rotationMatrix.setRotationFromEuler(rot);
-//            rotationMatrix.multiplyVector3(vel);
 
                     var rotationMatrix = new THREE.Matrix4();
                     rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
-                    rotationMatrix.multiplyVector3(vel);
+                    vel.applyMatrix4(rotationMatrix);
         }
 
 
-        vel.addSelf(this.globalVelocity);
+        vel.add(this.globalVelocity);
         this.globalVelocity.set(0,0,0);
 
-        this.localPosition.addSelf(vel.multiplyScalar(dTime));
+        this.localPosition.add(vel.multiplyScalar(dTime));
 
 
 
@@ -297,7 +290,7 @@ var PhysicsObject = Class.extend({
     GetCellStandingOn: function() {
       var cp = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
-      var cellStandingOn = ISDEF(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
+      var cellStandingOn = !_.isUndefined(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
 
       return cellStandingOn;
     }

@@ -465,7 +465,7 @@ var Unit = Class.extend({
     return this.InRangeOfPosition(unit.position, range);
   },
   InRangeOfPosition: function(position, range) {
-    return position.clone().subSelf(this.position).lengthSq() < range*range;
+    return position.clone().sub(this.position).lengthSq() < range*range;
   },
   Remove: function() {
 
@@ -501,7 +501,7 @@ var Unit = Class.extend({
       for(var z=cz-1;z<=cz+1;z++){
         if ( !worldHandler.CheckWorldStructure(zone, x, z) ) continue;
 
-        if ( ISDEF(worldHandler.world[zone][x][z].units) ) {
+        if ( !_.isUndefined(worldHandler.world[zone][x][z].units) ) {
 
           var units = worldHandler.world[zone][x][z].units;
 

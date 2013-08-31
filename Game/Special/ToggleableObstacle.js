@@ -20,28 +20,28 @@
 
 var ToggleableObstacle = Unit.extend({
   Init: function(data) {
-	
+
 
     this._super(data);
-             
-    this.on = ISDEF(this.data.startOpen) ? this.data.startOpen : false;
-             
+
+    this.on = !_.isUndefined(this.data.startOpen) ? this.data.startOpen : false;
+
     this.leverList = [];
-        
+
     this.keyUseTimeout = 0.0;
 
   },
   Awake: function() {
     //log("[ToggleableObstacle] Awake, updating leverlist!");
     this._super();
-                     
-    this.UpdateLeverList();        
-  },    
+
+    this.UpdateLeverList();
+  },
   UpdateLeverList: function() {
     // Get all levers in the world, and check which ones have a targetUnit that points to us
-          
+
     this.leverList = [];
-        
+
     (function(toggleableObstacle){
       worldHandler.LoopUnits(function(unit){
         if ( unit instanceof Lever ) {
@@ -50,59 +50,59 @@ var ToggleableObstacle = Unit.extend({
             toggleableObstacle.leverList.push(unit);
           }
 
-        } 
+        }
       });
     })(this);
-          
+
   },
   Toggle: function(bool) {
-            
+
     this.on = bool;
-            
+
     this.EmitNearby('toggle', {
       id:this.id,
       on:this.on
     });
-            
-            
+
+
     // Toggle all levers that point to us! This will keep everything synchronised
     for(var l=0;l<this.leverList.length;l++) {
       this.leverList[l].Toggle(this.on);
     }
   },
   Tick: function(dTime) {
-      
+
     // Check if there are players nearby, holding a key with an attr1 that points to us
     this._super(dTime);
-            
+
     if ( this.keyUseTimeout > 0 ) {
       this.keyUseTimeout -= dTime;
     }
     else {
       var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
-                
+
       for(var u=0;u<units.length;u++) {
         if ( !(units[u] instanceof Player) ) continue;
 
         if ( units[u].InRangeOfUnit(this, 2) ) {
-          
-          
-          
+
+
+
           // Check the equipped weapon of this unit, and see if it's a key?
-          
+
           var item = units[u].GetEquippedWeapon();
           if ( item ) {
             var template = dataHandler.items[item.template];
-            if ( template.type === "tool" && template.subtype === "key" ) {      
+            if ( template.type === "tool" && template.subtype === "key" ) {
               if ( item.attr1 === -this.id ) {
-                this.Toggle(!this.on);  
+                this.Toggle(!this.on);
                 this.keyUseTimeout = 2.0;
               }
             }
-          }           
+          }
         }
-          
-          
+
+
       }
 
     }
