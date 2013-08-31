@@ -1,34 +1,12 @@
 <script>
-    $(document).ready(function(){
+   $(document).ready(function() {
+    $('#markItUp').markItUp(myMarkdownSettings);
+});
+   </script>
 
-var editor = new wysihtml5.Editor("wysihtml5-area", { // id of textarea element
-  toolbar:      "wysihtml5-toolbar", // id of toolbar element
-  parserRules:  wysihtml5ParserRules // defined in parser rules set 
-});
-});
-</script>
-    <div id="wysihtml5-toolbar" style="display: none;">
-  <a data-wysihtml5-command="bold">bold</a>
-  <a data-wysihtml5-command="italic">italic</a>
-  
-  <!-- Some wysihtml5 commands require extra parameters -->
-  <a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="red">red</a>
-  <a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="green">green</a>
-  <a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="blue">blue</a>
-  
-  <!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
-  <a data-wysihtml5-command="createLink">insert link</a>
-  <div data-wysihtml5-dialog="createLink" style="display: none;">
-    <label>
-      Link:
-      <input data-wysihtml5-dialog-field="href" value="http://" class="text">
-    </label>
-    <a data-wysihtml5-dialog-action="save">OK</a> <a data-wysihtml5-dialog-action="cancel">Cancel</a>
-  </div>
-</div>
 
 <form name="postEditorForm">
     <input ng-show="topic == null" type="text" ng-model="post.title" placeholder="title your post" ng-maxlength="100" value="topic.title" />
-    <textarea id="wysihtml5-area" ng-model="post.body"></textarea>
+    <textarea id="markItUp" ng-model="post.body"></textarea>
     <button ng-click="save()">Post</button>
 </form>
