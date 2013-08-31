@@ -20,6 +20,8 @@
 
 var gravity = new THREE.Vector3(0, -9.81, 0);
 
+var tempMatrix = new THREE.Matrix4();
+
 var PhysicsObject = Class.extend({
     Init: function(position, rotation, scale, velocity) {
 
@@ -156,16 +158,11 @@ var PhysicsObject = Class.extend({
 
                     var str = "";
 
-//                    str += "localPosition was: "+this.localPosition.ToString();
-
-                    // Change the local position!
                     this.localPosition.copy(this.position.clone().sub(this.unitStandingOn.position));
 
                     var rotationMatrix = new THREE.Matrix4();
                     rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
-//                    var rot = new THREE.Vector3((this.unitStandingOn.rotation.x).ToRadians(),
-//                    (this.unitStandingOn.rotation.y).ToRadians(), (this.unitStandingOn.rotation.z).ToRadians()).multiplyScalar(-1);
-//                    rotationMatrix.makeRotationFromEuler(rot);
+
 
                     this.localPosition.applyMatrix4(rotationMatrix);
 
@@ -175,34 +172,24 @@ var PhysicsObject = Class.extend({
                     }
 
 
-//                    str += "<br>localPosition is now: "+this.localPosition.ToString();
-
-                    //this.object3D.updateMatrixWorld();
-
                     ironbane.scene.remove(this.object3D);
                     this.unitStandingOn.object3D.add(this.object3D);
 
 
-//                    str += "<br><br>position was: "+this.position.ToString();
-
                     this.object3D.updateMatrixWorld(true);
 
 
-//                    this.position.getPositionFromMatrix(this.object3D.matrixWorld);
-
-//                    str += "<br>position is now: "+this.position.ToString();
-//
-//                    ba(str);
-//
-//                    bm("changed to "+this.unitStandingOn.id);
-
-//this.test = true;
                 }
             }
 
 
         if ( this.dynamic || !this.initialStaticUpdateDone ) {
           this.position.getPositionFromMatrix(this.object3D.matrixWorld);
+
+          if ( this instanceof Mesh && this.mesh ) {
+            this.mesh.rotation.setFromQuaternion(this.object3D.quaternion);
+          }
+          //
           this.initialStaticUpdateDone = true;
         }
 

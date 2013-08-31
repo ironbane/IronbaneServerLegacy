@@ -114,7 +114,7 @@ var Sign = Mesh.extend({
     this.textMesh.position.z = 0.1;
     this.textMesh.position.y = ypos;
 
-    this.localRotation.copy(this.rotation.clone().ToRadians());
+    this.localRotation.copy(this.rotation);
 
 
     //this.textMesh.doubleSided = true;

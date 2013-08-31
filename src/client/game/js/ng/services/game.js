@@ -37,6 +37,7 @@ IronbaneApp
             this.stats = null;
             this.projector = null;
             this.player = null;
+            this.newLevelEditor = null;
             this.unitList = [];
             this.showingGame = false;
 
@@ -96,9 +97,9 @@ IronbaneApp
 
             this.scene.add(this.camera);
 
-            if ($window.isEditor) {
-                this.scene.add(new $window.THREE.AxisHelper(5));
-            }
+            var container = null;
+            var info = null;
+
             this.projector = new $window.THREE.Projector();
 
             this.renderer = new $window.THREE.WebGLRenderer({
@@ -165,13 +166,21 @@ IronbaneApp
 
                     loop(game);
                 });
+
+            this.renderer.setClearColor($window.ColorEnum.LIGHTBLUE, 1);
         };
 
         Game.prototype.render = function() {
 
-            this.renderer.setClearColor($window.ColorEnum.LIGHTBLUE, 1);
+            this.renderer.clear();
 
             this.renderer.render(this.scene, this.camera);
+
+            if ( this.newLevelEditor ) {
+                this.renderer.render(this.newLevelEditor.sceneHelpers, this.camera);
+            }
+
+
             $window.debug.Clear();
         };
 
@@ -203,17 +212,25 @@ IronbaneApp
 
             if ($window.socketHandler.loggedIn) {
                 // Add the player once we have terrain we can walk on
-                if (!game.player) {
-                    if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
-                        !$window.terrainHandler.IsLoadingCells()) {
 
-                        game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Vector3(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
-                        game.unitList.push(game.player);
+                if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
+                    !$window.terrainHandler.IsLoadingCells()) {
+                    if (!game.player) {
+                        game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
                     }
                 }
             }
 
             $window.particleHandler.Tick(dTime);
+
+            if ( game.player ) {
+                if ( le("globalEnable") && game.newLevelEditor ) {
+                    game.newLevelEditor.Tick(dTime);
+                }
+                else {
+                    game.player.Tick(dTime);
+                }
+            }
 
             for (var x = 0; x < game.unitList.length; x++) {
                 game.unitList[x].Tick(dTime);

@@ -201,13 +201,13 @@ var SocketHandler = Class.extend({
 
             switch (template.type) {
                 case UnitTypeEnum.MOVINGOBSTACLE:
-                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Vector3(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TRAIN:
-                    unit = new Train(ConvertVector3(data.position), new THREE.Vector3(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new Train(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TOGGLEABLEOBSTACLE:
-                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Vector3(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.LEVER:
                     unit = new Lever(ConvertVector3(data.position), data.id, data.metadata);
@@ -225,18 +225,18 @@ var SocketHandler = Class.extend({
                     unit = new HeartPiece(ConvertVector3(data.position), data.id);
                     break;
                 case UnitTypeEnum.SIGN:
-                    unit = new Sign(ConvertVector3(data.position), new THREE.Vector3(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new Sign(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.LOOTABLE:
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
                     } else {
-                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Vector3(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     }
                     break;
                 default:
                     // return;
-                    unit = new Fighter(ConvertVector3(data.position), new THREE.Vector3(0, data.rotY, 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
+                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
                     break;
             }
 
@@ -624,13 +624,15 @@ var SocketHandler = Class.extend({
             //if ( !socketHandler.loggedIn ) return;
             //bm('remove unit: '+data.id);
 
+
             hudHandler.AddChatMessage('Adding model...');
 
             levelEditor.PlaceModel(ConvertVector3(data.position),
                 data.rX,
                 data.rY,
                 data.rZ,
-                parseInt(data.param));
+                parseInt(data.param, 10));
+
         });
 
         this.socket.on('paintModel', function(data) {
@@ -711,13 +713,19 @@ var SocketHandler = Class.extend({
             //if ( !socketHandler.loggedIn ) return;
             //bm('remove unit: '+data.id);
 
+            if ( pos.equals(ironbane.newLevelEditor.selectedObjectOldPosition.clone().Round(2)) ) {
+                // We want to remove the object we are currently holding!
+                // So Undo it so we can find it here
+                ironbane.newLevelEditor.Undo();
+            }
 
-            hudHandler.AddChatMessage("Removing model...");
 
             // Check
             _.each(terrainHandler.cells, function(cell) {
                 _.each(cell.objects, function(obj) {
                     if (obj.position.clone().Round(2).equals(pos)) {
+
+                        hudHandler.AddChatMessage("Removing model "+obj.meshData.name);
 
                         cell.objects = _.without(cell.objects, obj);
 

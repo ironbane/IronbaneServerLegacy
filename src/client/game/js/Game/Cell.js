@@ -140,7 +140,9 @@ var Cell = Class.extend({
         }
 
         ironbane.shadowMapUpdateTimer = setTimeout(function() {
-            ironbane.renderer.shadowMapAutoUpdate = false;
+            if ( !le("globalEnable") ) {
+                ironbane.renderer.shadowMapAutoUpdate = false;
+            }
         }, 1000);
 
         this.status = cellStatusEnum.LOADED;
@@ -248,7 +250,9 @@ var Cell = Class.extend({
 
             var meshData = preMeshes[param] ? preMeshes[param] : null;
 
-            var rotation = new THREE.Euler(gObject.rX, gObject.rY, gObject.rZ);
+            // Eulers are expressed in radians, so convert!
+            var rotation = new THREE.Euler(gObject.rX.ToRadians(), gObject.rY.ToRadians(), gObject.rZ.ToRadians());
+
 
             // Special meshes do not get "baked" into the cell modelGeometry
             if ( meshData && (meshData.special || le("globalEnable")) ) {
@@ -258,6 +262,9 @@ var Cell = Class.extend({
                         unit = new Mesh(pos, rotation, 0, gObject.p, metadata);
                         break;
                 }
+
+                // Make the units dynamic so we can alter them
+                unit.dynamic = true;
 
                 if ( unit ) {
                     ironbane.unitList.push(unit);

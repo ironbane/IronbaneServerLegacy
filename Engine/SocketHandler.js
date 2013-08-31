@@ -258,6 +258,10 @@ var SocketHandler = Class.extend({
             socket.unit = null;
 
             socket.on("backToMainMenu", function(data, reply) {
+                if (!_.isFunction(reply)) {
+                    log('backToMainMenu no callback defined!');
+                    return;
+                }
                 if (socket.unit) {
                     if (socket.unit.health <= 0) {
                         reply({
@@ -349,7 +353,8 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
+                    log('addProjectile no callback defined!');
                     return;
                 }
 
@@ -445,7 +450,7 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("useItem", function (barIndex, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('useItem no callback defined!');
                     return;
                 }
@@ -544,7 +549,7 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("dropItem", function (data, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('dropItem no callback defined!');
                     return;
                 }
@@ -619,7 +624,7 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("lootItem", function (data, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('lootItem no callback defined!');
                     return;
                 }
@@ -789,7 +794,7 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("putItem", function (data, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('putItem no callback defined!');
                     return;
                 }
@@ -922,7 +927,7 @@ var SocketHandler = Class.extend({
 
             // swapping items, which also will handle combining/stacking
             socket.on("switchItem", function(data, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('switchItem no callback defined!');
                     return;
                 }
@@ -1056,7 +1061,7 @@ var SocketHandler = Class.extend({
             });
 
             socket.on("loot", function(npcID, reply) {
-                if (_.isUndefined(reply) || !_.isFunction(reply)) {
+                if (!_.isFunction(reply)) {
                     log('switchItem no callback defined!');
                     return;
                 }
@@ -1098,7 +1103,10 @@ var SocketHandler = Class.extend({
 
                 if ( !socket.unit ) return;
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+                if (!_.isFunction(reply)) {
+                    log('hit no callback defined!');
+                    return;
+                }
 
 
                 if ( !CheckData(data, ["l","w"]) ) {
@@ -1186,7 +1194,10 @@ var SocketHandler = Class.extend({
 
                 if ( !socket.unit ) return;
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+                if (!_.isFunction(reply)) {
+                    log('ghit no callback defined!');
+                    return;
+                }
 
 
                 if ( !CheckData(data, ["w","o"]) ) {
@@ -1238,7 +1249,10 @@ var SocketHandler = Class.extend({
 
             socket.on("getStartData", function (data, reply) {
 
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+                if (!_.isFunction(reply)) {
+                    log('getStartData no callback defined!');
+                    return;
+                }
 
                 var response = {
                     "numberOfPlayersOnline" : io.sockets.clients().length
@@ -1334,7 +1348,11 @@ var SocketHandler = Class.extend({
 
             socket.on("teleport", function (data, reply) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
-                if ( _.isUndefined(reply) || !_.isFunction(reply) ) return;
+
+                if (!_.isFunction(reply)) {
+                    log('teleport no callback defined!');
+                    return;
+                }
 
                 if ( !CheckData(data, ["pos", "zone", "name", "targetName"]) ) {
                     reply({
@@ -1400,6 +1418,10 @@ var SocketHandler = Class.extend({
             socket.on("generateCell", function (data, reply) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
+                if (!_.isFunction(reply)) {
+                    log('generateCell no callback defined!');
+                    return;
+                }
                 // debugger;
 
                 var cellPos = WorldToCellCoordinates(data.pos.x, data.pos.z, cellSize);
@@ -1538,11 +1560,15 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("deleteModel", function (data) {
+            socket.on("deleteModel", function (data, reply) {
 
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
+                if (!_.isFunction(reply)) {
+                    log('deleteModel no callback defined!');
+                    return;
+                }
 
 
                 data = ConvertVector3(data);
@@ -1590,12 +1616,18 @@ var SocketHandler = Class.extend({
 
                 socket.unit.EmitNearby("deleteModel", data, 0, true);
 
+                reply(true);
             });
 
-            socket.on("addModel", function (data) {
+            socket.on("addModel", function (data, reply) {
 
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
+
+                if (!_.isFunction(reply)) {
+                    log('addModel no callback defined!');
+                    return;
+                }
 
                 data.position = ConvertVector3(data.position);
                 data.position = data.position.Round(2);
@@ -1629,11 +1661,18 @@ var SocketHandler = Class.extend({
                 worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
 
                 socket.unit.EmitNearby("addModel", data, 0, true);
+
+                reply(true);
             });
 
             socket.on("ppAddNode", function (position, reply) {
 
                 if ( !socket.unit || socket.unit.editor === false ) return;
+
+                if (!_.isFunction(reply)) {
+                    log('ppAddNode no callback defined!');
+                    return;
+                }
 
                 position = ConvertVector3(position).Round(2);
 
@@ -1678,6 +1717,11 @@ var SocketHandler = Class.extend({
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
+                if (!_.isFunction(reply)) {
+                    log('ppAddEdge no callback defined!');
+                    return;
+                }
+
                 if ( !CheckData(data, ["from","to","twoway"]) ) {
                     reply({
                         errmsg:"Corrupt AddEdge data"
@@ -1703,6 +1747,11 @@ var SocketHandler = Class.extend({
 
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
+
+                if (!_.isFunction(reply)) {
+                    log('ppDeleteNode no callback defined!');
+                    return;
+                }
 
                 if ( !CheckData(data, ["id"]) ) {
                     reply({

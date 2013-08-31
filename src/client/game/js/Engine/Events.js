@@ -112,7 +112,7 @@ $('#gameFrame').on("mouseover",
     isHoveringHud = false;
   }
   );
-$('#statBar,#coinBar,#itemBar,#lootBag,div[id^="li"],div[id^="ii"]').on("mouseover",
+$('#statBar,#coinBar,#itemBar,#lootBag,#editorControls,div[id^="li"],div[id^="ii"]').on("mouseover",
   function(event) {
     event.stopPropagation();
     isHoveringHud = true;
@@ -291,6 +291,9 @@ $(document).mousedown(function(event) {
   var id = event.target.id;
   if (event.target == ironbane.renderer.domElement || $.inArray(id, ['chatContent','debugBox']) != -1 ) {
     event.preventDefault();
+
+    mouseClickFunction(event);
+
     if ( mouseCheckHoldInterval ) clearInterval(mouseCheckHoldInterval);
     mouseCheckHoldInterval = setInterval(function(){
       mouseIntervalFunction(event);
@@ -326,22 +329,11 @@ $(document).mousemove(function(event) {
   mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 
-//    if ( ironbane.player ) ironbane.player.UpdateMouseProjectedPosition();
+
 });
 
-var mouseIntervalFunction = function(event){
-
-
-  // relativeMouse = mouse.clone().sub(lastMouse);
-
-  // sw("relativeMouse", ConvertVector3(relativeMouse));
-
-  document.getSelection().removeAllRanges();
-
-
-
+var mouseClickFunction = function(event) {
   if ( showEditor && levelEditor.editorGUI.globalEnable ) {
-
     if (currentMouseToWorldData) {
 
       if ( levelEditor.editorGUI.enableNPCEditor ) {
@@ -511,82 +503,27 @@ var mouseIntervalFunction = function(event){
         }
 
       }
-      else if ( levelEditor.editorGUI.enableModelPlacer ) {
 
-        var position = currentMouseToWorldData.point;
-
-
-        if ( levelEditor.editorGUI.mpMode == ModelPlacerModeEnum.DELETE ) {
-          _.each(terrainHandler.cells, function(cell) {
-              _.each(cell.objects, function(obj) {
-              if ( currentMouseToWorldData.object == obj.mesh ) {
-
-                if ( obj instanceof Mesh ) {
-                  // Send a request to destroy this object
-
-                  socketHandler.socket.emit('deleteModel', obj.position.Round(2));
-
-                }
-              }
-            });
-          });
-
-        }
-        else {
-
-          socketHandler.socket.emit('addModel', {
-            position:levelEditor.previewMesh.position.clone().Round(2),
-            type: 5,
-            rX:levelEditor.editorGUI.mpRotX,
-            rY:levelEditor.editorGUI.mpRotY,
-            rZ:levelEditor.editorGUI.mpRotZ,
-            param:levelEditor.editorGUI.selectModel
-          });
-
-        }
-      }
-      else if ( levelEditor.editorGUI.enableModelPainter ) {
-
-          for(var c in terrainHandler.cells) {
-            for(var o=0;o<terrainHandler.cells[c].objects.length;o++) {
-              if ( currentMouseToWorldData.object == terrainHandler.cells[c].objects[o].mesh ) {
-
-                var obj = terrainHandler.cells[c].objects[o];
-
-                if ( obj instanceof Mesh ) {
-                  // Send a request to destroy this object
-
-                  var currentMetadata = {};
-
-                  // Alter it
-                  var materialIndex = currentMouseToWorldData.face.materialIndex + 1;
-
-                  var tileToPaint = levelEditor.editorGUI.selectedTile;
-
-                  // currentMetadata["t"+materialIndex] = tileToPaint;
-
-                  // _.extend(currentMetadata, obj.metadata);
-
-                  obj.metadata["t"+materialIndex] = tileToPaint;
-
-                  socketHandler.socket.emit('paintModel', {
-                    pos: obj.position.clone().Round(2),
-                    id: obj.meshData.id,
-                    metadata: le("mpClearMode") ? {} : obj.metadata,
-                    global : le("mpSetForAllModels") ? true : false
-                  });
-
-                }
-              }
-            }
-          }
-
-
-      }
 
     }
-  }
-  else if ( ironbane.player ) {
+      }
+}
+
+var mouseIntervalFunction = function(event){
+
+
+  // relativeMouse = mouse.clone().sub(lastMouse);
+
+  // sw("relativeMouse", ConvertVector3(relativeMouse));
+
+  document.getSelection().removeAllRanges();
+
+
+
+
+
+
+  if ( ironbane.player ) {
 
     if ( ironbane.player.dead ) return;
 

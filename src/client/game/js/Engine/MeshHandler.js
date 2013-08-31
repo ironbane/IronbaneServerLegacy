@@ -69,15 +69,9 @@ var MeshHandler = Class.extend({
     var meshData = options.meshData || {};
 
     // Rotate geometry
-
-    var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationFromEuler(
-      new THREE.Euler((rotation.x).ToRadians(),
-        (rotation.y).ToRadians(), (rotation.z).ToRadians()));
-
-    for(var v=0;v<geometry.vertices.length;v++) {
-      geometry.vertices[v] = geometry.vertices[v].applyMatrix4(rotationMatrix);
-    }
+    _.each(geometry.vertices, function(v) {
+      v.applyEuler(rotation);
+    });
 
     geometry.computeCentroids();
     geometry.computeFaceNormals();

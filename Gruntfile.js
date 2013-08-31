@@ -103,6 +103,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Game/Hud.js",
                     "<%= gameScriptPath %>/Game/PhysicsObject.js",
                     "<%= gameScriptPath %>/Game/Unit.js",
+                    "<%= gameScriptPath %>/Game/NewLevelEditor.js",
                     "<%= gameScriptPath %>/Game/Billboard.js",
                     "<%= gameScriptPath %>/Game/Waypoint.js",
                     "<%= gameScriptPath %>/Game/ChatBubble.js",
@@ -270,6 +271,15 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'src/client/game'
                 }]
+            },
+            assets: {
+                files: [{
+                    // Whats the '!**/*.php' for?
+                    src: ['**/*', '!**/*.php'],
+                    dest: '<%= cfg.get("buildTarget") %>game/',
+                    expand: true,
+                    cwd: '<%= cfg.get("assetDir") %>'
+                }]
             }
         },
         // TODO: make less agressive?
@@ -280,11 +290,11 @@ module.exports = function(grunt) {
             },
             html: {
                 files: 'src/client/**/*.html',
-                tasks: ['default', 'beep']
+                tasks: ['game', 'website', 'beep']
             },
             js: {
                 files: 'src/client/**/*.js',
-                tasks: ['default', 'beep']
+                tasks: ['game', 'website', 'beep']
             },
             assets: {
                 files: '<%= cfg.get("assetDir") %>**/*',
@@ -294,6 +304,9 @@ module.exports = function(grunt) {
         // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
              src: ['<%= cfg.get("assetDir") %>**/*.obj']
+        },
+        convertradians: {
+             src: ['<%= cfg.get("assetDir") %>**/objects.json']
         },
         // db script mgmt
         dbupgrade: {
@@ -335,10 +348,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-download');
 
     // Default task(s).
-    grunt.registerTask('assets', ['three_obj', 'copy:game']);
-    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
+    grunt.registerTask('assets', ['three_obj', 'copy:assets']);
+    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
+    grunt.registerTask('full', ['dbupgrade', 'game', 'website', 'assets', 'docular']);
 
     // when ready do both
-    grunt.registerTask('default', ['dbupgrade', 'website', 'game']);
+    grunt.registerTask('default', ['full']);
 };

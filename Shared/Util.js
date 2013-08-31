@@ -317,7 +317,9 @@ if ( !SERVER ) {
   THREE.Vector3.prototype.ToString = function ( ) {
     return "X: "+roundNumber(this.x,2)+", Y: "+roundNumber(this.y,2)+", Z: "+roundNumber(this.z,2)+"";
   }
-
+  THREE.Euler.prototype.ToString = function ( ) {
+    return "X: "+roundNumber(this.x,2)+", Y: "+roundNumber(this.y,2)+", Z: "+roundNumber(this.z,2)+"";
+  }
 
 
   function v(x,y,z){
@@ -743,7 +745,6 @@ function CheckForFunctionReturnValue(v, data) {
   return typeof(v)=="function"?v(data):v;
 }
 
-
 THREE.Vector3.prototype.Round = function(n) {
   this.x = roundNumber(this.x, n);
   this.y = roundNumber(this.y, n);
@@ -751,6 +752,17 @@ THREE.Vector3.prototype.Round = function(n) {
 
   return this;
 };
+
+// Server only uses the Vector3 Class (for now)
+if (!SERVER) {
+  THREE.Euler.prototype.Round = function(n) {
+    this.x = roundNumber(this.x, n);
+    this.y = roundNumber(this.y, n);
+    this.z = roundNumber(this.z, n);
+
+    return this;
+  };
+}
 
 THREE.Vector3.prototype.ToRadians = function(n) {
   this.x = this.x.ToRadians();

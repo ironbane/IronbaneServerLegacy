@@ -24,6 +24,11 @@ var ObjectPlacerModeEnum = {
   DELETE : 1
 };
 
+var ModelPlacerModeEnum = {
+  PLACE : 0,
+  DELETE : 1
+};
+
 
 var PathPlacerModeEnum = {
   NODES : 0,
@@ -37,8 +42,8 @@ var EditorGUI = function() {
   this.globalEnable = !_.isUndefined(localStorage.globalEnable) ? (localStorage.globalEnable === 'true') : false;
   this.globalEnable = false;
 
+  this.tbEnableTransparency = false;
 
-  // Cheats
   this.chFlyMode = !_.isUndefined(localStorage.chFlyMode) ? (localStorage.chFlyMode === 'true') : false;
   this.chClimb = !_.isUndefined(localStorage.chClimb) ? (localStorage.chClimb === 'true') : false;
   this.chSpeed = !_.isUndefined(localStorage.chSpeed) ? (localStorage.chSpeed === 'true') : false;
@@ -49,7 +54,6 @@ var EditorGUI = function() {
   this.chForceNight = !_.isUndefined(localStorage.chForceNight) ? (localStorage.chForceNight === 'true') : false;
   this.chSunOffset = 0;
   this.chFOV = 75;
-
 
   this.itemCollection = _.pluck(items, 'name').sort();
   this.chItemName = this.itemCollection[0];
@@ -109,7 +113,7 @@ var EditorGUI = function() {
   this.opMode = ObjectPlacerModeEnum.PLACE;
 
   // Model placer mode
-  this.mpTransformMode = true;
+  this.mpMode = ModelPlacerModeEnum.PLACE;
   this.selectModel = firstOfObject(ModelEnum);
   this.mpRotX = 0;
   this.mpRotY = 0;
@@ -143,6 +147,7 @@ var EditorGUI = function() {
   this.eptoStartOpen = false;
   this.eptoSpeedMultiplier = 1.0;
   this.eptoDistanceMultiplier = 1.0;
+  this.eptoDistanceMultiplier = 1.0;
   this.eptoAdd = function() {
     socketHandler.socket.emit('addNPC', {
       position: ironbane.player.position,
@@ -158,6 +163,7 @@ var EditorGUI = function() {
     });
   };
 
+
   this.eptAddExit = function() {
     socketHandler.socket.emit('addNPC', {
       position: ironbane.player.position,
@@ -167,7 +173,6 @@ var EditorGUI = function() {
       }
     });
   };
-
   this.eptTargetExit = 0;
   this.eptInvisible = false;
   this.eptAddEntrance = function() {
@@ -251,6 +256,11 @@ var EditorGUI = function() {
   this.neDeleteMode = false;
 
 
+
+  this.gui = false;
+
+  this.enableObjectPlacer = false;
+
   // Path placer
   this.enablePathPlacer = false;
   this.ppMode = PathPlacerModeEnum.NODES;
@@ -273,6 +283,24 @@ var EditorGUI = function() {
 
   this.npcTemplate = 1;
   this.npcParam = 0;
+  //this.npcRotation = 0;
+
+  //    this.editNPC = function() {
+  //        // Check if our npcID is not 0, and send a request to update the NPC with given ID
+  //        // our given editor data
+  //        if ( levelEditor.editorGUI.npcID == 0 ) {
+  //            hudHandler.MessageAlert('Select an NPC first!');
+  //            return;
+  //        }
+  //
+  //        socketHandler.socket.emit('editNPC', {
+  //                            name: levelEditor.editorGUI.npcName,
+  //                            type: levelEditor.editorGUI.npcType,
+  //                            param: levelEditor.editorGUI.npcParam,
+  //                            size: levelEditor.editorGUI.npcSize
+  //            });
+  //    };
+
 
 
   this.tpPlayerName = socketHandler.playerData.name;
@@ -428,10 +456,7 @@ var LevelEditor = Class.extend({
     this.setTileHeightBuffer = [];
     this.setTileHeightTimer = 0;
 
-
-
     this.selectedNode = null;
-
   },
   BuildPreviewBuildMesh: function() {
 
@@ -516,7 +541,7 @@ var LevelEditor = Class.extend({
     }
 
     if ( id ) {
-      this.previewMesh = new Mesh(new THREE.Vector3(), new THREE.Euler(), 0, id);
+      this.previewMesh = new Mesh(new THREE.Vector3(), new THREE.Vector3(), 0, id);
     }
 
 
@@ -662,7 +687,6 @@ var LevelEditor = Class.extend({
 
 
 
-
     var guiControls = {};
 
     guiControls['globalEnable'] = this.editorGUI.gui.add(this.editorGUI,'globalEnable');
@@ -700,7 +724,10 @@ var LevelEditor = Class.extend({
 
 
 
-    guiControls['mpTransformMode'] = fModelPlacer.add(this.editorGUI, 'mpTransformMode');
+    guiControls['mpMode'] = fModelPlacer.add(this.editorGUI, 'mpMode', {
+      Place: ModelPlacerModeEnum.PLACE,
+      Delete: ModelPlacerModeEnum.DELETE
+    });
 
     guiControls['selectModel'] = fModelPlacer.add(this.editorGUI, 'selectModel', ModelEnum);
     guiControls['mpRotX'] = fModelPlacer.add(this.editorGUI, 'mpRotX', 0, 359);
@@ -866,23 +893,26 @@ var LevelEditor = Class.extend({
     });
 
 
-    var me = this;
-
     guiControls['globalEnable'].onFinishChange(function(value) {
 
+     if ( value ) {
+
+       if ( levelEditor.editorGUI.enableModelPlacer ) {
+         levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
+       }
+       else {
+         levelEditor.SetPreviewMesh(null);
+       }
+
+     }
+     else {
+       levelEditor.SetPreviewMesh(null);
+     }
 
 
       localStorage.globalEnable = value;
 
       terrainHandler.ReloadCells();
-
-      if ( value ) {
-        ironbane.newLevelEditor = new NewLevelEditor();
-      }
-      else {
-        ironbane.newLevelEditor.Destroy();
-        ironbane.newLevelEditor = null;
-      }
 
 
     });
@@ -915,18 +945,15 @@ var LevelEditor = Class.extend({
 
       var value = delta * 5;
 
-      if ( keyTracker[16] && keyTracker[18] ) {
+      if ( keyTracker[16] ) {
         levelEditor.editorGUI.mpRotX += value;
       }
-      // shift
-      else if ( keyTracker[16] ) {
-        levelEditor.editorGUI.mpRotY += value;
-      }
-      // alt
       else if ( keyTracker[18] ) {
         levelEditor.editorGUI.mpRotZ += value;
       }
-
+      else {
+        levelEditor.editorGUI.mpRotY += value;
+      }
 
       if ( levelEditor.editorGUI.mpRotX >= 360 ) levelEditor.editorGUI.mpRotX = 0;
       if ( levelEditor.editorGUI.mpRotY >= 360 ) levelEditor.editorGUI.mpRotY = 0;
@@ -946,14 +973,12 @@ var LevelEditor = Class.extend({
 
     guiControls['enableModelPlacer'].onFinishChange(function(value) {
       if ( levelEditor.editorGUI.globalEnable ) {
-        if ( value && !levelEditor.editorGUI.mpTransformMode ) {
+        if ( value ) {
           levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
         }
         else {
           levelEditor.SetPreviewMesh(null);
         }
-
-
       }
       else {
         levelEditor.SetPreviewMesh(null);
@@ -962,8 +987,8 @@ var LevelEditor = Class.extend({
 
 
 
-    guiControls['mpTransformMode'].onFinishChange(function(value) {
-      if ( !value ) {
+    guiControls['mpMode'].onFinishChange(function(value) {
+      if ( value == ModelPlacerModeEnum.PLACE ) {
         levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
       }
       else {
@@ -987,9 +1012,6 @@ var LevelEditor = Class.extend({
 
     var customContainer = document.getElementById('editorControls');
     customContainer.appendChild(this.editorGUI.gui.domElement);
-
-
-    this.transformControls = new THREE.TransformControls(ironbane.camera);
 
   //this.SetTile(levelEditor.editorGUI.selectedTile);
   },
@@ -1046,12 +1068,8 @@ var LevelEditor = Class.extend({
       rZ:rotZ
     });
 
-    var unit = new Mesh(position,
-      new THREE.Euler(rotX.ToRadians(),
-        rotY.ToRadians(),
-        rotZ.ToRadians()), 0, id);
+    var unit = new Mesh(position, new THREE.Vector3(rotX, rotY, rotZ), 0, id);
 
-    unit.dynamic = true;
 
     if ( unit ) {
       ironbane.unitList.push(unit);
@@ -1172,5 +1190,6 @@ var LevelEditor = Class.extend({
     }
   }
 });
+
 
 var levelEditor = new LevelEditor();

@@ -283,6 +283,10 @@ var Player = Fighter.extend({
       doCameraCheck = false;
     }
 
+    if ( le("globalEnable") ) {
+      this.cameraStatus = CameraStatusEnum.FirstPerson;
+    }
+
     if ( doCameraCheck && !cinema.IsPlaying()) {
 
 
@@ -290,6 +294,7 @@ var Player = Fighter.extend({
 
 
       var ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), preTarget.clone().sub(this.position.clone()).normalize());
+
 
       var intersects = terrainHandler.RayTest(ray, {
         testMeshesNearPosition:ironbane.camera.position,

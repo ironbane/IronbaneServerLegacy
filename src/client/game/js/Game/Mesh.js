@@ -69,8 +69,9 @@ var Mesh = Unit.extend({
 
 
 
-
-
+    this.object3D.setRotationFromEuler(this.rotation);
+    this.object3D.rotation.setFromQuaternion(this.object3D.quaternion);
+    //this.object3D.rotation.Round()
 
 
 
@@ -270,7 +271,7 @@ var Mesh = Unit.extend({
     var result = meshHandler.ProcessMesh({
       geometry: geometry,
       jsonMaterials: jsonMaterials,
-      rotation: this.rotation,
+      //rotation: this.rotation,
       metadata: this.metadata,
       meshData: this.meshData
     });
@@ -366,23 +367,6 @@ var Mesh = Unit.extend({
     this.mesh.geometry.computeBoundingBox();
     this.boundingBox = this.mesh.geometry.boundingBox;
     this.boundingBox.size = this.boundingBox.max.clone().sub(this.boundingBox.min);
-  },
-  UpdateRotation: function() {
-    if( this.mesh ) {
-      this.mesh.rotation.x = (this.rotation.x).ToRadians();
-      this.mesh.rotation.y = (this.rotation.y).ToRadians();
-      this.mesh.rotation.z = (this.rotation.z).ToRadians();
-
-
-
-
-    //            this.mesh.geometry.computeCentroids();
-    //            this.mesh.geometry.computeFaceNormals();
-    //            this.mesh.geometry.computeVertexNormals();
-    }
-
-
-
   },
   Tick: function(dTime) {
 
