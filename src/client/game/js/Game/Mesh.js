@@ -99,6 +99,24 @@ var Mesh = Unit.extend({
         this.lightsToMaintain.push(pointLight);
 
         break;
+      case "Torch":
+
+        this.particleEmitters.push({
+          particle: ParticleTypeEnum.FIRESMALL,
+          data: {
+            followUnit:this,
+            spawnOffset: new THREE.Vector3(0.0, 1.0, 0.5)
+          }
+        });
+
+        this.flickerTime = 0.0;
+
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 1.0, 0);
+        this.lightsToMaintain.push(pointLight);
+
+        break;
       case "Campfire":
 
         this.particleEmitters.push({
@@ -115,6 +133,17 @@ var Mesh = Unit.extend({
         // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
         pointLight.position.set(0, 1.0, 0);
         this.lightsToMaintain.push(pointLight);
+
+        break;
+      case "Fountain":
+
+        this.particleEmitters.push({
+          particle: ParticleTypeEnum.FOUNTAINSIDE,
+          data: {
+            followUnit:this,
+            spawnOffset: new THREE.Vector3(0.0, 1.5, 0.5)
+          }
+        });
 
         break;
     }
@@ -144,6 +173,43 @@ var Mesh = Unit.extend({
     }, this);
 
 
+  },
+  UpdateLighting: function() {
+      var cell = terrainHandler.GetCellByWorldPosition(this.position);
+
+      setTimeout(function() {
+
+          if ( cell.modelMesh ) {
+            _.each(cell.modelMesh.geometry.materials, function(material) {
+              material.needsUpdate = true;
+            });
+          }
+
+
+          _.each(cell.objects, function(obj) {
+
+              if ( obj.mesh ) {
+                if ( ISDEF(obj.mesh.material.needsUpdate) ) {
+                  obj.mesh.material.needsUpdate = true;
+                }
+
+                if ( ISDEF(obj.mesh.geometry.materials) ) {
+                  _.each(obj.mesh.geometry.materials, function(material) {
+                    material.needsUpdate = true;
+                  });
+                }
+              }
+
+          }, cell);
+
+
+        terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
+
+        _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
+          material.needsUpdate = true;
+        });
+
+      }, 1);
   },
   Destroy: function() {
 
@@ -196,113 +262,8 @@ var Mesh = Unit.extend({
   },
   BuildMesh: function(geometry) {
 
-
-    // Rotate geometry
-
-    var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.setRotationFromEuler(new THREE.Vector3((this.rotation.x).ToRadians(), (this.rotation.y).ToRadians(), (this.rotation.z).ToRadians()));
-
-    for(var v=0;v<geometry.vertices.length;v++) {
-      geometry.vertices[v] = rotationMatrix.multiplyVector3(geometry.vertices[v]);
-    }
-
-    geometry.computeCentroids();
-    geometry.computeFaceNormals();
-    geometry.computeVertexNormals();
-
-    geometry.dynamic = true;
-
-    var tiles = [];
-    for(var x=1;x<=10;x++){
-      if ( ISDEF(this.metadata["t"+x]) ) {
-        tiles.push("tiles/"+this.metadata["t"+x]);
-      }
-      else if ( ISDEF(this.meshData["t"+x]) ) {
-        tiles.push(this.meshData["t"+x]);
-      }
-      else {
-        tiles.push(1);
-      }
-    }
-
-    var uvscale = [];
-    for(var x=1;x<=10;x++){
-      if ( ISDEF(this.metadata["ts"+x]) ) {
-        uvscale.push(new THREE.Vector2(parseFloat(this.metadata["ts"+x]),parseFloat(this.metadata["ts"+x])));
-      }
-      else if ( ISDEF(this.meshData["ts"+x]) ) {
-        uvscale.push(new THREE.Vector2(parseFloat(this.meshData["ts"+x]),parseFloat(this.meshData["ts"+x])));
-      }
-      else {
-        uvscale.push(new THREE.Vector2(1,1));
-      }
-    }
-
-
-    var materials = [];
-
-    // Only push materials that are actually inside the materials
-    for (var i=0; i<geometry.jsonMaterials.length; i++) {
-
-      // Check if there's a map inside the material, and if it contains a sourceFile
-      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tiles[i] === "tiles/1" ) {
-        // Extract the tile!
-        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
-        texture = texture[texture.length-1].split(".")[0];
-
-        if ( !_.isNaN(parseInt(texture,10)) ) {
-          tiles[i] = "tiles/"+texture;
-        }
-        else {
-          tiles[i] = "textures/"+texture;
-        }
-
-
-      }
-
-
-      if ( this.drawNameMesh ) {
-        materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
-          transparent:true,
-          opacity:0.5,
-          seeThrough:true,
-          alphaTest:0.5,
-          uvScaleX:uvscale[i].x,
-          uvScaleY:uvscale[i].y
-        }));
-      }
-      else {
-        materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
-          transparent:this.meshData["transparent"] === 1,
-          alphaTest:0.1,
-          useLighting:true
-        }));
-      }
-
-      materials[i].shading = THREE.FlatShading;
-
-    //materials.push(new THREE.MeshBasicMaterial({color:Math.random() * 0xffffff}));
-
-    //materials[i].wireframe = true;
-    }
-
-    // De-allocate the old materials
-    //        _.each(geometry.materials, function(material) {
-    //          material.deallocate();
-    //          ironbane.renderer.deallocateMaterial( material );
-    //        });
-
-    geometry.materials = materials;
-
-
-
-
-
-
-//--------
-
-
-
+    geometry = meshHandler.ProcessGeometry(geometry, this.rotation,
+        this.metadata, this.meshData, false);
 
     this.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
     this.mesh.unit = this;
@@ -340,6 +301,8 @@ var Mesh = Unit.extend({
     //   }, 10000);
     // })(this);
     this.Decorate();
+
+    this.UpdateLighting();
   //this.UpdateRotation();
   },
   // OnLoad: function(mesh) {
@@ -437,6 +400,18 @@ var Mesh = Unit.extend({
 
 
         break;
+      case "Torch":
+
+        this.flickerTime -= dTime;
+
+        if ( this.flickerTime <= 0 ) {
+          // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
+          this.flickerTime = getRandomFloat(0.1, 0.2);
+          this.lightsToMaintain[0].intensity =
+            this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
+        }
+
+        break;
       case "Campfire":
 
         this.flickerTime -= dTime;
@@ -449,6 +424,13 @@ var Mesh = Unit.extend({
         }
 
 
+
+        break;
+      case "Item Billboard":
+
+        if ( this.mesh ) {
+            this.mesh.LookAt(ironbane.camera.position, 0, 0, 0, true);
+        }
 
         break;
     }

@@ -315,6 +315,22 @@ var ParticleTypeEnum = {
         particleStartScale: new THREE.Vector2(1.5,1.5),
         particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.1, 0.9);}
     },
+    FOUNTAINSIDE: {
+        texture: function(){
+            return ChooseRandom(['particles/splash1','particles/splash2','particles/splash3'])
+        },
+        particleStartPosition: function(){return new THREE.Vector3(0, 0, 0)},
+        particleStartVelocity: function(){
+            var angle = getRandomFloat(0,0) * Math.PI * 2;
+            return new THREE.Vector3(0, -1, 0)
+        },
+        particleEnableGravity: true,
+        lifeTime: -1,
+        particleLifeTime: 2.0,
+        particleDelay: 0.08,
+        particleStartScale: new THREE.Vector2(1.5,1.5),
+        particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.1, 0.9);}
+    },
     LAVABURN: {
         texture: function(){
             return ChooseRandom(['particles/flame1','particles/flame2','particles/flame3'])

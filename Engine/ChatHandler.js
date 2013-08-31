@@ -15,6 +15,182 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var commands = {
+  "giveitem": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+      // So, which item?
+      var template = -1;
+
+      // Try to convert to integer, if we passed an ID
+      var testConvert = parseInt(realparams[0], 10);
+      if (_.isNumber(testConvert) && !_.isNaN(testConvert)) {
+          template = dataHandler.items[testConvert];
+      } else {
+          template = _.where(dataHandler.items, {
+              name: realparams[0]
+          })[0];
+      }
+
+      if (template) {
+          if (!unit.GiveItem(template)) {
+              errorMessage = 'You have no free space!';
+          }
+      } else {
+          errorMessage = "Item not found!";
+      }
+
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  },
+  "givecoins": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+            // find a "cash" item
+            var moneybag = _.where(dataHandler.items, {type: 'cash'})[0],
+                amount = parseInt(realparams[0], 10);
+            if(moneybag) {
+                if(!unit.GiveItem(moneybag, {value: amount})) {
+                    errorMessage = 'You have no free space!';
+                }
+            } else {
+                errorMessage = 'no cash items found!';
+            }
+            return {
+              errorMessage: errorMessage
+            };
+    }
+  },
+  "check": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+
+      // Check the server for errors!
+
+      // First check for NPC's without nodes
+
+      var errors = "";
+      worldHandler.LoopUnits(function(unit) {
+        if ( unit.id < 0 ) {
+
+          // Check for empty nodes
+          if ( unit.connectedNodeList && !unit.connectedNodeList.length ) {
+            errors += "Warning: no nodes found for NPC "+
+              Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
+          }
+
+          // Check for bad cells
+          if ( !worldHandler.CheckWorldStructure(unit.zone, unit.cellX, unit.cellZ) ) {
+            errors += "Warning: unexisting cell found for NPC "+
+              Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
+          }
+
+          // Check for bad loot
+          if ( !_.isEmpty(unit.template.loot) ) {
+            var lootSplit = unit.template.loot.split(";");
+            for(var l=0;l<lootSplit.length;l++) {
+              var item = null;
+
+              // No percentages for vendors!
+              if ( unit.template.type === UnitTypeEnum.VENDOR ) {
+                   item = parseInt(lootSplit[l], 10);
+              }
+              else {
+                  var chanceSplit = lootSplit[l].split(":");
+
+                  if ( WasLucky100(parseInt(chanceSplit[0], 10)) ) {
+                      item = parseInt(chanceSplit[1], 10);
+                  }
+              }
+
+              if ( item ) {
+                if ( !ISDEF(dataHandler.items[item]) ) {
+                    errors += "Warning: item "+item+" not found for loot in NPC "+unit.id+"!<br>";
+                }
+              }
+            }
+          }
+
+        }
+      });
+
+      if ( errors ) {
+        errorMessage = "Following errors were found:<br>"+errors;
+      }
+      else {
+        feedback += "No errors found!";
+      }
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  },
+  "announce": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+            var color = realparams[1];
+
+            chatHandler.Announce(realparams[0], color);
+
+            return {
+              errorMessage: errorMessage
+            };
+    }
+  },
+  "warn": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+            var target = worldHandler.FindPlayerByName(realparams[0]);
+            if (target) target.LightWarn();
+            return {
+              errorMessage: errorMessage
+            };
+    }
+  },
+  "seriouswarn": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+        var target = worldHandler.FindPlayerByName(realparams[0]);
+        if (target) target.SeriousWarn();
+        return {
+          errorMessage: errorMessage
+        };
+    }
+  },
+  "kick": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+      var target = worldHandler.FindPlayerByName(realparams[0]);
+      if (target) target.Kick(realparams[1]);
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  },
+  "ban": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+      var target = worldHandler.FindPlayerByName(realparams[0]);
+      if (target) target.Ban(realparams[1], realparams[2]);
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  },
+  "stuck": {
+    requiresEditor: false,
+    action: function(unit, realparams, errorMessage) {
+      unit.Teleport(normalSpawnZone, normalSpawnPosition);
+      chatHandler.AnnouncePersonally(unit, "You were teleported back to town.", "lightgreen");
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  }
+};
+
 var ChatHandler = Class.extend({
   GetChatColor: function(unit) {
 
@@ -60,132 +236,15 @@ var ChatHandler = Class.extend({
 
       var showFeedback = true;
 
-      // feedback += "Command "+command+"<br>";
-
-      if (unit.editor) {
-        switch (command) {
-            case "giveitem":
-                // So, which item?
-                var template = -1;
-
-                // Try to convert to integer, if we passed an ID
-                var testConvert = parseInt(realparams[0], 10);
-                if (_.isNumber(testConvert) && !_.isNaN(testConvert)) {
-                    template = dataHandler.items[testConvert];
-                } else {
-                    template = _.where(dataHandler.items, {
-                        name: realparams[0]
-                    })[0];
-                }
-
-                if (template) {
-                    if (!unit.GiveItem(template)) {
-                        errorMessage = 'You have no free space!';
-                    }
-                } else {
-                    errorMessage = "Item not found!";
-                }
-
-                break;
-            case "givecoins":
-                // find a "cash" item
-                var moneybag = _.where(dataHandler.items, {type: 'cash'})[0],
-                    amount = parseInt(realparams[0], 10);
-                if(moneybag) {
-                    if(!unit.GiveItem(moneybag, {value: amount})) {
-                        errorMessage = 'You have no free space!';
-                    }
-                } else {
-                    errorMessage = 'no cash items found!';
-                }
-                break;
-          case "check":
-
-            // Check the server for errors!
-
-            // First check for NPC's without nodes
-
-            var errors = "";
-            worldHandler.LoopUnits(function(unit) {
-              if ( unit.id < 0 ) {
-
-                // Check for empty nodes
-                if ( unit.connectedNodeList && !unit.connectedNodeList.length ) {
-                  errors += "Warning: no nodes found for NPC "+
-                    Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
-                }
-
-                // Check for bad cells
-                if ( !worldHandler.CheckWorldStructure(unit.zone, unit.cellX, unit.cellZ) ) {
-                  errors += "Warning: unexisting cell found for NPC "+
-                    Math.abs(unit.id)+" at "+unit.DebugLocationString()+"!<br>";
-                }
-
-                // Check for bad loot
-                if ( !_.isEmpty(unit.template.loot) ) {
-                  var lootSplit = unit.template.loot.split(";");
-                  for(var l=0;l<lootSplit.length;l++) {
-                    var item = null;
-
-                    // No percentages for vendors!
-                    if ( unit.template.type === UnitTypeEnum.VENDOR ) {
-                         item = parseInt(lootSplit[l], 10);
-                    }
-                    else {
-                        var chanceSplit = lootSplit[l].split(":");
-
-                        if ( WasLucky100(parseInt(chanceSplit[0], 10)) ) {
-                            item = parseInt(chanceSplit[1], 10);
-                        }
-                    }
-
-                    if ( item ) {
-                      if ( !ISDEF(dataHandler.items[item]) ) {
-                          errors += "Warning: item "+item+" not found for loot in NPC "+unit.id+"!<br>";
-                      }
-                    }
-                  }
-                }
-
-              }
-            });
-
-            if ( errors ) {
-              errorMessage = "Following errors were found:<br>"+errors;
-            }
-            else {
-              feedback += "No errors found!";
-            }
-
-
-            break;
-          case "announce":
-            var color = realparams[1];
-
-            this.Announce(realparams[0], color);
-
-            break;
-          case "warn":
-            var target = worldHandler.FindPlayerByName(realparams[0]);
-            if (target) target.LightWarn();
-            break;
-          case "seriouswarn":
-            var target = worldHandler.FindPlayerByName(realparams[0]);
-            if (target) target.SeriousWarn();
-            break;
-          case "kick":
-            var target = worldHandler.FindPlayerByName(realparams[0]);
-            if (target) target.Kick(realparams[1]);
-            break;
-          case "ban":
-            var target = worldHandler.FindPlayerByName(realparams[0]);
-            if (target) target.Ban(realparams[1], realparams[2]);
-            break;
-          default:
-            errorMessage = "That command does not exist!";
-            break;
-        }
+      if ( commands[command] &&
+        ((!commands[command].requiresEditor && !unit.editor) || unit.editor ) ) {
+        var result = commands[command].action(unit, realparams, errorMessage);
+        errorMessage = result.errorMessage;
       }
+      else {
+        errorMessage = "That command does not exist!";
+      }
+
 
       if (errorMessage) {
         feedback += "<br>" + errorMessage;
@@ -194,8 +253,8 @@ var ChatHandler = Class.extend({
       if (showFeedback) {
         this.AnnouncePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
       }
-
-    } else {
+    }
+    else {
 
       if (!unit.editor) {
         message = sanitize(message).entityEncode();
@@ -214,7 +273,9 @@ var ChatHandler = Class.extend({
       };
 
       io.sockets.emit("chatMessage", messageData);
+
     }
+
   },
   Announce: function(message, color) {
       log("[Announce] " + message);

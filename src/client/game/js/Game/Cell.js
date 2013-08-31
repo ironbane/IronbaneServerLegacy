@@ -144,41 +144,41 @@ var Cell = Class.extend({
 
         // Update cells & objects that are nearby
 
-        var cell = this;
+        // var cell = this;
 
-        setTimeout(function() {
+        // setTimeout(function() {
 
-            if ( cell.modelMesh ) {
-              _.each(cell.modelMesh.geometry.materials, function(material) {
-                material.needsUpdate = true;
-              });
-            }
-
-
-            _.each(cell.objects, function(obj) {
-
-                if ( obj.mesh ) {
-                  if ( ISDEF(obj.mesh.material.needsUpdate) ) {
-                    obj.mesh.material.needsUpdate = true;
-                  }
-
-                  if ( ISDEF(obj.mesh.geometry.materials) ) {
-                    _.each(obj.mesh.geometry.materials, function(material) {
-                      material.needsUpdate = true;
-                    });
-                  }
-                }
-
-            }, cell);
+        //     if ( cell.modelMesh ) {
+        //       _.each(cell.modelMesh.geometry.materials, function(material) {
+        //         material.needsUpdate = true;
+        //       });
+        //     }
 
 
-          terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
+        //     _.each(cell.objects, function(obj) {
 
-          _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
-            material.needsUpdate = true;
-          });
+        //         if ( obj.mesh ) {
+        //           if ( ISDEF(obj.mesh.material.needsUpdate) ) {
+        //             obj.mesh.material.needsUpdate = true;
+        //           }
 
-        }, 2000);
+        //           if ( ISDEF(obj.mesh.geometry.materials) ) {
+        //             _.each(obj.mesh.geometry.materials, function(material) {
+        //               material.needsUpdate = true;
+        //             });
+        //           }
+        //         }
+
+        //     }, cell);
+
+
+        //   terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
+
+        //   _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
+        //     material.needsUpdate = true;
+        //   });
+
+        // }, 2000);
 
         this.status = cellStatusEnum.LOADED;
 
@@ -320,8 +320,8 @@ var Cell = Class.extend({
                 (function(cell, pos, rotation, metadata, meshData, param){
                 meshHandler.Load(model, function(geometry) {
 
-                        var geometry = meshHandler.SpiceGeometry(geometry, rotation,
-                            metadata, meshData, param, false);
+                        var geometry = meshHandler.ProcessGeometry(geometry, rotation,
+                            metadata, meshData, false);
 
                         _.each(geometry.vertices, function(v) {
                             v.addSelf(pos);

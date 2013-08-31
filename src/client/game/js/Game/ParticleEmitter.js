@@ -29,6 +29,7 @@ var ParticleEmitter = Class.extend({
           || (new THREE.Vector3());
 
         this.spawnOffset = data.spawnOffset || new THREE.Vector3();
+        this.originalSpawnOffset = this.spawnOffset.clone();
 
         this.type = type;
         this.data = data;
@@ -83,6 +84,17 @@ var ParticleEmitter = Class.extend({
 
         var spawnOffset = CheckForFunctionReturnValue(this.type.particleSpawnOffset, this);
         particle.spawnOffset = spawnOffset ? spawnOffset.clone() : new THREE.Vector3();
+
+        // Also rotate the offset if attached to a unit
+        if ( this.followUnit ) {
+            var rotationMatrix = new THREE.Matrix4();
+            var rot = new THREE.Vector3((this.followUnit.rotation.x).ToRadians(), (this.followUnit.rotation.y).ToRadians(), (this.followUnit.rotation.z).ToRadians());
+            // sw("rot", rot.ToString());
+            rotationMatrix.setRotationFromEuler(rot);
+
+            this.spawnOffset.copy(this.originalSpawnOffset);
+            rotationMatrix.multiplyVector3(this.spawnOffset);
+        }
 
 
         // Add spawnOffset unique to this instance

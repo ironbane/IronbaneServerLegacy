@@ -542,6 +542,9 @@ var Unit = PhysicsObject.extend({
 
                 this.terrainAngle = Math.acos(raycastNormal.dot(vec)).ToDegrees();
 
+                // Prevent false values from players being stuck
+                if ( this.terrainAngle > 89 || this.terrainAngle < 0 ) this.terrainAngle = 0;
+
                 if ( showEditor && levelEditor.editorGUI.chClimb ) this.terrainAngle = 0;
 
                 if ( this.terrainAngle < 45 ) {
