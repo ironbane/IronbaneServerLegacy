@@ -111,6 +111,8 @@ var Server = Class.extend({
                     "Would you like to work on an exciting project with a cool team?<br>"+
                     "Give us a shout in the forums!",
 
+                    "Are you stuck? Type /stuck to be teleported back to town.",
+
                     "Follow us on Twitter! @IronbaneMMO",
 
                     "Join us on IRC! #ironbane on chat.freenode.net",
