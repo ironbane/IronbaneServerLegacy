@@ -117,17 +117,49 @@ angular.module('IronbaneApp', [])
             }
 
         })
-        .when('/editor/mainMenu', {
-            templateUrl: '/views/editMainMenu',
-            controller: 'EditMenuCtrl',
+        .when('/editor/item_template', {
+            templateUrl: '/views/item_template_list',
+            controller: 'ItemTemplate'
+            
+        })
+        .when('/editor/item_template/:id', {
+            templateUrl: '/views/item_template_editor',
+            controller: 'ItemTemplate',
             resolve: {
-                MenuData: ['$http', function($http) {
-                    return $http.get('/api/editor/menu')
-                        .then(function(response) {
-                            return response.data;
+                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
+                    var deferred = $q.defer();
+                    Item.get($route.current.params.id)
+                        .then(function(template) {
+                            deferred.resolve({template: template.data[0]});
+                        }, function(err) {
+                           deferred.reject();
                         });
+                        return deferred.promise;
                 }]
             }
+            
+        })
+        .when('/editor/unit_template', {
+            templateUrl: '/views/unit_template_list',
+            controller: 'UnitTemplateList'
+            
+        })
+        .when('/editor/unit_template/:id', {
+            templateUrl: '/views/unit_template_editor',
+            controller: 'UnitTemplateEditor',
+            resolve: {
+                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
+                    var deferred = $q.defer();
+                    Item.get($route.current.params.id)
+                        .then(function(template) {
+                            deferred.resolve({template: template.data[0]});
+                        }, function(err) {
+                           deferred.reject();
+                        });
+                        return deferred.promise;
+                }]
+            }
+            
         })
         .otherwise({redirectTo: '/'});
 }]);
