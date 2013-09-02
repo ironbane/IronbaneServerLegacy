@@ -16,6 +16,10 @@ angular.module('IronbaneApp', [])
             templateUrl: '/views/home',
             controller: 'HomeCtrl'
         })
+        .when('/faq', {
+            templateUrl: '/views/faq',
+            controller: 'FaqCtrl'
+        })
         .when('/register', {
             templateUrl: '/views/register',
             controller: 'RegisterCtrl'
