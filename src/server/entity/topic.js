@@ -35,6 +35,7 @@ module.exports = function(db) {
         db.query('insert into forum_topics set board_id = ?, time = ?, title = ?', [params.boardId, params.time, params.title], function(err, topicResult) {
             if (err) {
                 deferred.reject(err);
+                log("something went wrong here "+err);
                 return;
             }
 

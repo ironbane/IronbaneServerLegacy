@@ -15,13 +15,15 @@ angular.module('IronbaneApp')
                     $log.log("saving post");
                 var post = new Post({
                     time: (new Date()).valueOf() / 1000, // convert to mysql unix_timestamp
-                    bbcontent: $scope.post.body,
+                    content: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
-                if($scope.topic===null ){
+                $log.log("topic: " + $scope.topic);
+                if($scope.topic === undefined ){
 
                     post.title = $scope.post.title;
                 }
+                $log.log(post);
 
 
                 var savePromise;

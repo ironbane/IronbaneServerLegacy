@@ -8,7 +8,7 @@ module.exports = function(app, db) {
         Topic = require('../../entity/topic')(db),
         Article = require('../../entity/article')(db),
         Post = require('../../entity/post')(db),
-        bbcode = require('bbcode'),
+        //bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
 
@@ -71,9 +71,9 @@ module.exports = function(app, db) {
 
                 var posts = [];
                 results.forEach(function(p) {
-                    bbcode.parse(p.content, function(html) {
-                        p.content = html;
-                    });
+                    //bbcode.parse(p.content, function(html) {
+                    //    p.content = html;
+                  //  });
                     posts.push(p);
                 });
 
@@ -104,8 +104,9 @@ module.exports = function(app, db) {
         var post = { boardId:req.params.boardId, 
             time:req.body.time, 
             title:req.body.title, 
-            content:req.body.bbcontent,
+            content:req.body.content,
             user:req.body.user };
+            log("tudu: " + JSON.stringify(post));
         Topic.newPost(post)
         .then(function(){
 
@@ -134,7 +135,7 @@ module.exports = function(app, db) {
     app.post('/api/forum/topics/:topicId', function(req, res) {
         var post = {
             topic_id: req.params.topicId,
-            content: req.body.bbcontent,
+            content: req.body.content,
             time: req.body.time,
             user: req.body.user
         };
