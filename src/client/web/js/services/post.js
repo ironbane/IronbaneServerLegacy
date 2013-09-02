@@ -15,9 +15,7 @@ angular.module('IronbaneApp')
             .then(function(response) {
                 // update post object with id, topic_id etc...
                 $log.log('success saving post!', response.data);
-                return true;
-
-                
+                return true;                
             }, function(err) {
                 $log.error('error saving post', err);
                 return $q.reject(err);

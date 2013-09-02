@@ -1,6 +1,6 @@
 // board.js
 angular.module('IronbaneApp')
-.factory('Board', ['$log', '$http', function($log, $http) {
+.factory('Board', ['$log', '$http', '$q', function($log, $http, $q) {
     var Board = function(json) {
         // update with config
         angular.copy(json || {}, this);

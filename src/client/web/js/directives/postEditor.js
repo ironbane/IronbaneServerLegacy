@@ -25,6 +25,7 @@ angular.module('IronbaneApp')
                     post.$save({boardId: $scope.board, topicId: $scope.topic})
                         .then(function(result) {
                             // inject the post somewhere for auto rendering
+                            // this part is never called, investigate!!
                             $log.log("jobs done!");
                             // clear the form
                             delete $scope.post;
