@@ -140,6 +140,13 @@ module.exports = function(app, db) {
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
+        var path = require('path');
+        // if we are requesting a specific resource it is likely an image or something, don't do angular
+        if(path.extname(req.path) !== '') {
+            res.send(404);
+            return;
+        }
+
         // todo: use config for subfolder
         log('no server route (web index redirect): ' + req.path);
         res.render('web/index');
