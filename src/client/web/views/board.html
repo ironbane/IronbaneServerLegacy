@@ -1,8 +1,6 @@
 <div class="content-body">
     <section class="forum-listing">
-        <div class="tools">
-            <a href="javascript://" ng-click="newTopic()"><i class="icon-comment"></i> New Topic</a>
-        </div>
+        
         Users browsing this forum: <span ng-repeat="user in users"><userlink name="user.name"/></span><br>
         <a href = "/forum">Ironbane forum</a> - {{board.name}}
         <section  class="forum-group">
@@ -42,6 +40,6 @@
     </section>
     <section ng-show="currentUser.authenticated" class="new-topic-form">
         <h1><i class="icon-edit"></i> New Topic</h1>
-        <post-editor board="board" topic="null"></post-editor>
+        <post-editor board="board.id"></post-editor>
     </section>
 </div>

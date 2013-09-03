@@ -18,7 +18,8 @@ var Class = require('../../common/class');
 
 module.exports = function(db) {
     var Q = require('q'),
-        _ = require('underscore');
+        _ = require('underscore'),
+        log = require('util').log;
 
     var ItemTemplate = Class.extend({
         init: function(json) {
@@ -31,21 +32,41 @@ module.exports = function(db) {
 
     ItemTemplate.getAll = function() {
         var deferred = Q.defer();
-
+        log("getting templates");
         db.query('select * from ib_item_templates', [], function(err, results) {
             if (err) {
                 deferred.reject('error loading item template data' + err);
                 return;
             }
-
-            _.each(results, function(row, i) {
-                results[i] = new ItemTemplate(row);
+            var templates = [];
+            _.each(results, function(row) {
+                templates.push(new ItemTemplate(row));
             });
-            deferred.resolve(results);
+
+            deferred.resolve(templates);
         });
 
         return deferred.promise;
     };
+
+
+    ItemTemplate.get = function(templateId) {
+        var deferred = Q.defer();
+        log("getting template " + templateId);
+        db.query('select * from ib_item_templates where id = ?', [templateId], function(err, results) {
+            if (err) {
+                deferred.reject('error loading item template data' + err);
+                return;
+            }
+
+            log(JSON.stringify(results));
+
+            deferred.resolve(new ItemTemplate(results[0]));
+        });
+
+        return deferred.promise;
+    };
+
 
     return ItemTemplate;
 };

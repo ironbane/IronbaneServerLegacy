@@ -7,12 +7,13 @@ module.exports = function(app, db) {
         User = require('../../entity/user')(db),
         Topic = require('../../entity/topic')(db),
         Article = require('../../entity/article')(db),
-        bbcode = require('bbcode'),
+        Post = require('../../entity/post')(db),
+        //bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
 
         app.get('/api/forum', function(req, res) {
-            Forum.get().then(function(forum) {
+            Forum.getForumView().then(function(forum) {
                 res.send(forum);
             }, function(error){
                 res.send(error, 500);
@@ -38,7 +39,7 @@ module.exports = function(app, db) {
         }, function(error){
             res.send(error, 500);
         });
-    })
+    });
 
     app.get('/api/frontpage', function(req, res){
         Article.getFrontPage().then(function(frontpage){
@@ -56,70 +57,50 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get('/api/user/:username', function(req, res) {
-        User.getUserByName().then(function(user) {
-            res.send(user);
-        }, function(error){
-            log("oops");
-            res.send(error, 500);
-        });
-
-    });
+    
 
     // get a single board
-    app.get('/api/forum/:boardId', function(req, res) {
-        if(req.params.boardId === 'news') {
-            db.query('SELECT a.* from (SELECT * FROM forum_posts ORDER BY time ASC) as a, (SELECT * FROM forum_topics where board_id = 7) as b WHERE a.topic_id = b.id GROUP BY topic_id ORDER BY time DESC LIMIT 10', function(err, results) {
-                if(err) {
-                    log('SQL error getting news: ' + err);
-                    res.send(500, 'Error getting news posts!');
-                    return;
-                }
-
-                var posts = [];
-                results.forEach(function(p) {
-                    bbcode.parse(p.content, function(html) {
-                        p.content = html;
-                    });
-                    posts.push(p);
-                });
-
-                res.send(posts);
-            });
-        } else {
-            db.query('select * from forum_boards where id = ?', [req.params.boardId], function(err, results) {
-                if(err) {
-                    res.send(500, 'DB Error getting posts!');
-                    console.log('DB error getting posts: ', err);
-                    return;
-                }
-
-                if(results.length > 0) {
-                    res.send(results[0]);
-                } else {
-                    res.send(404, "no board found with id " + req.params.boardId);
-                }
-            });
-        }
-    });
-
-    // get all topics for a board
-    app.get('/api/forum/:boardId/topics', function(req, res) {
-        var func = arguments;
-         Board.getTopics(req.params.boardId).then(function(results) {            
+    app.get('/api/forum/:boardId', function(req, res) {        
+            Board.getView(req.params.boardId).then(function(results) {  
+                log('getting board: ' + req.params.boardId);          
                res.send(results);            
             }, function(error){
                 res.send(error, 500);
             });
         });
 
+    // get all topics for a board
+    app.get('/api/forum/:boardId/topics', function(req, res) {
+        if(parseInt(req.params.boardId, 10) === 7) {
+            db.query('SELECT topic.id, topic.title, post.content, users.name as username FROM forum_topics AS topic INNER JOIN forum_posts AS post ON post.`topic_id` = topic.`id` INNER JOIN bcs_users AS users ON users.id = post.user WHERE topic.board_id = 7 AND post.time = (SELECT MIN(forum_posts.time) FROM forum_posts WHERE forum_posts.`topic_id` = topic.id ) ORDER BY post.time DESC', function(err, results) {
+                if(err) {
+                    log('SQL error getting news: ' + err);
+                    res.send(500, 'Error getting news posts!');
+                    return;
+                }
+
+
+                res.send(results);
+                return;
+            });
+        }
+        else{ 
+            Board.getView(req.params.boardId).then(function(results) {            
+               res.send(results);            
+            }, function(error){
+                res.send(error, 500);
+            });
+        }
+    });
+
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
         var post = { boardId:req.params.boardId, 
             time:req.body.time, 
             title:req.body.title, 
-            content:req.body.bbcontent,
-            user:req.body.user }
+            content:req.body.content,
+            user:req.body.user };
+            log("tudu: " + JSON.stringify(post));
         Topic.newPost(post)
         .then(function(){
 
@@ -148,7 +129,7 @@ module.exports = function(app, db) {
     app.post('/api/forum/topics/:topicId', function(req, res) {
         var post = {
             topic_id: req.params.topicId,
-            content: req.body.bbcontent,
+            content: req.body.content,
             time: req.body.time,
             user: req.body.user
         };

@@ -233,9 +233,9 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    User.getUserByName = function(username) {
+    User.getUserByNameView = function(username) {
         var deferred = Q.defer();
-        db.query('select * from bcs_users where name=?', [username], function(err, results) {
+        db.query('select name, reg_date, count(forum_posts.id) as totalposts from bcs_users inner join forum_posts on forum_posts.user = bcs_users.id where bcs_users.name=?', [username], function(err, results) {
             if (err) {
                 deferred.reject(err);
                 return;

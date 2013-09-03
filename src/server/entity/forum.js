@@ -44,7 +44,7 @@ module.exports = function(db) {
 
     
 
-    Forum.get = function() {
+    Forum.getForumView = function() {
         var deferred = Q.defer();
         var topicQ = ' (select count(id) from forum_topics where board_id = fb.id) as topicCount, ',
             postsQ = ' (select count(id) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ';

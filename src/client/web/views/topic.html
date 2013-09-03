@@ -1,8 +1,6 @@
 <div class="content-body">
     <section class="forum-listing">
-        <div class="tools">
-            <a href="javascript://" ng-click="newPost()"><i class="icon-comment"></i> New Reply</a>
-        </div>
+        
         <section class="forum-group">
             <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }} - {{ topic.title }}</h1>
             <article class="topic board">
@@ -32,6 +30,6 @@
     <br class="clear">
     <section ng-show="currentUser.authenticated" class="new-topic-form">
         <h1><i class="icon-edit"></i> New Reply</h1>
-        <post-editor board="board" topic="topic"></post-editor>
+        <post-editor board="board.id" topic="topic.id"></post-editor>
     </section>
 </div>

@@ -1,0 +1,8 @@
+<a href="/editor/item_template">back to list </a><a ng-href="/editor/item_template/{{template.id+1}}">next</a>
+<a ng-href="/editor/item_template/{{template.id-1}}">previous</a>
+<ul>
+
+	<li ng-repeat="(key, value) in template">
+		{{key}} : {{value}}
+	</li>
+</ul>
