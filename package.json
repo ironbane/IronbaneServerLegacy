@@ -48,7 +48,8 @@
     "q-io": "~1.9.1",
     "winston": "~0.7.2",
     "shelljs": "~0.2.1",
-    "grunt-download": "~0.2.0"
+    "grunt-download": "~0.2.0",
+    "grunt-docular": "~0.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
