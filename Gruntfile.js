@@ -16,6 +16,11 @@ module.exports = function(grunt) {
             web: ['<%= cfg.get("buildTarget") %>web/'],
             game: ['<%= cfg.get("buildTarget") %>game/']
         },
+        docular: {
+            groups: [],
+            showDocularDocs: true,
+            showAngularDocs: true
+        },
         jshint: {
             files: ['src/client/web/js/**/*.js', 'src/client/game/js/**/*.js']
         },
@@ -249,12 +254,21 @@ module.exports = function(grunt) {
             },
             assets: {
                 files: '<%= cfg.get("assetDir") %>**/*',
-                tasks: ['assets', 'beep']
+                tasks: ['default', 'beep']
             }
         },
         // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
-             src: ['<%= cfg.get("assetDir") %>**/*.obj']
+            options: {
+                /** @optional  - if true the files are converted to binary JSON */
+                minify: false
+            },
+            dist: {
+                /** @required  - string (or array of) including grunt glob variables */
+                src: ['<%= cfg.get("buildTarget") %>game/**/*.obj']
+                /** @optional  - if provided the converted files will be saved in this folder instead */
+                //dest: './assets/'
+            }
         },
         // db script mgmt
         dbupgrade: {
@@ -286,17 +300,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
+    grunt.loadNpmTasks('grunt-docular');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-three-obj');
     grunt.loadNpmTasks('grunt-download');
 
     // Default task(s).
-    grunt.registerTask('assets', ['three_obj', 'copy:game']);
-    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
+    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj','docular']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
     // when ready do both

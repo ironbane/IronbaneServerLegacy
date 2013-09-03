@@ -19,7 +19,7 @@ var Class = require('../../common/class');
 module.exports = function(db) {
     var Q = require('q'),
         _ = require('underscore'),
-
+        Post = require('./post'),
         bbcode = require('bbcode'),
         log = require('util').log;
 
@@ -35,6 +35,7 @@ module.exports = function(db) {
         db.query('insert into forum_topics set board_id = ?, time = ?, title = ?', [params.boardId, params.time, params.title], function(err, topicResult) {
             if (err) {
                 deferred.reject(err);
+                log("something went wrong here "+err);
                 return;
             }
 
@@ -75,11 +76,12 @@ module.exports = function(db) {
                 deferred.reject(results);
                 return;
             }
-
+            var posts = []
             _.each(results, function(p) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
                 });
+                posts.push(new Post(p));
             });
 
             deferred.resolve(results);

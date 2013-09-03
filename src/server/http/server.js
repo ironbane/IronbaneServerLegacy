@@ -84,6 +84,7 @@ var Server = Class.extend({
             var sessionStore = new MySQLStore({client: db});
 
             app.use(express.favicon(config.get('buildTarget') + "game/favicon.ico")); // todo: move to common
+            app.use(express.compress());
             app.use(express.cookieParser());
             app.use(express.bodyParser());
             app.use(express.methodOverride());

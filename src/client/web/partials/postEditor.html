@@ -1,5 +1,12 @@
+<script>
+   $(document).ready(function() {
+    $('#markItUp').markItUp(myMarkdownSettings);
+});
+   </script>
+
+
 <form name="postEditorForm">
-    <input type="text" name="subject" ng-model="post.subject" required placeholder="title your post" ng-maxlength="100" />
-    <mark-it-up name="body" ng-model="post.body"></mark-it-up>
-    <button ng-disabled="postEditorForm.$invalid" ng-click="save()">Post</button>
+    <input ng-show="topic == null" type="text" ng-model="post.title" placeholder="title your post" ng-maxlength="100" value="topic.title" />
+    <textarea id="markItUp" ng-model="post.body"></textarea>
+    <button ng-click="save()">Post</button>
 </form>

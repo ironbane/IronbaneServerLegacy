@@ -9,19 +9,20 @@
 
     <link rel="stylesheet" type="text/css" href="/css/ironbane.css">
 
+    <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css" />
+<link rel="stylesheet" type="text/css" href="/lib/markitup/sets/markdown/style.css" />
+
     <script src="/lib/jquery-2.0.0.min.js"></script>
-    <script type="text/javascript" src="/lib/jquery.min.map"></script>
     <script src="/lib/angular-1.1.4/angular.min.js"></script>
-    <script src="/lib/xbbcode.js"></script>
+    <script src="/lib/angular-ui/ui-utils.js"></script>
 
-    <!-- markItUp! skin -->
-    <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css">
-    <!--  markItUp! toolbar skin -->
-    <link rel="stylesheet" type="text/css" href="/lib/markitup/sets/bbcode/style.css">
-    <link rel="stylesheet" type="text/css" href="/css/xbbcode.css">
-    <!-- markItUp! -->
-    <script src="/lib/markitup/jquery.markitup.js"></script>
 
+<script type="text/javascript" src="/lib/markitup/jquery.markitup.js"></script>
+<script type="text/javascript" src="/lib/markitup/sets/markdown/set.js"></script>
+
+
+    
+    
     <!-- todo: get this from grunt replace -->
     <script src="js/@@appName-@@appVersion.js"></script>
 </head>
@@ -47,6 +48,7 @@
                         <li><a href="/article/get-involved">Get Involved</a></li>
                         <li><a target="_new" href="https://twitter.com/IronbaneMMO">Twitter</a></li>
                         <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
+                        <li><a href="/faq">FAQ</a></li>
                         <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
                         <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
                         <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
@@ -61,8 +63,8 @@
             <div class="sock">
                 <p>&copy; Ironbane 2013</p>
                 <ul class="horizontal-list pipe-list">
-                    <li><a href="terms">Terms of Use</a></li>
-                    <li><a href="privacy">Privacy Policy</a></li>
+                    <li><a href="article/terms">Terms of Use</a></li>
+                    <li><a href="article/privacy">Privacy Policy</a></li>
                 </ul>
             </div>
         </footer>

@@ -1,5 +1,5 @@
 // app.js
-angular.module('IronbaneApp', [])
+angular.module('IronbaneApp', ['ui.utils'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User', '$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
@@ -15,6 +15,10 @@ angular.module('IronbaneApp', [])
         .when('/', {
             templateUrl: '/views/home',
             controller: 'HomeCtrl'
+        })
+        .when('/faq', {
+            templateUrl: '/views/faq',
+            controller: 'FaqCtrl'
         })
         .when('/register', {
             templateUrl: '/views/register',
@@ -88,15 +92,6 @@ angular.module('IronbaneApp', [])
                 }]
             }
         })
-        .when('/forum/:boardId/post', {
-            templateUrl: '/views/postEdit',
-            controller: 'PostEditCtrl',
-            resolve: {
-                BoardData: ['Board', '$route', function(Board, $route) {
-                    return Board.get($route.current.params.boardId);
-                }]
-            }
-        })
         .when('/editor', {
             templateUrl: '/views/editorMenu',
             resolve: {
@@ -109,10 +104,10 @@ angular.module('IronbaneApp', [])
              resolve: {
                 ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
                     var deferred = $q.defer();
-                    User.getByName($route.current.params.username)
+                    User.getProfile($route.current.params.username)
                         .then(function(userprofile) {
                             // should be processed already
-                            deferred.resolve({profile: userprofile});
+                            deferred.resolve({profile: userprofile.data[0]});
                         }, function(err) {
                             // can't find such article, reject route change
                            deferred.reject();
@@ -122,17 +117,89 @@ angular.module('IronbaneApp', [])
             }
 
         })
-        .when('/editor/mainMenu', {
-            templateUrl: '/views/editMainMenu',
-            controller: 'EditMenuCtrl',
+        .when('/editor/item_template', {
+            templateUrl: '/views/item_template_list',
+            controller: 'ItemTemplateList'
+            
+        })
+        .when('/editor/item_template/:id', {
+            templateUrl: '/views/item_template_editor',
+            controller: 'ItemTemplateEditor',
             resolve: {
-                MenuData: ['$http', function($http) {
-                    return $http.get('/api/editor/menu')
-                        .then(function(response) {
-                            return response.data;
+                ResolveData: ['Item', '$q', '$route', '$location', function(Item, $q, $route, $location) {
+                    var deferred = $q.defer();
+                    Item.get($route.current.params.id)
+                        .then(function(template) {
+                            if(template.id == null){
+
+                                $location.path('/editor/item_template');
+                                deferred.reject();
+                                return;
+                            }
+                            deferred.resolve({template: template});
+                        }, function(err) {
+                           deferred.reject();
                         });
+                        return deferred.promise;
                 }]
             }
+            
+        })
+        .when('/editor/unit_template', {
+            templateUrl: '/views/unit_template_list',
+            controller: 'UnitTemplateList'
+            
+        })
+        .when('/editor/unit_template/:id', {
+            templateUrl: '/views/unit_template_editor',
+            controller: 'UnitTemplateEditor',
+            resolve: {
+                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
+                    var deferred = $q.defer();
+                    Item.get($route.current.params.id)
+                        .then(function(template) {
+                            deferred.resolve({template: template.data[0]});
+                        }, function(err) {
+                           deferred.reject();
+                        });
+                        return deferred.promise;
+                }]
+            }
+            
+        })
+        .when('/editor/article', {
+            templateUrl: '/views/articlelist',
+            controller: 'ArticleList'
+        })
+        .when('/editor/article/:id', {
+            templateUrl: '/views/articleedit',
+            controller: 'ArticleEditor',
+            resolve: {
+                ResolveData: ['Article', '$q', '$route', '$location', function(Article, $q, $route, $location) {
+                    var deferred = $q.defer();
+                    Article.get($route.current.params.id)
+                        .then(function(article) {
+                            if(article.articleId == null){
+
+                                $location.path('/editor/article');
+                                deferred.reject();
+                                return;
+                            }
+                            deferred.resolve({article: article});
+                        }, function(err) {
+                           deferred.reject();
+                        });
+                        return deferred.promise;
+                }]
+            }
+        })
+        .when('/editor/users', {
+            templateUrl: '/views/userslist',
+            controller: 'userslist'
+        })
+        .when('/editor/users/:id', {
+            templateUrl: '/views/useredit',
+            controller: 'useredit'
         })
         .otherwise({redirectTo: '/'});
 }]);

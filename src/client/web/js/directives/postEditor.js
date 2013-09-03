@@ -8,33 +8,30 @@ angular.module('IronbaneApp')
         },
         restrict: 'AE',
         templateUrl: '/partials/postEditor.html',
-        controller: ['$scope', 'Post', '$log', function($scope, Post, $log) {
+        controller: ['$scope', 'Post', '$log', '$route', function($scope, Post, $log, $route) {
             $scope.save = function() {
                 // todo: validate form
-
                 var post = new Post({
-                    title: $scope.post.subject,
                     time: (new Date()).valueOf() / 1000, // convert to mysql unix_timestamp
-                    bbcontent: $scope.post.body,
+                    content: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
+                if($scope.topic === undefined ){
 
-
-                var savePromise;
-                // has a topic? reply else new topic
-                if($scope.topic && $scope.topic.id) {
-                    savePromise = post.$save($scope.board.id, $scope.topic.topic_id);
-                } else {
-                    savePromise = post.$save($scope.board.id);
+                    post.title = $scope.post.title;
                 }
 
-                savePromise.then(function(result) {
-                    // inject the post somewhere for auto rendering
 
-                    // clear the form
-                    delete $scope.post;
-                    $scope.postEditorForm.$setPristine();
-                });
+                    post.$save({boardId: $scope.board, topicId: $scope.topic})
+                        .then(function(result) {
+                            // inject the post somewhere for auto rendering
+                            // this part is never called, investigate!!
+                            $log.log("jobs done!");
+                            // clear the form
+                            delete $scope.post;
+                            $scope.postEditorForm.$setPristine();
+                            $route.reload();
+                        });
             };
         }]
     };

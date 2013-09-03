@@ -12,6 +12,7 @@ module.exports = function(app, db) {
     require('./books')(app, db);
     require('./forum')(app, db);
     require('./articles')(app, db);
+    require('./items')(app,db);
 
     // temp stuff for index until a better spot is thought
     var gameModel = {

@@ -17,10 +17,12 @@
         </div>
     </section>
     <section>
-        <article class="news-post" ng-repeat="post in posts">
+        <ul>
+        <li class="news-post" ng-repeat="post in posts">
             <header><h2><a ng-href="/forum/{{ post.board_id }}/topics/{{ post.id }}">{{post.title}}</a></h2></header>
-            <div ng-bind-html-unsafe="post.content"></div>
+            <article ng-bind-html-unsafe="post.content"></article>
             <footer>author: {{ post.username }}</footer>
-        </article>
+        </li>
+    </ul>
     </section>
 </div>
