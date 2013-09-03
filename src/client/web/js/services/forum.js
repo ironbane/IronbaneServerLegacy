@@ -31,7 +31,7 @@ angular.module('IronbaneApp')
         .then(function(response){
             $log.log("returned from server");
             $log.log(response);
-            return response;
+            return response.data;
         }, function(err){
             $log.error('Error getting statistics from the server', err);
             $q.reject(err);
@@ -42,7 +42,7 @@ angular.module('IronbaneApp')
 
         return $http.get('/api/onlineusers' )
             .then(function(response) {
-                return response;
+                return response.data;
             }, function(err) {
                 $log.error('Error getting board from server', err);
                 $q.reject(err);

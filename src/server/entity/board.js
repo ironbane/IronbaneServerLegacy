@@ -43,6 +43,7 @@ module.exports = function(db) {
                 log('no topics found');
                 deferred.resolve([]);
             }
+            log(JSON.stringify(results));
             
             deferred.resolve(results);
         });

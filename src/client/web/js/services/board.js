@@ -5,8 +5,7 @@ angular.module('IronbaneApp')
         // update with config
         angular.copy(json || {}, this);
 
-        // todo: fill these
-        this.url = '/forum/' + this.id;
+       
 
         if(!this.icon) {
             // todo: some fallback in the css?
@@ -29,7 +28,7 @@ angular.module('IronbaneApp')
         // cache this call, unlikely board will change during a session
         return $http.get('/api/forum/' + boardId, {cache: true})
             .then(function(response) {
-                return new Board(response.data);
+                return response.data;
 
             }, function(err) {
                 $log.error('Error getting board from server', err);
@@ -41,7 +40,7 @@ angular.module('IronbaneApp')
     Board.getAll = function() {
         return $http.get('/api/forum').then(function(response) {
             var boards = response.data;
-
+            $log.log(response);
             boards.forEach(function(board, i) {
                 boards[i] = new Board(board);
             });

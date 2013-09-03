@@ -61,7 +61,7 @@ module.exports = function(app, db) {
 
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {        
-            Board.get(req.params.boardId).then(function(results) {  
+            Board.getView(req.params.boardId).then(function(results) {  
                 log('getting board: ' + req.params.boardId);          
                res.send(results);            
             }, function(error){
