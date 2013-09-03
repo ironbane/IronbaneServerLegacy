@@ -6,11 +6,24 @@ angular.module('IronbaneApp')
     };
 
     Item.getAll = function() {
-        return $http.get('/api/editor/item_template').
-        then(function(results){
-            $log.log("item_template received");
+        return $http.get('/api/editor/item_template')
+        .then(function(results){
+             var templates = [];
+               angular.forEach(results.data, function(item_template){
+                    templates.push(new Item(item_template));
+                });
+                return templates;
+        }, function(error) {
+            $q.reject();
+        });
+    };
+
+    Item.get = function(templateId){
+        
+        return $http.get('/api/editor/item_template/'+templateId)
+        .then(function(results){
             $log.log(results);
-            return results;
+            return new Item(results.data);
         }, function(error) {
             $q.reject();
         });

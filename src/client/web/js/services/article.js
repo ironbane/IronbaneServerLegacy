@@ -20,6 +20,19 @@ var Article = function(json) {
              });
     };
 
+    Article.getAll = function(){
+        return $http.get('/api/article')
+        .then(function(response){
+            var articles = [];
+            angular.forEach(response.data, function(article){
+                articles.push(new Article(article));
+            });
+            return articles;
+        }, function(error){
+            return $q.reject();
+        });
+    };
+
     Article.get = function(id) {
         return $http.get('/api/article/' + id)
             .then(function(response) {

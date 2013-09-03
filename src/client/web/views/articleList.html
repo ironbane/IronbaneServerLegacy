@@ -1,0 +1,9 @@
+<a ng-href="/editor">Back to editor menu</a>
+<table>
+		<th>articleId</th>
+			<th>title</th>
+		<tr ng-repeat="article in articles | filter:search" >
+		<td><a ng-href="/editor/article/{{article.articleId}}">{{article.articleId}}</td>
+		<td><a ng-href="/editor/article/{{template.title}}">{{article.title}}</td>
+</tr>
+</table>

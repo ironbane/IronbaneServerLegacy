@@ -1,5 +1,5 @@
 // app.js
-angular.module('IronbaneApp', [])
+angular.module('IronbaneApp', ['ui.utils'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User', '$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
@@ -119,18 +119,24 @@ angular.module('IronbaneApp', [])
         })
         .when('/editor/item_template', {
             templateUrl: '/views/item_template_list',
-            controller: 'ItemTemplate'
+            controller: 'ItemTemplateList'
             
         })
         .when('/editor/item_template/:id', {
             templateUrl: '/views/item_template_editor',
-            controller: 'ItemTemplate',
+            controller: 'ItemTemplateEditor',
             resolve: {
-                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
+                ResolveData: ['Item', '$q', '$route', '$location', function(Item, $q, $route, $location) {
                     var deferred = $q.defer();
                     Item.get($route.current.params.id)
                         .then(function(template) {
-                            deferred.resolve({template: template.data[0]});
+                            if(template.id == null){
+
+                                $location.path('/editor/item_template');
+                                deferred.reject();
+                                return;
+                            }
+                            deferred.resolve({template: template});
                         }, function(err) {
                            deferred.reject();
                         });
@@ -160,6 +166,40 @@ angular.module('IronbaneApp', [])
                 }]
             }
             
+        })
+        .when('/editor/article', {
+            templateUrl: '/views/articlelist',
+            controller: 'ArticleList'
+        })
+        .when('/editor/article/:id', {
+            templateUrl: '/views/articleedit',
+            controller: 'ArticleEditor',
+            resolve: {
+                ResolveData: ['Article', '$q', '$route', '$location', function(Article, $q, $route, $location) {
+                    var deferred = $q.defer();
+                    Article.get($route.current.params.id)
+                        .then(function(article) {
+                            if(article.articleId == null){
+
+                                $location.path('/editor/article');
+                                deferred.reject();
+                                return;
+                            }
+                            deferred.resolve({article: article});
+                        }, function(err) {
+                           deferred.reject();
+                        });
+                        return deferred.promise;
+                }]
+            }
+        })
+        .when('/editor/users', {
+            templateUrl: '/views/userslist',
+            controller: 'userslist'
+        })
+        .when('/editor/users/:id', {
+            templateUrl: '/views/useredit',
+            controller: 'useredit'
         })
         .otherwise({redirectTo: '/'});
 }]);

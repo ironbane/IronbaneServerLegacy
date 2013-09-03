@@ -15,4 +15,15 @@ module.exports = function(app, db) {
             });
         });
 
+
+        app.get('/api/editor/item_template/:templateId', function(req, res) {
+            log("routing item template " + req.params.templateId);
+            ItemTemplate.get(req.params.templateId).then(function(template) {
+                log("trying to send template");
+                res.send(template);
+            }, function(error){
+                res.send(error, 500);
+            });
+        });
+
     };
