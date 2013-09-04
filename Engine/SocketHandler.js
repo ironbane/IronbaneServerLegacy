@@ -100,8 +100,7 @@ var SocketHandler = Class.extend({
                 hair: unit.hair,
                 eyes: unit.eyes,
                 skin: unit.skin,
-                items: unit.items,
-                heartPieces: unit.heartpieces
+                items: unit.items
             });
 
             // just before we're added to the list of online players,
