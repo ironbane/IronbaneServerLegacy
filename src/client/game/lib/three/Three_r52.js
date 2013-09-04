@@ -624,7 +624,7 @@ THREE.Vector2.prototype = {
 
 	isZero: function ( v ) {
 
-		return this.lengthSq() < ( v !== undefined ? v : 0.0001 );
+		return this.lengthSq() < 0.0001;
 
 	},
 

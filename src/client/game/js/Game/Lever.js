@@ -14,53 +14,53 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
 
 var Lever = ToggleableObstacle.extend({
-  Init: function(position, id, metadata) {	
-            
-            
-            
-            
+  Init: function(position, id, metadata) {
+
+
+
+
     this._super(position, new THREE.Vector3(), id, 17, {
       'movementType':4,
       'rotY':0,
       'on':metadata.on
       });
-	                
-            
+
+
   },
-  BuildMesh: function(geometry) {          
-        
-    this._super(geometry);
-        
+  BuildMesh: function(geometry, jsonMaterials) {
+
+    this._super(geometry, jsonMaterials);
+
     var mp = this.on ? 1 : 0;
 
     this.targetRotation.x = this.startRotation.x + 90 * mp;
 
     this.changeRotation = true;
-        
-        
-  },        
+
+
+  },
   Toggle: function(on) {
     this.on = on;
-        
+
     var mp = this.on ? 1 : 0;
-      
+
     this.targetRotation.x = this.startRotation.x + 90 * mp;
-        
-        
+
+
     soundHandler.Play("misc/switch");
 
   },
   Tick: function(dTime) {
-        
+
     this.changeRotation = true;
     this._super(dTime);
-        
+
   }
 });

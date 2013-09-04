@@ -108,8 +108,8 @@ var ChaseEnemy = State.extend({
 
       // log("[ChaseEnemy] Moving towards enemy!");
       // npc.TravelToPosition(this.enemy.position);
-      var direction = npc.position.clone().subSelf(this.enemy.position).normalize().multiplyScalar(1);
-      var target = this.enemy.position.clone().addSelf(direction);
+      var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(1);
+      var target = this.enemy.position.clone().add(direction);
 
       var distanceToTarget = DistanceSq(target, npc.position);
 
@@ -130,8 +130,8 @@ var ChaseEnemy = State.extend({
 
       // log("[ChaseEnemy] Within aggro range, moving closer...");
 
-      var direction = npc.position.clone().subSelf(this.enemy.position).normalize().multiplyScalar(2);
-      npc.TravelToPosition(this.enemy.position.clone().addSelf(direction), true);
+      var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(2);
+      npc.TravelToPosition(this.enemy.position.clone().add(direction), true);
 
     }
 

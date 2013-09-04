@@ -56,7 +56,7 @@ var TurretStraight = State.extend({
 
 
         npc.ShootProjectile(npc.position.clone()
-          .addSelf(npc.heading.clone().multiplyScalar(5)), false);
+          .add(npc.heading.clone().multiplyScalar(5)), false);
 
 
       // Attack!

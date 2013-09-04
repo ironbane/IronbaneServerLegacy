@@ -41,9 +41,9 @@ var Sign = Mesh.extend({
     this.dynamic = false;
 
   },
-  BuildMesh: function(geometry) {
+  BuildMesh: function(geometry, jsonMaterials) {
 
-    this._super(geometry);
+    this._super(geometry, jsonMaterials);
 
 
 

@@ -47,3 +47,4 @@ function passwordHash(password) {
     shasum.update(cryptSalt+password);
     return shasum.digest('hex');
 }
+

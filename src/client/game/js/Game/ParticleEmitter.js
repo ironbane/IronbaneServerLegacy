@@ -77,7 +77,7 @@ var ParticleEmitter = Class.extend({
 
         this.count--;
 
-        //var particle = new THREE.Vertex(CheckForFunctionReturnValue(this.type.particleStartPosition).clone().addSelf(this.position));
+        //var particle = new THREE.Vertex(CheckForFunctionReturnValue(this.type.particleStartPosition).clone().add(this.position));
         var particle = {};
 
         particle.emitter = this;
@@ -88,20 +88,20 @@ var ParticleEmitter = Class.extend({
         // Also rotate the offset if attached to a unit
         if ( this.followUnit ) {
             var rotationMatrix = new THREE.Matrix4();
-            var rot = new THREE.Vector3((this.followUnit.rotation.x).ToRadians(), (this.followUnit.rotation.y).ToRadians(), (this.followUnit.rotation.z).ToRadians());
+            var rot = new THREE.Euler((this.followUnit.rotation.x).ToRadians(), (this.followUnit.rotation.y).ToRadians(), (this.followUnit.rotation.z).ToRadians());
             // sw("rot", rot.ToString());
-            rotationMatrix.setRotationFromEuler(rot);
+            rotationMatrix.makeRotationFromEuler(rot);
 
             this.spawnOffset.copy(this.originalSpawnOffset);
-            rotationMatrix.multiplyVector3(this.spawnOffset);
+            this.spawnOffset.applyMatrix4(rotationMatrix);
         }
 
 
         // Add spawnOffset unique to this instance
-        particle.spawnOffset.addSelf(this.spawnOffset);
+        particle.spawnOffset.add(this.spawnOffset);
 
         particle.localStartPosition = (CheckForFunctionReturnValue(this.type.particleStartPosition, this) || new THREE.Vector3());
-        particle.startPosition = particle.localStartPosition.clone().addSelf(this.position).addSelf(particle.spawnOffset);
+        particle.startPosition = particle.localStartPosition.clone().add(this.position).add(particle.spawnOffset);
         particle.position = particle.startPosition.clone();
 
         particle.rotation = CheckForFunctionReturnValue(this.type.particleStartRotation, this) || 0.0;
@@ -117,6 +117,11 @@ var ParticleEmitter = Class.extend({
             }
         }
 
+        texture = textureHandler.GetTexture('plugins/game/images/' + texture + '.png', true);
+
+        // Deliberately take twice the width so the images are scaled correctly
+        particle.scale.x *= texture.image.width;
+        particle.scale.y *= texture.image.width;
 
         particle.velocity = (CheckForFunctionReturnValue(this.type.particleStartVelocity, particle) || new THREE.Vector3()).clone();
 
@@ -152,14 +157,15 @@ var ParticleEmitter = Class.extend({
         // transparent: true
         // });
 
-        particle.sprite = new THREE.Sprite({
+        particle.sprite = new THREE.Sprite(new THREE.SpriteMaterial({
             color: ColorEnum.WHITE,
-            map: textureHandler.GetTexture('plugins/game/images/' + texture + '.png', true),
+            map: texture,
             useScreenCoordinates: false,
             transparent : false,
             alphaTest: 0.5
         //blending: THREE.AdditiveBlending,
-        });
+        }));
+
         particle.sprite.opacity = 0;
 
         particle.sprite.scale = particle.scale;
@@ -179,13 +185,7 @@ var ParticleEmitter = Class.extend({
         for ( var p=0;p<this.particles.length;p++ ) {
             if ( this.particles[p] ) {
                 ironbane.scene.remove(this.particles[p].sprite);
-
-//              this.mesh.geometry.deallocate();
-              this.particles[p].sprite.deallocate();
-              //this.mesh.material.deallocate();
-
-              ironbane.renderer.deallocateObject( this.particles[p].sprite );
-//              renderer.deallocateTexture( texture );
+                releaseMesh(this.particles[p].sprite);
             }
         }
 
@@ -235,12 +235,12 @@ var ParticleEmitter = Class.extend({
             var steeringForce = (CheckForFunctionReturnValue(this.type.particleSteeringForce, particle) || new THREE.Vector3()).clone();
 
             var acceleration = steeringForce.multiplyScalar(particle.mass);
-            particle.velocity.addSelf(acceleration.multiplyScalar(dTime));
+            particle.velocity.add(acceleration.multiplyScalar(dTime));
             particle.velocity.Truncate(particle.maxSpeed);
 
 
             if ( particle.enableGravity ) {
-                particle.velocity.addSelf(gravity.clone().multiplyScalar(dTime));
+                particle.velocity.add(gravity.clone().multiplyScalar(dTime));
             }
 
             if (particle.velocity.length() > 0.01) {
@@ -252,11 +252,11 @@ var ParticleEmitter = Class.extend({
 
 
             if ( this.particleFollowUnit ) {
-                //particle.followUnitPosition.addSelf(particle.velocity.clone().multiplyScalar(dTime));
-                particle.position = this.particleFollowUnit.position.clone().addSelf(particle.startPosition);
+                //particle.followUnitPosition.add(particle.velocity.clone().multiplyScalar(dTime));
+                particle.position = this.particleFollowUnit.position.clone().add(particle.startPosition);
             }
             else {
-                particle.position.addSelf(particle.velocity.clone().multiplyScalar(dTime));
+                particle.position.add(particle.velocity.clone().multiplyScalar(dTime));
             }
 
 
@@ -266,12 +266,12 @@ var ParticleEmitter = Class.extend({
 
 
 
-            if ( !ISDEF(particle.opacityHack) ) {
+            if ( _.isUndefined(particle.opacityHack) ) {
                 particle.opacityHack = true;
             }
             else {
                 particle.sprite.scale = particle.scale.clone();
-                particle.scale.addSelf(particle.particleScaleVelocity.clone().multiplyScalar(dTime));
+                particle.scale.add(particle.particleScaleVelocity.clone().multiplyScalar(dTime));
             }
 
             particle.sprite.opacity = CheckForFunctionReturnValue(this.type.particleOpacity, particle) || 1.0;
@@ -288,15 +288,13 @@ var ParticleEmitter = Class.extend({
                 this.particles.splice(i--, 1);
                 ironbane.scene.remove(particle.sprite);
 
-                particle.sprite.deallocate();
-
-                ironbane.renderer.deallocateObject( particle.sprite );
+                releaseMesh(particle.sprite);
 
                 continue;
             }
 
 
-            var onTick = ISDEF(this.type.onTick) ? this.type.onTick : null;
+            var onTick = !_.isUndefined(this.type.onTick) ? this.type.onTick : null;
 
             if ( onTick ) onTick(dTime, particle, this);
 

@@ -24,13 +24,14 @@ var MeshHandler = Class.extend({
 
 
   },
-  Load: function(model, readyFunc, scale) {
+  Load: function(model, readyFunc, clone) {
 
     if ( this.geometries[model] ) {
       setTimeout(function() {
-        readyFunc(THREE.GeometryUtils.clone(meshHandler.geometries[model]));
-        // readyFunc(THREE.GeometryUtils.clone(meshHandler.geometries[model]));
-      }, 1000);
+        var val = meshHandler.geometries[model].geometry;
+        if ( clone ) val = val.clone();
+        readyFunc(val, meshHandler.geometries[model].jsonMaterials);
+      }, 1);
       return;
     }
 
@@ -38,30 +39,44 @@ var MeshHandler = Class.extend({
     var jsonLoader = new THREE.JSONLoader();
 
 
-
-    jsonLoader.load( model, function( geometry ) {
-      meshHandler.geometries[model] = geometry;
-      readyFunc(THREE.GeometryUtils.clone(geometry));
+    // TODO are the jsonMaterials allowed to be copied over here?
+    // Do they also need to be cached?
+    jsonLoader.load( model, function( geometry, jsonMaterials ) {
+      meshHandler.geometries[model] = {
+        geometry: geometry,
+        jsonMaterials: jsonMaterials
+      };
+      var val = meshHandler.geometries[model].geometry;
+      if ( clone ) val = val.clone();
+      readyFunc(val, meshHandler.geometries[model].jsonMaterials);
       // readyFunc(geometry);
-    }, null, scale);
+    }, null);
 
 
 
   },
-  ProcessGeometry: function(geometry, rotation, metadata, meshData, drawNameMesh) {
+  ProcessMesh: function(options) {
 
+    var geometry = options.geometry;
+    var jsonMaterials = options.jsonMaterials;
 
+    var rotation = options.rotation || new THREE.Euler();
 
+    // meshData: comes from the database, preset tiles to paint
+    // metadata: comes from the placed model,
+    // so each instance of the model can be separately painted with other tiles
+    var metadata = options.metadata || {};
+    var meshData = options.meshData || {};
 
     // Rotate geometry
 
     var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.setRotationFromEuler(
-      new THREE.Vector3((rotation.x).ToRadians(),
+    rotationMatrix.makeRotationFromEuler(
+      new THREE.Euler((rotation.x).ToRadians(),
         (rotation.y).ToRadians(), (rotation.z).ToRadians()));
 
     for(var v=0;v<geometry.vertices.length;v++) {
-      geometry.vertices[v] = rotationMatrix.multiplyVector3(geometry.vertices[v]);
+      geometry.vertices[v] = geometry.vertices[v].applyMatrix4(rotationMatrix);
     }
 
     geometry.computeCentroids();
@@ -71,14 +86,14 @@ var MeshHandler = Class.extend({
     geometry.dynamic = true;
 
     var tiles = [];
-    for (var i=0; i<geometry.jsonMaterials.length; i++) {
+    for (var i=0; i<jsonMaterials.length; i++) {
       var tileIndex = i+1;
       var tile = "tiles/1";
 
-      if ( ISDEF(meshData["t"+tileIndex]) ) {
+      if ( !_.isUndefined(meshData["t"+tileIndex]) ) {
         tile = meshData["t"+tileIndex];
       }
-      if ( ISDEF(metadata["t"+tileIndex]) ) {
+      if ( !_.isUndefined(metadata["t"+tileIndex]) ) {
         if ( !_.isNaN(parseInt(metadata["t"+tileIndex],10)) ) {
           tile = "tiles/"+metadata["t"+tileIndex];
         }
@@ -88,9 +103,9 @@ var MeshHandler = Class.extend({
       }
 
       // Check if there's a map inside the material, and if it contains a sourceFile
-      if ( !_.isUndefined(geometry.jsonMaterials[i]["mapDiffuse"]) && tile === "tiles/1" ) {
+      if ( !_.isUndefined(jsonMaterials[i]["mapDiffuse"]) && tile === "tiles/1" ) {
         // Extract the tile!
-        var texture = geometry.jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
+        var texture = jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
         texture = texture[texture.length-1].split(".")[0];
 
         if ( !_.isNaN(parseInt(texture,10)) ) {
@@ -106,11 +121,11 @@ var MeshHandler = Class.extend({
 
     var uvscale = [];
     for(var x=1;x<=10;x++){
-      if ( ISDEF(metadata["ts"+x]) ) {
+      if ( !_.isUndefined(metadata["ts"+x]) ) {
         uvscale.push(new THREE.Vector2(
           parseFloat(metadata["ts"+x]),parseFloat(metadata["ts"+x])));
       }
-      else if ( ISDEF(meshData["ts"+x]) ) {
+      else if ( !_.isUndefined(meshData["ts"+x]) ) {
         uvscale.push(new THREE.Vector2(
           parseFloat(meshData["ts"+x]),parseFloat(meshData["ts"+x])));
       }
@@ -122,43 +137,34 @@ var MeshHandler = Class.extend({
 
     var materials = [];
 
-    // Only push materials that are actually inside the materials
-    for (var i=0; i<geometry.jsonMaterials.length; i++) {
+    for (var i=0; i<jsonMaterials.length; i++) {
 
-      if ( drawNameMesh ) {
+      // if ( drawNameMesh ) {
+      //   materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
+      //     transparent:true,
+      //     opacity:0.5,
+      //     seeThrough:true,
+      //     alphaTest:0.5,
+      //     uvScaleX:uvscale[i].x,
+      //     uvScaleY:uvscale[i].y
+      //   }));
+      // }
+      // else {
         materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
-          transparent:true,
-          opacity:0.5,
-          seeThrough:true,
-          alphaTest:0.5,
-          uvScaleX:uvscale[i].x,
-          uvScaleY:uvscale[i].y
-        }));
-      }
-      else {
-        materials.push(textureHandler.GetTexture('plugins/game/images/'+tiles[i] + '.png', false, {
-          transparent:meshData["transparent"] === 1,
+          transparent:meshData["transparent"] && meshData["transparent"] === 1,
           alphaTest:0.1,
           useLighting:true
         }));
-      }
+      // }
 
       materials[i].shading = THREE.FlatShading;
 
-    //materials.push(new THREE.MeshBasicMaterial({color:Math.random() * 0xffffff}));
-
-    //materials[i].wireframe = true;
     }
 
-    // De-allocate the old materials
-    //        _.each(geometry.materials, function(material) {
-    //          material.deallocate();
-    //          ironbane.renderer.deallocateMaterial( material );
-    //        });
-
-    geometry.materials = materials;
-
-    return geometry;
+    return {
+      geometry: geometry,
+      materials: materials
+    };
   },
   BuildMesh: function(geometry, meshData) {
 

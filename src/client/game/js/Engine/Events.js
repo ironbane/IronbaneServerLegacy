@@ -189,7 +189,7 @@ $(document).keydown(function(event){
       hudHandler.MessageAlert("Back to the Main Menu?", "question", function() {
         socketHandler.readyToReceiveUnits = false;
         socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
-          if (ISDEF(reply.errmsg)) {
+          if (!_.isUndefined(reply.errmsg)) {
             hudHandler.MessageAlert(reply.errmsg);
             return;
           }
@@ -332,7 +332,7 @@ $(document).mousemove(function(event) {
 var mouseIntervalFunction = function(event){
 
 
-  // relativeMouse = mouse.clone().subSelf(lastMouse);
+  // relativeMouse = mouse.clone().sub(lastMouse);
 
   // sw("relativeMouse", ConvertVector3(relativeMouse));
 
@@ -414,7 +414,7 @@ var mouseIntervalFunction = function(event){
           // Send a request to destroy this object
           socketHandler.socket.emit('ppAddNode', position.Round(2), function(reply) {
 
-            if ( ISDEF(reply.errmsg) ) {
+            if ( !_.isUndefined(reply.errmsg) ) {
               hudHandler.MessageAlert(reply.errmsg);
               return;
             }
@@ -430,7 +430,7 @@ var mouseIntervalFunction = function(event){
                           twoway:true
                           }, function(reply) {
 
-                          if ( ISDEF(reply.errmsg) ) {
+                          if ( !_.isUndefined(reply.errmsg) ) {
                             hudHandler.MessageAlert(reply.errmsg);
                             return;
                           }
@@ -465,7 +465,7 @@ var mouseIntervalFunction = function(event){
                 twoway:levelEditor.editorGUI.ppTwoWay
                 }, function(reply) {
 
-                if ( ISDEF(reply.errmsg) ) {
+                if ( !_.isUndefined(reply.errmsg) ) {
                   hudHandler.MessageAlert(reply.errmsg);
                   return;
                 }
@@ -502,7 +502,7 @@ var mouseIntervalFunction = function(event){
             id:waypoint.nodeData.id
             }, function(reply) {
 
-            if ( ISDEF(reply.errmsg) ) {
+            if ( !_.isUndefined(reply.errmsg) ) {
               hudHandler.MessageAlert(reply.errmsg);
               return;
             }
@@ -623,18 +623,12 @@ var mouseIntervalFunction = function(event){
         .makeRotationAxis( new THREE.Vector3(0, 1, 0), factorX );
 
       var side = ironbane.camera.lookAtPosition.clone()
-        .subSelf(ironbane.camera.position).normalize()
-        .crossSelf(new THREE.Vector3(0, 1, 0)).normalize();
-        //debug.DrawVector(this.position, new THREE.Vector3(), 0xFF0000);
+        .sub(ironbane.camera.position).normalize()
+        .cross(new THREE.Vector3(0, 1, 0)).normalize();
 
-        //side.copy(ironbane.player.heading);
-
-      // rotationMatrix.rotateByAxis(side, factorY);
-
-      // // sw("factorX", factorX);
       var newTPR = ironbane.player.thirdPersonReference.clone();
 
-      rotationMatrix.multiplyVector3(newTPR);
+      newTPR.applyMatrix4(rotationMatrix);
 
       ironbane.player.thirdPersonReference.copy(newTPR);
 
@@ -642,20 +636,17 @@ var mouseIntervalFunction = function(event){
 
       var newTPR = ironbane.player.thirdPersonReference.clone();
 
-      matrix.multiplyVector3(newTPR);
+      newTPR.applyMatrix4(matrix);
 
       if ( newTPR.y > 0 && newTPR.y < 4 && false ) {
           ironbane.player.thirdPersonReference.copy(newTPR);
         }
-      //ironbane.player.thirdPersonReference.multiplyVector3( matrix );
+
 
       ironbane.player.thirdPersonReference.normalize().multiplyScalar(ironbane.player.originalThirdPersonReference.length());
 
       ironbane.player.thirdPersonReference.y += factorY;
 
-
-       // ironbane.player.thirdPersonReference.x = 0;
-       // ironbane.player.thirdPersonReference.z = 0;
     }
 
 

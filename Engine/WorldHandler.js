@@ -150,15 +150,15 @@ var WorldHandler = Class.extend({
     });
   },
   CheckWorldStructure: function(zone, cx, cz) {
-    if ( ISDEF(zone) && !ISDEF(worldHandler.world[zone]) ) return false;
-    if ( ISDEF(cx) && !ISDEF(worldHandler.world[zone][cx]) ) return false;
-    if ( ISDEF(cz) && !ISDEF(worldHandler.world[zone][cx][cz]) ) return false;
+    if ( !_.isUndefined(zone) && _.isUndefined(worldHandler.world[zone]) ) return false;
+    if ( !_.isUndefined(cx) && _.isUndefined(worldHandler.world[zone][cx]) ) return false;
+    if ( !_.isUndefined(cz) && _.isUndefined(worldHandler.world[zone][cx][cz]) ) return false;
     return true;
   },
   BuildWorldStructure: function(zone, cx, cz) {
-    if ( ISDEF(zone) && !ISDEF(worldHandler.world[zone]) ) worldHandler.world[zone] = {};
-    if ( ISDEF(cx) && !ISDEF(worldHandler.world[zone][cx]) ) worldHandler.world[zone][cx] = {};
-    if ( ISDEF(cz) && !ISDEF(worldHandler.world[zone][cx][cz]) ) worldHandler.world[zone][cx][cz] = {};
+    if ( !_.isUndefined(zone) && _.isUndefined(worldHandler.world[zone]) ) worldHandler.world[zone] = {};
+    if ( !_.isUndefined(cx) && _.isUndefined(worldHandler.world[zone][cx]) ) worldHandler.world[zone][cx] = {};
+    if ( !_.isUndefined(cz) && _.isUndefined(worldHandler.world[zone][cx][cz]) ) worldHandler.world[zone][cx][cz] = {};
   },
   LoadWorldLight: function() {
 
@@ -338,7 +338,7 @@ var WorldHandler = Class.extend({
       data.data = JSON.parse(data.data);
     }
 
-    if ( !ISDEF(dataHandler.units[data.template]) ) {
+    if ( _.isUndefined(dataHandler.units[data.template]) ) {
       log("Warning! Unit template "+data.template+" not found!");
       log("Cleaning up MySQL...");
 
@@ -544,7 +544,7 @@ var WorldHandler = Class.extend({
       this.world[zone][cellX][cellZ].objects.push(buffer_objects[o]);
     }
 
-    if ( ISDEF(worldHandler.world[zone][cellX][cellZ].changeBuffer) ) {
+    if ( !_.isUndefined(worldHandler.world[zone][cellX][cellZ].changeBuffer) ) {
 
       for(var d=0;d<worldHandler.world[zone][cellX][cellZ].changeBuffer.length;d++) {
 
@@ -595,7 +595,7 @@ var WorldHandler = Class.extend({
     }
 
     // Delete the things from the terrain in the deleteBuffer
-    if ( ISDEF(worldHandler.world[zone][cellX][cellZ].deleteBuffer) ) {
+    if ( !_.isUndefined(worldHandler.world[zone][cellX][cellZ].deleteBuffer) ) {
 
 
 
@@ -719,7 +719,7 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
 
             var units = worldHandler.world[z][cx][cz].units;
 
@@ -746,7 +746,7 @@ var WorldHandler = Class.extend({
       for(var z=cz-1;z<=cz+1;z++){
         if ( !worldHandler.CheckWorldStructure(zone, x, z) ) continue;
 
-        if ( ISDEF(worldHandler.world[zone][x][z].units) ) {
+        if ( !_.isUndefined(worldHandler.world[zone][x][z].units) ) {
 
           var units = worldHandler.world[zone][x][z].units;
 
@@ -765,7 +765,7 @@ var WorldHandler = Class.extend({
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
 
-          if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
 
             var units = worldHandler.world[z][cx][cz].units;
 
@@ -784,7 +784,7 @@ var WorldHandler = Class.extend({
   AutoSaveCell: function(zone, x, z) {
     // Set a timer to auto save this cell
     // If we set the height again, reset the timer
-    if ( ISDEF(worldHandler.world[zone][x][z].saveTimer) ) {
+    if ( !_.isUndefined(worldHandler.world[zone][x][z].saveTimer) ) {
       //log("clearTimer");
       clearTimeout(worldHandler.world[zone][x][z].saveTimer);
     }

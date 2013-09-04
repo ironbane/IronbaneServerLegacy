@@ -34,14 +34,14 @@ var DynamicMesh = Mesh.extend({
 
         this.changeRotation = false;
 
-        if ( ISDEF(this.metadata.movementType) ) this.movementType = parseInt(this.metadata.movementType, 10);
-        if ( ISDEF(this.metadata.speedMultiplier) ) this.speedMultiplier = parseFloat(this.metadata.speedMultiplier);
-        if ( ISDEF(this.metadata.distanceMultiplier) ) this.distanceMultiplier = parseFloat(this.metadata.distanceMultiplier);
+        if ( !_.isUndefined(this.metadata.movementType) ) this.movementType = parseInt(this.metadata.movementType, 10);
+        if ( !_.isUndefined(this.metadata.speedMultiplier) ) this.speedMultiplier = parseFloat(this.metadata.speedMultiplier);
+        if ( !_.isUndefined(this.metadata.distanceMultiplier) ) this.distanceMultiplier = parseFloat(this.metadata.distanceMultiplier);
 
     },
-    BuildMesh: function(geometry) {
+    BuildMesh: function(geometry, jsonMaterials) {
 
-        this._super(geometry);
+        this._super(geometry, jsonMaterials);
 
         // Let's keep everything at rotation 0,0,0 from the start
         this.startVertices = [];
@@ -68,16 +68,16 @@ var DynamicMesh = Mesh.extend({
         if ( !this.mesh ) return;
 
         var rotationMatrix = new THREE.Matrix4();
-        var rot = new THREE.Vector3((this.rotation.x).ToRadians(), (this.rotation.y).ToRadians(), (this.rotation.z).ToRadians());
+        var rot = new THREE.Euler((this.rotation.x).ToRadians(), (this.rotation.y).ToRadians(), (this.rotation.z).ToRadians());
         // sw("rot", rot.ToString());
-        rotationMatrix.setRotationFromEuler(rot);
+        rotationMatrix.makeRotationFromEuler(rot);
 
         for(var v=0;v<this.mesh.geometry.vertices.length;v++) {
             this.mesh.geometry.vertices[v].copy(this.startVertices[v]);
-            rotationMatrix.multiplyVector3(this.mesh.geometry.vertices[v]);
+            this.mesh.geometry.vertices[v].applyMatrix4(rotationMatrix);
         }
 
-        //this.object3D.matrixWorld.setRotationFromEuler(rot);
+        //this.object3D.matrixWorld.makeRotationFromEuler(rot);
         this.localRotation.copy(rot);
         //this.mesh.rotation.copy(rot);
 

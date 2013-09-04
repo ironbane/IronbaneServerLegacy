@@ -41,16 +41,16 @@ var SteeringBehaviour = Class.extend({
         this.steeringForce.set(0,0,0);
     },
     Seek: function(targetPos) {
-        var desiredVelocity = targetPos.clone().subSelf(this.unit.position).normalize().multiplyScalar(this.unit.maxSpeed);
-        return desiredVelocity.subSelf(this.unit.velocity);
+        var desiredVelocity = targetPos.clone().sub(this.unit.position).normalize().multiplyScalar(this.unit.maxSpeed);
+        return desiredVelocity.sub(this.unit.velocity);
     },
     Flee: function(targetPos) {
 
-        var desiredVelocity = this.unit.position.clone().subSelf(targetPos).normalize().multiplyScalar(this.unit.maxSpeed);
-        return desiredVelocity.subSelf(this.unit.velocity);
+        var desiredVelocity = this.unit.position.clone().sub(targetPos).normalize().multiplyScalar(this.unit.maxSpeed);
+        return desiredVelocity.sub(this.unit.velocity);
     },
     Arrive: function(targetPos, deceleration) {
-        var ToTarget = targetPos.clone().subSelf(this.unit.position);
+        var ToTarget = targetPos.clone().sub(this.unit.position);
 
 		//calculate the distance to the target position
         var dist = ToTarget.length();
@@ -68,7 +68,7 @@ var SteeringBehaviour = Class.extend({
 
             var desiredVelocity = ToTarget.multiplyScalar(speed/dist);
 
-            return desiredVelocity.subSelf(this.unit.velocity);
+            return desiredVelocity.sub(this.unit.velocity);
 
         }
 
@@ -76,7 +76,7 @@ var SteeringBehaviour = Class.extend({
     },
 	Pursuit: function(evader) {
 
-        var toEvader = evader.position.clone().subSelf(this.unit.position);
+        var toEvader = evader.position.clone().sub(this.unit.position);
 
 		var relativeHeading = this.unit.heading.dot(evader.heading);
 
@@ -86,19 +86,19 @@ var SteeringBehaviour = Class.extend({
 
 		var lookAheadTime = toEvader.length() / (this.unit.maxSpeed + evader.velocity.length());
 
-        var seek = evader.position.clone().addSelf(evader.velocity.clone().multiplyScalar(lookAheadTime));
+        var seek = evader.position.clone().add(evader.velocity.clone().multiplyScalar(lookAheadTime));
 
 		return this.Seek(seek);
 	},
 	Evade: function(pursuer) {
-        var toPursuer = pursuer.position.clone().subSelf(this.unit.position);
+        var toPursuer = pursuer.position.clone().sub(this.unit.position);
 
 		var lookAheadTime = toPursuer.length() / (this.unit.maxSpeed + pursuer.velocity.length());
 
-		return this.Flee(pursuer.position.clone().addSelf(pursuer.velocity.clone().multiplyScalar(lookAheadTime)));
+		return this.Flee(pursuer.position.clone().add(pursuer.velocity.clone().multiplyScalar(lookAheadTime)));
 	},
 	TurnaroundTime: function(unit, targetPos) {
-		var toTarget = targetPos.clone().subSelf(unit.position);
+		var toTarget = targetPos.clone().sub(unit.position);
 
 		var dot = unit.heading.dot(toTarget);
 
@@ -111,25 +111,25 @@ var SteeringBehaviour = Class.extend({
     },
 	Wander: function() {
 
-		this.wanderTarget.addSelf(new THREE.Vector3(RandomClamped() * this.wanderJitter,
+		this.wanderTarget.add(new THREE.Vector3(RandomClamped() * this.wanderJitter,
 		0,
 		RandomClamped() * this.wanderJitter));
 
 		this.wanderTarget.normalize().multiplyScalar(this.wanderRadius);
 
 		var offset = this.unit.heading.clone().multiplyScalar(this.wanderDistance);
-		return offset.addSelf(this.wanderTarget);
+		return offset.add(this.wanderTarget);
 	},
 	Interpose: function(unitA, unitB) {
 
-		var midPoint = unitA.position.clone().addSelf(unitB.position).multiplyScalar(0.5);
+		var midPoint = unitA.position.clone().add(unitB.position).multiplyScalar(0.5);
 
-		var timeToReachMidPoint = this.unit.position.clone().subSelf(midPoint).length() / this.unit.maxSpeed;
+		var timeToReachMidPoint = this.unit.position.clone().sub(midPoint).length() / this.unit.maxSpeed;
 
-		var posA = unitA.position.clone().addSelf(unitA.velocity.clone.multiplyScalar(timeToReachMidPoint));
-		var posB = unitB.position.clone().addSelf(unitB.velocity.clone.multiplyScalar(timeToReachMidPoint));
+		var posA = unitA.position.clone().add(unitA.velocity.clone.multiplyScalar(timeToReachMidPoint));
+		var posB = unitB.position.clone().add(unitB.velocity.clone.multiplyScalar(timeToReachMidPoint));
 
-		midPoint = posA.addSelf(posB).multiplyScalar(0.5);
+		midPoint = posA.add(posB).multiplyScalar(0.5);
 
 		return Arrive(midPoint, Deceleration.FAST);
 	}

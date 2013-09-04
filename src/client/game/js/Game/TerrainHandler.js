@@ -258,28 +258,31 @@ var TerrainHandler = Class.extend({
       noMeshes = true;
     }
 
+
+    var intersects = [];
+
+    // Disabled for now, ThreeOctree is fast enough:
+    //
     // To optimize, we keep track of the last mesh & face that had a succesful
     // hit. In our use case, it is very likely that the next hit will be the
     // same face/object
-    var intersects = [];
+    // if ( unitReference && false ) {
+    //   if ( !unitReference.lastRayData ) {
+    //     unitReference.lastRayData = {};
+    //   }
 
-    if ( unitReference && false ) {
-      if ( !unitReference.lastRayData ) {
-        unitReference.lastRayData = {};
-      }
+    //   if ( unitReference.lastRayData[unitRayName] ) {
+    //     var rayData = unitReference.lastRayData[unitRayName];
+    //     // Check for the stuff that's inside
+    //     // Do a simple raycast on one plane
+    //     var subIntersects = ray.intersectObject( rayData.mesh,
+    //       false, rayData.faceId );
 
-      if ( unitReference.lastRayData[unitRayName] ) {
-        var rayData = unitReference.lastRayData[unitRayName];
-        // Check for the stuff that's inside
-        // Do a simple raycast on one plane
-        var subIntersects = ray.intersectObject( rayData.mesh,
-          false, rayData.faceId );
+    //     intersects = intersects.concat(subIntersects);
 
-        intersects = intersects.concat(subIntersects);
-
-        if ( intersects.length > 0 ) return intersects;
-      }
-    }
+    //     if ( intersects.length > 0 ) return intersects;
+    //   }
+    // }
 
     var meshList = [];
 
@@ -391,7 +394,7 @@ var TerrainHandler = Class.extend({
 
       // Bring it on!
       socketHandler.socket.emit('readyToReceiveUnits', true, function (reply) {
-        if ( ISDEF(reply.errmsg) ) {
+        if ( !_.isUndefined(reply.errmsg) ) {
           hudHandler.MessageAlert(reply.errmsg);
           return;
         }

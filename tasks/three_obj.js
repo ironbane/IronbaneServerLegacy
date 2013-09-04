@@ -88,6 +88,15 @@ module.exports = function(grunt) {
                     }
                     data = JSON.parse(data);
 
+
+
+                    if ( !_.isNaN(parseInt(path.basename(file, ".obj"), 10)) ) {
+                      // For terrain, set a scale factor of x300
+                      // which is 0.003333 for the converter
+                      data.scale = 0.003333;
+                    }
+
+
                     data.metadata.md5 = md5;
 
                     if ( data.materials ) {

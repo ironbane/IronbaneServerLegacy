@@ -31,7 +31,7 @@ var Player = Fighter.extend({
 
         this.drawNameMesh = false;
         this.originalThirdPersonReference = new THREE.Vector3(0, 2.5, -4);
-        ironbane.camera.position.copy(position.clone().addSelf(new THREE.Vector3(0, 1, 0)));
+        ironbane.camera.position.copy(position.clone().add(new THREE.Vector3(0, 1, 0)));
         this.thirdPersonReference = this.originalThirdPersonReference.clone();
         this.targetSize = socketHandler.playerData.size;
         this.sendDataTimeout = 0.0;
@@ -113,26 +113,17 @@ var Player = Fighter.extend({
     },
   DestroyAimMesh: function() {
     if ( this.aimMesh ) {
+      releaseMesh(this.aimMesh, {removeMaterials:false});
+
       ironbane.scene.remove(this.aimMesh);
-
-      this.aimMesh.deallocate();
-      this.aimMesh.geometry.deallocate();
-      this.aimMesh.material.deallocate();
-
-      ironbane.renderer.deallocateObject( this.aimMesh );
 
     }
   },
   DestroyAimHelperMesh: function() {
     if ( this.aimHelperMesh ) {
+      releaseMesh(this.aimHelperMesh, {removeMaterials:false});
+
       ironbane.scene.remove(this.aimHelperMesh);
-
-      this.aimHelperMesh.deallocate();
-      this.aimHelperMesh.geometry.deallocate();
-      this.aimHelperMesh.material.deallocate();
-
-      ironbane.renderer.deallocateObject( this.aimHelperMesh );
-
     }
   },
   onChangeZone: function(newZone) {
@@ -225,7 +216,7 @@ var Player = Fighter.extend({
 
 
 
-          if ( ISDEF(reply.errmsg) ) {
+          if ( !_.isUndefined(reply.errmsg) ) {
             hudHandler.MessageAlert(reply.errmsg);
             return;
           }
@@ -279,7 +270,7 @@ var Player = Fighter.extend({
     uc.x = tx;
     uc.z = tz;
 
-    var preTarget = this.position.clone().addSelf(uc);
+    var preTarget = this.position.clone().add(uc);
 
 
     //        if ( this.mouseRayCastCheckTimeout <= 0 ) {
@@ -298,7 +289,7 @@ var Player = Fighter.extend({
       var needFirstPersonMode = false;
 
 
-      var ray = new THREE.Ray(this.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0)), preTarget.clone().subSelf(this.position.clone()).normalize());
+      var ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), preTarget.clone().sub(this.position.clone()).normalize());
 
       var intersects = terrainHandler.RayTest(ray, {
         testMeshesNearPosition:ironbane.camera.position,
@@ -315,7 +306,7 @@ var Player = Fighter.extend({
         if ( !this.isLookingAround ) {
           if ( relativeDifference < 2.5 ) {
             //manualLerp = true;
-            //ironbane.camera.position.lerpSelf(this.position.clone().addSelf(new THREE.Vector3(0, 2, 0)), dTime*3);
+            //ironbane.camera.position.lerp(this.position.clone().add(new THREE.Vector3(0, 2, 0)), dTime*3);
             //ironbane.camera.position.y = this.position.y + 2;
 
             needFirstPersonMode = true;
@@ -328,7 +319,7 @@ var Player = Fighter.extend({
 
           }
           else {
-            this.thirdPersonReference.lerpSelf(this.originalThirdPersonReference, dTime*10);
+            this.thirdPersonReference.lerp(this.originalThirdPersonReference, dTime*10);
           }
         }
 
@@ -349,7 +340,7 @@ var Player = Fighter.extend({
 
     }
 
-    var target = this.position.clone().addSelf(uc);
+    var target = this.position.clone().add(uc);
 
 
 
@@ -363,7 +354,7 @@ var Player = Fighter.extend({
 
     if ( !cinema.IsPlaying() ) {
       // Set our position behind the playe
-      var firstPersonTarget = this.position.clone().addSelf(new THREE.Vector3(-Math.sin(radians)*0.001, 0, -Math.cos(radians)*0.001));
+      var firstPersonTarget = this.position.clone().add(new THREE.Vector3(-Math.sin(radians)*0.001, 0, -Math.cos(radians)*0.001));
       firstPersonTarget.y += 1;
 
       switch(this.cameraStatus) {
@@ -372,15 +363,15 @@ var Player = Fighter.extend({
 
           break;
         case CameraStatusEnum.ThirdPersonToFirstPersonTransition:
-          ironbane.camera.position.lerpSelf(firstPersonTarget, dTime*10);
+          ironbane.camera.position.lerp(firstPersonTarget, dTime*10);
 
-          if ( (ironbane.camera.position.clone().subSelf(firstPersonTarget)).length() < 0.01 ) {
+          if ( (ironbane.camera.position.clone().sub(firstPersonTarget)).length() < 0.01 ) {
             this.cameraStatus = CameraStatusEnum.FirstPerson;
           }
           break;
         case CameraStatusEnum.ThirdPerson:
           //ironbane.camera.position.copy(target);
-          ironbane.camera.position.lerpSelf(target, dTime*3);
+          ironbane.camera.position.lerp(target, dTime*3);
           break;
       }
 
@@ -388,13 +379,13 @@ var Player = Fighter.extend({
 
       var lookAtTarget = null;
       if ( this.cameraStatus != CameraStatusEnum.ThirdPerson ) {
-        lookAtTarget = this.position.clone().addSelf(new THREE.Vector3(Math.sin(radians), 1, Math.cos(radians)));
+        lookAtTarget = this.position.clone().add(new THREE.Vector3(Math.sin(radians), 1, Math.cos(radians)));
       }
       else {
-        lookAtTarget = this.position.clone().addSelf(new THREE.Vector3(0, 1, 0));
+        lookAtTarget = this.position.clone().add(new THREE.Vector3(0, 1, 0));
 
       }
-      ironbane.camera.lookAtPosition.lerpSelf(lookAtTarget, dTime * 10);
+      ironbane.camera.lookAtPosition.lerp(lookAtTarget, dTime * 10);
       //ironbane.camera.lookAtPosition.copy(lookAtTarget);
 
 
@@ -492,7 +483,7 @@ var Player = Fighter.extend({
     }
 
 
-    this.velocity.addSelf(inputVelocity);
+    this.velocity.add(inputVelocity);
 
 
     if ( this.canMove ) {
@@ -562,7 +553,7 @@ var Player = Fighter.extend({
         var waterFrictionVector = this.velocity.clone().normalize().multiplyScalar(dTime*10);
 
         //if ( vlength > 3 ) {
-        this.velocity.subSelf(waterFrictionVector);
+        this.velocity.sub(waterFrictionVector);
         //}
 
         maxSpeed -= (GetZoneConfig('fluidLevel')-this.position.y)*4;
@@ -581,7 +572,7 @@ var Player = Fighter.extend({
     var frictionVector = this.velocity.clone().normalize().multiplyScalar(frictionLength);
 
     if ( vlength > frictionLength ) {
-      this.velocity.subSelf(frictionVector);
+      this.velocity.sub(frictionVector);
     }
     else {
       this.velocity.x = 0;
@@ -625,7 +616,7 @@ var Player = Fighter.extend({
 
 
 
-    //        if ( ISDEF(ironbane.unitList[0]) ) {
+    //        if ( !_.isUndefined(ironbane.unitList[0]) ) {
     //            var npc = ironbane.unitList[0];
     //
     //            this.position = npc.position;
@@ -649,7 +640,7 @@ var Player = Fighter.extend({
       if ( weapon ) {
         var template = items[weapon.template];
         var range = WeaponRanges[template.subtype];
-        var playerToPoint = point.clone().subSelf(this.position);
+        var playerToPoint = point.clone().sub(this.position);
 
 
           if ( template.type == 'weapon') {
@@ -670,7 +661,7 @@ var Player = Fighter.extend({
           if ( inFOV ) {
             // this.targetAimHelperTexture = this.targetAimTexture;
             this.aimHelperMeshPosition = this.position.clone()
-              .addSelf(playerToPoint.normalize().multiplyScalar(range));
+              .add(playerToPoint.normalize().multiplyScalar(range));
             this.aimHelperMeshPosition.setY(this.aimHelperMeshPosition.y + 0.1);
 
 
@@ -767,10 +758,10 @@ var Player = Fighter.extend({
     }
 
     if ( this.aimMesh && currentMouseToWorldData ) {
-      //this.aimMesh.position = point.addSelf(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
-      this.aimMeshPosition.lerpSelf(point.addSelf(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05)), dTime*20);
+      //this.aimMesh.position = point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
+      this.aimMeshPosition.lerp(point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05)), dTime*20);
       this.aimMesh.position.copy(this.aimMeshPosition);
-      this.aimMesh.LookAt(currentMouseToWorldData.face.normal.clone().addSelf(this.aimMesh.position));
+      this.aimMesh.LookFlatAt(currentMouseToWorldData.face.normal.clone().add(this.aimMesh.position));
     }
 
 
@@ -801,9 +792,9 @@ var Player = Fighter.extend({
     // }
 
     if ( this.aimHelperMesh && currentMouseToWorldData ) {
-      //this.aimHelperMesh.position = point.addSelf(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
+      //this.aimHelperMesh.position = point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
       this.aimHelperMesh.position.copy(this.aimHelperMeshPosition);
-      //this.aimHelperMesh.LookAt(new THREE.Vector3(0,1,0));
+      //this.aimHelperMesh.LookFlatAt(new THREE.Vector3(0,1,0));
     }
 
 
@@ -822,7 +813,7 @@ var Player = Fighter.extend({
     // Make a list of all NPC's in line of sight
     var npcLOS = [];
 
-    var ourpos = ironbane.player.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0));
+    var ourpos = ironbane.player.position.clone().add(new THREE.Vector3(0, 0.5, 0));
 
     // Do a raycast for each NPC
     for(var u=0;u<ironbane.unitList.length;u++) {
@@ -832,10 +823,10 @@ var Player = Fighter.extend({
 
 
 
-        var dir = unit.position.clone().addSelf(new THREE.Vector3(0, 0.5, 0)).subSelf( ourpos );
+        var dir = unit.position.clone().add(new THREE.Vector3(0, 0.5, 0)).sub( ourpos );
         // With a small offset to account for NPCs stuck in walls
         var distance = dir.length() - 0.5;
-        var ray = new THREE.Ray( ourpos, dir.clone().normalize(), 0, distance );
+        var ray = new THREE.Raycaster( ourpos, dir.clone().normalize(), 0, distance );
 
 
         var intersects = terrainHandler.RayTest(ray, {
@@ -873,7 +864,7 @@ var Player = Fighter.extend({
       return;
     }
 
-    var rotTest = player.heading.dot(ConvertVector3(position).subSelf(player.position).normalize());
+    var rotTest = player.heading.dot(ConvertVector3(position).sub(player.position).normalize());
     if (rotTest < -0.5) {
       return;
     }
@@ -886,9 +877,9 @@ var Player = Fighter.extend({
         // Don't return if out of range, instead adjust the position where we're
         // shooting at
         if (DistanceSq(position, player.position) > Math.pow(WeaponRanges[template.subtype], 2)) {
-          var playerToPoint = position.clone().subSelf(player.position);
+          var playerToPoint = position.clone().sub(player.position);
           playerToPoint.normalize().multiplyScalar(WeaponRanges[template.subtype]);
-          position = player.position.clone().addSelf(playerToPoint);
+          position = player.position.clone().add(playerToPoint);
         }
 
         var newDelay = template.delay;
@@ -901,7 +892,7 @@ var Player = Fighter.extend({
           sw: true
         }, function(reply) {
           //console.log('addProjectile reply', reply);
-          if (ISDEF(reply.errmsg)) {
+          if (!_.isUndefined(reply.errmsg)) {
             hudHandler.MessageAlert(reply.errmsg);
             // hudHandler.ShowMenuScreen();
             return;
@@ -913,8 +904,8 @@ var Player = Fighter.extend({
             //console.log('shoot dammit');
             // don't actually fire the projectile locally until OK'd
             var particle = template.particle;
-            var proj = new Projectile(player.position.clone().addSelf(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
-            proj.velocity.addSelf(player.velocity);
+            var proj = new Projectile(player.position.clone().add(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
+            proj.velocity.add(player.velocity);
             ironbane.unitList.push(proj);
             player.SwingWeapon(null, template);
           }
@@ -1085,7 +1076,7 @@ var Player = Fighter.extend({
 
       socketHandler.socket.emit('useItem', barIndex, function (reply) {
 
-        if ( ISDEF(reply.errmsg) ) {
+        if ( !_.isUndefined(reply.errmsg) ) {
           hudHandler.ReloadInventory();
           hudHandler.MessageAlert(reply.errmsg);
           return;
@@ -1155,7 +1146,7 @@ var Player = Fighter.extend({
     var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
     ironbane.projector.unprojectVector( vector, ironbane.camera );
 
-    var ray = new THREE.Ray( ironbane.camera.position, vector.subSelf( ironbane.camera.position ).normalize() );
+    var ray = new THREE.Raycaster( ironbane.camera.position, vector.sub( ironbane.camera.position ).normalize() );
 
     var intersects = terrainHandler.RayTest(ray, {
       testMeshesNearPosition:this.position,

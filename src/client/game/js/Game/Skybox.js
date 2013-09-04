@@ -49,7 +49,7 @@ var Skybox = PhysicsObject.extend({
 
     this.skyboxMesh = new THREE.Mesh(geometry, material);
 
-    this.terrainOctree = new THREE.Octree();
+    this.terrainOctree = new THREE.Octree({undeferred: true});
 
     ironbane.scene.add(this.skyboxMesh);
 
@@ -82,9 +82,9 @@ var Skybox = PhysicsObject.extend({
 
       var jsonLoader = new THREE.JSONLoader();
       (function(skybox){
-        jsonLoader.load( model, function( geometry ) {
-          skybox.BuildMesh( geometry );
-        }, null, 300);
+        jsonLoader.load( model, function( geometry, jsonMaterials ) {
+          skybox.BuildMesh( geometry, jsonMaterials );
+        }, null);
       })(this);
 
     //}
@@ -93,50 +93,23 @@ var Skybox = PhysicsObject.extend({
 
     this._super();
   },
-  BuildMesh: function(geometry) {
+  BuildMesh: function(geometry, jsonMaterials) {
 
-    // Only push materials that are actually inside the materials
-    var textures = [];
-
-    // Only push materials that are actually inside the materials
-    _.each(geometry.jsonMaterials, function(material) {
-
-      // Check if there's a map inside the material, and if it contains a sourceFile
-      if ( !_.isUndefined(material.mapDiffuse)) {
-        // Extract the tile!
-        textures.push("images/tiles/"+(material.mapDiffuse.split("."))[0]);
-      }
+    var result = meshHandler.ProcessMesh({
+      geometry: geometry,
+      jsonMaterials: jsonMaterials
     });
 
-    // Check if there's a map inside the material, and if it contains a sourceFile
-    _.each(textures, function(texture) {
-      var mat = textureHandler.GetTexture('plugins/game/'+texture + '.png', false, {
-        transparent:false,
-        alphaTest:0.1,
-        useLighting:true
-      });
-      mat.side = THREE.DoubleSide;
-      geometry.materials.push(mat);
-    });
+    //THREE.GeometryUtils.triangulateQuads(geometry);
 
-    // _.each(geometry.materials, function(m) {
-    //   m.wireframe = true;
-    // });
-
-    THREE.GeometryUtils.triangulateQuads(geometry);
-
-    geometry.computeCentroids();
-    geometry.computeFaceNormals();
-
-    this.terrainMesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+    this.terrainMesh = new THREE.Mesh( result.geometry, new THREE.MeshFaceMaterial(result.materials) );
     this.terrainMesh.receiveShadow = true;
 
     ironbane.scene.add(this.terrainMesh);
 
-    this.terrainOctree.add( this.terrainMesh, true );
+    this.terrainOctree.add( this.terrainMesh, {useFaces:true} );
 
     if ( this.onReady ) this.onReady();
-
 
     terrainHandler.RebuildOctree();
 
@@ -190,7 +163,7 @@ var Skybox = PhysicsObject.extend({
 
     if ( this.sunMesh ) {
       var rotationMatrix = new THREE.Matrix4();
-      rotationMatrix.setRotationFromEuler(new THREE.Vector3((param).ToRadians(), (-30).ToRadians(), 0));
+      rotationMatrix.makeRotationFromEuler(new THREE.Euler((param).ToRadians(), (-30).ToRadians(), 0));
 
 
       if ( (showEditor && levelEditor.editorGUI.chForceDay)
@@ -203,17 +176,17 @@ var Skybox = PhysicsObject.extend({
       }
       else {
         this.sunVector.set(0,0,1);
-        this.sunVector = rotationMatrix.multiplyVector3(this.sunVector);
+        this.sunVector = this.sunVector.applyMatrix4(rotationMatrix);
       }
 
       this.skyboxMesh.material.uniforms.vSun.value.copy(this.sunVector);
 
       var sunDistance = 1950;
 
-      this.sunMesh.position.copy(p.clone().addSelf(this.sunVector.clone().multiplyScalar(sunDistance)));
+      this.sunMesh.position.copy(p.clone().add(this.sunVector.clone().multiplyScalar(sunDistance)));
 
 
-      this.sunMesh.LookAt(p);
+      this.sunMesh.LookFlatAt(p);
 
       var al = this.sunMesh.position.y/sunDistance;
 

@@ -35,9 +35,9 @@ var LootableMesh = Mesh.extend({
     this._super(position, rotation, id, param, metadata);
 
   },
-  BuildMesh: function(geometry) {
+  BuildMesh: function(geometry, jsonMaterials) {
 
-    this._super(geometry);
+    this._super(geometry, jsonMaterials);
 
     this.localRotation.copy(this.rotation.clone().ToRadians());
 

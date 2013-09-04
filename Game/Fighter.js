@@ -69,24 +69,24 @@ var Fighter = Actor.extend({
     },
   ShootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
 
-      aimError = ISDEF(aimError) ? aimError : 0;
+      aimError = !_.isUndefined(aimError) ? aimError : 0;
 
       // var offset = victim.velocity.clone().multiplyScalar(0.6);
       // var angle = getRandomFloat(0,getRandomFloat(0,1)) * Math.PI * 2;
-      // offset.addSelf(new THREE.Vector3(Math.cos(angle)*aimError,
+      // offset.add(new THREE.Vector3(Math.cos(angle)*aimError,
       //  0, Math.sin(angle)*aimError));
 
       var offset = new THREE.Vector3();
       // var angle = getRandomFloat(0,getRandomFloat(0,1)) * Math.PI * 2;
-      // offset.addSelf(new THREE.Vector3(Math.cos(angle)*aimError,
+      // offset.add(new THREE.Vector3(Math.cos(angle)*aimError,
       //  0, Math.sin(angle)*aimError));
 
-      swingWeapon = ISDEF(swingWeapon) ? swingWeapon : true;
+      swingWeapon = !_.isUndefined(swingWeapon) ? swingWeapon : true;
       weaponID = weaponID || this.weapon.id;
 
       this.EmitNearby("addProjectile", {
         s:this.position.clone().Round(2),
-        t:targetPosition.clone().addSelf(offset).Round(2),
+        t:targetPosition.clone().add(offset).Round(2),
         o:this.id,
         w:weaponID,
         sw:swingWeapon
@@ -566,7 +566,7 @@ var Fighter = Actor.extend({
         return true;
     },
   InLineOfSight: function(unit, noHeadingCheck) {
-    var unitToUs = unit.position.clone().subSelf(this.position);
+    var unitToUs = unit.position.clone().sub(this.position);
 
     noHeadingCheck = noHeadingCheck || false;
 

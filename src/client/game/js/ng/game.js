@@ -86,7 +86,6 @@ IronbaneApp
                 return;
             }
 
-            var bgcolor = $window.ColorEnum.LIGHTBLUE;
             this.scene = new $window.THREE.Scene();
             this.octree = new $window.THREE.Octree();
             this.camera = new $window.THREE.PerspectiveCamera(75, $window.innerWidth / $window.innerHeight, 0.1, 100000);
@@ -103,11 +102,9 @@ IronbaneApp
             this.projector = new $window.THREE.Projector();
 
             this.renderer = new $window.THREE.WebGLRenderer({
-                antialias: false,
-                clearColor: bgcolor,
-                clearAlpha: 1,
-                maxLights: 20
+                antialias: false
             });
+            this.renderer.shadowMapType = THREE.BasicShadowMap;
             this.renderer.shadowMapEnabled = true;
             this.renderer.shadowMapAutoUpdate = true;
             this.renderer.shadowMapSoft = false;
@@ -171,6 +168,9 @@ IronbaneApp
         };
 
         Game.prototype.render = function() {
+
+            this.renderer.setClearColor($window.ColorEnum.LIGHTBLUE, 1);
+
             this.renderer.render(this.scene, this.camera);
             $window.debug.Clear();
         };
@@ -221,10 +221,10 @@ IronbaneApp
 
             $window.cinema.Tick(dTime);
 
-            $window.sw("THREE.Object3DLibrary.length", $window.THREE.Object3DLibrary.length);
-            $window.sw("THREE.GeometryLibrary.length", $window.THREE.GeometryLibrary.length);
-            $window.sw("THREE.MaterialLibrary.length", $window.THREE.MaterialLibrary.length);
-            $window.sw("THREE.TextureLibrary.length", $window.THREE.TextureLibrary.length);
+            $window.sw("THREE.Object3DIdCount", $window.THREE.Object3DIdCount);
+            $window.sw("THREE.GeometryIdCount", $window.THREE.GeometryIdCount);
+            $window.sw("THREE.MaterialIdCount", $window.THREE.MaterialIdCount);
+            $window.sw("THREE.TextureIdCount", $window.THREE.TextureIdCount);
 
 
 
@@ -287,7 +287,7 @@ IronbaneApp
                 }
             }
 
-            $window.relativeMouse = $window.mouse.clone().subSelf($window.lastMouse);
+            $window.relativeMouse = $window.mouse.clone().sub($window.lastMouse);
             $window.lastMouse = $window.mouse.clone();
             $window.sw("relativeMouse", $window.ConvertVector3($window.relativeMouse));
         };

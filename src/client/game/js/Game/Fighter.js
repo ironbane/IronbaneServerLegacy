@@ -195,14 +195,8 @@ this.walkSoundTimer = 0.0;
       alphaTest: 0.5
     });
 
-    //shaderMaterial = new THREE.MeshBasicMaterial( { map: textureHandler.GetTexture( texture ), alphaTest: 0.5, transparent: true } );
-
     if (stealth) shaderMaterial.wireframe = true;
 
-    //shaderMaterial.wireframe = true;
-
-    //        planeGeo.materials = [shaderMaterial];
-    //        planeGeo.faces[0].materialIndex = 0;
     me.mesh = new THREE.Mesh(planeGeo, shaderMaterial);
     me.mesh.material.side = THREE.DoubleSide;
     me.mesh.unit = me;
@@ -307,7 +301,7 @@ this.walkSoundTimer = 0.0;
 
       //this.speed = (new THREE.Vector3(targetVelX, 0, targetVelZ)).length();
 
-      var bogusVelocity = this.oldPosition.clone().subSelf(this.localPosition).divideScalar(dTime);
+      var bogusVelocity = this.oldPosition.clone().sub(this.localPosition).divideScalar(dTime);
 
       this.fakeVelocity.copy(bogusVelocity);
       this.fakeVelocity.multiplyScalar(-1);
@@ -342,7 +336,7 @@ this.walkSoundTimer = 0.0;
 
     if ( this.meleeHitTimer <= 0 && this.meleeAttackTimer <= 0 ) {
       // Reset position
-      if ( !this.renderOffset.isZero() ) {
+      if ( !(this.renderOffset.lengthSq() < 0.0001) ) {
         this.renderOffset.set(0,0,0);
       }
     }
@@ -368,7 +362,7 @@ this.walkSoundTimer = 0.0;
 
 
     if ( this.mesh ) {
-      this.mesh.LookAt(ironbane.camera.position, 0, 0, 0, true);
+      this.mesh.LookFlatAt(ironbane.camera.position, true);
 
 
 
@@ -455,7 +449,7 @@ this.walkSoundTimer = 0.0;
 
       var pointDirection = null;
       if ( this instanceof Player && currentMouseToWorldData) {
-        pointDirection = ConvertVector3(currentMouseToWorldData.point).subSelf(this.position).normalize();
+        pointDirection = ConvertVector3(currentMouseToWorldData.point).sub(this.position).normalize();
       }
 
       switch(weaponSpriteIndex) {
@@ -626,7 +620,7 @@ this.walkSoundTimer = 0.0;
 
 
       var roffset = this.renderOffset.clone().multiplyScalar(this.renderOffsetMultiplier);
-      var renderPosition = this.position.clone().addSelf(roffset);
+      var renderPosition = this.position.clone().add(roffset);
 
 
 
@@ -637,7 +631,7 @@ this.walkSoundTimer = 0.0;
 
 
 
-          //.subSelf(weaponLocation);
+          //.sub(weaponLocation);
 
       // if ( this.attackStateTimer < 0 ) this.attackStateTimer = 0;
 
@@ -650,7 +644,7 @@ this.walkSoundTimer = 0.0;
 
 
 
-      // this.weaponOrigin.position = renderPosition.lerpSelf(this.meleeHitPosition, weaponSwingDistance);
+      // this.weaponOrigin.position = renderPosition.lerp(this.meleeHitPosition, weaponSwingDistance);
 
       this.weaponOrigin.position = renderPosition;
 
@@ -664,7 +658,7 @@ this.walkSoundTimer = 0.0;
       //debug.SetWatch("targetWalkAngleZ", targetWalkAngleZ);
 
 
-      DisplayUVFrame(this.weaponMesh, 0, 0, 1, 1, false);
+      DisplayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
 
 
       //this.weaponPivot.rotation.z = Math.cos(time);
@@ -716,7 +710,7 @@ this.walkSoundTimer = 0.0;
       this.weaponMesh.scale.x = scaleX;
       this.weaponMesh.scale.y = scaleY;
 
-      this.weaponOrigin.LookAt(ironbane.camera.position, 0, 0, 0, true);
+      this.weaponOrigin.LookFlatAt(ironbane.camera.position, true);
 
     }
 
@@ -804,7 +798,7 @@ this.walkSoundTimer = 0.0;
       this.DoMeleeHitAnimation(pos, 0.5);
     }
     // else {
-    //   this.DoMeleeHitAnimation(this.position.clone().addSelf(this.heading), 0.5);
+    //   this.DoMeleeHitAnimation(this.position.clone().add(this.heading), 0.5);
     // }
 
 
@@ -875,7 +869,7 @@ this.walkSoundTimer = 0.0;
 
     this.meleeAttackTimer = meleeTime * (0.5 + (power / 2)) * 1;
 
-    var force = this.position.clone().subSelf(position).normalize().multiplyScalar(-power);
+    var force = this.position.clone().sub(position).normalize().multiplyScalar(-power);
 //    force.y  = power;
 
     this.renderOffset = force;
@@ -903,7 +897,7 @@ this.walkSoundTimer = 0.0;
 
       this.meleeHitTimer = meleeTime * (0.5 + (power / 2));
 
-      var force = this.position.clone().subSelf(attacker.position).normalize().multiplyScalar(power);
+      var force = this.position.clone().sub(attacker.position).normalize().multiplyScalar(power);
       force.y  = power;
 
       this.renderOffset = force;

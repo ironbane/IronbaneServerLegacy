@@ -54,7 +54,7 @@ var Mesh = Unit.extend({
     this.boundingBox = null;
     this.boundingSphere = null;
 
-    this.octree = new THREE.Octree();
+    this.octree = new THREE.Octree({undeferred: true});
 
 
 
@@ -180,7 +180,9 @@ var Mesh = Unit.extend({
       setTimeout(function() {
 
           if ( cell.modelMesh ) {
-            _.each(cell.modelMesh.geometry.materials, function(material) {
+            // TODO am I allowed to update them like this? Are they references?
+            // Or do I need to dig into the mesh and update the facematerial?
+            _.each(cell.totalMaterials, function(material) {
               material.needsUpdate = true;
             });
           }
@@ -189,25 +191,27 @@ var Mesh = Unit.extend({
           _.each(cell.objects, function(obj) {
 
               if ( obj.mesh ) {
-                if ( ISDEF(obj.mesh.material.needsUpdate) ) {
-                  obj.mesh.material.needsUpdate = true;
-                }
 
-                if ( ISDEF(obj.mesh.geometry.materials) ) {
-                  _.each(obj.mesh.geometry.materials, function(material) {
+                if ( obj.mesh.material instanceof THREE.MeshFaceMaterial ) {
+                  _.each(obj.mesh.material.materials, function(material) {
                     material.needsUpdate = true;
                   });
                 }
+                else {
+                  obj.mesh.material.needsUpdate = true;
+                }
+                // TODO I only updated the facematerial, is that enough?
+
               }
 
           }, cell);
 
 
-        terrainHandler.skybox.terrainMesh.material.needsUpdate = true;
 
-        _.each(terrainHandler.skybox.terrainMesh.geometry.materials, function(material) {
-          material.needsUpdate = true;
-        });
+          _.each(terrainHandler.skybox.terrainMesh.material.materials, function(material) {
+            material.needsUpdate = true;
+          });
+
 
       }, 1);
   },
@@ -245,11 +249,12 @@ var Mesh = Unit.extend({
     //this.texture = textureHandler.GetTexture( texture, true);
 
 
-    (function(unit){
-      meshHandler.Load(model, function(geometry) {
-        unit.BuildMesh( geometry );
-      }, unit.meshData['scale']);
-    })(this);
+    var me = this;
+
+    meshHandler.Load(model, function(geometry, jsonMaterials) {
+      me.BuildMesh( geometry, jsonMaterials );
+    }, true);
+
     //meshHandler.GetMesh(this.param, this);
 
 
@@ -260,23 +265,26 @@ var Mesh = Unit.extend({
 
 
   },
-  BuildMesh: function(geometry) {
+  BuildMesh: function(geometry, jsonMaterials) {
 
-    geometry = meshHandler.ProcessGeometry(geometry, this.rotation,
-        this.metadata, this.meshData, false);
+    var result = meshHandler.ProcessMesh({
+      geometry: geometry,
+      jsonMaterials: jsonMaterials,
+      rotation: this.rotation,
+      metadata: this.metadata,
+      meshData: this.meshData
+    });
 
-    this.mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+    this.mesh = new THREE.Mesh( result.geometry, new THREE.MeshFaceMaterial(result.materials) );
     this.mesh.unit = this;
-
 
     this.mesh.castShadow = true;
 
     this.mesh.geometry.dynamic = true;
 
-
     this.mesh.geometry.computeBoundingBox();
     this.boundingBox = this.mesh.geometry.boundingBox;
-    this.boundingBox.size = this.boundingBox.max.clone().subSelf(this.boundingBox.min);
+    this.boundingBox.size = this.boundingBox.max.clone().sub(this.boundingBox.min);
 
     this.mesh.geometry.computeBoundingSphere();
     this.boundingSphere = this.mesh.geometry.boundingSphere;
@@ -289,7 +297,7 @@ var Mesh = Unit.extend({
     if ( socketHandler.inGame )  {
       (function(unit){
         unit.mesh.traverse( function ( object ) {
-          unit.octree.add( object, true );
+          unit.octree.add( object, {useFaces:true} );
         } );
       })(this);
     }
@@ -322,7 +330,7 @@ var Mesh = Unit.extend({
 
 
 
-    if ( !ISDEF(this.startVertices) ) {
+    if ( _.isUndefined(this.startVertices) ) {
       this.startVertices = [];
 
       _.each(this.mesh.geometry.vertices, function(vertex) {
@@ -334,8 +342,8 @@ var Mesh = Unit.extend({
 
 
     var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.setRotationFromEuler(
-      new THREE.Vector3(
+    rotationMatrix.makeRotationFromEuler(
+      new THREE.Euler(
         (this.rotation.x).ToRadians(),
         (this.rotation.y).ToRadians(),
         (this.rotation.z).ToRadians()));
@@ -345,7 +353,7 @@ var Mesh = Unit.extend({
     }
 
     _.each(this.mesh.geometry.vertices, function(vertex) {
-      rotationMatrix.multiplyVector3(vertex);
+      vertex.applyMatrix4(rotationMatrix);
     });
 
 
@@ -357,7 +365,7 @@ var Mesh = Unit.extend({
 
     this.mesh.geometry.computeBoundingBox();
     this.boundingBox = this.mesh.geometry.boundingBox;
-    this.boundingBox.size = this.boundingBox.max.clone().subSelf(this.boundingBox.min);
+    this.boundingBox.size = this.boundingBox.max.clone().sub(this.boundingBox.min);
   },
   UpdateRotation: function() {
     if( this.mesh ) {
@@ -429,7 +437,7 @@ var Mesh = Unit.extend({
       case "Item Billboard":
 
         if ( this.mesh ) {
-            this.mesh.LookAt(ironbane.camera.position, 0, 0, 0, true);
+            this.mesh.LookAt(ironbane.camera.position, true);
         }
 
         break;
@@ -458,18 +466,6 @@ var Mesh = Unit.extend({
 
       });
     }
-
-
-
-    //        if ( ironbane.player && this.mesh ) {
-    //
-    //            for(var m in this.mesh.geometry.materials) {
-    //                //bm("test");
-    //                this.mesh.geometry.materials[m].uniforms.camPos.value = terrainHandler.GetReferenceLocationNoClone();
-    //                this.mesh.geometry.materials[m].uniforms.meshPos.value = this.position;
-    //                //this.mesh.geometry.materials[m].uniformsList[3][0].value = ironbane.player.position
-    //            }
-    //        }
 
     this._super(dTime);
 

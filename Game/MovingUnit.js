@@ -37,11 +37,11 @@ var MovingUnit = Unit.extend({
 
         var acceleration = this.steeringForce.multiplyScalar(this.mass);
 
-        this.velocity.addSelf(acceleration.multiplyScalar(dTime));
+        this.velocity.add(acceleration.multiplyScalar(dTime));
 
         this.velocity.Truncate(this.maxSpeed);
 
-        this.position.addSelf(this.velocity.clone().multiplyScalar(dTime));
+        this.position.add(this.velocity.clone().multiplyScalar(dTime));
 
         if ( this.velocity.length() > 0.2 ) {
 

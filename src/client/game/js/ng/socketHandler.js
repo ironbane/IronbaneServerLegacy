@@ -104,7 +104,7 @@ IronbaneApp
             }
 
             var particle = new Projectile(ConvertVector3(data.s), target, unit, data.w);
-            particle.velocity.addSelf(unit.fakeVelocity);
+            particle.velocity.add(unit.fakeVelocity);
 
             ironbane.unitList.push(particle);
         });

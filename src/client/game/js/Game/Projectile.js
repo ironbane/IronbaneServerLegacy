@@ -188,7 +188,7 @@ var Projectile = Unit.extend({
 
         this.particle = null;
 
-        this.size = this.owner.size;
+        this.size = 0.5 + this.owner.size * 0.5;
 
         this._super(position, 0, GetNewProjectileID(), 'Projectile', 0, this.size);
 
@@ -226,10 +226,10 @@ var Projectile = Unit.extend({
             this.bringToGroundOnSpawn = false;
         }
 
-        var launchVelocity = this.targetPosition.clone().subSelf(this.position);
+        var launchVelocity = this.targetPosition.clone().sub(this.position);
 
 
-        var height = this.targetPosition.clone().subSelf(this.position).y;
+        var height = this.targetPosition.clone().sub(this.position).y;
 
 
         launchVelocity.normalize().multiplyScalar(this.type.speed);
@@ -242,7 +242,7 @@ var Projectile = Unit.extend({
             this.heading = launchVelocity.clone().normalize();
             this.side = this.heading.clone().Perp();
             var matrix = new THREE.Matrix4().makeRotationAxis( this.side, angle );
-            matrix.multiplyVector3( launchVelocity );
+            launchVelocity.applyMatrix4( matrix );
         }
 
         this.velocity = launchVelocity;
@@ -415,8 +415,6 @@ var Projectile = Unit.extend({
 
         }
 
-        this.meshChild.scale.set(0.75 * this.owner.size, 0.75 * this.owner.size, 0.75 * this.owner.size);
-
         ironbane.scene.add(this.mesh);
 
 
@@ -435,7 +433,7 @@ var Projectile = Unit.extend({
 
 
 
-        //this.velocity = this.targetPosition.clone().subSelf(this.position).normalize().multiplyScalar(this.type.speed);
+        //this.velocity = this.targetPosition.clone().sub(this.position).normalize().multiplyScalar(this.type.speed);
         //this.steeringForce = this.steeringBehaviour.Seek(this.targetPosition);
 
 
@@ -478,7 +476,7 @@ var Projectile = Unit.extend({
 
         if ( this.owner == ironbane.player ) {
             if ( !this.damageDone ) {
-                if ( !this.velocity.isZero() ) {
+                if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
                     (function(unit){
                     var list = [];
@@ -498,7 +496,7 @@ var Projectile = Unit.extend({
                     if ( list.length > 0 ) {
                         socketHandler.socket.emit('hit', {w:unit.weapon.id,l:list}, function (reply) {
 
-                            if ( ISDEF(reply.errmsg) ) {
+                            if ( !_.isUndefined(reply.errmsg) ) {
                                 hudHandler.MessageAlert(reply.errmsg);
                                 return;
                             }
@@ -525,7 +523,7 @@ var Projectile = Unit.extend({
         }
         else if ( this.owner.id < 0 ) {
             if ( !this.damageDone ) {
-                if ( !this.velocity.isZero() ) {
+                if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
                     (function(unit){
                     var list = [];
@@ -537,7 +535,7 @@ var Projectile = Unit.extend({
                     if ( list.length > 0 ) {
                         socketHandler.socket.emit('ghit', {w:unit.weapon.id,o:unit.owner.id}, function (reply) {
 
-                            if ( ISDEF(reply.errmsg) ) {
+                            if ( !_.isUndefined(reply.errmsg) ) {
                                 hudHandler.MessageAlert(reply.errmsg);
                                 return;
                             }
@@ -560,7 +558,7 @@ var Projectile = Unit.extend({
         }
         else if ( this.owner.id > 0 ) {
             if ( !this.damageDone ) {
-                if ( !this.velocity.isZero() ) {
+                if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
                     (function(unit){
                     var list = [];
@@ -619,12 +617,11 @@ var Projectile = Unit.extend({
             if ( this.type.meshType ) {
 
               //if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
-                this.mesh.LookAt(this.position.clone().addSelf(this.heading), 0, 0, 0);
+                this.mesh.LookFlatAt(this.position.clone().add(this.heading));
               //}
 
                 if ( !this.impactDone ) {
-                  //this.changedRotation.addSelf(this.type.rotationSpeed);
-                  this.meshChild.rotation.addSelf(this.type.rotationSpeed);
+                  this.type.rotationSpeed.applyQuaternion(this.meshChild.rotation);
                 }
             }
         }
@@ -646,7 +643,7 @@ var Projectile = Unit.extend({
             this.lifeTime = 0;
         }
 
-        if ( ISDEF(this.type.impactParticle) ) {
+        if ( !_.isUndefined(this.type.impactParticle) ) {
             if ( !(this.type.impactParticleOnUnitsOnly && hasHitTerrain) ) {
                 particleHandler.Add(this.type.impactParticle, {
                     position:this.position.clone()
@@ -654,7 +651,7 @@ var Projectile = Unit.extend({
             }
         }
 
-        if ( ISDEF(this.type.impactSound) && !this.damageDone ) {
+        if ( !_.isUndefined(this.type.impactSound) && !this.damageDone ) {
             soundHandler.Play(CheckForFunctionReturnValue(this.type.impactSound), this.position);
         }
 
@@ -670,7 +667,7 @@ var Projectile = Unit.extend({
 
         targetTransform.y = myTransform.y = 0;
 
-        var x = targetTransform.subSelf(myTransform).length();
+        var x = targetTransform.sub(myTransform).length();
 
 
 

@@ -140,7 +140,7 @@ var ConsoleHandler = Class.extend({
       for(var z in worldHandler.world) {
         for(var cx in worldHandler.world[z]) {
           for(var cz in worldHandler.world[z][cx]) {
-            if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
 
               var units = worldHandler.world[z][cx][cz].units;
 
@@ -151,7 +151,7 @@ var ConsoleHandler = Class.extend({
                   console.log(units[u].items);
                 }
                 else {
-                  if ( ISDEF(units[u].loot) ) {
+                  if ( !_.isUndefined(units[u].loot) ) {
                     log("Loot of "+units[u].template.name+":");
                     console.log(units[u].loot);
                   }
@@ -261,7 +261,7 @@ var ConsoleHandler = Class.extend({
         for(var cx in worldHandler.world[z]) {
           for(var cz in worldHandler.world[z][cx]) {
             cellsLoaded++;
-            if ( ISDEF(worldHandler.world[z][cx][cz].units) ) {
+            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
 
               var units = worldHandler.world[z][cx][cz].units;
 

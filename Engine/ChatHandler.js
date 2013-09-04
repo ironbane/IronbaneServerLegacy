@@ -106,7 +106,7 @@ var commands = {
               }
 
               if ( item ) {
-                if ( !ISDEF(dataHandler.items[item]) ) {
+                if ( _.isUndefined(dataHandler.items[item]) ) {
                     errors += "Warning: item "+item+" not found for loot in NPC "+unit.id+"!<br>";
                 }
               }
