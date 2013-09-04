@@ -17,11 +17,8 @@ angular.module('IronbaneApp')
                     user: $scope.$root.currentUser.id // temp for now
                 });
                 if($scope.topic === undefined ){
-
                     post.title = $scope.post.title;
                 }
-
-
                     post.$save({boardId: $scope.board, topicId: $scope.topic})
                         .then(function(result) {
                             // inject the post somewhere for auto rendering

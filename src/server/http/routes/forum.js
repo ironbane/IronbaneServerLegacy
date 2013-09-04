@@ -61,7 +61,7 @@ module.exports = function(app, db) {
 
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {        
-            Board.getView(req.params.boardId).then(function(results) {  
+            Board.get(req.params.boardId).then(function(results) {  
                 log('getting board: ' + req.params.boardId);          
                res.send(results);            
             }, function(error){
@@ -95,7 +95,8 @@ module.exports = function(app, db) {
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
-        var post = { boardId:req.params.boardId, 
+        var post = { 
+            boardId:req.params.boardId, 
             time:req.body.time, 
             title:req.body.title, 
             content:req.body.content,

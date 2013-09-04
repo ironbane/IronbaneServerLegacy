@@ -29,7 +29,6 @@ angular.module('IronbaneApp')
         return $http.get('/api/forum/' + boardId, {cache: true})
             .then(function(response) {
                 return response.data;
-
             }, function(err) {
                 $log.error('Error getting board from server', err);
                 return $q.reject(err);
@@ -39,12 +38,10 @@ angular.module('IronbaneApp')
 
     Board.getAll = function() {
         return $http.get('/api/forum').then(function(response) {
-            var boards = response.data;
-            $log.log(response);
-            boards.forEach(function(board, i) {
-                boards[i] = new Board(board);
+            var boards = []
+            angular.forEach(response.data, function(board) {
+                boards.push(new Board(board));
             });
-
             return boards;
         }, function(err) {
             $log.error('Error getting boards from server', err);
