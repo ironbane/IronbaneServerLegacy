@@ -254,21 +254,12 @@ module.exports = function(grunt) {
             },
             assets: {
                 files: '<%= cfg.get("assetDir") %>**/*',
-                tasks: ['default', 'beep']
+                tasks: ['assets', 'beep']
             }
         },
         // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
-            options: {
-                /** @optional  - if true the files are converted to binary JSON */
-                minify: false
-            },
-            dist: {
-                /** @required  - string (or array of) including grunt glob variables */
-                src: ['<%= cfg.get("buildTarget") %>game/**/*.obj']
-                /** @optional  - if provided the converted files will be saved in this folder instead */
-                //dest: './assets/'
-            }
+             src: ['<%= cfg.get("assetDir") %>**/*.obj']
         },
         // db script mgmt
         dbupgrade: {
@@ -311,6 +302,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-download');
 
     // Default task(s).
+    grunt.registerTask('assets', ['three_obj', 'copy:game']);
     grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj','docular']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
