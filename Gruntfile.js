@@ -298,7 +298,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-beep');
     grunt.loadNpmTasks('grunt-replace');
-    grunt.loadNpmTasks('grunt-three-obj');
     grunt.loadNpmTasks('grunt-download');
 
     // Default task(s).
