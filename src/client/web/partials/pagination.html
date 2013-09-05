@@ -1,5 +1,10 @@
-<div class="pagination"><ul>
-  <li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>
-  <li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>
-  </ul>
+<div class="pagination">
+    <ul class="horizontal-list">
+        <li ng-class="{disabled: noPrevious()}">
+            <a class="ibutton_attention" ng-click="selectPrevious()">Previous</a>
+        </li>
+        <li ng-class="{disabled: noNext()}">
+            <a class="ibutton_attention" ng-click="selectNext()">Next</a>
+        </li>
+    </ul>
 </div>
