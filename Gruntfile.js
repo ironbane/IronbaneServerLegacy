@@ -53,6 +53,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/timer.js",
                     "<%= gameScriptPath %>/ng/loadingBar.js",
                     "<%= gameScriptPath %>/ng/socket.js",
+                    "<%= gameScriptPath %>/ng/charSelect.js",
 
                     // Shared between client and server
                     "Shared/Util.js",

@@ -1,0 +1,28 @@
+<div id="charSelect" class="dialog">
+    <div>
+        <div>{{ currentUser.name }}</div>
+        <button>Log out</button>
+    </div>
+
+    <div>
+        <button ng-click="prev()">←</button>
+        <span>{{ selectedChar.name }}</span>
+        <button ng-click="next()">→</button>
+    </div>
+
+    <div>
+        <div ng-show="selectedChar.name !== 'Create Character'">
+            <div class="preview">
+                <img ng-src="{{ selectedChar.getTexture() }}" />
+            </div>
+            <button ng-click="deleteChar()"></button>
+        </div>
+        <div ng-show="selectedChar.name === 'Create Character'">
+            <span>{{ remainingSlots }} slots remaining</span>
+        </div>
+    </div>
+
+    <div>
+        <button ng-click="enterGame()">Enter Ironbane</button>
+    </div>
+</div>
