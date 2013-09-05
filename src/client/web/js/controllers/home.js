@@ -12,7 +12,7 @@ angular.module('IronbaneApp')
             };
 
             // todo: config boardId and/or config via server
-            Topic.getTopics(7).then(function(results) {
+            Topic.getTopics("news").then(function(results) {
                 $scope.posts = results;
             }, function(err) {
                 $log.error('error getting news topics', err);

@@ -71,7 +71,7 @@ module.exports = function(app, db) {
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
-        if(parseInt(req.params.boardId, 10) === 7) {
+        if(req.params.boardId === "news") {
             db.query('SELECT topic.id, topic.title, post.content, users.name as username FROM forum_topics AS topic INNER JOIN forum_posts AS post ON post.`topic_id` = topic.`id` INNER JOIN bcs_users AS users ON users.id = post.user WHERE topic.board_id = 7 AND post.time = (SELECT MIN(forum_posts.time) FROM forum_posts WHERE forum_posts.`topic_id` = topic.id ) ORDER BY post.time DESC', function(err, results) {
                 if(err) {
                     log('SQL error getting news: ' + err);
