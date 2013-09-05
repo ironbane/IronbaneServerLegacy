@@ -50,6 +50,8 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/chat.js",
                     "<%= gameScriptPath %>/ng/game.js",
                     "<%= gameScriptPath %>/ng/news.js",
+                    "<%= gameScriptPath %>/ng/timer.js",
+                    "<%= gameScriptPath %>/ng/loadingBar.js",
                     "<%= gameScriptPath %>/ng/socket.js",
 
                     // Shared between client and server
@@ -302,7 +304,7 @@ module.exports = function(grunt) {
 
     // Default task(s).
     grunt.registerTask('assets', ['three_obj', 'copy:game']);
-    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj','docular']);
+    grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game', 'three_obj']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
 
     // when ready do both
