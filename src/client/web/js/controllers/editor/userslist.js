@@ -13,7 +13,9 @@ angular.module('IronbaneApp')
 
             $scope.noOfPages = Math.ceil(_data.length / numPerPage);
 
-              $scope.$watch( 'currentPage', utilities.paginator($scope.allData, $scope.currentPage, numPerPage) );
+              $scope.$watch( 'currentPage', function(){
+                $scope.data = utilities.paginator($scope.allData, $scope.currentPage, numPerPage) ;
+          });
 		    
             
         });
