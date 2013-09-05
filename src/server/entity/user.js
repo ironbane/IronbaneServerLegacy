@@ -195,6 +195,19 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
+    User.getAll = function(){
+        var deferred = Q.defer();
+        db.query('select id, name from bcs_users', function(err, results){
+            if(err){
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(results);
+
+        });
+        return deferred.promise;
+    }
+
     // used for the login process
     User.authenticate = function(username, password) {
         var deferred = Q.defer(),

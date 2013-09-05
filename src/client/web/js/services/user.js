@@ -3,7 +3,6 @@ angular.module('IronbaneApp')
 .factory('User', ['DEFAULT_AVATAR', '$http', '$log', '$q', '$rootScope', function(DEFAULT_AVATAR, $http, $log, $q, $rootScope) {
     var User = function(json) {
         angular.copy(json || {}, this);
-        $log.log(this);
         
     };
 
@@ -39,6 +38,19 @@ angular.module('IronbaneApp')
                 $log.error('error retreiving user', err);
 
                 return $q.reject('error retreiving user', err);
+            });
+    };
+
+    User.getAll = function(){
+        return $http.get('/api/users')
+            .then(function(response) {
+                var users = [];
+                angular.forEach(response.data, function(user){
+                    users.push(new User(user));
+                });
+                return users;
+            }, function(error) {
+                return $q.reject('error retrieving all users', err);
             });
     };
 

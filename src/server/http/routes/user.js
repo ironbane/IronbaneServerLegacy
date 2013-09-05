@@ -133,4 +133,12 @@ module.exports = function(app, db) {
                 res.send(500, err);
             });
     });
+
+    app.get('/api/users', function(req, res){
+        User.getAll().then(function(users){
+            res.send(users);
+        }, function(error){
+            res.send(error, 500);
+        })
+    })
 };

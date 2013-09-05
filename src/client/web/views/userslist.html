@@ -1,0 +1,10 @@
+<a ng-href="/editor">Back to editor menu</a>
+<table>
+		<th>id</th>
+		<th>name</th>
+		<tr ng-repeat="user in data | filter:search" >
+		<td><a ng-href="/editor/users/{{user.id}}">{{user.id}}</td>
+		<td><a ng-href="/editor/users/{{user.id}}">{{user.name}}</td>
+</tr>
+</table>
+    <pagination num-pages="noOfPages" current-page="currentPage" class="pagination-small"></pagination>

@@ -21,7 +21,6 @@ angular.module('IronbaneApp')
                 });
                 // push the last cat, meow!
                 cats.push(cat);
-                console.log(cats);
                 return cats;
             });
     };
@@ -29,8 +28,6 @@ angular.module('IronbaneApp')
     Forum.getStatistics = function() {
         return $http.get('/api/statistics')
         .then(function(response){
-            $log.log("returned from server");
-            $log.log(response);
             return response.data;
         }, function(err){
             $log.error('Error getting statistics from the server', err);
