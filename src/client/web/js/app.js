@@ -24,6 +24,10 @@ angular.module('IronbaneApp', ['ui.utils'])
             templateUrl: '/views/login',
             controller: 'LoginCtrl'
         })
+        .when('/profile', {
+            templateUrl: '/views/myProfile',
+            controller: 'MyProfileCtrl'
+        })
         .when('/article/:articleId', {
             templateUrl: '/views/article',
             controller: 'ArticleCtrl',
@@ -58,7 +62,6 @@ angular.module('IronbaneApp', ['ui.utils'])
 
                     $q.all([Board.get(boardId), Topic.getTopics(boardId)])
                         .then(function(results) {
-                            console.log(results);
                             deferred.resolve({board: results[0], topics: results[1]});
                         }, function(err) {
                             deferred.reject(err);
@@ -191,7 +194,7 @@ angular.module('IronbaneApp', ['ui.utils'])
         })
         .when('/editor/users', {
             templateUrl: '/views/userslist',
-            controller: 'userslist'
+            controller: 'UsersList'
         })
         .when('/editor/users/:id', {
             templateUrl: '/views/useredit',
