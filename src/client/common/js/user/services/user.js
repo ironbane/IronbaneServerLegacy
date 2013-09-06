@@ -1,5 +1,5 @@
 // user.js - for now mostly duplicated from the website
-angular.module('User', []) // separate module for later sharing with web
+angular.module('User') // separate module for sharing with website
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .factory('User', ['DEFAULT_AVATAR', '$http', '$log', '$q', '$rootScope', function(DEFAULT_AVATAR, $http, $log, $q, $rootScope) {
     var User = function(json) {

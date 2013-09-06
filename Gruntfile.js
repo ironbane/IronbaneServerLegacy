@@ -44,8 +44,16 @@ module.exports = function(grunt) {
             game: {
                 src: [ // order matters!
                     "src/client/game/shared.js",
-                    "<%= gameScriptPath %>/ng/user.js", // required module for app (move to common)
-                    "<%= gameScriptPath %>/ng/friends.js", // required module for app (move to common)
+
+                    // common modules must be loaded before app.js as they are dependencies
+                    "src/client/common/js/user/module.js",
+                    "src/client/common/js/user/services/user.js",
+                    "src/client/common/js/friendship/module.js",
+                    "src/client/common/js/friendship/services/friend.js",
+                    "src/client/common/js/friendship/directives/friendsDialog.js",
+                    "src/client/common/js/general/module.js",
+                    "src/client/common/js/general/directives/passwordField.js",
+
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     //"<%= gameScriptPath %>/ng/states.js", // do not load this yet
                     "<%= gameScriptPath %>/ng/services/game.js",
