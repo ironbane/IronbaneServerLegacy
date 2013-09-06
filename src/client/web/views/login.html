@@ -1,7 +1,7 @@
 <div class="loginPage">
     <h1>Log in</h1>
     <form class='loginForm' name="LoginForm">
-        <div class="error" ng-show="loginError">Invalid username and/or password!</div>
+        <div class="error" ng-show="loginError">{{ loginErrorMsg }}</div>
         <input type="text" name="username" ng-model="username" placeholder="username" />
         <br>
         <password-field name="password" toggle="togglePW" ng-model="password" placeholder="password"></password-field>

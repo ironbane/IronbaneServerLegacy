@@ -1,6 +1,7 @@
 angular.module('IronbaneApp')
 .controller('LoginCtrl', ['$scope', 'User', '$log', '$location', function($scope, User, $log, $location) {
     $scope.loginError = false;
+    $scope.loginErrorMsg = 'oh noes! somethings went wrong!';
 
     $scope.login = function() {
         // clear for each attempt
@@ -14,6 +15,7 @@ angular.module('IronbaneApp')
                 $log.warn('login error!', err);
                 // greater detail?
                 $scope.loginError = true;
+                $scope.loginErrorMsg = err.data;
             });
     };
 }]);
