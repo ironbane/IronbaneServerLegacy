@@ -3,7 +3,7 @@ angular.module('IronbaneApp')
 	return {
     restrict: "E", 
 		scope: {
-			user: "@"
+			user: "="
 
 		},
 		template:

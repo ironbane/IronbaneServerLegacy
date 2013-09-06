@@ -22,7 +22,12 @@
                         </a>
                         <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
                     </header>
-                    <article class="postcontent" ng-bind-html-unsafe="post.content"></article>
+                    <forumuserprofile user="post.user"/>
+                    <article class="postcontent" ng-bind-html-unsafe="post.content">
+                        
+                     <span class="signature">{{post.user.sig}}</span>
+                     </article>
+                     <br class="clear">
                 </li>
             </ul>
         </section>

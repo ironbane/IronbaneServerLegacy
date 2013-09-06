@@ -111,7 +111,7 @@ module.exports = function(app, db) {
 
     // get all posts for topic
     app.get('/api/forum/topics/:topicId/posts', function(req, res) {
-        Topic.getPosts(req.params.topicId).then(function(results){
+        Topic.getPostsView(req.params.topicId).then(function(results){
             res.send(results);
         }, function(error){
             res.send(error);

@@ -64,9 +64,9 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    Topic.getPosts = function(topicId) {
+    Topic.getPostsView = function(topicId) {
         var deferred = Q.defer();
-        db.query('select * from forum_posts where topic_id = ?', [topicId], function(err, results) {
+        db.query('SELECT fp.content, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ?', [topicId], function(err, results) {
             if (err) {
                 deferred.reject(err);
                 return;
@@ -81,6 +81,7 @@ module.exports = function(db) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
                 });
+                p.user = {name: p.name, avatar : p.forum_avatar, sig:p.forum_sig};
                 posts.push(new Post(p));
             });
 
