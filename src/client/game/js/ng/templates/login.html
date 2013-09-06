@@ -1,14 +1,12 @@
 <div class="dialog">
-    <form name="loginForm">
-        <label for="username">Username</label>
-        <div class="spacersmall"></div>
-        <input type="text" id="username" name="username" ng-model="creds.username" class="iinput" style="width:305px">
-        <div class="spacersmall"></div>
-        <label for="password">Password</label>
-        <div class="spacersmall"></div>
-        <input type="password" id="password" name="password" ng-model="creds.password" class="iinput" style="width:305px">
-        <div class="spacersmall"></div>
-        <button ng-click="login()" class="ibutton_attention" style="width:150px">Log in</button>
-        <button ng-click="cancel()" class="ibutton" style="width:150px">Back</button>
+    <form class='loginForm' name="LoginForm">
+        <div class="error" ng-show="loginError">{{ loginErrorMsg }}</div>
+        <input type="text" name="username" ng-model="username" placeholder="username" />
+        <br>
+        <password-field name="password" toggle="togglePW" ng-model="password" placeholder="password"></password-field>
+        <div class="passwordToggle"><input type="checkbox" checkbox-custom id="hidePassToggle" name="hidePassToggle" ng-model="togglePW" label="hide password" /></div>
+        <br>
+        <button ng-click="login()">Sign In</button>
+        <button ng-click="cancel()">Back</button>
     </form>
 </div>

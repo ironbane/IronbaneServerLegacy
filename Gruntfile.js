@@ -214,9 +214,9 @@ module.exports = function(grunt) {
                     cwd: 'src/client/web',
                     expand: true
                 }, {
-                    src: 'font/**/*',
+                    src: 'fonts/**/*',
                     dest: '<%= cfg.get("buildTarget") %>web/',
-                    cwd: 'src/client/web',
+                    cwd: 'src/client/common',
                     expand: true
                 }, { // TODO: setup lib to copy only certain files?
                     src: 'lib/**/*',
@@ -231,6 +231,11 @@ module.exports = function(grunt) {
                     src: 'media/**/*',
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     cwd: 'src/client/game',
+                    expand: true
+                }, {
+                    src: 'fonts/**/*',
+                    dest: '<%= cfg.get("buildTarget") %>game/',
+                    cwd: 'src/client/common',
                     expand: true
                 }, {
                     src: 'src/client/game/js/ng/templates/*',

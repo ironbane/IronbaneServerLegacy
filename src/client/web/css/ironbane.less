@@ -1,20 +1,7 @@
 // ironbane.less
-// some portions of this less taken from Twitter Bootstrap
 
-// Core variables and mixins
-@import "variables.less"; // Modify this for custom colors, font-sizes, etc
-@import "mixins.less";
-
-// CSS Reset
-@import "reset.less";
-
-// fonts
-@import "font-awesome/font-awesome";
-@import "PressStart2P/PressStart2P";
-
-// core
-@import "scaffolding.less";
-@import "forms.less";
+// load all the base styles (shared between web and game)
+@import "../../common/css/import.less";
 
 @pageBackground: #051d1c;
 
@@ -207,7 +194,7 @@ forumuserprofile {
     float:left;
     width: 200px;
     height: 250px;
-    border-right: 3px dotted #000; 
+    border-right: 3px dotted #000;
 }
 
 .postcontent {

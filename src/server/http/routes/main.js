@@ -14,13 +14,14 @@ module.exports = function(app, db) {
     app.use('/game/plugins', express.static(gamePath + 'plugins'));
 
     app.use('/game/css', express.static(gamePath + 'css'));
+    app.use('/game/fonts', express.static(gamePath + 'fonts'));
     app.use('/game/flash', express.static(gamePath + 'flash'));
     app.use('/game/media', express.static(gamePath + 'media'));
     app.use('/game/js', express.static(gamePath + 'js'));
     app.use('/game/lib', express.static(gamePath + 'lib'));
 
     app.use('/css', express.static(webPath + 'css'));
-    app.use('/font', express.static(webPath + 'font'));
+    app.use('/fonts', express.static(webPath + 'fonts'));
     app.use('/images', express.static(webPath + 'images'));
     app.use('/js', express.static(webPath + 'js'));
     app.use('/lib', express.static(webPath + 'lib'));
