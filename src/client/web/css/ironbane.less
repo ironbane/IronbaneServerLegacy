@@ -23,6 +23,9 @@
 @baseFontColor:                 @primary1;
 @baseFontLineHeight:            1.231;
 
+@inputDisabledFontColor:        #ececec;
+@errorTextColor:                #FF0000;
+
 html {height: 100%;}
 body {
     background-image: url(../images/bg.png);
@@ -30,6 +33,10 @@ body {
 }
 
 .clear {clear: both;}
+
+.OffScreen {
+    position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
+}
 
 header.logo {
     height:192px;
@@ -273,27 +280,41 @@ footer .sock {
     }
 }
 
-.loginForm {
-    input,
-    textarea { .placeholder(darken(@textColor, 10%)); }
+.customCheckbox {display: inline-block; vertical-align: baseline; font-size: 14px;
+    .customCheckboxInput {width: 16px; height: 16px;display: inline-block; text-align: left; margin: 0 5px 0 0;}
+    .customCheckboxInput,
+    .customCheckboxLabel {cursor: pointer; display: inline-block; vertical-align: baseline;margin-left: 4px;}
+    &.disabled {cursor: default; color: @inputDisabledFontColor !important;}
+}
 
-    input[type=text],
-    button {
-        color: @textColor;
-        border-color: @primary4;
-        background-color: @primary3;
-        font-weight: bold;
-        font-size: 20px;
-        padding: 10px;
-        height: 30px;
-        text-indent: 2px;
-        margin: 8px;
-    }
+.error {color: @errorTextColor;}
 
-    button {
-        font-weight: bold;
-        font-size: 16px;
-        padding: 5px;
+.loginPage {
+    padding: 16px;
+    text-align: center;
+    .loginForm {
+        input,
+        textarea { .placeholder(darken(@textColor, 10%)); }
+
+        input[type=text],
+        input[type=password],
+        button {
+            color: @textColor;
+            border-color: @primary4;
+            background-color: @primary3;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 10px;
+            height: 30px;
+            text-indent: 2px;
+            margin: 8px;
+        }
+
+        button {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px;
+        }
     }
 }
 

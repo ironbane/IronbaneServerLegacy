@@ -1,10 +1,11 @@
-<div>
-    <h1>Login Form</h1>
+<div class="loginPage">
+    <h1>Log in</h1>
     <form class='loginForm' name="LoginForm">
-        <div class="error" ng-show="loginError">* - Invalid username and/or password!</div>
+        <div class="error" ng-show="loginError">Invalid username and/or password!</div>
         <input type="text" name="username" ng-model="username" placeholder="username" />
         <br>
-        <input type="text" name="password" ng-model="password" placeholder="password" />
+        <password-field name="password" toggle="togglePW" ng-model="password" placeholder="password"></password-field>
+        <div class="passwordToggle"><input type="checkbox" checkbox-custom id="hidePassToggle" name="hidePassToggle" ng-model="togglePW" label="hide password" /></div>
         <br>
         <button ng-click="login()">Sign In</button>
     </form>

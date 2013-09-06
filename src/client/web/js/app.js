@@ -1,5 +1,5 @@
 // app.js
-angular.module('IronbaneApp', ['ui.utils'])
+angular.module('IronbaneApp', ['ui.utils', 'IBCommon'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User', '$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
@@ -119,7 +119,7 @@ angular.module('IronbaneApp', ['ui.utils'])
         .when('/editor/item_template', {
             templateUrl: '/views/item_template_list',
             controller: 'ItemTemplateList'
-            
+
         })
         .when('/editor/item_template/:id', {
             templateUrl: '/views/item_template_editor',
@@ -142,12 +142,12 @@ angular.module('IronbaneApp', ['ui.utils'])
                         return deferred.promise;
                 }]
             }
-            
+
         })
         .when('/editor/unit_template', {
             templateUrl: '/views/unit_template_list',
             controller: 'UnitTemplateList'
-            
+
         })
         .when('/editor/unit_template/:id', {
             templateUrl: '/views/unit_template_editor',
@@ -164,7 +164,7 @@ angular.module('IronbaneApp', ['ui.utils'])
                         return deferred.promise;
                 }]
             }
-            
+
         })
         .when('/editor/article', {
             templateUrl: '/views/articlelist',

@@ -36,6 +36,11 @@ module.exports = function(grunt) {
         concat: {
             web: {
                 src: [
+                    // common modules must be loaded before app.js as they are dependencies
+                    "src/client/common/js/general/module.js",
+                    "src/client/common/js/general/directives/passwordField.js",
+                    "src/client/common/js/general/directives/checkboxCustom.js",
+
                     '<%= webScriptPath %>/app.js',
                     '<%= webScriptPath %>/**/*.js'
                 ],
@@ -53,6 +58,7 @@ module.exports = function(grunt) {
                     "src/client/common/js/friendship/directives/friendsDialog.js",
                     "src/client/common/js/general/module.js",
                     "src/client/common/js/general/directives/passwordField.js",
+                    "src/client/common/js/general/directives/checkboxCustom.js",
 
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     //"<%= gameScriptPath %>/ng/states.js", // do not load this yet

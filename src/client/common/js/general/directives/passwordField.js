@@ -35,6 +35,10 @@ angular.module('IBCommon')
                     if (tAttrs.ngClass) {
                         $(input).attr('ng-class', tAttrs.ngClass);
                     }
+                    // pass placeholder along
+                    if(tAttrs.placeholder) {
+                        $(input).attr('placeholder', tAttrs.placeholder);
+                    }
                 });
 
                 return function passwordFieldPostLink(scope, el, attr, ctrl) {
@@ -92,9 +96,9 @@ angular.module('IBCommon')
                     scope.$watch(attr.toggle, function(val) {
                         if (val === true) {
                             textInput.css('display', 'none');
-                            pwInput.css('display', 'block');
+                            pwInput.css('display', 'inline');
                         } else {
-                            textInput.css('display', 'block');
+                            textInput.css('display', 'inline');
                             pwInput.css('display', 'none');
                         }
                     });
