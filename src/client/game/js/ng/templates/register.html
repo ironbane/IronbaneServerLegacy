@@ -1,0 +1,18 @@
+<div class="dialog">
+    <form name="registrationForm">
+        <label for="username">Username</label>
+        <div class="spacersmall"></div>
+        <input type="text" id="username" name="username" ng-model="reg.username" class="iinput" style="width:305px">
+        <div class="spacersmall"></div>
+        <label for="password">Password</label>
+        <div class="spacersmall"></div>
+        <input type="password" id="password" name="password" ng-model="reg.password" class="iinput" style="width:305px">
+        <div class="spacersmall"></div>
+        <label for="email">E-mail</label>
+        <div class="spacersmall"></div>
+        <input type="text" id="email" name="email" ng-model="reg.email" class="iinput" style="width:305px">
+        <div class="spacersmall"></div>
+        <button ng-click="register()" class="ibutton_attention" style="width:150px">Register</button>
+        <button ng-click="cancel()" class="ibutton" style="width:150px">Back</button>
+    </form>
+</div>

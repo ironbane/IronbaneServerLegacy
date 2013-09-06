@@ -47,13 +47,18 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/user.js", // required module for app (move to common)
                     "<%= gameScriptPath %>/ng/friends.js", // required module for app (move to common)
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
-                    "<%= gameScriptPath %>/ng/chat.js",
-                    "<%= gameScriptPath %>/ng/game.js",
-                    "<%= gameScriptPath %>/ng/news.js",
-                    "<%= gameScriptPath %>/ng/timer.js",
-                    "<%= gameScriptPath %>/ng/loadingBar.js",
-                    "<%= gameScriptPath %>/ng/socket.js",
-                    "<%= gameScriptPath %>/ng/charSelect.js",
+                    //"<%= gameScriptPath %>/ng/states.js", // do not load this yet
+                    "<%= gameScriptPath %>/ng/services/game.js",
+                    "<%= gameScriptPath %>/ng/services/socket.js",
+                    "<%= gameScriptPath %>/ng/services/character.js",
+                    "<%= gameScriptPath %>/ng/services/timer.js",
+                    "<%= gameScriptPath %>/ng/services/news.js",
+                    "<%= gameScriptPath %>/ng/controllers/charSelect.js",
+                    "<%= gameScriptPath %>/ng/directives/chat.js",
+                    "<%= gameScriptPath %>/ng/directives/newsPane.js",
+                    "<%= gameScriptPath %>/ng/directives/loadingBar.js",
+                    "<%= gameScriptPath %>/ng/filters/timeSince.js",
+                    "<%= gameScriptPath %>/ng/filters/mouthwash.js",
 
                     // Shared between client and server
                     "Shared/Util.js",

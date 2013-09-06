@@ -1,0 +1,14 @@
+<div class="dialog">
+    <form name="loginForm">
+        <label for="username">Username</label>
+        <div class="spacersmall"></div>
+        <input type="text" id="username" name="username" ng-model="creds.username" class="iinput" style="width:305px">
+        <div class="spacersmall"></div>
+        <label for="password">Password</label>
+        <div class="spacersmall"></div>
+        <input type="password" id="password" name="password" ng-model="creds.password" class="iinput" style="width:305px">
+        <div class="spacersmall"></div>
+        <button ng-click="login()" class="ibutton_attention" style="width:150px">Log in</button>
+        <button ng-click="cancel()" class="ibutton" style="width:150px">Back</button>
+    </form>
+</div>
