@@ -1,0 +1,10 @@
+<div class="dialog alert-box">
+    <div class="alert-image">
+        <img src="/game/media/images/hud/attention.png" />
+    </div>
+    <div class="alert-message" ng-bind-html-unsafe="alert.message"></div>
+    <div class="alert-buttons" ng-if="alert.ok || alert.cancel">
+        <button ng-show="alert.ok" ng-click="alert.ok.handler()">{{ alert.ok.text }}</button>
+        <button ng-show="alert.cancel" ng-click="alert.cancel.handler()">{{ alert.cancel.text }}</button>
+    </div>
+</div>
