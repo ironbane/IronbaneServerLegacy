@@ -71,5 +71,18 @@ angular.module('User') // separate module for sharing with website
 
     };
 
+    User.register = function(username, password, email) {
+        return $http.post('/api/user', {
+            Ux466hj8: username,
+            Ed2h18Ks: password,
+            s8HO5oYe: email,
+            url: 'shibby'
+        }).then(function(response) {
+            return new User(response.data);
+        }, function(response) {
+            return $q.reject(response.data);
+        });
+    };
+
     return User;
 }]);

@@ -1,14 +1,17 @@
 <div id="mainMenu">
-    <div id="logo"></div>
-    <div id="versionNumber">
-        <div class="bigoutline">{{ gameVersion }}</div>
-    </div>
-
-    <div class="spacer"></div>
+    <header class="logo">
+        <div id="logo"></div>
+        <div id="versionNumber">
+            <div class="bigoutline">{{ gameVersion }}</div>
+        </div>
+    </header>
 
     <div class="menuContainer">
-        <ui-view></ui-view>
-
-        <news-pane id="devNews" class="dialog"></news-pane>
+        <div class="menu-left">
+            <ui-view></ui-view>
+        </div>
+        <div class="menu-right">
+            <news-pane id="devNews" class="dialog"></news-pane>
+        </div>
     </div>
 </div>

@@ -13,17 +13,20 @@ IronbaneApp
                     templateUrl: '/game/templates/mainMenu.html',
                     controller: ['$scope', '$state', '$log',
                         function($scope, $state, $log) {
+                            $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
                             // if not logged in goto mainMenu.login
                             // if logged in goto charselect
                             $state.go('mainMenu.unauthenticated');
-                        }
-                    ]
+                    }]
                 })
                 .state('mainMenu.unauthenticated', {
                     templateUrl: '/game/templates/login1.html',
-                    controller: ['$scope', '$state', '$log', function($scope, $state, $log) {
+                    controller: ['$scope', '$state', '$log', 'AlertService', function($scope, $state, $log, alert) {
                         $scope.guestPlay = function() {
-
+                            $log.log('play clicked');
+                            alert.show('testing', {ok: {text: 'Ok', handler: function() {
+                                $log.log('alert OK clicked');
+                            }}});
                         };
 
                         $scope.login = function() {
@@ -51,14 +54,21 @@ IronbaneApp
                 })
                 .state('mainMenu.register', {
                     templateUrl: '/game/templates/register.html',
-                    controller: ['$scope', '$state', '$log', function($scope, $state, $log) {
+                    controller: ['$scope', '$state', '$log', 'User', function($scope, $state, $log, User) {
                         $scope.cancel = function() {
                             $state.go('mainMenu.unauthenticated');
                         };
 
                         $scope.register = function() {
                             // do the reg stuff... then on to char select
-                            $state.go('mainMenu.charSelect');
+                            $log.log('reg data', $scope.reg);
+                            User.register($scope.reg.username, $scope.reg.password, $scope.reg.email)
+                                .then(function(user) {
+                                    // set current user in rootscope? we should also be signed in now...
+                                    $state.go('mainMenu.charSelect');
+                                }, function(err) {
+                                    $scope.registrationError = err;
+                                });
                         };
                     }]
                 })
@@ -108,7 +118,8 @@ IronbaneApp
                     }
                 })
                 .state('playing', {
-                    template: '<p>playing the game!</p>'
+                    templateUrl: '/game/templates/playHud.html',
+                    controller: 'PlayCtrl'
                 });
         }
     ])
