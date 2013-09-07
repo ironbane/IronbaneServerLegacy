@@ -19,6 +19,8 @@ var Class = require('../../common/class');
 module.exports = function(db) {
     var Q = require('q'),
         _ = require('underscore'),
+        
+        bbcode = require('bbcode'),
         log = require('util').log;
 
     var Forum = Class.extend({
@@ -30,16 +32,37 @@ module.exports = function(db) {
     Forum.getStatistics = function() {
         var deferred = Q.defer();
         var postQ = ' (select count(id) from forum_posts) as totalposts,',
-            userQ = ' (select count(id) from bcs_users) as totalusers,'
+            userQ = ' (select count(id) from bcs_users) as totalusers,';
            
         db.query('SELECT ' +postQ + userQ + 'name as lastregistered from bcs_users  ORDER BY reg_date DESC LIMIT 1', function(err, results) {
             if(err){
-                deferred.reject(err);
-                return
+                return deferred.reject(err);
+                
             }
             deferred.resolve(results[0]);
         });
         return deferred.promise;
+    };
+
+    Forum.getFrontPage = function() {
+
+        var deferred = Q.defer();
+            db.query('SELECT topic.id, topic.title, post.content, users.name as username FROM forum_topics AS topic INNER JOIN forum_posts AS post ON post.`topic_id` = topic.`id` INNER JOIN bcs_users AS users ON users.id = post.user WHERE topic.board_id = 7 AND post.time = (SELECT MIN(forum_posts.time) FROM forum_posts WHERE forum_posts.`topic_id` = topic.id ) ORDER BY post.time DESC', function(err, results) {
+                if(err) {
+                    log('SQL error getting news: ' + err);
+                    return deferred.reject('Error getting news posts!');
+                    
+                }
+                _.each(results, function(p) {
+                bbcode.parse(p.content, function(html) {
+                    p.content = html;
+                });
+                deferred.resolve(results);
+            });
+
+            });
+            return deferred.promise;
+
     };
 
     
