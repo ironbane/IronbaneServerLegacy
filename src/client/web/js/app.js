@@ -1,7 +1,7 @@
 // app.js
-angular.module('IronbaneApp', ['ui.utils', 'IBCommon'])
+angular.module('IronbaneApp', ['ui.utils', 'IBCommon','User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
-.run(['User', '$rootScope', function(User, $rootScope) {
+.run(['User','$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
     User.getCurrentUser()
         .then(function(user) {
@@ -106,7 +106,7 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon'])
                     User.getProfile($route.current.params.username)
                         .then(function(userprofile) {
                             // should be processed already
-                            deferred.resolve({profile: userprofile.data[0]});
+                            deferred.resolve({profile: userprofile});
                         }, function(err) {
                             // can't find such article, reject route change
                            deferred.reject();
@@ -157,7 +157,7 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon'])
                     var deferred = $q.defer();
                     Item.get($route.current.params.id)
                         .then(function(template) {
-                            deferred.resolve({template: template.data[0]});
+                            deferred.resolve({template: template});
                         }, function(err) {
                            deferred.reject();
                         });

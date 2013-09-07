@@ -41,6 +41,9 @@ module.exports = function(grunt) {
                     "src/client/common/js/general/directives/passwordField.js",
                     "src/client/common/js/general/directives/checkboxCustom.js",
 
+                    "src/client/common/js/user/module.js",
+                    "src/client/common/js/user/services/user.js",
+
                     '<%= webScriptPath %>/app.js',
                     '<%= webScriptPath %>/**/*.js'
                 ],
