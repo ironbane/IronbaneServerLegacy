@@ -1,0 +1,1 @@
+UPDATE bcs_users SET forum_avatar = NULL WHERE forum_avatar = "theme/images/noavatar.png"
