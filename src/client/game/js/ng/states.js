@@ -14,9 +14,11 @@ IronbaneApp
                     controller: ['$scope', '$state', '$log',
                         function($scope, $state, $log) {
                             $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
-                            // if not logged in goto mainMenu.login
-                            // if logged in goto charselect
-                            $state.go('mainMenu.unauthenticated');
+                            if($scope.currentUser.authenticated) {
+                                $state.go('mainMenu.charSelect');
+                            } else {
+                                $state.go('mainMenu.unauthenticated');
+                            }
                     }]
                 })
                 .state('mainMenu.unauthenticated', {
@@ -55,20 +57,25 @@ IronbaneApp
                 .state('mainMenu.register', {
                     templateUrl: '/game/templates/register.html',
                     controller: ['$scope', '$state', '$log', 'User', function($scope, $state, $log, User) {
+                        $scope.registrationError = null;
+
                         $scope.cancel = function() {
                             $state.go('mainMenu.unauthenticated');
                         };
 
                         $scope.register = function() {
-                            // do the reg stuff... then on to char select
-                            $log.log('reg data', $scope.reg);
-                            User.register($scope.reg.username, $scope.reg.password, $scope.reg.email)
-                                .then(function(user) {
-                                    // set current user in rootscope? we should also be signed in now...
-                                    $state.go('mainMenu.charSelect');
-                                }, function(err) {
-                                    $scope.registrationError = err;
-                                });
+                            if($scope.registrationForm.$valid) {
+                                User.register($scope.reg.username, $scope.reg.password, $scope.reg.email)
+                                    .then(function(user) {
+                                        // set current user in rootscope? we should also be signed in now...
+                                        $state.go('mainMenu.charSelect');
+                                    }, function(err) {
+                                        $scope.registrationError = err;
+                                        $scope.registerClicked = false; // reset to give it another go
+                                    });
+                            } else {
+                                $scope.registerClicked = false; // reset to give it another go
+                            }
                         };
                     }]
                 })

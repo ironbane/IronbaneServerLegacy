@@ -71,6 +71,26 @@ angular.module('User') // separate module for sharing with website
 
     };
 
+    // criteria for valid username
+    User.validateUsername = function(username) {
+        var test = /^[A-Za-z0-9 _.@]*$/;
+
+        return test.test(username) && username.length > 3 && username.length <= 20;
+    };
+
+    // criteria for valid email address
+    User.validateEmail = function(email) {
+        var test = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+
+        return test.test(email) && email.length <= 254;
+    };
+
+    // password test only works on pre-hashed
+    User.validatePassword = function(password) {
+        // since it gets hashed it can really be anything
+        return password.length > 3 && password.length <= 254;
+    };
+
     User.register = function(username, password, email) {
         return $http.post('/api/user', {
             Ux466hj8: username,

@@ -1,11 +1,15 @@
 <div class="dialog">
+    <div class="error" ng-show="registrationError">{{ registrationError }}</div>
     <form class="registrationForm" name="registrationForm" novalidate>
-        <input type="text" id="username" name="username" ng-model="reg.username" placeholder="username">
-        <password-field name="password" toggle="togglePW" ng-model="reg.password" placeholder="password"></password-field>
-        <input type="email" id="email" name="email" ng-model="reg.email" placeholder="e-mail">
+        <input type="text" id="username" name="username" ng-model="reg.username" placeholder="username" username-validate>
+        <password-field name="password" toggle="togglePW" ng-model="reg.password" placeholder="password" ng-minlength="3" ng-maxlength="254"></password-field>
+        <input type="email" id="email" name="email" ng-model="reg.email" placeholder="e-mail" email-validate>
+        <ul class="message-list">
+            <li class="error" ng-show="registerClicked && registrationForm.email.$invalid"><i class="icon-exclamation-sign"></i> invalid e-mail address!</li>
+        </ul>
         <div class="passwordToggle"><input type="checkbox" checkbox-custom id="hidePassToggle" name="hidePassToggle" ng-model="togglePW" label="hide password" /></div>
         <br>
-        <button ng-click="register()" class="attention">Register</button>
-        <button ng-click="cancel()">Back</button>
+        <button ng-click="registerClicked=true;register();" class="attention" ng-disabled="registerClicked">Register</button>
+        <button ng-click="cancel()" ng-disabled="registerClicked">Back</button>
     </form>
 </div>
