@@ -8,7 +8,7 @@ angular.module('IronbaneApp')
         replace: true,
         template: '<textarea></textarea>',
         link: function(scope, el, attrs) {
-            el.markItUp(bbcodeSettings);
+            el.markItUp(myBbcodeSettings);
         }
     };
 }]);
