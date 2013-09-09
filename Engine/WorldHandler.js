@@ -16,8 +16,8 @@
 */
 
 
-var dataPath = clientDir + 'plugins/game/data';
-var dataPathPersistent = assetDir + 'plugins/game/data';
+var dataPath = clientDir + 'data';
+var dataPathPersistent = assetDir + 'data';
 
 
 var WorldHandler = Class.extend({

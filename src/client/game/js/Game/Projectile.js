@@ -295,7 +295,7 @@ var Projectile = Unit.extend({
         this.mesh.add(this.meshChild);
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
-            var mat = textureHandler.GetTexture( 'plugins/game/images/projectiles/arrow_single.png', false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.GetTexture( 'images/projectiles/arrow_single.png', false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -316,7 +316,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI/2;
             this.meshChild.add(mesh);
 
-            var texture = 'plugins/game/images/projectiles/arrowback.png';
+            var texture = 'images/projectiles/arrowback.png';
             var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
@@ -326,7 +326,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var texture = 'plugins/game/images/projectiles/arrowhead.png';
+            var texture = 'images/projectiles/arrowhead.png';
             var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
@@ -339,7 +339,7 @@ var Projectile = Unit.extend({
         }
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.BONE ) {
-            var mat = textureHandler.GetTexture( 'plugins/game/images/projectiles/bone.png', false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.GetTexture( 'images/projectiles/bone.png', false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -361,7 +361,7 @@ var Projectile = Unit.extend({
             this.meshChild.add(mesh);
 
 
-            var texture = 'plugins/game/images/projectiles/bonehead.png';
+            var texture = 'images/projectiles/bonehead.png';
             var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
@@ -386,7 +386,7 @@ var Projectile = Unit.extend({
 
             var weaponImage = this.weaponTemplate.image;
 
-            var texture = 'plugins/game/images/items/'+weaponImage+'.png';
+            var texture = 'images/items/'+weaponImage+'.png';
 
             var mat = textureHandler.GetTexture(texture, false, {transparent:true, doubleSided:true});
 

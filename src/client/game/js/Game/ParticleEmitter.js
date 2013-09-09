@@ -117,7 +117,7 @@ var ParticleEmitter = Class.extend({
             }
         }
 
-        texture = textureHandler.GetTexture('plugins/game/images/' + texture + '.png', true);
+        texture = textureHandler.GetTexture('images/' + texture + '.png', true);
 
         // Deliberately take twice the width so the images are scaled correctly
         particle.scale.x *= texture.image.width;
@@ -152,7 +152,7 @@ var ParticleEmitter = Class.extend({
         // var material = new THREE.ParticleBasicMaterial({
         // color: 0xFFFFFF,
         // size: 20,
-        // map: textureHandler.GetTexture('plugins/game/images/' + texture + '.png', true),
+        // map: textureHandler.GetTexture('images/' + texture + '.png', true),
         // blending: THREE.AdditiveBlending,
         // transparent: true
         // });

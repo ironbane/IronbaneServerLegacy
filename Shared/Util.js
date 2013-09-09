@@ -116,7 +116,7 @@ if ( !SERVER ) {
           }
       });
 
-      var cachefile = 'plugins/game/images/characters/cache/' +
+      var cachefile = 'images/characters/cache/' +
           [options.skin, options.eyes, options.hair, options.feet, options.body, options.head, (options.big ? 1 : 0)].join('_') +
           '.png';
 

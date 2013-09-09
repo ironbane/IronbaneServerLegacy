@@ -231,7 +231,7 @@ var SoundHandler = Class.extend({
 
         // Start SoundManager2
         soundManager.setup({
-            url: ironbane_root_directory + 'plugins/game/flash/',
+            url: ironbane_root_directory + 'flash/',
             flashVersion: 9,
             useFlashBlock: false,
             preferFlash: false,
@@ -261,7 +261,7 @@ var SoundHandler = Class.extend({
             self.sounds[key] = {
                 sound: soundManager.createSound({
                     id: key,
-                    url: ironbane_root_directory + 'plugins/game/sound/' + sound.file,
+                    url: ironbane_root_directory + 'sound/' + sound.file,
                     autoLoad: !! sound.preload,
                     onload: function(success) {
                         if (success) {

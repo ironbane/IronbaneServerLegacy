@@ -554,7 +554,7 @@ var ParticleTypeEnum = {
         },
         particleStartScale: function(p){
             var scale = getRandomFloat(3, 2);
-            var tex = textureHandler.GetTexture('plugins/game/images/' + p.texture + '.png', true);
+            var tex = textureHandler.GetTexture('images/' + p.texture + '.png', true);
             return new THREE.Vector2((tex.image.width/16)*scale, (tex.image.height/16)*scale);
         },
         particleOpacity: function(p){return (ParticleFunctions.OpacityLifeTime(p, 0.02, 0.98))*0.5;}

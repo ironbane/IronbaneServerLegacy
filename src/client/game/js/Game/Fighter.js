@@ -16,8 +16,8 @@
 */
 
 
-var charactersSpritePath = 'plugins/game/images/characters/';
-var NPCSpritePath = 'plugins/game/images/npcs/';
+var charactersSpritePath = 'images/characters/';
+var NPCSpritePath = 'images/npcs/';
 
 
 var rotation_speed = 100;
@@ -223,7 +223,7 @@ this.walkSoundTimer = 0.0;
 
     var imgWeapon = this.weaponTemplate.image;
 
-    var texture = 'plugins/game/images/items/' + imgWeapon + '.png';
+    var texture = 'images/items/' + imgWeapon + '.png';
 
 
     planeGeo = new THREE.PlaneGeometry(0.6, 0.6, 1, 1);

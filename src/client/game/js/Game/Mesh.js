@@ -19,7 +19,7 @@
  * and open the template in the editor.
  */
 
-var meshPath = 'plugins/game/images/meshes/';
+var meshPath = 'images/meshes/';
 
 var scaleModifierRightBeforeJSONLoader = 0;
 

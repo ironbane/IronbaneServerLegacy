@@ -203,7 +203,7 @@ var HUDHandler = Class.extend({
             //n = 9;
             if (!isLoot) {
                 $('#' + name).append('<div id="' + name + '_equip" class="unequipped"></div>');
-                $('#' + name).append('<div style="width:48px;height:48px;background-image:url(plugins/game/images/misc/key_' + n + '.png);position:absolute"></div>');
+                $('#' + name).append('<div style="width:48px;height:48px;background-image:url(images/misc/key_' + n + '.png);position:absolute"></div>');
             }
             //if ( !isLoot ) $("#"+name).append('<div style="margin-top:18px;margin-left:5px;width:40px;height:40px;color:white;font-size:10px">'+n+'</div>');
             $('#' + name).droppable({
@@ -558,13 +558,13 @@ var HUDHandler = Class.extend({
 
         if (template.type === 'armor') {
             itemUrl = [
-                    'plugins/game/images/characters/base/',
+                    'images/characters/base/',
                 template.subtype,
                     '/medium.php?i=',
                 template.image
             ].join('');
         } else {
-            itemUrl = 'plugins/game/images/items/medium.php?i=' + template.image;
+            itemUrl = 'images/items/medium.php?i=' + template.image;
         }
 
         function infoRow(label, value) {
@@ -596,7 +596,7 @@ var HUDHandler = Class.extend({
         if (item.price) {
             var priceHtml = [
                     '<span class="amount" style="color:gold;padding-left: 16px;',
-                    'background-image:url(plugins/game/images/misc/coin_full.png);',
+                    'background-image:url(images/misc/coin_full.png);',
                     'background-repeat:no-repeat;">',
                     'x ', item.price,
                     '</span>'
@@ -608,7 +608,7 @@ var HUDHandler = Class.extend({
         if(template.type === 'cash') {
             var valueHTML = [
                     '<span class="amount" style="color:gold;padding-left: 16px;',
-                    'background-image:url(plugins/game/images/misc/coin_full.png);',
+                    'background-image:url(images/misc/coin_full.png);',
                     'background-repeat:no-repeat;">',
                     'x ', item.value,
                     '</span>'
@@ -661,9 +661,9 @@ var HUDHandler = Class.extend({
 
             var itemurl;
             if (template.type === 'armor') {
-                itemurl = 'plugins/game/images/characters/base/' + (template['subtype']) + '/big.php?i=' + (template['image']) + '';
+                itemurl = 'images/characters/base/' + (template['subtype']) + '/big.php?i=' + (template['image']) + '';
             } else {
-                itemurl = 'plugins/game/images/items/big.php?i=' + (template['image']);
+                itemurl = 'images/items/big.php?i=' + (template['image']);
             }
 
             $('#' + name).css('background-image', 'url(' + itemurl + ')');
@@ -803,19 +803,19 @@ var HUDHandler = Class.extend({
             if (fullStat) {
                 fullStat -= 2;
             }
-            content += '<img src="plugins/game/images/' + prefix + '_full.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
+            content += '<img src="images/' + prefix + '_full.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
         }
         // Spawn all the half hearts
         if (halfHeart) {
             if (fullStat) {
                 fullStat -= 2;
             }
-            content += '<img src="plugins/game/images/' + prefix + '_half.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
+            content += '<img src="images/' + prefix + '_half.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
         }
 
         if (fullStat) {
             for (x = 0; x < fullStat / 2; x++) {
-                content += '<img src="plugins/game/images/' + prefix + '_empty.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
+                content += '<img src="images/' + prefix + '_empty.png" style="' + (!noMarginSpace ? 'margin-right:1px;' : '') + '">';
             }
         }
 
@@ -827,7 +827,7 @@ var HUDHandler = Class.extend({
             coins = ironbane.player.getTotalCoins(),
             img = 'misc/coin_medium',
             imgFlash = 'misc/coin_medium_flash',
-            src = 'plugins/game/images/' + (flash ? imgFlash : img) + '_full.png';
+            src = 'images/' + (flash ? imgFlash : img) + '_full.png';
 
         // if the element is already been rendered before just use it
         if (el.html() !== '') {
@@ -1463,7 +1463,7 @@ var HUDHandler = Class.extend({
             var refreshChar = function() {
                 constrainCustomizers();
 
-                var cachefile = 'plugins/game/images/characters/cache/' +
+                var cachefile = 'images/characters/cache/' +
                     selectedSkin + '_' + selectedEyes + '_' + selectedHair + '_0_0_0_1.png';
 
                 $('#charSkinLayer').css('background-image', 'url(' + cachefile + ')');
@@ -1578,7 +1578,7 @@ var HUDHandler = Class.extend({
     },
     ShowMap: function() {
 
-        $("#map").css("background-image", "url(plugins/game/data/" + terrainHandler.zone + "/map.png" + (isEditor ? "?" + (new Date()).getTime() : "") + ")");
+        $("#map").css("background-image", "url(data/" + terrainHandler.zone + "/map.png" + (isEditor ? "?" + (new Date()).getTime() : "") + ")");
 
         $("#map").show();
 

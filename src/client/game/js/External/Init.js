@@ -14,9 +14,9 @@ var showEditor = false;
 var slotsAvailable = 4;
 
 var tileSize = 32;
-var texturesPath = 'plugins/game/images/textures/';
-var tilesPath = 'plugins/game/images/tiles/';
-var tilesBigPath = 'plugins/game/images/tiles_big/';
+var texturesPath = 'images/textures/';
+var tilesPath = 'images/tiles/';
+var tilesBigPath = 'images/tiles_big/';
 var tilesExt = 'png';
 
 //var objectsPath = 'plugins/world/images/objects/';

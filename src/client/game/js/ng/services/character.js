@@ -15,7 +15,7 @@ IronbaneApp
                     }
                 });
 
-                var cachefile = 'plugins/game/images/characters/cache/' +
+                var cachefile = 'images/characters/cache/' +
                     [myChar.skin, myChar.eyes, myChar.hair, myChar.feet, myChar.body, myChar.head, (myChar.big ? 1 : 0)].join('_') +
                     '.png';
 

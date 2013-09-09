@@ -748,7 +748,7 @@ var Player = Fighter.extend({
 
       if ( this.aimTexture !== "" ) {
         this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-          textureHandler.GetTexture('plugins/game/images/misc/'+this.aimTexture+'.png', false, {
+          textureHandler.GetTexture('images/misc/'+this.aimTexture+'.png', false, {
             transparent:true,
             alphaTest:0.1
           }));
@@ -782,7 +782,7 @@ var Player = Fighter.extend({
 
     //   if ( this.aimHelperTexture !== "" ) {
     //     this.aimHelperMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-    //       textureHandler.GetTexture('plugins/game/images/misc/'+this.aimHelperTexture+'.png', false, {
+    //       textureHandler.GetTexture('images/misc/'+this.aimHelperTexture+'.png', false, {
     //         transparent:true,
     //         alphaTest:0.1
     //       }));

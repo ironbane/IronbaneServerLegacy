@@ -14,24 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
-var itemSpritePath = 'plugins/game/images/items/';
- 
-var LootBag = Billboard.extend({
-    Init: function(position, id, param) {	
-        
+var itemSpritePath = 'images/items/';
 
-		
+var LootBag = Billboard.extend({
+    Init: function(position, id, param) {
+
+
+
         this._super(position, 0, id, param);
-        
+
         this.dynamic = true;
         this.enableGravity = true;
 
-		
+
     },
     Add: function () {
 
@@ -51,7 +51,7 @@ var LootBag = Billboard.extend({
                 case LootBagTypeEnum.LEGENDARY:
                         image = 4;
                         break;
-        }				
+        }
 
 
         var texture = itemSpritePath + ''+image+'.png';

@@ -58,7 +58,7 @@ var ConsoleHandler = Class.extend({
     this.AddCommand(this.AccessLevel.GUEST, ["clearcharacterimages","cci"], "Clear character images", "", "", function (params) {
 
       log("Starting characters cleanup...");
-      var charPath = clientDir+'plugins/game/images/characters';
+      var charPath = clientDir+'images/characters';
 
       // Read the directory
       fs.readdir(charPath, function (err, list) {
@@ -99,7 +99,7 @@ var ConsoleHandler = Class.extend({
       }
 
       log("Starting zone cleanup...");
-      var charPath = clientDir+'plugins/game/data/'+params[0];
+      var charPath = clientDir+'data/'+params[0];
 
 
       // Read the directory

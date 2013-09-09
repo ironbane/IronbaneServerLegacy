@@ -19,7 +19,7 @@
  * and open the template in the editor.
  */
 
-var billboardSpritePath = 'plugins/game/images/billboards/';
+var billboardSpritePath = 'images/billboards/';
 
 var Billboard = Unit.extend({
     Init: function(position, rotY, id, param, customPath, customName) {
@@ -50,7 +50,7 @@ var Billboard = Unit.extend({
     // Get material
 
 
-        var texture = this.customPath ? 'plugins/game/images/'  + this.param+'.png' : billboardSpritePath + ''+this.param+'.png';
+        var texture = this.customPath ? 'images/'  + this.param+'.png' : billboardSpritePath + ''+this.param+'.png';
         this.texture = textureHandler.GetTexture( texture, true);
 
         this.TryToBuildMesh();;

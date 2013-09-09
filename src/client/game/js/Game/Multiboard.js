@@ -19,7 +19,7 @@
  * and open the template in the editor.
  */
 
-var multiboardSpritePath = 'plugins/game/images/multiboards/';
+var multiboardSpritePath = 'images/multiboards/';
 
 var Multiboard = Unit.extend({
     Init: function(position, rotY, id, param) {

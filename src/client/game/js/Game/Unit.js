@@ -235,7 +235,7 @@ var Unit = PhysicsObject.extend({
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
-        textureHandler.GetTexture('plugins/game/images/misc/shadow.png', false, {
+        textureHandler.GetTexture('images/misc/shadow.png', false, {
           transparent:true,
           alphaTest:0.1
         }));
