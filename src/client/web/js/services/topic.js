@@ -11,7 +11,9 @@ angular.module('IronbaneApp')
                     .then(function(response) {
                         var posts = [];
                         angular.forEach(response.data, function(post) {
-                            posts.push(new Post(post));
+                            var p = new Post(post);
+                            p.user.avatar = post.avatar || User.getDefaultAvatar();
+                            posts.push(p);
                         });
                         return posts;
                     }, function(error) {

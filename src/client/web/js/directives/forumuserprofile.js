@@ -8,9 +8,7 @@ angular.module('IronbaneApp')
 		},
 		template:
 		 '<span class="forumuserprofile"> ' +
-		 '<userlink name="{{user.name}}"/>" <br> {{user.posts}} <br> {{user.rank}} <br> <img src="{{user.avatar}}"/> </span>'
-
-
+		 '<userlink name="{{user.name}}"/> <br> posts: {{user.posts}} <br> rank:{{user.rank}} <br> <img ng-src="{{user.avatar}}"/> </span>'
 	};
 	
 

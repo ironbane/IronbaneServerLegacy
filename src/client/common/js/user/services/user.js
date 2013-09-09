@@ -9,7 +9,9 @@ angular.module('User') // separate module for sharing with website
     User.prototype.roles = [];
 
     // todo: make this a getter?
-    User.prototype.$avatar = function() { return this.forum_avatar || DEFAULT_AVATAR; };
+    User.getDefaultAvatar = function() {
+       return DEFAULT_AVATAR; 
+    } 
 
     User.prototype.$hasRole = function(role) {
         return this.roles.indexOf(role) >= 0;

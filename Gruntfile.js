@@ -351,7 +351,7 @@ module.exports = function(grunt) {
     grunt.registerTask('assets', ['three_obj', 'copy:assets']);
     grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
-    grunt.registerTask('full', ['dbupgrade', 'game', 'website', 'assets', 'docular']);
+    grunt.registerTask('full', ['dbupgrade', 'game', 'website', 'assets']);
 
     // when ready do both
     grunt.registerTask('default', ['full']);
