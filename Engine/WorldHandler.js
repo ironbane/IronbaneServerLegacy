@@ -663,7 +663,7 @@ var WorldHandler = Class.extend({
       });
     }
 
-    var str = JSON.stringify(this.world[zone][cellX][cellZ].objects);
+    var str = JSON.stringify(this.world[zone][cellX][cellZ].objects, null, 4);
     fs.writeFileSync(path+"/objects.json", str);
 
     if ( persistentWorldChanges ) {
@@ -676,7 +676,7 @@ var WorldHandler = Class.extend({
     // Rebuild the zone waypoints
     worldHandler.BuildZoneWaypoints();
 
-    str = JSON.stringify(this.world[zone][cellX][cellZ].graph);
+    str = JSON.stringify(this.world[zone][cellX][cellZ].graph, null, 4);
     fs.writeFileSync(path+"/graph.json", str);
 
 
