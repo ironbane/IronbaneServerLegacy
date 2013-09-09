@@ -216,6 +216,7 @@
 							return false;
 						}).bind('click.markItUp', function(e) {
 							e.preventDefault();
+							return false;
 						}).bind("focusin.markItUp", function(){
                             $$.focus();
 						}).bind('mouseup', function() {
