@@ -65,7 +65,8 @@ var ZoneTypeEnum = {
 var LightSystemEnum = {
   DAYANDNIGHT: 1,
   DAYONLY: 2,
-  NIGHTONLY: 3
+  NIGHTONLY: 3,
+  DUNGEON: 4
 };
 
 var zoneTypeConfig = {};
@@ -94,7 +95,7 @@ zoneTypeConfig[ZoneTypeEnum.DUNGEON] = {
   "cloudDensity":0.0,
   "cloudLevel": 0,
   "skyboxShader": "dungeon",
-  "lightSystem": LightSystemEnum.NIGHTONLY,
+  "lightSystem": LightSystemEnum.DUNGEON,
   "music": ["music/underground"]
 };
 
@@ -108,7 +109,7 @@ zoneTypeConfig[ZoneTypeEnum.TUTORIAL] = {
   "cloudDensity":0.0,
   "cloudLevel": 0,
   "skyboxShader": "dungeon",
-  "lightSystem": LightSystemEnum.NIGHTONLY,
+  "lightSystem": LightSystemEnum.DUNGEON,
   "music": ["music/tutorial"]
 };
 
@@ -122,7 +123,7 @@ zoneTypeConfig[ZoneTypeEnum.CASTLE] = {
   "cloudDensity":0.0,
   "cloudLevel": 0,
   "skyboxShader": "dungeon",
-  "lightSystem": LightSystemEnum.NIGHTONLY,
+  "lightSystem": LightSystemEnum.DUNGEON,
   "music": ["music/castle"]
 };
 

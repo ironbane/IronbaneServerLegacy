@@ -71,10 +71,11 @@ var Skybox = PhysicsObject.extend({
     this.ambientLight = new THREE.AmbientLight( 0x444444 );
     ironbane.scene.add( this.ambientLight );
 
-    this.directionalLight = new THREE.DirectionalLight( 0xcccccc );
-    ironbane.scene.add( this.directionalLight );
+    this.sunLight = new THREE.DirectionalLight( 0xcccccc );
+    ironbane.scene.add( this.sunLight );
 
-
+    this.moonLight = new THREE.DirectionalLight( 0xcccccc );
+    ironbane.scene.add( this.moonLight );
     // Add terrain
     //if ( zones[terrainHandler.zone]['type'] == ZoneTypeEnum.WORLD ) {
       var model = skyboxPath + terrainHandler.zone+".js";
@@ -133,9 +134,14 @@ var Skybox = PhysicsObject.extend({
       ironbane.scene.remove(this.ambientLight);
       releaseMesh(this.ambientLight);
     }
-    if ( this.directionalLight ) {
-      ironbane.scene.remove(this.directionalLight);
-      releaseMesh(this.directionalLight);
+    if ( this.sunLight ) {
+      ironbane.scene.remove(this.sunLight);
+      releaseMesh(this.sunLight);
+    }
+
+    if ( this.moonLight ) {
+      ironbane.scene.remove(this.moonLight);
+      releaseMesh(this.moonLight);
     }
 
     this.isLoaded = false;
@@ -147,9 +153,11 @@ var Skybox = PhysicsObject.extend({
     this.skyboxMesh.position.copy(p);
     this.skyboxMesh.position.y = 0;
 
-    this.directionalLight.position.copy( this.sunVector.clone().multiplyScalar(450) );
+    this.sunLight.position.copy( this.sunVector.clone().multiplyScalar(450) );
+    this.sunLight.target.position.copy( this.sunVector.clone().multiplyScalar(-450) );
 
-    this.directionalLight.target.position.copy( this.sunVector.clone().multiplyScalar(-450) );
+    this.moonLight.position.y = 450;
+    this.moonLight.target.position.y = -450;
 
     ironbane.shadowLight.position.copy( new THREE.Vector3(0, 100, 0) );
     ironbane.shadowLight.target.position.copy( new THREE.Vector3(0, -100, 0) );
@@ -171,7 +179,8 @@ var Skybox = PhysicsObject.extend({
         this.sunVector.set(0,1,0);
       }
       else if ( (showEditor && levelEditor.editorGUI.chForceNight)
-        || GetZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY ) {
+        || GetZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY
+        || GetZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
         this.sunVector.set(0,-1,0);
       }
       else {
@@ -213,8 +222,26 @@ var Skybox = PhysicsObject.extend({
       alg = alg.clamp(0,1);
       alb = alb.clamp(0,1);
 
-      this.ambientLight.color.setRGB( 0.4, 0.4, 0.4);
-      this.directionalLight.color.setRGB( str + (alr * 0.6), stg + (alg * 0.6), stb  + (alb * 0.6));
+
+
+      if ( GetZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
+        this.ambientLight.color.setRGB(0.3, 0.3, 0.3);
+        this.sunLight.color.setRGB( 0.0, 0.0, 0.0 );
+      }
+      else {
+        this.sunLight.color.setRGB( str + (alr * 0.6), stg + (alg * 0.6), stb  + (alb * 0.6));
+
+        var moonFactor = al;
+        if ( moonFactor > 0 ) moonFactor = 0;
+        moonFactor *= -1;
+
+        var moonFactorReverse = 1 - moonFactor;
+
+        this.ambientLight.color.setRGB( 0.4 * moonFactorReverse, 0.4 * moonFactorReverse, 0.4 * moonFactorReverse );
+        // Night
+        this.moonLight.color.setRGB(0.2 * moonFactor, 0.2 * moonFactor, 0.9 * moonFactor);
+      }
+
 
     }
 
