@@ -1780,37 +1780,6 @@ var SocketHandler = Class.extend({
 
                 socket.unit.EmitNearby("ppDeleteNode", data, 0, true);
             });
-
-            socket.on("addGameObject", function (data) {
-
-                // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                data.position = ConvertVector3(data.position);
-                data.position = data.position.Round(2);
-
-                var zone = socket.unit.zone;
-
-                var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
-
-
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
-
-                // Just add the object, and save it. Clients should automatically add it
-                worldHandler.world[zone][cellPos.x][cellPos.z].objects.push({
-                    x:data.position.x,
-                    y:data.position.y,
-                    z:data.position.z,
-                    t:data.type,
-                    p:data.param
-                });
-
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
-
-            });
-
             socket.on("disconnect", function (data) {
                 if (socket.unit) {
                     log(socket.unit.name + " disconnected.");

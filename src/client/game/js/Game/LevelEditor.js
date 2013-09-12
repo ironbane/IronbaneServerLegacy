@@ -993,36 +993,6 @@ var LevelEditor = Class.extend({
 
   //this.SetTile(levelEditor.editorGUI.selectedTile);
   },
-  PlaceObject: function(position, objectId) {
-    var gObject = preGameObjects[objectId];
-
-    position = position.Round(2);
-
-    // We emit, and must add the Object ourselves because it is static
-    // Set the cell to reload
-    socketHandler.socket.emit('addGameObject', {
-      position: position,
-      type: gObject.type,
-      param: gObject.param,
-      size: gObject.size
-    });
-
-
-    var unit = null;
-
-    switch (gObject.type) {
-      case UnitTypeEnum.BILLBOARD:
-        unit = new Billboard((position), 0, 0, gObject.param);
-        break;
-    }
-
-    unit.size = gObject.size;
-
-    if ( unit ) {
-      ironbane.unitList.push(unit);
-      terrainHandler.GetCellByWorldPosition(position).objects.push(unit);
-    }
-  },
   PlaceModel: function(position, rotX, rotY, rotZ, id) {
 
     position = position.Round(2);
