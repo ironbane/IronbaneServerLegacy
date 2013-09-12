@@ -26,11 +26,13 @@ Play the game at <http://www.ironbane.com/>.
 
 * Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/)
 
-* Checkout the [IronbaneAssets repo](https://github.com/ironbane/IronbaneAssets) in your root folder:
+* Checkout the [IronbaneAssets repo](https://github.com/ironbane/IronbaneAssets) in your root folder.
 
 ```
     git clone git@github.com:ironbane/IronbaneAssets.git
 ``` 
+
+Your root folder should now contain an IronbaneAssets folder.
 
 * Run ```npm install``` from the root directory
 
