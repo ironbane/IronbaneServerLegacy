@@ -22,7 +22,7 @@ nconf.defaults({
 
     buildTarget: 'deploy/', // replaces old clientDir
 
-    assetDir: 'media',
+    assetDir: 'IronbaneAssets',
 
     // Set to true to allow the game to modify the files in the assetDir directly.
     // Otherwise, next time you run grunt all changes will be lost.
