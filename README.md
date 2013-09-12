@@ -26,15 +26,17 @@ Play the game at <http://www.ironbane.com/>.
 
 * Install [Node.js version 0.8.5 or higher](http://nodejs.org/download/)
 
-* Get a copy of the base assets from http://www.ironbane.com/data.tar
+* Checkout the [IronbaneAssets repo](https://github.com/ironbane/IronbaneAssets) in your root folder:
 
-* Make a new folder ```media``` in your repository, and extract the assets archive in this folder.
+```
+    git clone git@github.com:ironbane/IronbaneAssets.git
+``` 
 
-* Next, run ```npm install``` from the root directory
+* Run ```npm install``` from the root directory
 
-* Run ```ironbane init``` at the prompt OR Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
+* Run ```ironbane init``` at the prompt **OR** Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
 
-* Install grunt ``` npm install -g grunt-cli ```
+* Install grunt ```npm install -g grunt-cli```
 
 * (Optional) If you want to make new 3d models and test them out, you will need to have [Python 2.7.x](http://www.python.org/download/) installed. Do not use the latest version of Python, only 2.7.x currently works with the script that converts our 3d models to be used in-game.
 
