@@ -266,6 +266,9 @@ var Cell = Class.extend({
                 // Make the units dynamic so we can alter them
                 unit.dynamic = true;
 
+                // Also set a special flag so we can only select these objects using the editor
+                unit.canSelectWithEditor = true;
+
                 if ( unit ) {
                     ironbane.unitList.push(unit);
                     this.objects.push(unit);

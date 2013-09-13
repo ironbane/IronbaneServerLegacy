@@ -223,6 +223,8 @@ var NewLevelEditor = PhysicsObject.extend({
         // If a unit is present, alter the unit
         if ( mesh && mesh.unit ) {
 
+            // Check that the unit can be selected
+            if ( !mesh.unit.canSelectWithEditor ) return;
 
             this.selectedObjectOldPosition = mesh.unit.localPosition.clone();
             this.selectedObjectOldRotation = mesh.unit.localRotation.clone();

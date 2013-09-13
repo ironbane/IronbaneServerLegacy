@@ -1021,6 +1021,8 @@ var LevelEditor = Class.extend({
         rotY.ToRadians(),
         rotZ.ToRadians()), 0, id);
 
+    unit.canSelectWithEditor = true;
+
     unit.dynamic = true;
 
     if ( unit ) {
