@@ -6,21 +6,23 @@ IronbaneApp
                 angular.copy(json || {}, this);
             };
 
-            Character.prototype.getTexture = function() {
-                var myChar = this;
-
-                var props = ['skin', 'eyes', 'hair', 'feet', 'body', 'head', 'big'];
-                _.each(props, function(p) {
-                    if (!(p in myChar)) {
-                        myChar[p] = 0;
-                    }
-                });
+            Character.prototype.getTexture = function(big) {
+                var myChar = this,
+                    options = {
+                        skin: myChar.skin || 0,
+                        eyes: myChar.eyes || 0,
+                        hair: myChar.hair || 0,
+                        feet: myChar.feet || 0,
+                        body: myChar.body || 0,
+                        head: myChar.head || 0,
+                        big: big
+                    };
 
                 var cachefile = 'images/characters/cache/' +
-                    [myChar.skin, myChar.eyes, myChar.hair, myChar.feet, myChar.body, myChar.head, (myChar.big ? 1 : 0)].join('_') +
+                    [options.skin, options.eyes, options.hair, options.feet, options.body, options.head, (options.big ? 1 : 0)].join('_') +
                     '.png';
 
-                if (_.every(myChar, function(p) {
+                if (_.every(options, function(p) {
                     return parseInt(p, 10) === 0;
                 })) {
                     cachefile = 'media/images/misc/blank.png';

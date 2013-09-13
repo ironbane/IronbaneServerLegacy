@@ -14,10 +14,10 @@
         <div class="clearfix"></div>
 
         <div>
-            <div class="preview">
-                <img ng-src="{{ selectedChar.getTexture() }}" />
-            </div>
             <button class="cycle pull-right" ng-click="deleteChar()">✖</button>
+            <div class="preview pull-right">
+                <img ng-src="{{ selectedChar.getTexture(true) }}" />
+            </div>
         </div>
     </div>
 
