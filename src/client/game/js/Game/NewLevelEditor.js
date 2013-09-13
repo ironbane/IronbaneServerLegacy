@@ -84,7 +84,7 @@ var NewLevelEditor = PhysicsObject.extend({
 
                   });
                 }
-                else if ( levelEditor.editorGUI.enableModelPainter ) {
+                else if ( levelEditor.editorGUI.enableModelPainter && currentMouseToWorldData ) {
 
                   for(var c in terrainHandler.cells) {
                     for(var o=0;o<terrainHandler.cells[c].objects.length;o++) {
@@ -215,6 +215,11 @@ var NewLevelEditor = PhysicsObject.extend({
         var oldRot = this.selectedObjectOldRotation.clone();
         var newRot = this.selectedObject.rotation.clone();
 
+        var id = this.selectedObject.unit.meshData.id;
+
+        // Make a deep copy, not a reference
+        var metadata = this.selectedObject.unit.metadata;
+
         if ( !newPos.equals(oldPos) ||
             !newRot.equals(oldRot)) {
             socketHandler.socket.emit('addModel', {
@@ -223,9 +228,16 @@ var NewLevelEditor = PhysicsObject.extend({
                 rX:newRot.x.ToDegrees(),
                 rY:newRot.y.ToDegrees(),
                 rZ:newRot.z.ToDegrees(),
-                param:this.selectedObject.unit.meshData.id
+                param:id
             }, function() {
-
+                if ( !_.isEmpty(metadata) ) {
+                  socketHandler.socket.emit('paintModel', {
+                    pos: newPos,
+                    id: id,
+                    metadata: metadata,
+                    global : false
+                  });
+                }
             });
         }
 
@@ -288,7 +300,7 @@ var NewLevelEditor = PhysicsObject.extend({
             // Make it invisible as it will be deleted shortly
             this.selectedObject.unit.mesh.visible = false;
 
-            (function(oldPos, newPos, newRot, id) {
+            (function(oldPos, newPos, newRot, id, metadata) {
                 setTimeout(function() {
                     socketHandler.socket.emit('deleteModel', oldPos, function() {
                         socketHandler.socket.emit('addModel', {
@@ -299,14 +311,22 @@ var NewLevelEditor = PhysicsObject.extend({
                             rZ:newRot.z.ToDegrees(),
                             param:id
                         }, function() {
-
+                            if ( !_.isEmpty(metadata) ) {
+                              socketHandler.socket.emit('paintModel', {
+                                pos: newPos,
+                                id: id,
+                                metadata: metadata,
+                                global : false
+                              });
+                            }
                         });
                     });
                 }, 100);
             })(oldPos,
             newPos,
             newRot,
-            this.selectedObject.unit.meshData.id);
+            this.selectedObject.unit.meshData.id,
+            this.selectedObject.unit.metadata);
 
         }
 

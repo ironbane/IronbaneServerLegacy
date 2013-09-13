@@ -656,18 +656,18 @@ var SocketHandler = Class.extend({
 
                             var rotation = obj.rotation.clone();
                             var param = obj.param;
-                            var metadata = obj.metadata;
+                            var metadata = data.metadata;
+
+
+                            levelEditor.PlaceModel(ConvertVector3(data.pos),
+                                rotation.x.ToDegrees(),
+                                rotation.y.ToDegrees(),
+                                rotation.z.ToDegrees(),
+                                param, metadata);
 
                             cell.objects = _.without(cell.objects, obj);
 
                             obj.Destroy();
-
-                            setTimeout(function() {
-                                var unit = new Mesh(ConvertVector3(data.pos),
-                                    rotation, 0, param, data.metadata);
-                                ironbane.unitList.push(unit);
-                                cell.objects.push(unit);
-                            }, 1);
                         }
 
 

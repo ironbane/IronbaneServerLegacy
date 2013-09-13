@@ -1008,7 +1008,7 @@ var LevelEditor = Class.extend({
 
   //this.SetTile(levelEditor.editorGUI.selectedTile);
   },
-  PlaceModel: function(position, rotX, rotY, rotZ, id) {
+  PlaceModel: function(position, rotX, rotY, rotZ, id, metadata) {
 
     position = position.Round(2);
 
@@ -1034,7 +1034,7 @@ var LevelEditor = Class.extend({
     var unit = new Mesh(position,
       new THREE.Euler(rotX.ToRadians(),
         rotY.ToRadians(),
-        rotZ.ToRadians()), 0, id);
+        rotZ.ToRadians()), 0, id, metadata);
 
     unit.canSelectWithEditor = true;
 
