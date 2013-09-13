@@ -1,4 +1,5 @@
 IronbaneApp
+.constant('MAX_CHAR_SLOTS', 3) // TODO: set by server config?
 .factory('Character', ['$log', '$http', '$q',
         function($log, $http, $q) {
             var Character = function(json) {

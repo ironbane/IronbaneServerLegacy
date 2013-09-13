@@ -15,6 +15,7 @@
 
 // BUTTONS
 @buttonAttentionTextColor:      #A9F8FC;
+@buttonDisabledTextColor:       #06452d;
 
 .OffScreen {
     position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
@@ -44,7 +45,15 @@ a {
 .dialog {
     outline: 3px solid #06452d;
     background-color: @bgc1_75;
-    padding: 10px;
+    //padding: 10px;
+    position: relative;
+    >header,
+    >.body {padding: 10px}
+    >footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
 }
 
 .customCheckbox {display: inline-block; vertical-align: baseline; font-size: 14px;
@@ -82,8 +91,9 @@ a {
     height: 341px;
     font-size: 10px;
     font-weight: normal;
+    .body {padding: 0 0px 0 2px;font-size: 10px;line-height: 13px;}
     .news-content {
-        height: 280px;
+        height: 260px;
         .news-post-title, .news-post-time {margin: 0;}
         ul, ol {padding-left: 30px;}
         hr {
@@ -136,6 +146,9 @@ button {
     &:disabled:active {
         background-color: #677874;
         border: 3px solid #33423e;
+        color: @buttonDisabledTextColor;
+        text-shadow: 2px 1px 0px #abe0cc;
+        font-weight: normal;
     }
     &.attention {
         color: @buttonAttentionTextColor;
@@ -146,8 +159,9 @@ button {
     button {width: 150px;}
 }
 
-#charSelect {
+.char-select {
     min-height: 340px;
+    .char-name {width: 228px;padding: 10px;}
     button.cycle {
         padding: 6px 3px;
         min-width: 0px;

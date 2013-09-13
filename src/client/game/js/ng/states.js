@@ -46,32 +46,40 @@ IronbaneApp
                 })
                 .state('mainMenu.register', {
                     templateUrl: '/game/templates/register.html',
-                    controller: ['$scope', '$state', '$log', 'User', function($scope, $state, $log, User) {
-                        $scope.registrationError = null;
-
-                        $scope.cancel = function() {
-                            $state.go('mainMenu.unauthenticated');
-                        };
-
-                        $scope.register = function() {
-                            if($scope.registrationForm.$valid) {
-                                User.register($scope.reg.username, $scope.reg.password, $scope.reg.email)
-                                    .then(function(user) {
-                                        // set current user in rootscope? we should also be signed in now...
-                                        $state.go('mainMenu.charSelect');
-                                    }, function(err) {
-                                        $scope.registrationError = err;
-                                        $scope.registerClicked = false; // reset to give it another go
-                                    });
-                            } else {
-                                $scope.registerClicked = false; // reset to give it another go
-                            }
-                        };
-                    }]
+                    controller: 'RegisterCtrl'
                 })
                 .state('mainMenu.charSelect', {
                     templateUrl: '/game/templates/charSelect.html',
-                    controller: 'CharSelectCtrl'
+                    controller: 'CharSelectCtrl',
+                    data: {
+                        startingIndex: 0 // todo: get last char ID?
+                    }
+                })
+                .state('mainMenu.charSelectNew', {
+                    templateUrl: '/game/templates/charSelectNew.html',
+                    controller: ['$log', '$scope', 'MAX_CHAR_SLOTS', 'User', function($log, $scope, MAX_CHAR_SLOTS, User) {
+                        $scope.remainingSlots = MAX_CHAR_SLOTS -= $scope.currentUser.activeCharCount;
+
+                        $scope.prev = function() {
+                            $scope.$state.go('mainMenu.charSelect');
+                        };
+
+                        $scope.next = function() {
+                            $scope.$state.go('mainMenu.charSelect');
+                        };
+
+                        $scope.logout = function() {
+                            User.logout().then(function() {
+                                $scope.$state.go('mainMenu.unauthenticated');
+                            }, function(err) {
+                                $log.error(err);
+                            });
+                        };
+
+                        $scope.create = function() {
+                            $scope.$state.go('mainMenu.charCreate');
+                        };
+                    }]
                 })
                 .state('loading', {
                     url: '/',

@@ -1,20 +1,21 @@
 IronbaneApp
     .controller('CharSelectCtrl', ['$scope', 'Character', '$rootScope', '$log', 'User', '$state',
         function($scope, Character, $rootScope, $log, User, $state) {
-            $scope.chars = [new Character({
-                name: 'Create Character'
-            })];
+            $scope.chars = [];
             $scope.selectedChar = null;
-            $scope.remainingSlots = 3; // todo: constant? or what
-
-            var index = 0;
+            var index = $state.current.data.startingIndex || 0;
 
             Character.getAll($rootScope.currentUser.id).then(function(chars) {
-                angular.forEach(chars, function(c) {
-                    $scope.chars.unshift(c);
-                });
-                $scope.remainingSlots -= chars.length;
-                $scope.selectedChar = chars[0];
+                $rootScope.currentUser.activeCharCount = chars.length;
+
+                if(chars.length === 0) {
+                    $state.go('mainMenu.charSelectNew');
+                } else {
+                    angular.forEach(chars, function(c) {
+                        $scope.chars.unshift(c);
+                    });
+                    $scope.selectedChar = chars[0];
+                }
             }, function(err) {
                 $log.error('error loading characters for current user!', err);
             });
@@ -22,7 +23,8 @@ IronbaneApp
             $scope.next = function() {
                 index++;
                 if (index > $scope.chars.length - 1) {
-                    index = 0;
+                    //index = 0;
+                    $state.go('mainMenu.charSelectNew');
                 }
 
                 $scope.selectedChar = $scope.chars[index];
@@ -31,7 +33,8 @@ IronbaneApp
             $scope.prev = function() {
                 index--;
                 if (index < 0) {
-                    index = $scope.chars.length - 1;
+                    //index = $scope.chars.length - 1;
+                    $state.go('mainMenu.charSelectNew');
                 }
 
                 $scope.selectedChar = $scope.chars[index];
