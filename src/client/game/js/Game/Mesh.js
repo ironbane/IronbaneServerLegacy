@@ -80,10 +80,51 @@ var Mesh = Unit.extend({
   Decorate: function() {
      this.particleEmitters = [];
 
+     var useCollision = true;
+
     // Initialize events
     switch (this.meshData.name) {
-      case "Lantern 1":
+      case "Dungeon Light Small":
+        this.flickerTime = 0.0;
 
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 0, 0);
+        this.lightsToMaintain.push(pointLight);
+
+        if ( !le("globalEnable") ) {
+          useCollision = false;
+          this.mesh.visible = false;
+        }
+
+        break;
+      case "Dungeon Light Big":
+        this.flickerTime = 0.0;
+
+        if ( !le("globalEnable") ) {
+          useCollision = false;
+          this.mesh.visible = false;
+        }
+
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 40);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 0, 0);
+        this.lightsToMaintain.push(pointLight);
+        break;
+      case "Dungeon Light Huge":
+        this.flickerTime = 0.0;
+
+        if ( !le("globalEnable") ) {
+          useCollision = false;
+          this.mesh.visible = false;
+        }
+
+        var pointLight = new THREE.PointLight(0xdf724c, 1, 100);
+        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
+        pointLight.position.set(0, 0, 0);
+        this.lightsToMaintain.push(pointLight);
+        break;
+      case "Lantern 1":
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FIRESMALL,
           data: {
@@ -91,17 +132,8 @@ var Mesh = Unit.extend({
             spawnOffset: new THREE.Vector3(0, 1.0, 0)
           }
         });
-
-        this.flickerTime = 0.0;
-
-        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
-        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
-        pointLight.position.set(0, 1.0, 0);
-        this.lightsToMaintain.push(pointLight);
-
         break;
       case "Torch":
-
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FIRESMALL,
           data: {
@@ -109,17 +141,8 @@ var Mesh = Unit.extend({
             spawnOffset: new THREE.Vector3(0.0, 1.0, 0.5)
           }
         });
-
-        this.flickerTime = 0.0;
-
-        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
-        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
-        pointLight.position.set(0, 1.0, 0);
-        this.lightsToMaintain.push(pointLight);
-
         break;
       case "Campfire":
-
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FIREMEDIUM,
           data: {
@@ -127,17 +150,8 @@ var Mesh = Unit.extend({
             spawnOffset: new THREE.Vector3(0, 1.0, 0)
           }
         });
-
-        this.flickerTime = 0.0;
-
-        var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
-        // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
-        pointLight.position.set(0, 1.0, 0);
-        this.lightsToMaintain.push(pointLight);
-
         break;
       case "Fountain":
-
         this.particleEmitters.push({
           particle: ParticleTypeEnum.FOUNTAINSIDE,
           data: {
@@ -145,7 +159,6 @@ var Mesh = Unit.extend({
             spawnOffset: new THREE.Vector3(0.0, 1.5, 0.5)
           }
         });
-
         break;
     }
 
@@ -154,18 +167,13 @@ var Mesh = Unit.extend({
 
     _.each(this.lightsToMaintain, function(light) {
 
-
       light.startColor = light.color;
       light.startIntensity = light.intensity;
       light.startDistance = light.distance;
 
       me.object3D.add(light);
 
-
-
-
     }, this);
-
 
     _.each(this.particleEmitters, function(emitter) {
             this.particleEmittersToMaintain.push(
@@ -173,6 +181,13 @@ var Mesh = Unit.extend({
                 emitter.data));
     }, this);
 
+    if ( useCollision ) {
+      var me = this;
+
+      this.mesh.traverse( function ( object ) {
+        me.octree.add( object, {useFaces:true} );
+      });
+    }
 
   },
   UpdateLighting: function() {
@@ -295,15 +310,6 @@ var Mesh = Unit.extend({
 
     ironbane.scene.add(this.mesh);
 
-    if ( socketHandler.inGame )  {
-      (function(unit){
-        unit.mesh.traverse( function ( object ) {
-          unit.octree.add( object, {useFaces:true} );
-        } );
-      })(this);
-    }
-
-
     // (function(unit){
     //   setTimeout(function() {
     //     unit.Decorate();
@@ -370,15 +376,15 @@ var Mesh = Unit.extend({
   },
   Tick: function(dTime) {
 
-
     // Adjust to the time of the day
     _.each(this.lightsToMaintain, function(light) {
         light.distance = light.startDistance;
     });
 
-
     switch (this.meshData.name) {
-      case "Lantern 1":
+      case "Dungeon Light Small":
+      case "Dungeon Light Big":
+      case "Dungeon Light Huge":
 
         this.flickerTime -= dTime;
 
@@ -388,44 +394,26 @@ var Mesh = Unit.extend({
           this.lightsToMaintain[0].intensity =
             this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
         }
-
-
-
-        break;
-      case "Torch":
-
-        this.flickerTime -= dTime;
-
-        if ( this.flickerTime <= 0 ) {
-          // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
-          this.flickerTime = getRandomFloat(0.1, 0.2);
-          this.lightsToMaintain[0].intensity =
-            this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
-        }
-
-        break;
-      case "Campfire":
-
-        this.flickerTime -= dTime;
-
-        if ( this.flickerTime <= 0 ) {
-          // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
-          this.flickerTime = getRandomFloat(0.1, 0.2);
-          this.lightsToMaintain[0].intensity =
-            this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.2, 0.2);
-        }
-
-
 
         break;
       case "Item Billboard":
-
         if ( this.mesh ) {
-            this.mesh.LookAt(ironbane.camera.position, true);
+            this.mesh.LookFlatAt(ironbane.camera.position, true);
         }
-
         break;
     }
+
+    // Disable lights if they are too far
+    _.each(this.lightsToMaintain, function(light) {
+
+      if ( !ironbane.player.InRangeOfPosition(light.parent.position, 30) ) {
+        light.visible = false;
+      }
+      else {
+        light.visible = true;
+      }
+
+    }, this);
 
 
     if ( terrainHandler.skybox ) {
