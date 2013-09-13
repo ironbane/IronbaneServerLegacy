@@ -109,7 +109,7 @@ var EditorGUI = function() {
   this.opMode = ObjectPlacerModeEnum.PLACE;
 
   // Model placer mode
-  this.mpTransformMode = true;
+  this.mpTransformMode = false;
   this.selectModel = firstOfObject(ModelEnum);
   this.mpRotX = 0;
   this.mpRotY = 0;
@@ -967,6 +967,21 @@ var LevelEditor = Class.extend({
         levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
       }
       else {
+
+        _.each([
+          'Entering Transform mode...',
+          'Click a mesh to select it.',
+          'Press R to switch to Rotation mode',
+          'Press T to switch back to Translation mode.',
+          'Press X to delete the selected mesh.',
+          'Press Z to undo changes made to the selected mesh.',
+          'Press D to duplicate the mesh you are holding.'
+        ], function(msg) {
+          hudHandler.AddChatMessage(msg);
+        });
+
+
+
         levelEditor.SetPreviewMesh(null);
       }
     });

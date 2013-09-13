@@ -151,7 +151,9 @@ var NewLevelEditor = PhysicsObject.extend({
             if ( isHoveringHud ) return;
 
 
-              if (event.keyCode == 90 && (event.ctrlKey || event.metaKey)) me.Undo();
+              if (event.keyCode == 90 ) me.Undo();
+
+              if (event.keyCode == 68 ) me.Duplicate();
 
               if ( event.keyCode === 88 ) {
 
@@ -202,6 +204,32 @@ var NewLevelEditor = PhysicsObject.extend({
 
         this.selectedObject.quaternion.setFromEuler(this.selectedObjectOldRotation);
         //this.selectedObject.rotation.copy(this.selectedObjectOldRotation);
+
+    },
+    Duplicate: function() {
+
+        if ( !this.selectedObject ) return;
+
+        var oldPos = this.selectedObjectOldPosition.clone().Round(2);
+        var newPos = this.selectedObject.position.clone().Round(2);
+        var oldRot = this.selectedObjectOldRotation.clone();
+        var newRot = this.selectedObject.rotation.clone();
+
+        if ( !newPos.equals(oldPos) ||
+            !newRot.equals(oldRot)) {
+            socketHandler.socket.emit('addModel', {
+                position:newPos,
+                type: 5,
+                rX:newRot.x.ToDegrees(),
+                rY:newRot.y.ToDegrees(),
+                rZ:newRot.z.ToDegrees(),
+                param:this.selectedObject.unit.meshData.id
+            }, function() {
+
+            });
+        }
+
+        this.Undo();
 
     },
     DeleteSelectedObject: function() {
