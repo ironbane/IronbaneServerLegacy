@@ -57,13 +57,11 @@ module.exports = function(app, db) {
         });
     });
 
-    
-
     // get a single board
-    app.get('/api/forum/:boardId', function(req, res) {        
-            Board.get(req.params.boardId).then(function(results) {  
-                log('getting board: ' + req.params.boardId);          
-               res.send(results);            
+    app.get('/api/forum/:boardId', function(req, res) {
+            Board.get(req.params.boardId).then(function(results) {
+                log('getting board: ' + req.params.boardId);
+               res.send(results);
             }, function(error){
                 res.send(error, 500);
             });
@@ -71,19 +69,16 @@ module.exports = function(app, db) {
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
-        if(req.params.boardId === "news") {
+        if (req.params.boardId === "news") {
             Forum.getFrontPage().then(function(results) {
                 res.send(results);
-
-            }, function(error){
+            }, function(error) {
                 res.send(error, 500);
             });
-            
-        }
-        else{ 
-            Board.getView(req.params.boardId).then(function(results) {            
-               res.send(results);            
-            }, function(error){
+        } else {
+            Board.getView(req.params.boardId).then(function(results) {
+                res.send(results);
+            }, function(error) {
                 res.send(error, 500);
             });
         }
@@ -91,18 +86,22 @@ module.exports = function(app, db) {
 
     // start a new topic
     app.post('/api/forum/:boardId/topics', function(req, res) {
-        var post = { 
-            boardId:req.params.boardId, 
-            time:req.body.time, 
-            title:req.body.title, 
-            content:req.body.content,
-            user:req.body.user };
-            log("tudu: " + JSON.stringify(post));
-        Topic.newPost(post)
-        .then(function(){
+        var post = {
+            boardId: req.params.boardId,
+            time: req.body.time,
+            title: req.body.title,
+            content: req.body.content,
+            user: req.body.user
+        };
+        log("tudu: " + JSON.stringify(post));
 
-        });
-       
+        Topic.newPost(post)
+            .then(function(results) {
+                res.send(results);
+            }, function(err) {
+                res.send(500, err);
+            });
+
     });
 
     // get all posts for topic
@@ -110,7 +109,7 @@ module.exports = function(app, db) {
         Topic.getPostsView(req.params.topicId).then(function(results){
             res.send(results);
         }, function(error){
-            res.send(error);
+            res.send(500, error);
         });
     });
 
@@ -118,7 +117,7 @@ module.exports = function(app, db) {
         Topic.get(req.params.topicId).then(function(results){
             res.send(results);
         }, function(error){
-            res.send(error);
+            res.send(500, error);
         });
     });
 
@@ -130,11 +129,12 @@ module.exports = function(app, db) {
             time: req.body.time,
             user: req.body.user
         };
-        Post.save(post).then(function(result){
 
+        Post.save(post).then(function(result){
+            res.send(result);
         }, function(error){
-            res.send(error);
+            res.send(500, error);
         });
-        
+
     });
 };

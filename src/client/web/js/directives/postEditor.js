@@ -16,19 +16,23 @@ angular.module('IronbaneApp')
                     content: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
-                if($scope.topic === undefined ){
+
+                if($scope.topic === undefined ) {
                     post.title = $scope.post.title;
                 }
-                    post.$save({boardId: $scope.board, topicId: $scope.topic})
-                        .then(function(result) {
-                            // inject the post somewhere for auto rendering
-                            // this part is never called, investigate!!
-                            $log.log("jobs done!");
-                            // clear the form
-                            delete $scope.post;
-                            $scope.postEditorForm.$setPristine();
-                            $route.reload();
-                        });
+
+                post.$save({boardId: $scope.board, topicId: $scope.topic})
+                    .then(function(result) {
+                        // inject the post somewhere for auto rendering
+                        // this part is never called, investigate!!
+                        $log.log("jobs done!");
+                        // clear the form
+                        delete $scope.post;
+                        $scope.postEditorForm.$setPristine();
+                        $route.reload();
+                    }, function(err) {
+                        $log.error('error saving post!', err);
+                    });
             };
         }]
     };

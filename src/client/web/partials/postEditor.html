@@ -1,12 +1,5 @@
-<script>
-   $(document).ready(function() {
-    $('#markItUp').markItUp(myBbcodeSettings);
-});
-   </script>
-
-
 <form name="postEditorForm">
     <input ng-show="topic == null" type="text" ng-model="post.title" placeholder="title your post" ng-maxlength="100" value="topic.title" />
-    <textarea id="markItUp" ng-model="post.body"></textarea>
+    <mark-it-up ng-model="post.body"></mark-it-up>
     <button ng-click="save()">Post</button>
 </form>

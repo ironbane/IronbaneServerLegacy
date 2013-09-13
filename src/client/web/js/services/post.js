@@ -5,17 +5,18 @@ angular.module('IronbaneApp')
     };
 
     Post.prototype.$save = function(params) {
-        var url = '/api/forum/' + params.boardId + '/topics';
+        var url = '/api/forum/' + params.boardId + '/topics',
+            self = this;
 
         if(params.topicId && params.topicId > 0) {
             url = '/api/forum/topics/' + params.topicId;
         }
 
-        var promise = $http.post(url, this)
+        var promise = $http.post(url, self)
             .then(function(response) {
                 // update post object with id, topic_id etc...
                 $log.log('success saving post!', response.data);
-                return true;                
+                return response.data;
             }, function(err) {
                 $log.error('error saving post', err);
                 return $q.reject(err);
