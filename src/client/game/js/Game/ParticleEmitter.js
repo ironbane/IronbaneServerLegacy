@@ -87,13 +87,8 @@ var ParticleEmitter = Class.extend({
 
         // Also rotate the offset if attached to a unit
         if ( this.followUnit ) {
-            var rotationMatrix = new THREE.Matrix4();
-            var rot = new THREE.Euler((this.followUnit.rotation.x).ToRadians(), (this.followUnit.rotation.y).ToRadians(), (this.followUnit.rotation.z).ToRadians());
-            // sw("rot", rot.ToString());
-            rotationMatrix.makeRotationFromEuler(rot);
-
             this.spawnOffset.copy(this.originalSpawnOffset);
-            this.spawnOffset.applyMatrix4(rotationMatrix);
+            this.spawnOffset.applyEuler(this.followUnit.rotation);
         }
 
 
