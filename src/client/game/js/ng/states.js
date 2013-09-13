@@ -42,17 +42,7 @@ IronbaneApp
                 })
                 .state('mainMenu.login', {
                     templateUrl: '/game/templates/login.html',
-                    controller: ['$scope', '$state', '$log', function($scope, $state, $log) {
-                        $scope.login = function() {
-                            // if all goes well during login, move to character select
-                            $state.go('mainMenu.charSelect');
-                        };
-
-                        $scope.cancel = function() {
-                            // back we go!
-                            $state.go('mainMenu.unauthenticated');
-                        };
-                    }]
+                    controller: 'LoginCtrl'
                 })
                 .state('mainMenu.register', {
                     templateUrl: '/game/templates/register.html',

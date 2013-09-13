@@ -1,6 +1,6 @@
 IronbaneApp
-    .controller('CharSelectCtrl', ['$scope', 'Character', '$rootScope',
-        function($scope, Character, $rootScope) {
+    .controller('CharSelectCtrl', ['$scope', 'Character', '$rootScope', '$log', 'User', '$state',
+        function($scope, Character, $rootScope, $log, User, $state) {
             $scope.chars = [new Character({
                 name: 'Create Character'
             })];
@@ -43,6 +43,14 @@ IronbaneApp
 
             $scope.enterGame = function() {
                 // go play!
+            };
+
+            $scope.logout = function() {
+                User.logout().then(function() {
+                    $state.go('mainMenu.unauthenticated');
+                }, function(err) {
+                    $log.error(err);
+                });
             };
         }
     ]);
