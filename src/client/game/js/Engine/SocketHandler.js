@@ -581,32 +581,8 @@ var SocketHandler = Class.extend({
 
 
         });
-        this.socket.on('setTileHeight', function(array) {
 
-            if (!le("globalEnable")) return;
-
-            for (var d = 0; d < array.length; d++) {
-                var data = array[d];
-
-                levelEditor.SetTileHeight(data['tx'], data['tz'], data['height'], false, false, true);
-            }
-
-
-            // Make all gameobjects re-init their height
-            //            for(var u in ironbane.unitList){
-            //                ironbane.unitList[u].positionedShadowMesh = false;
-            //            }
-
-
-        });
-        this.socket.on('setTileImage', function(data) {
-            if (!le("globalEnable")) return;
-
-            levelEditor.SetTileImage(data['tx'], data['tz'], data['image'], false, true);
-        });
         this.socket.on('removeUnit', function(data) {
-            //if ( !socketHandler.loggedIn ) return;
-            //bm('remove unit: '+data.id);
 
             // Remove the unit from the list
             for (var i = 0; i < ironbane.unitList.length; i++) {
@@ -616,16 +592,10 @@ var SocketHandler = Class.extend({
                     break;
                 }
             }
+
         });
 
-
-
         this.socket.on('addModel', function(data) {
-            //if ( !socketHandler.loggedIn ) return;
-            //bm('remove unit: '+data.id);
-
-
-            hudHandler.AddChatMessage('Adding model...');
 
             levelEditor.PlaceModel(ConvertVector3(data.position),
                 data.rX,
@@ -636,8 +606,6 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('paintModel', function(data) {
-            //if ( !socketHandler.loggedIn ) return;
-            //bm('remove unit: '+data.id);
 
             // Find the model at this position, and reload it
 
@@ -710,8 +678,6 @@ var SocketHandler = Class.extend({
         this.socket.on('deleteModel', function(pos) {
 
             pos = ConvertVector3(pos).Round(2);
-            //if ( !socketHandler.loggedIn ) return;
-            //bm('remove unit: '+data.id);
 
             if ( pos.equals(ironbane.newLevelEditor.selectedObjectOldPosition.clone().Round(2)) ) {
                 // We want to remove the object we are currently holding!
@@ -720,12 +686,9 @@ var SocketHandler = Class.extend({
             }
 
 
-            // Check
             _.each(terrainHandler.cells, function(cell) {
                 _.each(cell.objects, function(obj) {
                     if (obj.position.clone().Round(2).equals(pos)) {
-
-                        hudHandler.AddChatMessage("Removing model "+obj.meshData.name);
 
                         cell.objects = _.without(cell.objects, obj);
 
