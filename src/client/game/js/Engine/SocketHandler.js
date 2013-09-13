@@ -201,13 +201,13 @@ var SocketHandler = Class.extend({
 
             switch (template.type) {
                 case UnitTypeEnum.MOVINGOBSTACLE:
-                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TRAIN:
-                    unit = new Train(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new Train(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TOGGLEABLEOBSTACLE:
-                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.LEVER:
                     unit = new Lever(ConvertVector3(data.position), data.id, data.metadata);
@@ -225,18 +225,18 @@ var SocketHandler = Class.extend({
                     unit = new HeartPiece(ConvertVector3(data.position), data.id);
                     break;
                 case UnitTypeEnum.SIGN:
-                    unit = new Sign(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                    unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.LOOTABLE:
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
                     } else {
-                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
+                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
                     }
                     break;
                 default:
                     // return;
-                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
+                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
                     break;
             }
 

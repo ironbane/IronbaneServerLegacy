@@ -38,7 +38,7 @@ var Sign = Mesh.extend({
     this._super(position, rotation, id, param, metadata);
 
 
-    this.dynamic = false;
+    this.dynamic = true;
 
   },
   BuildMesh: function(geometry, jsonMaterials) {
@@ -114,7 +114,7 @@ var Sign = Mesh.extend({
     this.textMesh.position.z = 0.1;
     this.textMesh.position.y = ypos;
 
-    this.localRotation.copy(this.rotation);
+    //this.localRotation.copy(this.rotation);
 
 
     //this.textMesh.doubleSided = true;

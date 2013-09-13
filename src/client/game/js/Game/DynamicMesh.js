@@ -39,52 +39,52 @@ var DynamicMesh = Mesh.extend({
         if ( !_.isUndefined(this.metadata.distanceMultiplier) ) this.distanceMultiplier = parseFloat(this.metadata.distanceMultiplier);
 
     },
-    BuildMesh: function(geometry, jsonMaterials) {
+//     BuildMesh: function(geometry, jsonMaterials) {
 
-        this._super(geometry, jsonMaterials);
+//         this._super(geometry, jsonMaterials);
 
-        // Let's keep everything at rotation 0,0,0 from the start
-        this.startVertices = [];
-        for(var v=0;v<this.mesh.geometry.vertices.length;v++) {
-            this.startVertices.push(this.mesh.geometry.vertices[v].clone());
-        }
+//         // Let's keep everything at rotation 0,0,0 from the start
+//         this.startVertices = [];
+//         for(var v=0;v<this.mesh.geometry.vertices.length;v++) {
+//             this.startVertices.push(this.mesh.geometry.vertices[v].clone());
+//         }
 
-//        this.rotation.copy(this.startRotation);
-//        this.RotateVertices();
-    },
+// //        this.rotation.copy(this.startRotation);
+// //        this.RotateVertices();
+//     },
     Tick: function(dTime) {
 
-        if ( this.changeRotation ) {
+        // if ( this.changeRotation ) {
 
-            this.RotateVertices();
-            this.changeRotation = false;
-        }
+        //     this.RotateVertices();
+        //     this.changeRotation = false;
+        // }
 
         this._super(dTime);
 
-    },
-    RotateVertices: function() {
-
-        if ( !this.mesh ) return;
-
-        var rotationMatrix = new THREE.Matrix4();
-        var rot = new THREE.Euler(this.rotation.x, this.rotation.y, this.rotation.z);
-        // sw("rot", rot.ToString());
-        rotationMatrix.makeRotationFromEuler(rot);
-
-        for(var v=0;v<this.mesh.geometry.vertices.length;v++) {
-            this.mesh.geometry.vertices[v].copy(this.startVertices[v]);
-            this.mesh.geometry.vertices[v].applyMatrix4(rotationMatrix);
-        }
-
-        //this.object3D.matrixWorld.makeRotationFromEuler(rot);
-        this.localRotation.copy(rot);
-        //this.mesh.rotation.copy(rot);
-
-        this.mesh.geometry.verticesNeedUpdate = true;
-
-        this.mesh.geometry.computeCentroids();
-        this.mesh.geometry.computeFaceNormals();
-        //this.mesh.geometry.computeVertexNormals();
     }
+    // RotateVertices: function() {
+
+    //     if ( !this.mesh ) return;
+
+    //     var rotationMatrix = new THREE.Matrix4();
+    //     var rot = new THREE.Euler(this.rotation.x, this.rotation.y, this.rotation.z);
+    //     // sw("rot", rot.ToString());
+    //     rotationMatrix.makeRotationFromEuler(rot);
+
+    //     for(var v=0;v<this.mesh.geometry.vertices.length;v++) {
+    //         this.mesh.geometry.vertices[v].copy(this.startVertices[v]);
+    //         this.mesh.geometry.vertices[v].applyMatrix4(rotationMatrix);
+    //     }
+
+    //     //this.object3D.matrixWorld.makeRotationFromEuler(rot);
+    //     this.localRotation.copy(rot);
+    //     //this.mesh.rotation.copy(rot);
+
+    //     this.mesh.geometry.verticesNeedUpdate = true;
+
+    //     this.mesh.geometry.computeCentroids();
+    //     this.mesh.geometry.computeFaceNormals();
+    //     //this.mesh.geometry.computeVertexNormals();
+    // }
 });
