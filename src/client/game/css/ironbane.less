@@ -1,9 +1,24 @@
+// main file
+
+@import "../../common/css/import.less";
+
 @textColor: #6DF2C0;
 @borderColor: #06452d;
 
 // replace similarly named image (todo: better name)
 @bgc1: #103C32;
 @bgc1_75: fade(@bgc1, 75);
+
+@inputDisabledFontColor:        #ececec;
+@errorTextColor:                #FF0000;
+
+
+// BUTTONS
+@buttonAttentionTextColor:      #A9F8FC;
+
+.OffScreen {
+    position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
+}
 
 body {
     margin:0px;
@@ -30,6 +45,105 @@ a {
     outline: 3px solid #06452d;
     background-color: @bgc1_75;
     padding: 10px;
+}
+
+.customCheckbox {display: inline-block; vertical-align: baseline; font-size: 14px;
+    .customCheckboxInput {width: 16px; height: 16px;display: inline-block; text-align: left; margin: 0 5px 0 0;}
+    .customCheckboxInput,
+    .customCheckboxLabel {cursor: pointer; display: inline-block; vertical-align: baseline;margin-left: 4px;}
+    &.disabled {cursor: default; color: @inputDisabledFontColor !important;}
+}
+
+.error {color: @errorTextColor;}
+
+#mainMenu {
+    position: absolute;
+    top: 10%;
+    left: 35%;
+    header.logo {
+        width: 500px;
+        height: 200px;
+    }
+    .menuContainer {
+        .menu-left,
+        .menu-right {
+            float: left;
+            margin: 16px;
+        }
+        .menu-left {
+            width: 360px;
+            text-align: center;
+        }
+    }
+}
+
+#devNews {
+    width: 250px;
+    height: 341px;
+    font-size: 10px;
+    font-weight: normal;
+    .news-content {
+        height: 280px;
+        .news-post-title, .news-post-time {margin: 0;}
+        ul, ol {padding-left: 30px;}
+        hr {
+            height: 2px;
+            border-style: dashed none none none;
+            border-width: 2px;
+            border-color: @textColor;
+        }
+    }
+}
+
+input[type=text],
+input[type=email],
+input[type=password] {
+    .placeholder(darken(@textColor, 10%));
+    color: @textColor;
+    border-color: @primary4;
+    background-color: @primary3;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 10px;
+    height: 30px;
+    text-indent: 2px;
+    margin: 8px;
+}
+
+button {
+    background-color: #357768;
+    border: 3px solid #1f453c;
+    display: inline-block;
+    color: #37ffac;
+    font-family: Verdana;
+    font-size: 19px;
+    font-weight: bold;
+    padding: 6px 25px;
+    text-decoration: none;
+    text-shadow: 2px 1px 0px #06452d;
+    margin: 3px;
+    min-width: 100px;
+    &:hover {
+        background-color: #5ba997;
+    }
+    &:active {
+        position: relative;
+        top: 1px;
+    }
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:focus,
+    &:disabled:active {
+        background-color: #677874;
+        border: 3px solid #33423e;
+    }
+    &.attention {
+        color: @buttonAttentionTextColor;
+    }
+}
+
+.registrationForm {
+    button {width: 150px;}
 }
 
 #gameFrame {
@@ -209,7 +323,6 @@ a {
 
 #loadingBar {
     pointer-events: none;
-    display: none;
     position: absolute;
     text-align: center;
     padding-top: 20px;
@@ -308,26 +421,6 @@ a {
 }
 
 
-.ibutton {
-    background-color: #357768;
-    border: 3px solid #1f453c;
-    display: inline-block;
-    color: #37ffac;
-    font-family: Verdana;
-    font-size: 19px;
-    font-weight: bold;
-    padding: 6px 0px;
-    text-decoration: none;
-    text-shadow: 2px 1px 0px #06452d;
-    margin: 3px;
-    &:hover {
-        background-color:#5ba997;
-    }
-    &:active {
-        position:relative;
-        top:1px;
-    }
-}
 
 .ibutton_book {
   background-color:#cc9999;
@@ -398,51 +491,29 @@ label {
     text-shadow: 2px 2px 1px #06452d;
 }
 
-#alertBox {
-    position: absolute;
-    z-index: 1000;
-}
-
-#alertImage {
-  width:100px;
-
-  background-image:url(../media/images/hud/attention.png);
-  background-position:center;
-  background-repeat: no-repeat;
-  float:left;
-}
-
-#alertMessage {
-  padding-top:10px;
-  padding-bottom:10px;
-  width:400px;float:left;
-
-}
-
-#alertOK {
-  width:400px;
-  text-align:center;
-
-}
-
-#devNews {
-    position: absolute;
-    width: 250px;
-    height: 341px;
-    font-size: 10px;
-    font-weight: normal;
-    .news-content {
-        height: 280px;
-        .news-post-title, .news-post-time {margin: 0;}
-        ul, ol {padding-left: 30px;}
-        hr {
-            height: 2px;
-            border-style: dashed none none none;
-            border-width: 2px;
-            border-color: @textColor;
-        }
+.alert-box {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    z-index: 1050;
+    .alert-image,
+    .alert-message {
+        float: left;
+    }
+    .alert-message {
+        padding: 10px;
+        min-width: 300px;
+    }
+    .alert-image {
+        margin: 10px;
+    }
+    .alert-buttons {
+        clear: both;
+        text-align: right;
     }
 }
+
+
 
 #bogusButton {
     display:none;

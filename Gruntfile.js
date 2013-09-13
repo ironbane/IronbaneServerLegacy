@@ -66,7 +66,7 @@ module.exports = function(grunt) {
                     "src/client/common/js/general/directives/checkboxCustom.js",
 
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
-                    //"<%= gameScriptPath %>/ng/states.js", // do not load this yet
+                    "<%= gameScriptPath %>/ng/states.js", // do not load this yet
                     "<%= gameScriptPath %>/ng/services/game.js",
                     "<%= gameScriptPath %>/ng/services/socket.js",
                     "<%= gameScriptPath %>/ng/services/character.js",

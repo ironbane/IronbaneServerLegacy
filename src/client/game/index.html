@@ -33,48 +33,8 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <ui-view id="hudHandler"></ui-view>
-    <!-- contents of frame.html from old client -->
-    <div id="loadingBar" style="display:none">
-        <img src="media/images/misc/loading.gif"><div class="spacersmall"></div>
-        <div id="loadingBarMessage"></div>
-    </div>
+    <ui-view id="HUD"></ui-view>
     <div id="gameFrame" style="opacity:0">
-        <div id="dropItemsBox"></div>
-        <div id="bigMessagesBox"></div>
-        <div id="loginBox">
-            <div id="logo" style="display:none"></div>
-            <div id="versionNumber" style="display:none">
-                <div class="bigoutline">@@gameVersion</div>
-            </div>
-            <div class="spacer"></div>
-            <div id="loginContainer">
-                <div id="loginContent"></div>
-                <div id="noWebGL" class="dialog">
-                    <div id="hquote"></div>
-                    <div class="spacersmall"></div>
-                    <div class="gen">It appears your browser does not support WebGL, or it is not enabled.<div class="spacersmall"></div><div id="webglsolution"></div></div>
-                    <div class="spacer"></div>
-                </div>
-                <div id="serverDownDisconnect">
-                    <div class="spacer"></div>
-                    <h2>The server disconnected!<br></h2>
-                </div>
-            </div>
-            <div class="spacer"></div>
-        </div>
-
-        <div id="alertBox" class="dialog" style="display:none">
-            <div id="alertImage"></div>
-            <div id="alertMessage">Sample alert message</div>
-            <div id="alertOK">
-                <button id="btnOK" class="ibutton" style="width:100px;">Okay</button>
-                <button id="btnNo" class="ibutton" style="width:100px;">No way</button>
-            </div>
-        </div>
-
-        <news-pane id="devNews" class="dialog" style="display:none;"></news-pane>
-
         <div id="chatBox">
             <chat-window id="chatContent"></chat-window>
             <div id="chatInputBox">
@@ -111,8 +71,6 @@
         <div id="editorControls"></div>
         <div class="ib-tutorial">
         </div>
-
-        <friends-dialog user-id="currentUser.id" character-id="currentCharacter.id"></friends-dialog>
     </div>
 
     <script>
