@@ -91,7 +91,8 @@ a {
     height: 341px;
     font-size: 10px;
     font-weight: normal;
-    .body {padding: 0 0px 0 2px;font-size: 10px;line-height: 13px;}
+    >header {text-align: center;border-bottom: 4px double;}
+    >.body {padding: 0 0px 0 2px;font-size: 10px;line-height: 13px;}
     .news-content {
         height: 260px;
         .news-post-title, .news-post-time {margin: 0;}
@@ -161,7 +162,9 @@ button {
 
 .char-select {
     min-height: 340px;
-    .char-name {width: 228px;padding: 10px;}
+    .char-name,
+    .create-button {width: 228px;}
+    .char-name {padding: 10px;}
     button.cycle {
         padding: 6px 3px;
         min-width: 0px;

@@ -51,3 +51,30 @@ a:focus {
 .img-circle {
   .border-radius(500px); // crank the border-radius so it works with most reasonably sized images
 }
+
+// Lists
+// ----------------------
+
+.horizontal-list {
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    list-style-type: none;
+    display: inline;
+    li {
+        display: inline;
+        float: none;
+        list-style: none;
+        a {
+            &:hover {
+                cursor:pointer;
+            }
+        }
+    }
+}
+
+.pipe-list {
+    li a {margin: 0.5em;text-decoration: none;}
+    li:after {content: "|";}
+    li:last-child:after {content: "";}
+}

@@ -46,6 +46,11 @@ IronbaneApp
 
             $scope.enterGame = function() {
                 // go play!
+                $state.go('playing');
+            };
+
+            $scope.options = function() {
+                $state.go('mainMenu.options');
             };
 
             $scope.logout = function() {
