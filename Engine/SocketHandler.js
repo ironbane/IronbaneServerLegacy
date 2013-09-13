@@ -1538,9 +1538,8 @@ var SocketHandler = Class.extend({
                 // (no more tiles/... saved)
                 // data = JSON.parse(JSON.stringify(data));
 
-                // Set a timer to auto save this cell
-                // If we set the height again, reset the timer
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
                 if ( data.global ) {
                     _.each(data.metadata, function(value, key, list) {
@@ -1585,33 +1584,14 @@ var SocketHandler = Class.extend({
                 if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
 
 
-                var foundOnBuffer = false;
-                for(var o=0;o<worldHandler.world[zone][cellPos.x][cellPos.z].objects.length;o++) {
-                    var obj = worldHandler.world[zone][cellPos.x][cellPos.z].objects[o];
-
-                    obj = ConvertVector3(obj);
-                    obj = obj.Round(2);
-
-                    if ( data.x === obj.x && data.y === obj.y && data.z === obj.z ) {
-                        // Found it on the buffer, so we added something and deleted it back before the save
-                        // Just delete it from the buffer, don't add to the deleteBuffer
-                        foundOnBuffer = true;
-                        worldHandler.world[zone][cellPos.x][cellPos.z].objects.splice(o, 1);
-                        break;
-                    }
+                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer) ) {
+                    worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer = [];
                 }
-
-                if ( !foundOnBuffer ) {
-                    if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer) ) {
-                        worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer = [];
-                    }
-                    worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer.push(data);
-                }
-
+                worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer.push(data);
 
                 // Set a timer to auto save this cell
                 // If we set the height again, reset the timer
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
 
                 socket.unit.EmitNearby("deleteModel", data, 0, true);
@@ -1656,9 +1636,8 @@ var SocketHandler = Class.extend({
                     rZ:data.rZ
                 });
 
-                // Set a timer to auto save this cell
-                // If we set the height again, reset the timer
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+                // Save directly
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
                 socket.unit.EmitNearby("addModel", data, 0, true);
 
@@ -1700,7 +1679,7 @@ var SocketHandler = Class.extend({
                 nodeHandler.AddNode(zone, newNodeID, position);
 
                 var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
                 socket.unit.EmitNearby("ppAddNode", {
                     id: newNodeID,
@@ -1736,7 +1715,7 @@ var SocketHandler = Class.extend({
                 var position = nodeHandler.GetNodePosition(zone, data.from);
 
                 var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
                 socket.unit.EmitNearby("ppAddEdge", data, 0, true);
 
@@ -1769,7 +1748,7 @@ var SocketHandler = Class.extend({
                 var position = nodeHandler.GetNodePosition(zone, data.id);
 
                 var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.AutoSaveCell(zone, cellPos.x, cellPos.z);
+                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
 
                 nodeHandler.DeleteNode(zone, data.id);

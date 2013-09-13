@@ -546,97 +546,57 @@ var WorldHandler = Class.extend({
 
     if ( !_.isUndefined(worldHandler.world[zone][cellX][cellZ].changeBuffer) ) {
 
-      for(var d=0;d<worldHandler.world[zone][cellX][cellZ].changeBuffer.length;d++) {
-
-        var obj = worldHandler.world[zone][cellX][cellZ].changeBuffer[d];
-
+      _.each(worldHandler.world[zone][cellX][cellZ].changeBuffer, function(obj) {
 
         var pos = ConvertVector3(obj.pos);
         pos = pos.Round(2);
 
-
-        var found = false;
-
-        for(var o=0;o<worldHandler.world[zone][cellX][cellZ].objects.length;o++) {
-          var loopObj = worldHandler.world[zone][cellX][cellZ].objects[o];
+        _.each(worldHandler.world[zone][cellX][cellZ].objects, function(loopObj) {
 
           if ( pos.x === loopObj.x && pos.y === loopObj.y && pos.z === loopObj.z ) {
-
-
-
             if ( _.isEmpty(obj.metadata) ) {
-              delete worldHandler.world[zone][cellX][cellZ].objects[o].metadata;
+              delete loopObj.metadata;
             }
             else {
 
-              if ( _.isUndefined(worldHandler.world[zone][cellX][cellZ].objects[o].metadata) ) {
-                worldHandler.world[zone][cellX][cellZ].objects[o].metadata = {};
+              if ( _.isUndefined(loopObj.metadata) ) {
+                loopObj.metadata = {};
               }
 
-              _.extend(worldHandler.world[zone][cellX][cellZ].objects[o].metadata, obj.metadata);
+              _.extend(loopObj.metadata, obj.metadata);
             }
-
-            found = true;
-            break;
           }
-        }
+
+        });
+
+      });
 
 
-        if ( !found ) {
-          log("Could not find object in changeBuffer!");
-        }
-        else {
-          log("Found object in changeBuffer!");
-        }
-
-
-
-      }
     }
 
     // Delete the things from the terrain in the deleteBuffer
     if ( !_.isUndefined(worldHandler.world[zone][cellX][cellZ].deleteBuffer) ) {
 
+      _.each(worldHandler.world[zone][cellX][cellZ].deleteBuffer, function(obj) {
 
-
-      for(var d=0;d<worldHandler.world[zone][cellX][cellZ].deleteBuffer.length;d++) {
-
-        var data = worldHandler.world[zone][cellX][cellZ].deleteBuffer[d];
-
-
-        data = ConvertVector3(data);
+        var data = ConvertVector3(obj);
         data = data.Round(2);
 
+        _.each(worldHandler.world[zone][cellX][cellZ].objects, function(loopObj) {
 
-
-        var found = false;
-
-        for(var o=0;o<worldHandler.world[zone][cellX][cellZ].objects.length;o++) {
-          var obj = worldHandler.world[zone][cellX][cellZ].objects[o];
-
-
-          obj = ConvertVector3(obj);
+          var obj = ConvertVector3(loopObj);
           obj = obj.Round(2);
 
           if ( data.x === obj.x && data.y === obj.y && data.z === obj.z ) {
-            worldHandler.world[zone][cellX][cellZ].objects.splice(o--, 1);
-            worldHandler.world[zone][cellX][cellZ].deleteBuffer.splice(d--, 1);
-            found = true;
-            break;
+            worldHandler.world[zone][cellX][cellZ].objects =
+              _.without(worldHandler.world[zone][cellX][cellZ].objects, loopObj);
+            worldHandler.world[zone][cellX][cellZ].deleteBuffer =
+              _.without(worldHandler.world[zone][cellX][cellZ].deleteBuffer, loopObj);
+
           }
-        }
+        });
 
-
-        if ( !found ) {
-          log("Could not find object in deleteBuffer!");
-        }
-        else {
-          log("Found object in deleteBuffer!");
-        }
-
-
-
-      }
+      });
     }
 
     // Query the entry
@@ -650,7 +610,6 @@ var WorldHandler = Class.extend({
         log('Directory created');
       }
     });
-
 
     // Same for persistent data
     if ( persistentWorldChanges ) {
@@ -780,20 +739,6 @@ var WorldHandler = Class.extend({
       }
     }
     return false;
-  },
-  AutoSaveCell: function(zone, x, z) {
-    // Set a timer to auto save this cell
-    // If we set the height again, reset the timer
-    if ( !_.isUndefined(worldHandler.world[zone][x][z].saveTimer) ) {
-      //log("clearTimer");
-      clearTimeout(worldHandler.world[zone][x][z].saveTimer);
-    }
-    worldHandler.world[zone][x][z].saveTimer = setTimeout(
-      (function(zone, cx, cz) {
-        return function() {
-          worldHandler.SaveCell(zone, cx, cz);
-        };
-      })(zone, x, z), 5000);
   },
   GetWaypointID: function(zone) {
     if ( worldHandler.world[zone] === undefined ) return -1;
