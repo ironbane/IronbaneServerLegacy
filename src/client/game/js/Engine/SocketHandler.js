@@ -585,12 +585,13 @@ var SocketHandler = Class.extend({
         this.socket.on('removeUnit', function(data) {
 
             // Remove the unit from the list
-            for (var i = 0; i < ironbane.unitList.length; i++) {
-                if (ironbane.unitList[i].id == data.id) {
-                    ironbane.unitList[i].Destroy();
-                    ironbane.unitList.splice(i, 1);
-                    break;
-                }
+            var unit = _.find(ironbane.unitList, function(unit) {
+                return unit.id === data.id;
+            });
+
+            if ( unit ) {
+                unit.Destroy();
+                ironbane.unitList = _.without(ironbane.unitList, unit);
             }
 
         });
