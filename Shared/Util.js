@@ -17,7 +17,7 @@ if ( !SERVER ) {
     options.alphaTest = options.alphaTest === undefined ? 0.5 : options.alphaTest;
     options.doubleSided = options.doubleSided === undefined ? false : options.doubleSided;
     options.useLighting = options.useLighting === undefined ? false : options.useLighting;
-
+    options.spriteMaterial = options.spriteMaterial === undefined ? false : options.spriteMaterial;
 
 
     var image = new Image();
@@ -57,6 +57,20 @@ if ( !SERVER ) {
       // var mat = new THREE.MeshPhongMaterial( config );
       // mat.perPixel = true;
       var mat = new THREE.MeshLambertMaterial( config );
+
+      return mat;
+
+    }
+
+    if ( options.spriteMaterial ) {
+
+      var mat = new THREE.SpriteMaterial({
+            color: ColorEnum.WHITE,
+            map: texture,
+            useScreenCoordinates: false,
+            transparent: true,
+            alphaTest: 0.5
+        });
 
       return mat;
 

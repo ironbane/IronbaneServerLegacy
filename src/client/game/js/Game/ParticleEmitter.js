@@ -112,11 +112,13 @@ var ParticleEmitter = Class.extend({
             }
         }
 
-        texture = textureHandler.GetTexture('images/' + texture + '.png', true);
+        var spriteMaterial = textureHandler.GetTexture('images/' + texture + '.png', false, {
+            spriteMaterial: true
+        });
 
         // Deliberately take twice the width so the images are scaled correctly
-        particle.scale.x *= texture.image.width;
-        particle.scale.y *= texture.image.width;
+        particle.scale.x *= spriteMaterial.map.image.width;
+        particle.scale.y *= spriteMaterial.map.image.width;
 
         particle.velocity = (CheckForFunctionReturnValue(this.type.particleStartVelocity, particle) || new THREE.Vector3()).clone();
 
@@ -127,10 +129,6 @@ var ParticleEmitter = Class.extend({
         particle.maxForce = CheckForFunctionReturnValue(this.type.particleMaxForce, this) || 10.0;
         particle.maxTurnRate = CheckForFunctionReturnValue(this.type.particleMaxTurnRate, this) || 0.5;
         particle.enableGravity = CheckForFunctionReturnValue(this.type.particleEnableGravity, this) || false;
-
-
-
-
 
         if ( this.particleFollowUnit ) {
             //particle.followUnitPosition = particle.position.clone();
@@ -143,23 +141,7 @@ var ParticleEmitter = Class.extend({
         particle.particleScaleVelocity = (CheckForFunctionReturnValue(this.type.particleScaleVelocity, this) || new THREE.Vector2()).clone();
 
 
-
-        // var material = new THREE.ParticleBasicMaterial({
-        // color: 0xFFFFFF,
-        // size: 20,
-        // map: textureHandler.GetTexture('images/' + texture + '.png', true),
-        // blending: THREE.AdditiveBlending,
-        // transparent: true
-        // });
-
-        particle.sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            color: ColorEnum.WHITE,
-            map: texture,
-            useScreenCoordinates: false,
-            transparent : false,
-            alphaTest: 0.5
-        //blending: THREE.AdditiveBlending,
-        }));
+        particle.sprite = new THREE.Sprite(spriteMaterial);
 
         particle.sprite.opacity = 0;
 
