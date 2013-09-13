@@ -64,6 +64,8 @@ module.exports = function(grunt) {
                     "src/client/common/js/general/module.js",
                     "src/client/common/js/general/directives/passwordField.js",
                     "src/client/common/js/general/directives/checkboxCustom.js",
+                    "src/client/common/js/twitter/module.js",
+                    "src/client/common/js/twitter/services/search.js",
 
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     "<%= gameScriptPath %>/ng/states.js", // do not load this yet
