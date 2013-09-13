@@ -3,7 +3,7 @@ IronbaneApp
         function($scope, Character, $rootScope, $log, User, $state) {
             $scope.chars = [];
             $scope.selectedChar = null;
-            var index = $state.current.data.startingIndex || 0;
+            var index = $scope.$stateParams.startingIndex || 0;
 
             Character.getAll($rootScope.currentUser.id).then(function(chars) {
                 $rootScope.currentUser.activeCharCount = chars.length;
@@ -11,9 +11,7 @@ IronbaneApp
                 if(chars.length === 0) {
                     $state.go('mainMenu.charSelectNew');
                 } else {
-                    angular.forEach(chars, function(c) {
-                        $scope.chars.unshift(c);
-                    });
+                    $scope.chars = chars;
                     $scope.selectedChar = chars[0];
                 }
             }, function(err) {

@@ -15,7 +15,7 @@ IronbaneApp
                         function($scope, $state, $log) {
                             $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
                             if($scope.currentUser.authenticated) {
-                                $state.go('mainMenu.charSelect');
+                                $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
                             } else {
                                 $state.go('mainMenu.unauthenticated');
                             }
@@ -50,10 +50,7 @@ IronbaneApp
                 })
                 .state('mainMenu.charSelect', {
                     templateUrl: '/game/templates/charSelect.html',
-                    controller: 'CharSelectCtrl',
-                    data: {
-                        startingIndex: 0 // todo: get last char ID?
-                    }
+                    controller: 'CharSelectCtrl'
                 })
                 .state('mainMenu.charSelectNew', {
                     templateUrl: '/game/templates/charSelectNew.html',
@@ -61,7 +58,7 @@ IronbaneApp
                         $scope.remainingSlots = MAX_CHAR_SLOTS -= $scope.currentUser.activeCharCount;
 
                         $scope.prev = function() {
-                            $scope.$state.go('mainMenu.charSelect');
+                            $scope.$state.go('mainMenu.charSelect', {startingIndex: $scope.currentUser.activeCharCount - 1});
                         };
 
                         $scope.next = function() {
