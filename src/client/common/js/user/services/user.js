@@ -10,8 +10,8 @@ angular.module('User') // separate module for sharing with website
 
     // todo: make this a getter?
     User.getDefaultAvatar = function() {
-       return DEFAULT_AVATAR; 
-    } 
+       return DEFAULT_AVATAR;
+    };
 
     User.prototype.$hasRole = function(role) {
         return this.roles.indexOf(role) >= 0;
@@ -54,6 +54,17 @@ angular.module('User') // separate module for sharing with website
                 //$log.log('User service login error', err);
                 return $q.reject(err);
             });
+    };
+
+    // logout current user, clear rootscope current user
+    User.logout = function() {
+        return $http.get('/logout').then(function(response) {
+            $rootScope.currentUser = null;
+
+            return true;
+        }, function(response) {
+            return $q.reject('error logging out! ' + response.data);
+        });
     };
 
     User.getByName = function(username) {
