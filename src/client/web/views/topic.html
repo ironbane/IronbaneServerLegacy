@@ -34,7 +34,12 @@
     </section>
     <br class="clear">
     <section ng-show="currentUser.authenticated" class="new-topic-form">
-        <h1><i class="icon-edit"></i> New Reply</h1>
-        <post-editor board="board.id" topic="topic.id"></post-editor>
+        <div ng-controller="CollapseControl">
+            <button class="btn" ng-click="isCollapsed = !isCollapsed">New Reply</button>
+            <hr>
+            <div collapse="isCollapsed">
+                <post-editor board="board.id" topic="topic.id"/>
+            </div>
+        </div>
     </section>
 </div>

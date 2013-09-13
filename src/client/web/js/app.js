@@ -1,5 +1,5 @@
 // app.js
-angular.module('IronbaneApp', ['ui.utils', 'IBCommon','User'])
+angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User','$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
