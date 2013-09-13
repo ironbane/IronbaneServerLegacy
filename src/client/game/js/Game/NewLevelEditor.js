@@ -206,8 +206,12 @@ var NewLevelEditor = PhysicsObject.extend({
     },
     DeleteSelectedObject: function() {
 
-      socketHandler.socket.emit('deleteModel', this.selectedObjectOldPosition.Round(2));
-      me.ClearSelectedObject();
+      var me = this;
+
+      socketHandler.socket.emit('deleteModel', this.selectedObjectOldPosition.clone().Round(2), function() {
+        me.ClearSelectedObject();
+      });
+
 
     },
     SetSelectedObject: function(mesh) {
