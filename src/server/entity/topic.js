@@ -78,13 +78,15 @@ module.exports = function(db) {
                 deferred.reject(results);
                 return;
             }
-            var posts = []
             _.each(results, function(p) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
                 });
                 p.user = {name: p.name, avatar : p.forum_avatar, sig:p.forum_sig, postcount: p.postcount};
                 p.postcount = undefined;
+                p.name = undefined;
+                p.forum_sig = undefined;
+                p.forum_avatar = undefined;
             });
 
 

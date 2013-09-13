@@ -27,7 +27,7 @@
                         <td>
                         {{topic.viewcount}}</td>
                         
-                        <td> <userlink name="PLACEHOLDER"/> <br>
+                        <td> <userlink name={{topic.lastuser}}/> <br>
                         <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
                             <time datetime="{{ topic.lastposttime * 1000 | date }}">{{ topic.lastposttime * 1000 | date:'medium' }}</time>
                         </a>

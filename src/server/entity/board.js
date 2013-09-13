@@ -31,8 +31,8 @@ module.exports = function(db) {
     Board.getView = function(boardId){
         log('getting topics for ' +boardId);
         var deferred = Q.defer();
-        // to do: make an extra join and alias for the last poster (nasty query....)
-        db.query('SELECT forum_topics.sticky, forum_topics.locked, forum_topics.id, forum_topics.views as viewcount, MIN(forum_posts.time) AS firstposttime, MAX(forum_posts.time) as lastposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id order by sticky desc, lastposttime desc', [boardId], function(err, results) {
+        var recentUserQuery = "(SELECT bcs_users.name FROM bcs_users INNER JOIN forum_posts ON forum_posts.user = bcs_users.id WHERE forum_posts.topic_id = forum_topics.id ORDER BY forum_posts.time DESC LIMIT 1) as lastuser, "
+        db.query('SELECT ' + recentUserQuery + ' forum_topics.sticky, forum_topics.locked, forum_topics.id, forum_topics.views as viewcount, MIN(forum_posts.time) AS firstposttime, MAX(forum_posts.time) as lastposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? GROUP BY forum_topics.id order by sticky desc, lastposttime desc', [boardId], function(err, results) {
             if (err) {
                 log('error getting topics');
                 deferred.reject(err);
@@ -43,7 +43,6 @@ module.exports = function(db) {
                 log('no topics found');
                 deferred.resolve([]);
             }
-            
             deferred.resolve(results);
         });
         return deferred.promise;
