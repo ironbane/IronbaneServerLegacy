@@ -305,8 +305,10 @@ var Mesh = Unit.extend({
     this.mesh.geometry.computeBoundingSphere();
     this.boundingSphere = this.mesh.geometry.boundingSphere;
 
+    _.each(this.mesh.material.materials, function(mat) {
+      mat.side = THREE.DoubleSide;
+    });
 
-    //this.mesh.material.side = THREE.DoubleSide;
 
     ironbane.scene.add(this.mesh);
 
