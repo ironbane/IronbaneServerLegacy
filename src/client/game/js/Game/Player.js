@@ -766,7 +766,7 @@ var Player = Fighter.extend({
       //this.aimMesh.position = point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
       this.aimMeshPosition.lerp(point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05)), dTime*20);
       this.aimMesh.position.copy(this.aimMeshPosition);
-      this.aimMesh.LookFlatAt(currentMouseToWorldData.face.normal.clone().add(this.aimMesh.position));
+      this.aimMesh.LookFlatAt(currentMouseToWorldData.face.normalWithRotations.clone().add(this.aimMesh.position));
     }
 
 

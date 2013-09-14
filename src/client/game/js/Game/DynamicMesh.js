@@ -60,6 +60,10 @@ var DynamicMesh = Mesh.extend({
         //     this.changeRotation = false;
         // }
 
+        //this.object3D.setRotationFromEuler(this.rotation);
+        //this.object3D.rotation.setFromQuaternion(this.object3D.quaternion);
+        this.object3D.quaternion.setFromEuler(this.localRotation);
+
         this._super(dTime);
 
     }

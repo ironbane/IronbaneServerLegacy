@@ -187,7 +187,8 @@ var PhysicsObject = Class.extend({
           this.position.getPositionFromMatrix(this.object3D.matrixWorld);
 
           if ( this instanceof Mesh && this.mesh ) {
-            this.mesh.rotation.setFromQuaternion(this.object3D.quaternion);
+            //this.mesh.rotation.setFromQuaternion(this.object3D.quaternion);
+            this.UpdateRotationByVertices();
           }
           //
           this.initialStaticUpdateDone = true;

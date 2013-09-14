@@ -69,54 +69,57 @@ var MovingObstacle = DynamicMesh.extend({
                     this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier*1.1)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationX:
-                    this.changeRotation = true;
-                    this.rotation.x = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationY:
-                    this.changeRotation = true;
-                    this.rotation.y = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationZ:
-                    this.changeRotation = true;
-                    this.rotation.z = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXY:
-                    this.changeRotation = true;
-                    this.rotation.x = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.y = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXZ:
-                    this.changeRotation = true;
-                    this.rotation.x = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.z = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationYZ:
-                    this.changeRotation = true;
-                    this.rotation.y = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.z = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXYZ:
-                    this.changeRotation = true;
-                    this.rotation.x = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.y = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.z = ((time/100.0)*this.speedMultiplier)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXYZ2:
-                    this.changeRotation = true;
-                    this.rotation.x = ((time/100.0)*this.speedMultiplier*0.9)%360;
-                    this.rotation.y = ((time/100.0)*this.speedMultiplier)%360;
-                    this.rotation.z = ((time/100.0)*this.speedMultiplier*1.1)%360;
+                    this.changeRotationNextTick = true;
+                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier*0.9)%(Math.PI*2);
+                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier*1.1)%(Math.PI*2);
                     break;
                 default:
-                    this.changeRotation = true;
-                    this.position.lerp(this.targetPosition, dTime*2);
-                    this.rotation.lerp(this.targetRotation, dTime*20);
+                    this.changeRotationNextTick = true;
+                    this.localPosition.lerp(this.targetPosition, dTime*2);
+                    this.localRotation.lerp(this.targetRotation, dTime*20);
                     break;
             }
 
+
+            // Trim rotations
+
 // this.localPosition.y = 1;
 //
-//                    this.changeRotation = true;
+//                    this.changeRotationNextTick = true;
 //                    this.rotation.x = 180;
 //                    //this.rotation.y = 0;
 //                    this.rotation.z = 0;

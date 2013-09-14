@@ -57,9 +57,6 @@ var Mesh = Unit.extend({
     this.octree = new THREE.Octree({undeferred: true});
 
 
-
-
-
     // Going to use children to add special properties/effects to meshes
     // A bit hacky, but it's better than creating a ton of classes for each
     // model name. We're just going to check for the model name and do
@@ -286,7 +283,7 @@ var Mesh = Unit.extend({
     var result = meshHandler.ProcessMesh({
       geometry: geometry,
       jsonMaterials: jsonMaterials,
-      //rotation: this.rotation,
+      // No rotaion passed here! We do things manually to circumvent the raycast bug
       metadata: this.metadata,
       meshData: this.meshData
     });
@@ -309,64 +306,42 @@ var Mesh = Unit.extend({
       mat.side = THREE.DoubleSide;
     });
 
+    // Because of a bug with the raycaster, rotations are not taken into account
+    // when casting rays. We need to rotate the geometry of the mesh instead.
+    // We therefore need the starting rotations of all the vertices here
+    // so we can do a manual rotation for each vertex later in Tick()
+    this.startVertices = [];
+
+    _.each(this.mesh.geometry.vertices, function(vertex) {
+      this.startVertices.push(vertex.clone());
+    }, this);
+
 
     ironbane.scene.add(this.mesh);
 
-    // (function(unit){
-    //   setTimeout(function() {
-    //     unit.Decorate();
-    //   }, 10000);
-    // })(this);
     this.Decorate();
 
     this.UpdateLighting();
-  //this.UpdateRotation();
+
+    // Rotate atleast once to set things up
+    this.changeRotationNextTick = true;
+
   },
-  // OnLoad: function(mesh) {
-  //   //this.mesh = mesh;
-  //   this.mesh = new THREE.Mesh(mesh.geometry, new THREE.MeshFaceMaterial());
-  //   ironbane.scene.add(this.mesh);
-  //   this.dynamic = false;
-  // },
-
-  // Hacky, currently only used by the previewMesh for the level editor
   UpdateRotationByVertices: function() {
-    if ( !this.mesh ) return;
 
+    if ( !this.mesh || !this.changeRotationNextTick ) return;
 
-      this.mesh.geometry.dynamic = true;
-      this.mesh.geometry.verticesNeedUpdate = true;
-
-
-
-    if ( _.isUndefined(this.startVertices) ) {
-      this.startVertices = [];
-
-      _.each(this.mesh.geometry.vertices, function(vertex) {
-        this.startVertices.push(vertex.clone());
-      }, this);
-    }
-
-
-
-
-    var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationFromEuler(
-      new THREE.Euler(
-        (this.rotation.x).ToRadians(),
-        (this.rotation.y).ToRadians(),
-        (this.rotation.z).ToRadians()));
+    this.mesh.geometry.dynamic = true;
+    this.mesh.geometry.verticesNeedUpdate = true;
 
     for (var i = 0; i < this.mesh.geometry.vertices.length; i++) {
       this.mesh.geometry.vertices[i].copy(this.startVertices[i]);
     }
 
+    var me = this;
     _.each(this.mesh.geometry.vertices, function(vertex) {
-      vertex.applyMatrix4(rotationMatrix);
+      vertex.applyEuler(me.localRotation);
     });
-
-
-
 
     // this.mesh.geometry.computeCentroids();
     // this.mesh.geometry.computeFaceNormals();
@@ -375,6 +350,10 @@ var Mesh = Unit.extend({
     this.mesh.geometry.computeBoundingBox();
     this.boundingBox = this.mesh.geometry.boundingBox;
     this.boundingBox.size = this.boundingBox.max.clone().sub(this.boundingBox.min);
+
+
+    this.changeRotationNextTick = false;
+
   },
   Tick: function(dTime) {
 

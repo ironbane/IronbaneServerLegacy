@@ -305,6 +305,13 @@ var TerrainHandler = Class.extend({
       for(var m=0;m<meshList.length;m++) {
         var subIntersects = ray.intersectOctreeObjects( meshList[m].octree.objects );
 
+        _.each(subIntersects, function(i) {
+            if ( i.object.unit ) {
+                i.face.normalWithRotations = i.face.normal.clone();
+                i.face.normalWithRotations.applyEuler(i.object.unit.localRotation);
+            }
+        });
+
         intersects = intersects.concat(subIntersects);
       }
     }
@@ -337,6 +344,12 @@ var TerrainHandler = Class.extend({
         faceId: intersects[0].faceIndex
       };
     }
+
+    _.each(intersects, function(i) {
+      if ( !i.face.normalWithRotations ) {
+        i.face.normalWithRotations = i.face.normal.clone();
+      }
+    });
 
     return intersects;
   },
