@@ -88,6 +88,9 @@ module.exports = function(db) {
                 p.forum_sig = undefined;
                 p.forum_avatar = undefined;
             });
+            db.query('UPDATE forum_topics set views = views + 1 where id = ?', [topicId], function(results) {
+
+            });
 
 
             deferred.resolve(results);
