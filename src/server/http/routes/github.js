@@ -3,13 +3,19 @@ module.exports = function(app) {
 
     var config = require('../../../../nconf'),
         ghcfg = config.get('github'),
-        github = require('octonode');
+        GitHubApi = require("github"),
+        github = new GitHubApi({
+            // required
+            version: "3.0.0",
+            // optional
+            timeout: 5000
+        });
 
     app.get('/api/github/events', function(req, res) {
-        var client = github.client(),
-        repo = client.repo('ironbane/IronbaneServer');
-
-        repo.info(function(err, results) {
+        github.events.getFromRepo({
+            user: 'ironbane',
+            repo: 'IronbaneServer'
+        }, function(err, results) {
             //console.log('github', arguments);
             if(err) {
                 res.send(500, err);
