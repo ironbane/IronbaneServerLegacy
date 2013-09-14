@@ -223,6 +223,10 @@ IronbaneApp
 
             $window.particleHandler.Tick(dTime);
 
+            for (var x = 0; x < game.unitList.length; x++) {
+                game.unitList[x].Tick(dTime);
+            }
+
             if ( game.player ) {
                 if ( le("globalEnable") && game.newLevelEditor ) {
                     game.newLevelEditor.Tick(dTime);
@@ -230,10 +234,6 @@ IronbaneApp
                 else {
                     game.player.Tick(dTime);
                 }
-            }
-
-            for (var x = 0; x < game.unitList.length; x++) {
-                game.unitList[x].Tick(dTime);
             }
 
             $window.cinema.Tick(dTime);
