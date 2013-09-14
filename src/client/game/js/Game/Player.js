@@ -328,10 +328,14 @@ var Player = Fighter.extend({
           }
         }
 
+        var bufferSpace = relativeDifference <= this.originalThirdPersonReference.length() ? 1.0 : 0;
+
         relativeDifference = Math.min(relativeDifference, this.originalThirdPersonReference.length());
 
         uc.normalize();
-        uc.multiplyScalar(relativeDifference-1.0);
+
+        uc.multiplyScalar(relativeDifference-bufferSpace);
+
       }
       if ( !needFirstPersonMode ) {
         switch(this.cameraStatus) {
