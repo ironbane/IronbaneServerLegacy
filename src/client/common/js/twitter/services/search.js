@@ -1,6 +1,7 @@
 angular.module('TwitterServices')
     .service('TwitterSearch', ['$log', '$http', '$q',
         function($log, $http, $q) {
+            // apparently this is deprecated, need to switch to API v1.1 which requires auth / app
             var url = 'http://search.twitter.com/search.json' +
                 '?&rpp=100&include_entities=true&result_type=mixed' +
                 '&callback=JSON_CALLBACK';

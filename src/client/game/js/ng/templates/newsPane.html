@@ -1,16 +1,20 @@
 <div>
     <header>
         <ul class="horizontal-list pipe-list">
-            <li><a href="javascript://" ng-click="showNews($event)">Forum News</a></li>
-            <li><a href="javascript://" ng-click="showTwitter($event)">Twitter</a></li>
-            <li><a href="javascript://" ng-click="showGithub($event)">Github</a></li>
+            <li><a href="javascript://" ng-click="activeCategory='News';">Forum News</a></li>
+            <li><a href="javascript://" ng-click="activeCategory='Twitter';">Twitter</a></li>
+            <li><a href="javascript://" ng-click="activeCategory='Github';">Github</a></li>
         </ul>
     </header>
     <section class="body">
         <header>
-            <h2>News</h2>
+            <h2>{{ activeCategory }}</h2>
         </header>
-        <div class="news-content">
+        <div ng-show="activeCategory === 'Twitter'">
+            <a class="twitter-timeline" href="https://twitter.com/IronbaneMMO" data-widget-id="378778613690015744">Tweets by @IronbaneMMO</a>
+        </div>
+        <div ng-show="activeCategory === 'Github'">?</div>
+        <div ng-show="activeCategory === 'News'" class="news-content">
             <div>
                 <article ng-repeat="post in posts">
                     <header>

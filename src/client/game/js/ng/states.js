@@ -8,7 +8,6 @@ IronbaneApp
 
             // state machine router (since game doesn't have url routing)
             $stateProvider
-                // root state
                 .state('mainMenu', {
                     templateUrl: '/game/templates/mainMenu.html',
                     controller: ['$scope', '$state', '$log',
