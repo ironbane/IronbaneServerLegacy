@@ -27,14 +27,54 @@ module.exports = function(db) {
         }
     });
 
-    Post.save = function(post){
+    Post.prototype.$save = function() {
+        var deferred = Q.defer(),
+            post = this;
+
+        if(post.id) {
+            // update post
+            var uObj = {
+                title: post.title,
+                content: post.content,
+                lastedit_time: post.lastedit_time,
+                lastedit_author: post.lastedit_author
+            };
+
+            db.query('update forum_posts set title=?, content=?, lastedit_time=?, lastedit_count=lastedit_count+1, lastedit_author=? WHERE id=' + post.id, uObj, function(err, result) {
+                if(err) {
+                    deferred.reject('error updating post: ' + err.code);
+                    return;
+                }
+
+                deferred.resolve(post);
+            });
+        } else {
+            // create new post
+            db.query('insert into forum_posts set ?', post, function(err, result) {
+                if(err) {
+                    deferred.reject('error creating post: ' + err.code);
+                    return;
+                }
+
+                // return new ID of post
+                post.id = result.insertId;
+                deferred.resolve(post);
+            });
+        }
+
+        return deferred.promise;
+    };
+
+    Post.save = function(post) {
         var deferred = Q.defer();
         db.query('insert into forum_posts set ?', post, function(err, result) {
             if(err) {
-                deferred.reject('error creating post');
+                deferred.reject('error creating post: ' + err.code);
                 return;
             }
-            deferred.resolve();
+
+            // return new ID of post
+            deferred.resolve(result.insertId);
         });
         return deferred.promise;
     };

@@ -1,7 +1,7 @@
 // forum.js
 module.exports = function(app, db) {
     var log = require('util').log,
-    _ = require('underscore'),
+        _ = require('underscore'),
         Forum = require('../../entity/forum')(db),
         Board = require('../../entity/board')(db),
         User = require('../../entity/user')(db),
@@ -11,14 +11,13 @@ module.exports = function(app, db) {
         bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 
-
-        app.get('/api/forum', function(req, res) {
-            Forum.getForumView().then(function(forum) {
-                res.send(forum);
-            }, function(error){
-                res.send(error, 500);
-            });
+    app.get('/api/forum', function(req, res) {
+        Forum.getForumView().then(function(forum) {
+            res.send(forum);
+        }, function(error) {
+            res.send(error, 500);
         });
+    });
 
     // create a new board
     app.post('/api/forum', function(req, res) {
@@ -36,36 +35,36 @@ module.exports = function(app, db) {
     app.get('/api/onlineusers', function(req, res) {
         User.getOnlineUsersLastDay().then(function(users) {
             res.send(users);
-        }, function(error){
+        }, function(error) {
             res.send(error, 500);
         });
     });
 
-    app.get('/api/frontpage', function(req, res){
-        Article.getFrontPage().then(function(frontpage){
+    app.get('/api/frontpage', function(req, res) {
+        Article.getFrontPage().then(function(frontpage) {
             res.send(frontpage);
-        }, function(error){
+        }, function(error) {
             res.send(error, 500);
         });
     });
 
     app.get('/api/statistics', function(req, res) {
-        Forum.getStatistics().then(function(statistics){
+        Forum.getStatistics().then(function(statistics) {
             res.send(statistics);
-        }, function(error){
+        }, function(error) {
             res.send(error, 500);
         });
     });
 
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
-            Board.get(req.params.boardId).then(function(results) {
-                log('getting board: ' + req.params.boardId);
-               res.send(results);
-            }, function(error){
-                res.send(error, 500);
-            });
+        Board.get(req.params.boardId).then(function(results) {
+            log('getting board: ' + req.params.boardId);
+            res.send(results);
+        }, function(error) {
+            res.send(error, 500);
         });
+    });
 
     // get all topics for a board
     app.get('/api/forum/:boardId/topics', function(req, res) {
@@ -106,35 +105,39 @@ module.exports = function(app, db) {
 
     // get all posts for topic
     app.get('/api/forum/topics/:topicId/posts', function(req, res) {
-        Topic.getPostsView(req.params.topicId).then(function(results){
+        Topic.getPostsView(req.params.topicId).then(function(results) {
             res.send(results);
-        }, function(error){
+        }, function(error) {
             res.send(500, error);
         });
     });
 
     app.get('/api/forum/topics/:topicId', function(req, res) {
-        Topic.get(req.params.topicId).then(function(results){
+        Topic.get(req.params.topicId).then(function(results) {
             res.send(results);
-        }, function(error){
+        }, function(error) {
             res.send(500, error);
         });
     });
 
     // create a new post
     app.post('/api/forum/topics/:topicId', function(req, res) {
-        var post = {
+        var post = new Post({
             topic_id: req.params.topicId,
             content: req.body.content,
             time: req.body.time,
             user: req.body.user
-        };
-
-        Post.save(post).then(function(result){
-            res.send(result);
-        }, function(error){
-            res.send(500, error);
         });
 
+        post.$save().then(function(result) {
+            // before sending back to the client, we need to parse the bbcode
+            // this should prolly be done in Post entity? or static method?
+            bbcode.parse(result.content, function(html) {
+                result.content = html;
+            });
+            res.send(result);
+        }, function(error) {
+            res.send(500, error);
+        });
     });
 };

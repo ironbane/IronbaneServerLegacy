@@ -8,7 +8,7 @@ angular.module('IronbaneApp')
         },
         restrict: 'AE',
         templateUrl: '/partials/postEditor.html',
-        controller: ['$scope', 'Post', '$log', '$route', function($scope, Post, $log, $route) {
+        controller: ['$scope', 'Post', '$log', function($scope, Post, $log) {
             $scope.save = function() {
                 // todo: validate form
                 var post = new Post({
@@ -17,21 +17,20 @@ angular.module('IronbaneApp')
                     user: $scope.$root.currentUser.id // temp for now
                 });
 
-                if($scope.topic === undefined ) {
+                if($scope.topic === undefined) {
                     post.title = $scope.post.title;
                 }
 
                 post.$save({boardId: $scope.board, topicId: $scope.topic})
                     .then(function(result) {
-                        // inject the post somewhere for auto rendering
-                        // this part is never called, investigate!!
-                        $log.log("jobs done!");
+                        $scope.$emit('postSaveSuccess', result);
+
                         // clear the form
                         delete $scope.post;
                         $scope.postEditorForm.$setPristine();
-                        $route.reload();
                     }, function(err) {
                         $log.error('error saving post!', err);
+                        $scope.$emit('postSaveError');
                     });
             };
         }]
