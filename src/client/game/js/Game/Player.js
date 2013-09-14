@@ -379,8 +379,14 @@ var Player = Fighter.extend({
           }
           break;
         case CameraStatusEnum.ThirdPerson:
-          //ironbane.camera.position.copy(target);
-          ironbane.camera.position.lerp(target, dTime*3);
+          if ( this.unitStandingOn ) {
+            ironbane.camera.position.copy(target);
+          }
+          else {
+            ironbane.camera.position.lerp(target, dTime*3);
+          }
+
+
           break;
       }
 
@@ -394,8 +400,12 @@ var Player = Fighter.extend({
         lookAtTarget = this.position.clone().add(new THREE.Vector3(0, 1, 0));
 
       }
-      ironbane.camera.lookAtPosition.lerp(lookAtTarget, dTime * 10);
-      //ironbane.camera.lookAtPosition.copy(lookAtTarget);
+      if ( this.unitStandingOn ) {
+        ironbane.camera.lookAtPosition.copy(lookAtTarget);
+      }
+      else {
+        ironbane.camera.lookAtPosition.lerp(lookAtTarget, dTime * 10);
+      }
 
 
       ironbane.camera.lookAt(ironbane.camera.lookAtPosition);
