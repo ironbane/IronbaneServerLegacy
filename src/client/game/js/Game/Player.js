@@ -436,7 +436,8 @@ var Player = Fighter.extend({
 
 
     if ( this.unitStandingOn ) {
-      this.targetRotation.y = this.localRotationY + this.unitStandingOn.rotation.y;
+      this.targetRotation.y = this.localRotationY + this.unitStandingOn.localRotation.y.ToDegrees();
+      //sw("this.unitStandingOn.rotation.y.ToDegrees()", this.unitStandingOn.localRotationY.y.ToDegrees());
     }
     else {
       this.targetRotation.y = this.localRotationY;
@@ -455,8 +456,8 @@ var Player = Fighter.extend({
       this.localRotationY = this.targetRotation.y;
     }
 
-    sw("this.localRotationY", this.localRotationY);
-    sw("this.targetRotation", this.targetRotation);
+    // sw("this.localRotationY", this.localRotationY);
+    // sw("this.targetRotation.y", this.targetRotation.y);
 
 
     //if ( !this.freeFall ) {

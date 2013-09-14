@@ -150,7 +150,7 @@ var PhysicsObject = Class.extend({
 
                     if ( this instanceof Player ) {
                         // Add the object's rotation to rotY
-                        this.localRotationY += this.lastUnitStandingOn.rotation.y;
+                        this.localRotationY += this.lastUnitStandingOn.localRotation.y.ToDegrees();
                     }
 
                 }
@@ -168,7 +168,7 @@ var PhysicsObject = Class.extend({
 
                     if ( this instanceof Player ) {
                         // Add the object's rotation to rotY
-                        this.localRotationY -= this.unitStandingOn.rotation.y;
+                        this.localRotationY -= this.unitStandingOn.localRotation.y.ToDegrees();
                     }
 
 

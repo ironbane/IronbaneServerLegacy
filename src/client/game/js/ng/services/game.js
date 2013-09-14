@@ -306,7 +306,6 @@ IronbaneApp
 
             $window.relativeMouse = $window.mouse.clone().sub($window.lastMouse);
             $window.lastMouse = $window.mouse.clone();
-            $window.sw("relativeMouse", $window.ConvertVector3($window.relativeMouse));
         };
 
         return Game;
