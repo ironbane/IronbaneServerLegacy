@@ -868,6 +868,17 @@ var LevelEditor = Class.extend({
 
     var me = this;
 
+    var checkPreviewMesh = function() {
+      if ( levelEditor.editorGUI.globalEnable
+        && !levelEditor.editorGUI.mpTransformMode
+        && levelEditor.editorGUI.enableModelPlacer ) {
+        levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
+      }
+      else {
+        levelEditor.SetPreviewMesh(null);
+      }
+    };
+
     guiControls['globalEnable'].onFinishChange(function(value) {
 
 
@@ -883,6 +894,8 @@ var LevelEditor = Class.extend({
         ironbane.newLevelEditor.Destroy();
         ironbane.newLevelEditor = null;
       }
+
+      checkPreviewMesh();
 
 
     });
@@ -944,29 +957,15 @@ var LevelEditor = Class.extend({
     });
 
 
+
     guiControls['enableModelPlacer'].onFinishChange(function(value) {
-      if ( levelEditor.editorGUI.globalEnable ) {
-        if ( value && !levelEditor.editorGUI.mpTransformMode ) {
-          levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
-        }
-        else {
-          levelEditor.SetPreviewMesh(null);
-        }
-
-
-      }
-      else {
-        levelEditor.SetPreviewMesh(null);
-      }
+      checkPreviewMesh();
     });
 
 
 
     guiControls['mpTransformMode'].onFinishChange(function(value) {
-      if ( !value ) {
-        levelEditor.SetPreviewMesh(levelEditor.editorGUI.selectModel);
-      }
-      else {
+      if ( value ) {
 
         _.each([
           'Entering Transform mode...',
@@ -979,15 +978,13 @@ var LevelEditor = Class.extend({
         ], function(msg) {
           hudHandler.AddChatMessage(msg);
         });
-
-
-
-        levelEditor.SetPreviewMesh(null);
       }
+
+      checkPreviewMesh();
     });
 
     guiControls['selectModel'].onFinishChange(function(value) {
-      levelEditor.SetPreviewMesh(value);
+      checkPreviewMesh();
     });
 
 
