@@ -63,6 +63,12 @@ nconf.defaults({
         server: 'irc.freenode.net',
         nick: 'Ironbane',
         channels: ['#ironbane']
+    },
+    // integrate with Github API
+    github: {
+        enabled: false,
+        username: 'FOO',
+        password: 'BAR'
     }
 });
 

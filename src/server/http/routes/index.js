@@ -13,6 +13,9 @@ module.exports = function(app, db) {
     require('./forum')(app, db);
     require('./articles')(app, db);
     require('./items')(app,db);
+    if(config.get('github').enabled) {
+        require('./github')(app);
+    }
 
     // temp stuff for index until a better spot is thought
     var gameModel = {
