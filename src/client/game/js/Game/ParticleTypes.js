@@ -23,7 +23,7 @@ var ParticleFunctions = {
         if ( opac > end ) return (1-opac)/(1-end);
         return 1.0;
     }
-}
+};
 
 var ParticleTypeEnum = {
     TEST: {
@@ -607,7 +607,7 @@ var ParticleTypeEnum = {
         particleLifeTime: 1.0,
         particleStartScale: new THREE.Vector2(2.5,2.5),
         particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.5, 0.5);},
-        particleScaleVelocity : new THREE.Vector2(-0.05,-0.05)
+        particleScaleVelocity : new THREE.Vector2(-0.6,-0.6)
     },
     TELEPORTEXITCIRCLES: {
         texture: function(p){
@@ -621,7 +621,7 @@ var ParticleTypeEnum = {
         particleLifeTime: 1.0,
         particleStartScale: new THREE.Vector2(0.5,0.5),
         particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.5, 0.5);},
-        particleScaleVelocity : new THREE.Vector2(0.05,0.05)
+        particleScaleVelocity : new THREE.Vector2(0.6,0.6)
     },
     FIRESMALL: {
         texture: function(){

@@ -68,8 +68,8 @@ if ( !SERVER ) {
             color: ColorEnum.WHITE,
             map: texture,
             useScreenCoordinates: false,
-            transparent: true,
-            alphaTest: 0.5
+            transparent: true
+            //alphaTest: 0.5
         });
 
       return mat;

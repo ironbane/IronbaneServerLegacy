@@ -104,7 +104,6 @@ var ParticleEmitter = Class.extend({
         var texture = CheckForFunctionReturnValue(this.type.texture, this);
         particle.texture = texture;
 
-        particle.scale = (CheckForFunctionReturnValue(this.type.particleStartScale, particle) || new THREE.Vector2(1.0, 1.0)).clone().multiplyScalar(0.02);
 
         if ( this.particleFollowUnit ) {
             if ( this.particleFollowUnit.size > 2 ) {
@@ -122,9 +121,7 @@ var ParticleEmitter = Class.extend({
             //alphaTest: 0.5
         });
 
-        // Deliberately take twice the width so the images are scaled correctly
-        particle.scale.x *= spriteMaterial.map.image.width;
-        particle.scale.y *= spriteMaterial.map.image.width;
+
 
         particle.velocity = (CheckForFunctionReturnValue(this.type.particleStartVelocity, particle) || new THREE.Vector3()).clone();
 
@@ -149,10 +146,16 @@ var ParticleEmitter = Class.extend({
 
         particle.sprite = new THREE.Sprite(spriteMaterial);
 
-        particle.sprite.opacity = 0;
+        particle.sprite.scale = (CheckForFunctionReturnValue(this.type.particleStartScale, particle) || new THREE.Vector2(1.0, 1.0)).clone().multiplyScalar(0.02);
 
-        particle.sprite.scale = particle.scale;
-        particle.sprite.scale = 0;
+        // Deliberately take twice the width so the images are scaled correctly
+        particle.sprite.scale.x *= spriteMaterial.map.image.width;
+        particle.sprite.scale.y *= spriteMaterial.map.image.width;
+
+        particle.sprite.material.opacity = 0;
+
+        // particle.sprite.scale = particle.scale;
+        // particle.sprite.scale = 0;
 
         particle.sprite.rotation = particle.rotation;
 
@@ -231,9 +234,6 @@ var ParticleEmitter = Class.extend({
                 particle.side = particle.heading.clone().Perp();
             }
 
-
-
-
             if ( this.particleFollowUnit ) {
                 //particle.followUnitPosition.add(particle.velocity.clone().multiplyScalar(dTime));
                 particle.position = this.particleFollowUnit.position.clone().add(particle.startPosition);
@@ -242,22 +242,17 @@ var ParticleEmitter = Class.extend({
                 particle.position.add(particle.velocity.clone().multiplyScalar(dTime));
             }
 
-
-
-            particle.particleScaleSpeed = CheckForFunctionReturnValue(this.type.particleScaleSpeed, particle) || 0.0;
-
-
-
-
             if ( _.isUndefined(particle.opacityHack) ) {
                 particle.opacityHack = true;
             }
             else {
-                particle.sprite.scale = particle.scale.clone();
-                particle.scale.add(particle.particleScaleVelocity.clone().multiplyScalar(dTime));
+                //particle.sprite.scale = particle.scale.clone();
+                particle.sprite.scale.add(particle.particleScaleVelocity.clone().multiplyScalar(dTime));
             }
 
-            particle.sprite.opacity = CheckForFunctionReturnValue(this.type.particleOpacity, particle) || 1.0;
+            var opac = CheckForFunctionReturnValue(this.type.particleOpacity, particle);
+            particle.sprite.material.opacity = opac === undefined ? 1.0 : opac;
+
 
 
             particle.sprite.rotation += particle.particleRotationSpeed * dTime;
@@ -271,7 +266,9 @@ var ParticleEmitter = Class.extend({
                 this.particles.splice(i--, 1);
                 ironbane.scene.remove(particle.sprite);
 
-                releaseMesh(particle.sprite);
+                releaseMesh(particle.sprite, {
+                    removeMaterials: true
+                });
 
                 continue;
             }
