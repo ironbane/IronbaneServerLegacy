@@ -112,8 +112,14 @@ var ParticleEmitter = Class.extend({
             }
         }
 
-        var spriteMaterial = textureHandler.GetTexture('images/' + texture + '.png', false, {
-            spriteMaterial: true
+        var texture = textureHandler.GetTexture('images/' + texture + '.png', true);
+
+        var spriteMaterial = new THREE.SpriteMaterial({
+            color: ColorEnum.WHITE,
+            map: texture,
+            useScreenCoordinates: false,
+            transparent: true
+            //alphaTest: 0.5
         });
 
         // Deliberately take twice the width so the images are scaled correctly
