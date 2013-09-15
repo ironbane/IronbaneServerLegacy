@@ -181,7 +181,7 @@ var SocketHandler = Class.extend({
                     // Check if the character is already being used in the server (since they bypassed the member check)
                     var gu = worldHandler.FindUnit(character.id);
                     if (gu) {
-                        reply({
+                        respond({
                             errmsg: "There is already a guest playing under your credentials!"
                         });
                         return;
@@ -233,7 +233,7 @@ var SocketHandler = Class.extend({
                                     return p.id === gu.id;
                                 }));
                                 gu.LeaveGame();
-                                reply({
+                                respond({
                                     errmsg: "This character is already logged in!"
                                 });
                                 return;
