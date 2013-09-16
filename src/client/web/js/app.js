@@ -20,6 +20,10 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
             templateUrl: '/views/register',
             controller: 'RegisterCtrl'
         })
+        .when('/messages', {
+            templateUrl: '/views/messagelist',
+            controller: 'MessageListCtrl'
+        })
         .when('/login', {
             templateUrl: '/views/login',
             controller: 'LoginCtrl'

@@ -48,8 +48,8 @@
                         <li><a href="/forum">Forum</a></li>
                         <li><a href="/game" target="_self">Play!</a></li>
                         <li><a href="/article/get-involved">Get Involved</a></li>
-                        <li><a target="_new" href="https://twitter.com/IronbaneMMO">Twitter</a></li>
                         <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
+                        <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
                         <li><a href="/article/faq">FAQ</a></li>
                         <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
                         <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
@@ -67,6 +67,9 @@
                 <ul class="horizontal-list pipe-list">
                     <li><a href="article/terms">Terms of Use</a></li>
                     <li><a href="article/privacy">Privacy Policy</a></li>
+
+                    <li><a href="http://twitter.com/Ironbane">Twitter</a></li>
+
                 </ul>
             </div>
         </footer>

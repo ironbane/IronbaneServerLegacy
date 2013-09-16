@@ -1,0 +1,14 @@
+<table>
+		<th>..............</th>
+		<th></th>
+			<th>subject</th>
+			<th>Date</th>
+		<tr ng-repeat="message in messages" >
+			<td></td>
+		<td><input type="checkbox" value="message.id" ng-checked="message.checked" ng-model="message.checked"></td>
+		<td><a ng-href="/message/{{message.id}}">{{message.subject}}</a></td>
+		<td>{{message.date * 1000 | date:'medium'}}</td>
+</tr>
+</table>
+<button ng-click="">New Post</button>
+<button ng-show="{{selectedCount > 0}}">Delete</button>
