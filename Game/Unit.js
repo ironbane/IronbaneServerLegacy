@@ -324,11 +324,11 @@ var Unit = Class.extend({
     maxDistance = maxDistance || 0;
     var cx = this.cellX;
     var cz = this.cellZ;
-
+    var nearestUnit = null
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          _.each(worldHandler.world[this.zone][x][z].units,function(unit) {
+          nearestUnit = _.find(worldHandler.world[this.zone][x][z].units,function(unit) {
             
             if ( unit !== this ) {
               if ( unit instanceof Fighter && unit.health > 0 ) {  
@@ -337,11 +337,11 @@ var Unit = Class.extend({
                 }
               }
             }
-          }); 
+          }, this); 
         }
       }
     }
-    return null;
+    return nearestUnit;
   },
   ChangeCell: function(newCellX, newCellZ) {
 
@@ -364,13 +364,12 @@ var Unit = Class.extend({
       // Remove the unit from the world cells
       if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
         var units = worldHandler.world[zone][cx][cz].units;
-        for(var u=0;u<units.length;u++) {
-          if ( units[u].id == this.id ) {
-            worldHandler.world[zone][cx][cz].units.splice(u, 1);
-            break;
-          }
+        var removeUnit = _.find(units, function(unit){
+          return unit.id == this.id ;            
+          }, this);
+        worldHandler.world[zone][cx][cz].units = _.without(units, removeUnit);
         }
-      }
+      
 
       // Add to the new cell
       // What if the cell doesn't exist? Don't add?
@@ -393,10 +392,8 @@ var Unit = Class.extend({
       var secondList = [];
 
 
-
       for(var x=cx-1;x<=cx+1;x++){
         for(var z=cz-1;z<=cz+1;z++){
-
           firstList.push({
             x:x,
             z:z
@@ -410,7 +407,6 @@ var Unit = Class.extend({
 
       for(var x=cx-1;x<=cx+1;x++){
         for(var z=cz-1;z<=cz+1;z++){
-
           secondList.push({
             x:x,
             z:z
@@ -419,30 +415,28 @@ var Unit = Class.extend({
         }
       }
 
-      for (var c=0;c<firstList.length;c++) {
-        if ( secondList.indexOf(firstList[c]) == -1 ) {
+      _.each(firstList, function(firstListItem) {
+        if ( secondList.indexOf(firstListItem) == -1 ) {
           // Not found in the secondlist, so recalculate all units inside
-          if ( !worldHandler.CheckWorldStructure(zone, firstList[c].x, firstList[c].z) ) continue;
-			var cl = worldHandler.world[zone][firstList[c].x][firstList[c].z].units.length;
-          for ( var u=0;u<cl;u++ ) {
-            var funit = worldHandler.world[zone][firstList[c].x][firstList[c].z].units[u];
-            funit.UpdateOtherUnitsList();
+          if ( worldHandler.CheckWorldStructure(zone, firstListItem.x, firstListItem.z) ){ 
+      			_.each(worldHandler.world[zone][firstListItem.x][firstListItem.z].units, function(sunit){
+              sunit.UpdateOtherUnitsList();
+            });
           }
         }
-      }
+      });
 
 
-      for (var c=0;c<secondList.length;c++) {
-        if ( firstList.indexOf(secondList[c]) == -1 ) {
+      _.each(secondList, function(secondListItem) {
+        if ( firstList.indexOf(secondListItem) == -1 ) {
           // Not found in the firstlist, so recalculate all units inside
-          if ( !worldHandler.CheckWorldStructure(zone, secondList[c].x, secondList[c].z) ) continue;
-
-          for ( var u=0;u<worldHandler.world[zone][secondList[c].x][secondList[c].z].units.length; u++ ) {
-            var funit = worldHandler.world[zone][secondList[c].x][secondList[c].z].units[u];
-            funit.UpdateOtherUnitsList();
+          if ( worldHandler.CheckWorldStructure(zone, secondListItem.x, secondListItem.z) ) {
+            _.each(worldHandler.world[zone][secondListItem.x][secondListItem.z].units, function(funit) {
+              funit.UpdateOtherUnitsList();
+            });
           }
         }
-      }
+      });
       this.cellX = cellPos.x;
       this.cellZ = cellPos.z;
 
@@ -474,9 +468,9 @@ var Unit = Class.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[zone][x][z].units.length;u++) {
-            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
-          }
+          _.each(worldHandler.world[zone][x][z].units, function(unit){
+            unit.UpdateOtherUnitsList();
+          });
         }
       }
     }
