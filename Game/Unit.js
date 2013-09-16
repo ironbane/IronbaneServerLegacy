@@ -328,21 +328,16 @@ var Unit = Class.extend({
     for(var x=cx-1;x<=cx+1;x++){
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[this.zone][x][z].units.length;u++) {
-            var unit = worldHandler.world[this.zone][x][z].units.u;
-
-            if ( unit == this ) continue;
-
-            if ( unit instanceof Fighter ) {
-              if ( unit.health <= 0 ) continue;
+          _.each(worldHandler.world[this.zone][x][z].units,function(unit) {
+            
+            if ( unit !== this ) {
+              if ( unit instanceof Fighter && unit.health > 0 ) {  
+                if ( maxDistance > 0 && DistanceBetweenPoints(this.position.x, this.position.z, unit.position.x, unit.position.z) <= maxDistance ){
+                  return unit;
+                }
+              }
             }
-
-            if ( maxDistance > 0 && DistanceBetweenPoints(this.position.x, this.position.z, unit.position.x, unit.position.z) > maxDistance ) continue;
-
-
-            return unit;
-
-          }
+          }); 
         }
       }
     }
