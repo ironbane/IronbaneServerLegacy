@@ -19,7 +19,7 @@
     <section>
         <ul>
         <li class="news-post" ng-repeat="post in posts">
-            <header><h2><a ng-href="/forum/{{ post.board_id }}/topics/{{ post.id }}">{{post.title}}</a></h2></header>
+            <header><h2><a ng-href="/forum/7/topics/{{ post.id }}">{{post.title}}</a></h2></header>
             <article ng-bind-html-unsafe="post.content"></article>
             <footer>author: {{ post.username }}</footer>
         </li>
