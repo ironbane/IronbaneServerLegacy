@@ -3,6 +3,7 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User','$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
+    
     User.getCurrentUser()
         .then(function(user) {
             angular.copy(user, $rootScope.currentUser);
@@ -29,8 +30,8 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
             controller: 'LoginCtrl'
         })
         .when('/profile', {
-            templateUrl: '/views/myProfile',
-            controller: 'MyProfileCtrl'
+            templateUrl: '/views/preferences',
+            controller: 'PreferencesCtrl'
         })
         .when('/article/:articleId', {
             templateUrl: '/views/article',

@@ -57,7 +57,8 @@ module.exports = function(app, db) {
                 id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
-                roles: req.user.roles || []
+                roles: req.user.roles || [],
+                birthday: req.user.info_birthday
             });
         } else {
             res.send(404, 'no user signed in');
@@ -124,6 +125,12 @@ module.exports = function(app, db) {
             });
     });
 
+    app.post('/api/user/preferences', app.ensureAuthenticated, function(req, res) {
+        log("received: " + JSON.stringify(req.body));
+        log("user: " + JSON.stringify(req.user));
+
+    });
+
     // add a friend (currently signed in user!)
     app.post('/api/user/friends', app.ensureAuthenticated, function(req, res) {
         req.user.$addFriend(req.body.friendId, req.body.tags)
@@ -139,6 +146,6 @@ module.exports = function(app, db) {
             res.send(users);
         }, function(error){
             res.send(error, 500);
-        })
-    })
+        });
+    });
 };
