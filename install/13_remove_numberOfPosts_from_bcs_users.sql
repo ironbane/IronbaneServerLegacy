@@ -1,0 +1,1 @@
+ALTER TABLE bcs_users DROP COLUMN forum_posts
