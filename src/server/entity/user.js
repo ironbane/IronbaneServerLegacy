@@ -11,6 +11,10 @@ module.exports = function(db) {
         init: function(json) {
             _.extend(this, json || {});
         },
+
+        $update: function() {
+
+        },
         $save: function() {
             var self = this;
             var deferred = Q.defer(),

@@ -14,4 +14,14 @@ angular.module('IronbaneApp')
                 });
     };
 
+    $scope.send = function(){
+$http.post('/api/user/avatar', $scope.user.avatar)
+                .success(function(response) {
+                    $log.log('update success', response);
+                })
+                .error(function(response) {
+                    $log.warn('update error', response);
+                });
+    };
+       
 }]);

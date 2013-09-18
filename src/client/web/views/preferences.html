@@ -1,36 +1,41 @@
 <div class="content-body">
 <h1>User Preferences</h1>
 
-Important stuff<br>
+<h2>Important stuff</h2><br>
 Old Password: <input type="password" ng-model="user.passwordold"/><br>
 If you would like to keep your password, leave this blank.	<br>
 New Password: <input type="password" ng-model="user.passwordnew"/><br>
 Case-sensitive, min. 4 characters, max. 20 characters.	<br>
 Confirm New Password: <input type="password" ng-model="user.passwordnewconfirm"/><br>
 
-E-mail Address: <input type="email" ng-model="email"/><br>
-Your e-mail will NOT be shared with anyone, it is only used to send back your forgotten password.	
-GMT Timezone: [?]	
-
-Optional stuff: <br>
+E-mail Address: <input type="email" ng-model="user.email"/><br>
+Your e-mail will <strong>NOT</strong> be shared with anyone, it is only used to send back your forgotten password.	<br>
+<h2>Optional stuff:</h2> <br>
 It would be awesome if you'd tell us a bit more who you are and what you do!
 This information will be put on your profile page. <br>
-Name : <input type="text" ng-model="user.name"/>	<br>
-Country	: <input type="text" ng-model="user.country"/><br>
-Location : <input type="text" ng-model="user.location"/><br>	
-Gender : <select ng-model="user.gender" ng-options="g.gender as g.gender for g in genderOptions"/><br>
+Name : <input type="text" ng-model="user.info_name"/>	<br>
+Country	: <input type="text" ng-model="user.info_country"/><br>
+Location : <input type="text" ng-model="user.info_location"/><br>	
+Gender : <select ng-model="userinfo_.gender" ng-options="g.gender as g.gender for g in genderOptions"/><br>
  
-Birthday : <input type="date" ng-model="user.birthday"/><br>
-Occupation:	<input type="text" ng-model="user.occupation"/><br>
-Interests : <input type="text" ng-model="user.interests"/><br>	
-Website	: <input type="text" ng-model="user.website"/><br>
-Upload an avatar : <input type="file" ng-model="user.avatar"/><br>
-Max. 100 KB, Max. 100x100 pixels.	<br>
-Uploading a new avatar will replace your old one.	
-Signature : <input type="text" ng-model="user.signature"/><br>
+Birthday : <input type="date" ng-model="user.info_birthday"/><br>
+Occupation:	<input type="text" ng-model="user.info_occupation"/><br>
+Interests : <input type="text" ng-model="user.info_interests"/><br>	
+Website	: <input type="text" ng-model="user.info_website"/><br>
+	
+Signature : <post-editor ng-model="user.signature" maxlength=255></post-editor><br>
 Max. 255 characters.	
 
 Other stuff<br>
 Show my e-mail address <input type="checkbox" ng-model="user.showemail"/><br>
 <button ng-click="save()">Update</button>
+<hr>
+<h2>Avatars</h2><br>
+Upload an avatar : <input name="uploadavatar" type="file" file="user.avatar"/><br>
+<img src="{{user.avatar}}"/>
+Max. 100 KB, Max. 100x100 pixels.	<br>
+Uploading a new avatar will replace your old one.
+
+<button ng-click="send()">Upload</button>
+
 </div>
