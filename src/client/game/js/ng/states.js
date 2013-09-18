@@ -22,7 +22,7 @@ IronbaneApp
                 })
                 .state('mainMenu.unauthenticated', {
                     templateUrl: '/game/templates/pre-login.html',
-                    controller: ['$scope', '$state', '$log', '$modal', function($scope, $state, $log, $modal) {
+                    controller: ['$scope', '$state', '$log', '$modal', '$window', function($scope, $state, $log, $modal, $window) {
                         $scope.guestPlay = function() {
                             $log.log('play clicked');
                             var modalInstance = $modal.open({
@@ -46,6 +46,15 @@ IronbaneApp
                         $scope.register = function() {
                             $state.go('mainMenu.register');
                         };
+
+                        $scope.options = function() {
+                            $state.go('mainMenu.options');
+                        };
+
+                        $scope.quit = function() {
+                            // for us, quit means back to website
+                            $window.location.href = '/';
+                        };
                     }]
                 })
                 .state('mainMenu.login', {
@@ -55,6 +64,10 @@ IronbaneApp
                 .state('mainMenu.register', {
                     templateUrl: '/game/templates/register.html',
                     controller: 'RegisterCtrl'
+                })
+                .state('mainMenu.options', {
+                    templateUrl: '/game/templates/options.html',
+                    controller: 'OptionsCtrl'
                 })
                 .state('mainMenu.charSelect', {
                     templateUrl: '/game/templates/charSelect.html',
@@ -85,6 +98,10 @@ IronbaneApp
                             $scope.$state.go('mainMenu.charCreate');
                         };
                     }]
+                })
+                .state('mainMenu.charCreate', {
+                    templateUrl: '/game/templates/charCreate.html',
+                    controller: 'CharCreateCtrl'
                 })
                 .state('loading', {
                     url: '/',
