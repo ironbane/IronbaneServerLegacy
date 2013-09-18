@@ -21,7 +21,7 @@ IronbaneApp
                     }]
                 })
                 .state('mainMenu.unauthenticated', {
-                    templateUrl: '/game/templates/login1.html',
+                    templateUrl: '/game/templates/pre-login.html',
                     controller: ['$scope', '$state', '$log', '$modal', function($scope, $state, $log, $modal) {
                         $scope.guestPlay = function() {
                             $log.log('play clicked');
