@@ -22,12 +22,21 @@ IronbaneApp
                 })
                 .state('mainMenu.unauthenticated', {
                     templateUrl: '/game/templates/login1.html',
-                    controller: ['$scope', '$state', '$log', 'AlertService', function($scope, $state, $log, alert) {
+                    controller: ['$scope', '$state', '$log', '$modal', function($scope, $state, $log, $modal) {
                         $scope.guestPlay = function() {
                             $log.log('play clicked');
-                            alert.show('testing', {ok: {text: 'Ok', handler: function() {
-                                $log.log('alert OK clicked');
-                            }}});
+                            var modalInstance = $modal.open({
+                                windowClass: 'dialog alert-box',
+                                templateUrl: '/game/templates/basicAlert.html',
+                                controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                                    $scope.title = 'Server Down!';
+                                    $scope.message = "We're very sorry but it appears that the server is not responding. Please try again later.";
+
+                                    $scope.ok = function() {
+                                        $modalInstance.dismiss('ok');
+                                    };
+                                }]
+                            });
                         };
 
                         $scope.login = function() {
