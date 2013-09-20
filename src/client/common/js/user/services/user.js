@@ -20,7 +20,7 @@ angular.module('User') // separate module for sharing with website
      User.getProfile = function(username) {
         return $http.get('/api/profile/' + username)
             .then(function(response) {
-                return response.data[0];
+                return response.data;
             }, function(err) {
                 $log.error('error retreiving user', err);
 

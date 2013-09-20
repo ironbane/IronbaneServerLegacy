@@ -277,12 +277,17 @@ module.exports = function(db) {
 
     User.getUserByNameView = function(username) {
         var deferred = Q.defer();
-        db.query('select name, reg_date, count(forum_posts.id) as totalposts from bcs_users inner join forum_posts on forum_posts.user = bcs_users.id where bcs_users.name=?', [username], function(err, results) {
+        db.query('select name, reg_date, count(forum_posts.id) as totalposts, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, show_email, email from bcs_users inner join forum_posts on forum_posts.user = bcs_users.id where bcs_users.name=?', [username], function(err, results) {
             if (err) {
                 deferred.reject(err);
                 return;
             }
-            deferred.resolve(results);
+            var user = results[0];
+            if(user.show_email===0){
+                delete user.email;
+                delete user.show_email;
+            }
+            deferred.resolve(user);
         });
         return deferred.promise;
     };
