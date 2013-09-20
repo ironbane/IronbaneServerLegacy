@@ -46,10 +46,6 @@ module.exports = function(db) {
                     time: params.time,
                     user: params.user
                 };
-            log("topic id :" + post.topic_id);
-            log("content : " + post.content);
-            log("time : " + post.time);
-            log("user : " + post.user);
 
             db.query('insert into forum_posts set ?', [post], function(err, result) {
                 if (err) {
@@ -83,10 +79,10 @@ module.exports = function(db) {
                     p.content = html;
                 });
                 p.user = {name: p.name, avatar : p.forum_avatar, sig:p.forum_sig, postcount: p.postcount};
-                p.postcount = undefined;
-                p.name = undefined;
-                p.forum_sig = undefined;
-                p.forum_avatar = undefined;
+                delete p.postcount;
+                delete p.name;
+                delete p.forum_sig;
+                delete p.forum_avatar;
             });
             db.query('UPDATE forum_topics set views = views + 1 where id = ?', [topicId], function(results) {
 
