@@ -329,15 +329,15 @@ var Unit = Class.extend({
       for(var z=cz-1;z<=cz+1;z++){
         if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
           nearestUnit = _.find(worldHandler.world[this.zone][x][z].units,function(unit) {
-            
+
             if ( unit !== this ) {
-              if ( unit instanceof Fighter && unit.health > 0 ) {  
+              if ( unit instanceof Fighter && unit.health > 0 ) {
                 if ( maxDistance > 0 && DistanceBetweenPoints(this.position.x, this.position.z, unit.position.x, unit.position.z) <= maxDistance ){
                   return unit;
                 }
               }
             }
-          }, this); 
+          }, this);
         }
       }
     }
@@ -365,11 +365,11 @@ var Unit = Class.extend({
       if ( worldHandler.CheckWorldStructure(zone, cx, cz) ) {
         var units = worldHandler.world[zone][cx][cz].units;
         var removeUnit = _.find(units, function(unit){
-          return unit.id == this.id ;            
+          return unit.id == this.id ;
           }, this);
         worldHandler.world[zone][cx][cz].units = _.without(units, removeUnit);
         }
-      
+
 
       // Add to the new cell
       // What if the cell doesn't exist? Don't add?
@@ -418,7 +418,7 @@ var Unit = Class.extend({
       _.each(firstList, function(firstListItem) {
         if ( secondList.indexOf(firstListItem) == -1 ) {
           // Not found in the secondlist, so recalculate all units inside
-          if ( worldHandler.CheckWorldStructure(zone, firstListItem.x, firstListItem.z) ){ 
+          if ( worldHandler.CheckWorldStructure(zone, firstListItem.x, firstListItem.z) ){
       			_.each(worldHandler.world[zone][firstListItem.x][firstListItem.z].units, function(sunit){
               sunit.UpdateOtherUnitsList();
             });
@@ -550,7 +550,7 @@ var Unit = Class.extend({
 
     // If we can't find any node, just go straight to the target
     if ( !closestNode || !farthestNode ) {
-      this.targetNodePosition = targetPosition.clone();
+      //this.targetNodePosition = targetPosition.clone();
       return;
     }
 
@@ -559,7 +559,7 @@ var Unit = Class.extend({
 
     // If the path is empty, go straight for the target
     if ( paths.length === 0 ) {
-      this.targetNodePosition = targetPosition.clone();
+      //this.targetNodePosition = targetPosition.clone();
                // log("[CalculatePath] No path found, going straight for the target! new targetNodePosition: "+this.targetNodePosition.ToString());
     }
     else {

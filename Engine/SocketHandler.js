@@ -1658,37 +1658,46 @@ var SocketHandler = Class.extend({
                 var zone = socket.unit.zone;
 
                 // Check if there is a node at this position
-                var existingNode = false;
+                var existingNode = null;
                 _.each(worldHandler.world[zone], function(cx) {
                     _.each(cx, function(cz) {
                         if ( cz.graph === undefined ) return;
                         if ( cz.graph.nodes === undefined ) return;
                         _.each(cz.graph.nodes, function(node) {
                             if ( VectorDistanceSq(ConvertVector3(node.pos), position) < 1 ) {
-                                existingNode = true;
+                                existingNode = node;
                             }
                         });
                     });
                 });
 
-                if ( existingNode ) return;
+                if ( !existingNode ) {
+                    var newNodeID = worldHandler.GetWaypointID(zone);
 
+                    nodeHandler.AddNode(zone, newNodeID, position);
 
-                var newNodeID = worldHandler.GetWaypointID(zone);
+                    var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
+                    worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
-                nodeHandler.AddNode(zone, newNodeID, position);
+                    socket.unit.EmitNearby("ppAddNode", {
+                        id: newNodeID,
+                        pos: position
+                    }, 0, true);
 
-                var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
+                    reply({
+                        newNodeID:newNodeID
+                    });
+                }
+                else {
+                    socket.unit.EmitNearby("ppAddNode", {
+                        id: existingNode.id,
+                        pos: position
+                    }, 0, true);
 
-                socket.unit.EmitNearby("ppAddNode", {
-                    id: newNodeID,
-                    pos: position
-                }, 0, true);
-
-                reply({
-                    newNodeID:newNodeID
-                });
+                    reply({
+                        newNodeID:existingNode.id
+                    });
+                }
             });
 
             socket.on("ppAddEdge", function (data, reply) {

@@ -252,10 +252,12 @@ var EditorGUI = function() {
 
 
   // Path placer
-  this.enablePathPlacer = false;
-  this.ppMode = PathPlacerModeEnum.NODES;
-  this.ppTwoWay = true;
-  this.ppAutoConnectWithin = 0;
+  this.ppShowWaypoints = false;
+
+  this.ppAutoScanMode = false;
+  this.ppAutoDeleteMode = false;
+  this.ppUseSmallNodes = false;
+  this.ppAllowElevation = false;
 
   // Model placer
   this.enableModelPlacer = false;
@@ -442,18 +444,6 @@ var LevelEditor = Class.extend({
     if ( !currentMouseToWorldData ) return;
 
     this.previewBuildMesh = new THREE.Object3D();
-
-    if ( levelEditor.editorGUI.enablePathPlacer ) {
-
-      var ix = (currentMouseToWorldData.point.x);
-      var iz = (currentMouseToWorldData.point.z);
-
-      if ( levelEditor.editorGUI.ppMode == PathPlacerModeEnum.NODES ) {
-
-          //this.AddPreviewCircleToMesh(ix, iz, levelEditor.editorGUI.ppAutoConnectWithin, 0xffffff);
-
-      }
-    }
 
 
     this.previewBuildMesh.position.y = ConvertVector3(currentMouseToWorldData.face.centroid).y;
@@ -683,22 +673,14 @@ var LevelEditor = Class.extend({
     var fPlayerManagement = this.editorGUI.gui.addFolder('Player Management');
 
 
-    guiControls['enablePathPlacer'] = fPathPlacer.add(this.editorGUI, 'enablePathPlacer');
-
-    guiControls['ppMode'] = fPathPlacer.add(this.editorGUI, 'ppMode', {
-      "Add Nodes": PathPlacerModeEnum.NODES,
-      "Add Edges": PathPlacerModeEnum.EDGES,
-      "Delete": PathPlacerModeEnum.DELETE
-    });
-
-    var fEdgeOptions = fPathPlacer.addFolder('Options');
-    guiControls['ppTwoWay'] = fEdgeOptions.add(this.editorGUI, 'ppTwoWay');
-    guiControls['ppAutoConnectWithin'] = fEdgeOptions.add(this.editorGUI, 'ppAutoConnectWithin', 0, 20);
+    guiControls['ppShowWaypoints'] = fPathPlacer.add(this.editorGUI, 'ppShowWaypoints');
+    guiControls['ppAutoScanMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoScanMode');
+    guiControls['ppAutoDeleteMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoDeleteMode');
+    guiControls['ppUseSmallNodes'] = fPathPlacer.add(this.editorGUI, 'ppUseSmallNodes');
+    guiControls['ppAllowElevation'] = fPathPlacer.add(this.editorGUI, 'ppAllowElevation');
 
 
     guiControls['enableModelPlacer'] = fModelPlacer.add(this.editorGUI, 'enableModelPlacer');
-
-
 
     guiControls['mpTransformMode'] = fModelPlacer.add(this.editorGUI, 'mpTransformMode');
 
@@ -988,10 +970,33 @@ var LevelEditor = Class.extend({
     });
 
 
-    guiControls['enablePathPlacer'].onFinishChange(function(value) {
+    guiControls['ppShowWaypoints'].onFinishChange(function(value) {
       for(var c in terrainHandler.cells) terrainHandler.cells[c].ReloadWaypointsOnly();
     });
 
+    guiControls['ppAutoScanMode'].onFinishChange(function(value) {
+      if ( value ) {
+
+        _.each([
+          'Entering Autoscan mode...',
+          'Simply walk around to add navigation points.',
+          'For narrow areas, use the Small Nodes setting.',
+        ], function(msg) {
+          hudHandler.AddChatMessage(msg);
+        });
+      }
+    });
+
+    guiControls['ppAutoDeleteMode'].onFinishChange(function(value) {
+      if ( value ) {
+        _.each([
+          'Entering Autodelete mode...',
+          'Simply walk around to delete navigation points that are near the player.',
+        ], function(msg) {
+          hudHandler.AddChatMessage(msg);
+        });
+      }
+    });
 
     //$('#tileSelectBox').css('width', (frameWidth-20)+'px');
     $('#tileSelectBox').css('left', ((frameWidth/2)-200)+'px');

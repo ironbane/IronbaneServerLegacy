@@ -34,10 +34,10 @@ var ChaseEnemy = State.extend({
 
 
 
-    npc.EmitNearby("addParticle", {
-      p:"ENEMYINSIGHT",
-      pfu:npc.id
-      });
+    // npc.EmitNearby("addParticle", {
+    //   p:"ENEMYINSIGHT",
+    //   pfu:npc.id
+    //   });
 
 
     this.chaseTimeBeforeGivingUp = 8;
@@ -108,19 +108,22 @@ var ChaseEnemy = State.extend({
 
       // log("[ChaseEnemy] Moving towards enemy!");
       // npc.TravelToPosition(this.enemy.position);
-      var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(1);
+      var direction = npc.position.clone().sub(this.enemy.position).normalize();
       var target = this.enemy.position.clone().add(direction);
 
       var distanceToTarget = DistanceSq(target, npc.position);
 
       // console.log(distanceToTarget);
 
-      if ( distanceToTarget < 0.5 ) {
+      //if ( distanceToTarget < 0.5 ) {
         // Look at me!
         npc.heading.copy(direction.clone().multiplyScalar(-1));
-      }
+      //}
 
-      npc.steeringForce = npc.steeringBehaviour.Arrive(target, Deceleration.FAST);
+      //npc.steeringForce = npc.steeringBehaviour.Arrive(target, Deceleration.FAST);
+      //var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(0.5);
+      //npc.TravelToPosition(this.enemy.position.clone().add(direction), true);
+      npc.velocity.set(0,0,0);
 
     //if ( this.jumpTimeout <= 0 && getRandomInt(0, 50) == 1 ) this.Jump();
     }
@@ -130,35 +133,35 @@ var ChaseEnemy = State.extend({
 
       // log("[ChaseEnemy] Within aggro range, moving closer...");
 
-      var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(2);
-      npc.TravelToPosition(this.enemy.position.clone().add(direction), true);
+      var direction = npc.position.clone().sub(this.enemy.position).normalize().multiplyScalar(0.5);
+      npc.TravelToPosition(this.enemy.position, true);
 
     }
 
   },
   Exit: function(npc) {
 
-    if ( this.enemy.health > 0 ) {
-      npc.EmitNearby("addParticle", {
-        p:"ENEMYOUTOFSIGHT",
-        pfu:npc.id
-        });
-    }
-    else {
+//     if ( this.enemy.health > 0 ) {
+//       npc.EmitNearby("addParticle", {
+//         p:"ENEMYOUTOFSIGHT",
+//         pfu:npc.id
+//         });
+//     }
+//     else {
 
-//      switch(getRandomInt(0,2)){
-//        case 0:
-//          npc.Say("Got you, "+this.enemy.name+"!");
-//          break;
-//        case 1:
-//          npc.Say("Is that all you got?");
-//          break;
-//        case 2:
-//          npc.Say("Whahahaha! Rookie!");
-//          break;
-//      }
+// //      switch(getRandomInt(0,2)){
+// //        case 0:
+// //          npc.Say("Got you, "+this.enemy.name+"!");
+// //          break;
+// //        case 1:
+// //          npc.Say("Is that all you got?");
+// //          break;
+// //        case 2:
+// //          npc.Say("Whahahaha! Rookie!");
+// //          break;
+// //      }
 
-    }
+//     }
 
   },
   HandleMessage: function(unit, message, data) {

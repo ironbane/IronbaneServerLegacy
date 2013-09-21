@@ -32,7 +32,7 @@ var Waypoint = Billboard.extend({
             texture = "misc/waypoint_red";
         }
 
-        this.drawNameMesh = true;
+        //this.drawNameMesh = true;
 
         this._super(position, 0, id, texture, true, this.nodeData.id);
 

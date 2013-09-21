@@ -262,7 +262,7 @@ var EditorGUI = function() {
   this.enableObjectPlacer = false;
 
   // Path placer
-  this.enablePathPlacer = false;
+  this.showWaypoints = false;
   this.ppMode = PathPlacerModeEnum.NODES;
   this.ppTwoWay = true;
   this.ppAutoConnectWithin = 0;
@@ -468,7 +468,7 @@ var LevelEditor = Class.extend({
 
     this.previewBuildMesh = new THREE.Object3D();
 
-    if ( levelEditor.editorGUI.enablePathPlacer ) {
+    if ( levelEditor.editorGUI.showWaypoints ) {
 
       var ix = (currentMouseToWorldData.point.x);
       var iz = (currentMouseToWorldData.point.z);
@@ -707,7 +707,7 @@ var LevelEditor = Class.extend({
     var fPlayerManagement = this.editorGUI.gui.addFolder('Player Management');
 
 
-    guiControls['enablePathPlacer'] = fPathPlacer.add(this.editorGUI, 'enablePathPlacer');
+    guiControls['showWaypoints'] = fPathPlacer.add(this.editorGUI, 'showWaypoints');
 
     guiControls['ppMode'] = fPathPlacer.add(this.editorGUI, 'ppMode', {
       "Add Nodes": PathPlacerModeEnum.NODES,
@@ -1001,7 +1001,7 @@ var LevelEditor = Class.extend({
     });
 
 
-    guiControls['enablePathPlacer'].onFinishChange(function(value) {
+    guiControls['showWaypoints'].onFinishChange(function(value) {
       for(var c in terrainHandler.cells) terrainHandler.cells[c].ReloadWaypointsOnly();
     });
 

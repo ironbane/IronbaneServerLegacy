@@ -331,7 +331,7 @@ var Cell = Class.extend({
         // Keep track of the ID's in a list of the cell
         }, this);
 
-        if ( showEditor && levelEditor.editorGUI.enablePathPlacer ) {
+        if ( showEditor && levelEditor.editorGUI.ppShowWaypoints ) {
 
             var graph = this.graphData;
 
@@ -347,13 +347,21 @@ var Cell = Class.extend({
                     }
 
                     var nodeID = parseInt(node.id, 10);
-                    var unit = new Waypoint(pos, node);
 
-                    if ( unit ) {
-                        ironbane.unitList.push(unit);
-                        this.objects.push(unit);
+
+                    if ( true ) {
+                        // ironbane.unitList.push(unit);
+                        // this.objects.push(unit);
+                        // Sphere parameters: radius, segments along width, segments along height
+                        var sphereGeometry = new THREE.SphereGeometry( 0.2, 4, 4 );
+                        var sphereMaterial = new THREE.MeshLambertMaterial( {color: 0xff00ff} );
+                        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                        sphere.position.copy(pos.clone().add(new THREE.Vector3(0, 0.5, 0)));
+                        this.waypointMeshes.push(sphere);
+                        ironbane.scene.add(sphere);
 
                         for (var e=0;e<node.edges.length;e++ ) {
+
                             var edge = node.edges[e];
 
                             // Find the node in adjacent cells
@@ -378,7 +386,7 @@ var Cell = Class.extend({
                                             var subpos = ConvertVector3(subnodes[sn].pos);
                                             var vec = subpos.sub(pos);
                                             if ( !(vec.lengthSq() < 0.0001) ) {
-                                                var aH = new THREE.ArrowHelper(vec, pos.clone().add(new THREE.Vector3(0, 0.5, 0)), vec.length()-1, 0x00FFFF);
+                                                var aH = new THREE.ArrowHelper(vec.clone().normalize(), pos.clone().add(new THREE.Vector3(0, 0.5, 0)), vec.length(), 0x00ffff);
                                                 this.waypointMeshes.push(aH);
                                                 ironbane.scene.add(aH);
                                             }

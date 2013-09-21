@@ -35,7 +35,7 @@ module.exports = function() {
 
     if (!cryptSalt) {
         var warn = function() {
-            console.log("Warning: no password hash set! Edit config.json and set the cryptSalt variable.");
+            console.log("Warning: no password hash set! Your server works, but is very insecure. Edit config.json and set the cryptSalt variable.");
         };
         if ( isProduction ) {
             setInterval(warn, 1000);

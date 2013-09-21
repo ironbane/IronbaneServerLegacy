@@ -78,6 +78,9 @@ var Player = Fighter.extend({
         this.onChangeZone(terrainHandler.zone);
 
         this.lastFoundLootBag = null;
+
+
+        this.pathFinder = IB.PathFinder();
     },
     getTotalCoins: function() {
         //console.log('getTotalCoins', socketHandler.playerData.items);
@@ -143,7 +146,7 @@ var Player = Fighter.extend({
 
     this.sendDataTimeout -= dTime;
 
-
+    this.pathFinder.tick(dTime);
 
 
     if ( this.mouseRayCastCheckTimeout > 0 ) this.mouseRayCastCheckTimeout -= dTime;

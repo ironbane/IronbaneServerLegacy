@@ -13153,7 +13153,9 @@ THREE.LineBasicMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xffffff );
 
-	this.linewidth = 1;
+	// NICK EDIT START
+	this.linewidth = 5;
+	// NICK EDIT END
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
@@ -34028,12 +34030,16 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
-	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.875, 0 ) );
+	// NICK EDIT START
+	// var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
+	//var coneGeometry = new THREE.CylinderGeometry( 0, 0.02, 0.10, 5, 1 );
 
-	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
-	this.cone.matrixAutoUpdate = false;
-	this.add( this.cone );
+	//coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.875, 0 ) );
+
+	//this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
+	//this.cone.matrixAutoUpdate = false;
+	//this.add( this.cone );
+	// NICK EDIT END
 
 	this.setDirection( dir );
 	this.setLength( length );
