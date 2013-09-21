@@ -29,6 +29,32 @@ module.exports = function(db) {
         }
     });
 
+    Topic.unlock = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set locked = 0 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+
+    }
+
+    Topic.lock = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set locked = 1 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+
+    }
+
     Topic.newPost = function(params) {
         log(JSON.stringify(params));
         var deferred = Q.defer();

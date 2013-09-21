@@ -33,7 +33,9 @@
         </section>
     </section>
     <br class="clear">
-    <section ng-show="currentUser.authenticated" class="new-topic-form">
+    <button ng-show="currentUser.$hasRole('EDITOR') && !topic.locked" ng-click="lock()">Lock topic</button>
+    <button ng-show="currentUser.$hasRole('EDITOR') && topic.locked" ng-click="unlock()">Unlock topic</button>
+    <section ng-show="currentUser.authenticated && !topic.locked" class="new-topic-form">
         <div ng-controller="CollapseControl">
             <button class="btn" ng-click="isCollapsed = !isCollapsed">New Reply</button>
             <hr>
