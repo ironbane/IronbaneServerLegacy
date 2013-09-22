@@ -40,7 +40,7 @@ module.exports = function(db) {
         });
         return deferred.promise;
 
-    }
+    };
 
     Topic.lock = function(topicId) {
         var deferred = Q.defer();
@@ -52,8 +52,32 @@ module.exports = function(db) {
             deferred.resolve(Topic.get(topicId));
         });
         return deferred.promise;
+    };
 
-    }
+    Topic.unsticky = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set sticky = 0 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+
+    };
+
+    Topic.sticky = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set sticky = 1 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+    };
 
     Topic.newPost = function(params) {
         log(JSON.stringify(params));

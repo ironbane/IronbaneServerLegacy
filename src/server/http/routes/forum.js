@@ -119,6 +119,22 @@ module.exports = function(app, db) {
        });
     });
 
+    app.post('/api/forum/topics/:topicId/unsticky', function(req, res) {
+        Topic.unsticky(req.params.topicId).then(function(result) {
+            res.send(result);
+       }, function(err) {
+        res.send(500, err);
+       });
+    });
+
+    app.post('/api/forum/topics/:topicId/sticky', function(req, res) {
+        Topic.sticky(req.params.topicId).then(function(result) {
+            res.send(result);
+       }, function(err) {
+        res.send(500, err);
+       });
+    });
+
     // get all posts for topic
     app.get('/api/forum/topics/:topicId/posts', function(req, res) {
         Topic.getPostsView(req.params.topicId).then(function(results) {

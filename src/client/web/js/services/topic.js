@@ -22,6 +22,24 @@ angular.module('IronbaneApp')
 
             };
 
+            Topic.unsticky = function(topicId){
+                return $http.post('/api/forum/topics/' + topicId + '/unsticky')
+                    .then(function(response) {
+                        
+                    }, function(error) {
+                        return $q.reject(error);
+                    });
+            };
+
+            Topic.sticky = function(topicId){
+                return $http.post('/api/forum/topics/' + topicId + '/sticky')
+                    .then(function(response) {
+                                                
+                    }, function(error) {
+                        return $q.reject(error);
+                    });
+            };
+
             Topic.unlock = function(topicId){
                 return $http.post('/api/forum/topics/' + topicId + '/unlock')
                     .then(function(response) {
@@ -29,16 +47,16 @@ angular.module('IronbaneApp')
                     }, function(error) {
                         return $q.reject(error);
                     });
-            }
+            };
 
             Topic.lock = function(topicId){
                 return $http.post('/api/forum/topics/' + topicId + '/lock')
                     .then(function(response) {
-                        
+                                                
                     }, function(error) {
                         return $q.reject(error);
                     });
-            }
+            };
 
             Topic.get = function(topicId) {
                 return $http.get('/api/forum/topics/' + topicId)

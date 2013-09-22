@@ -20,7 +20,7 @@ angular.module('IronbaneApp')
     	}, function(error){
     		$log.log('error while locking topic');
     	});
-    }
+    };
 
     $scope.unlock = function(){
 
@@ -31,5 +31,27 @@ angular.module('IronbaneApp')
     	}, function(error){
     		$log.log('error while locking topic');
     	});
-    }
+    };
+
+    $scope.sticky = function(){
+
+        Topic.sticky($scope.topic.id)
+        .then(function(succes){
+            $log.log('topic sticky');
+            $scope.topic.sticky=1;
+        }, function(error){
+            $log.log('error while stickying topic');
+        });
+    };
+
+    $scope.unsticky = function(){
+
+        Topic.unsticky($scope.topic.id)
+        .then(function(succes){
+            $log.log('topic unsticky');
+             $scope.topic.sticky=0;
+        }, function(error){
+            $log.log('error while unstickying topic');
+        });
+    };
 }]);
