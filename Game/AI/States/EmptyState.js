@@ -18,23 +18,23 @@
 
 var EmptyState = State.extend({
 	Init: function() {
-	
-	
+
+
 	},
 	Enter: function(unit) {
-		
-		
+
+
 	},
 	Execute: function(unit, dTime) {
-	
-	
+
+
 	},
 	Exit: function(unit) {
-	
-	
+
+
 	},
-        HandleMessage: function(unit, message, data) {
-            
-            
-        }
+    HandleMessage: function(unit, message, data) {
+
+
+    }
 });

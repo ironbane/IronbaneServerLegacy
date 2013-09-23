@@ -200,10 +200,6 @@ var ToggleableObstacleMovementTypeEnum = {
   DoorZ : 3
 };
 
-var TrainMovementTypeEnum = {
-  Normal: 1
-};
-
 var UserManagementTypeEnum = {
   LIGHTWARN : 0,
   SERIOUSWARN : 1,

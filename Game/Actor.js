@@ -29,6 +29,12 @@ var Actor = MovingUnit.extend({
 
     if ( this.id < 0 ) {
 
+      var identifier = this.template.name;
+
+      // Hack for trains...bad! We need to switch to a CES system
+      if ( this instanceof Train ) {
+        identifier = this.data.scriptName;
+      }
 
       this.BuildWaypoints();
 
@@ -43,9 +49,6 @@ var Actor = MovingUnit.extend({
           break;
         case UnitTypeEnum.MOVINGOBSTACLE:
           currentState = new MovingObstacle();
-          break;
-        case UnitTypeEnum.TRAIN:
-          currentState = new FollowWaypoints();
           break;
         case UnitTypeEnum.TURRET:
           currentState = new Turret();
@@ -66,10 +69,12 @@ var Actor = MovingUnit.extend({
 
       this.stateMachine.ChangeState(currentState);
 
+      //identifier = identifier.replace(/ /g,"");
+
       // Check if we have a global state defined
-      if ( !_.isUndefined(monsterStateMachines[this.template.name]) ) {
+      if ( !_.isUndefined(actorScripts[identifier]) ) {
         this.stateMachine
-          .SetGlobalState(monsterStateMachines[this.template.name]());
+          .SetGlobalState(new actorScripts[identifier]());
       }
     }
 

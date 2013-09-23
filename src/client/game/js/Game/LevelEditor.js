@@ -159,8 +159,7 @@ var EditorGUI = function() {
   };
 
   this.eptrMesh = firstOfObject(ModelEnum);
-  this.eptrMovementType = firstOfObject(TrainMovementTypeEnum);
-  this.eptrWaypointList = "";
+  this.eptrScriptName = "";
   this.eptrAdd = function() {
     // Location doesn't matter, will auto teleport to first waypoint
     socketHandler.socket.emit('addNPC', {
@@ -168,8 +167,7 @@ var EditorGUI = function() {
       template: trainTemplate,
       param: levelEditor.editorGUI.eptrMesh,
       data: {
-        movementType:parseInt(levelEditor.editorGUI.eptrMovementType, 10),
-        waypointList:levelEditor.editorGUI.eptrWaypointList
+        scriptName:levelEditor.editorGUI.eptrScriptName
       }
     });
   };
@@ -763,8 +761,7 @@ var LevelEditor = Class.extend({
 
     var fTrains = fEntityPlacer.addFolder('Trains');
     guiControls['eptrMesh'] = fTrains.add(this.editorGUI, 'eptrMesh', ModelEnum);
-    guiControls['eptrMovementType'] = fTrains.add(this.editorGUI, 'eptrMovementType', TrainMovementTypeEnum);
-    guiControls['eptrWaypointList'] = fTrains.add(this.editorGUI, 'eptrWaypointList');
+    guiControls['eptrScriptName'] = fTrains.add(this.editorGUI, 'eptrScriptName');
     guiControls['eptrAdd'] = fTrains.add(this.editorGUI, 'eptrAdd');
 
     var fLootableMeshes = fEntityPlacer.addFolder('Lootable Meshes');

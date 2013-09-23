@@ -113,7 +113,7 @@ var SteeringBehaviour = Class.extend({
 
 		this.wanderTarget.add(new THREE.Vector3(RandomClamped() * this.wanderJitter,
 		0,
-		RandomClamped() * this.wanderJitter));
+		util.randomClamped() * this.wanderJitter));
 
 		this.wanderTarget.normalize().multiplyScalar(this.wanderRadius);
 

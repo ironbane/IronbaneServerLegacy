@@ -32,8 +32,6 @@ var WorldHandler = Class.extend({
 
     this.switches = {};
 
-    this.LoadWorldLight();
-
     this.awake = false;
     this.hasLoadedWorld = false;
 
@@ -164,7 +162,7 @@ var WorldHandler = Class.extend({
 
     this.world = {};
 
-    walk(dataPath, function(err, results) {
+    util.walk(dataPath, function(err, results) {
       if (err) throw err;
     var rl = results.length;
       for (var r=0;r<rl;r++) {
