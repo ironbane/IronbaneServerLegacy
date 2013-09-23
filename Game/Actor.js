@@ -44,6 +44,9 @@ var Actor = MovingUnit.extend({
         case UnitTypeEnum.MOVINGOBSTACLE:
           currentState = new MovingObstacle();
           break;
+        case UnitTypeEnum.TRAIN:
+          currentState = new FollowWaypoints();
+          break;
         case UnitTypeEnum.TURRET:
           currentState = new Turret();
           break;

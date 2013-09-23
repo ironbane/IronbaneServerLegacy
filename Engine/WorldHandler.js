@@ -384,6 +384,12 @@ var WorldHandler = Class.extend({
         unit = new ToggleableObstacle(data);
         break;
       case UnitTypeEnum.TRAIN:
+
+        // Convert data rotations to regular members
+        data.rotx = 0;
+        data.roty = 0;
+        data.rotz = 0;
+
         unit = new Train(data);
         break;
       case UnitTypeEnum.LEVER:
@@ -406,6 +412,9 @@ var WorldHandler = Class.extend({
         data.rotz = data.data.rotZ;
 
         unit = new Sign(data);
+        break;
+      case UnitTypeEnum.WAYPOINT:
+        unit = new Waypoint(data);
         break;
       case UnitTypeEnum.LOOTABLE:
 

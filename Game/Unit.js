@@ -238,7 +238,7 @@ var Unit = Class.extend({
       if ( unit.id < 0 ) {
         packet.template = unit.template.id;
 
-        if ( unit.template.type === UnitTypeEnum.MOVINGOBSTACLE || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
+        if ( unit.template.type === UnitTypeEnum.TRAIN ) {
           packet.rotX = unit.rotation.x.Round();
           packet.rotZ = unit.rotation.z.Round();
         }

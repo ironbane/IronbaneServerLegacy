@@ -106,6 +106,7 @@ module.exports = function() {
             './Game/AI/MonsterScripts.js',
             './Game/AI/States/ChaseEnemy.js',
             './Game/AI/States/ExploreAndLookForEnemies.js',
+            './Game/AI/States/FollowWaypoints.js',
             './Game/AI/States/NPCGlobalState.js',
             './Game/AI/States/EmptyState.js',
             './Game/AI/States/SellMerchandise.js',
@@ -129,6 +130,7 @@ module.exports = function() {
             './Game/Special/TeleportEntrance.js',
             './Game/Special/TeleportExit.js',
             './Game/Special/Sign.js',
+            './Game/Special/Waypoint.js',
             './Game/Special/HeartPiece.js',
             './Game/Special/MusicPlayer.js',
             './Server.js'

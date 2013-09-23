@@ -14,19 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
-var Waypoint = Billboard.extend({
-    Init: function(position, id) {
 
-        var texture = "misc/waypoint";
 
-        this.drawNameMesh = true;
 
-        this._super(position, 0, id, texture, true, -id);
+var Waypoint = Unit.extend({
+    Init: function(data) {
+
+        this._super(data);
+
+
+    },
+    Tick: function(dTime) {
+
+        this._super(dTime);
+
 
     }
 });

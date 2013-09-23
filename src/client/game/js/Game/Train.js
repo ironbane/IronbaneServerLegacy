@@ -26,7 +26,6 @@ var Train = DynamicMesh.extend({
 
 
 
-
     },
     Tick: function(dTime) {
 
@@ -40,12 +39,42 @@ var Train = DynamicMesh.extend({
 //        else {
 //            this.velocity.
 //        }
+        this.changeRotationNextTick = true;
+
         this.steeringForce = this.steeringBehaviour.Arrive(this.targetPosition, 1.0);
 
-        // sw("this.targetRotation", this.targetRotation.ToString());
-        // sw("this.rotation", this.rotation.ToString());
+        this.localPosition.x = this.localPosition.x.Lerp(this.targetPosition.x, dTime*2);
+        this.localPosition.z = this.localPosition.z.Lerp(this.targetPosition.z, dTime*2);
+        this.localPosition.y = this.localPosition.y.Lerp(this.targetPosition.y, dTime*2);
 
-        this.rotation.lerp(this.targetRotation, dTime*4);
+        if ( (this.targetRotation.x-this.localRotation.x) > Math.PI ) {
+            this.localRotation.x += Math.PI*2;
+        }
+        if ( (this.targetRotation.y-this.localRotation.y) > Math.PI ) {
+            this.localRotation.y += Math.PI*2;
+        }
+        if ( (this.targetRotation.z-this.localRotation.z) > Math.PI ) {
+            this.localRotation.z += Math.PI*2;
+        }
+
+        if ( (this.localRotation.x-this.targetRotation.x) > Math.PI ) {
+            this.localRotation.x -= Math.PI*2;
+        }
+        if ( (this.localRotation.y-this.targetRotation.y) > Math.PI ) {
+            this.localRotation.y -= Math.PI*2;
+        }
+        if ( (this.localRotation.z-this.targetRotation.z) > Math.PI ) {
+            this.localRotation.z -= Math.PI*2;
+        }
+
+        this.localRotation.x = this.localRotation.x.Lerp(this.targetRotation.x, dTime*2);
+        this.localRotation.z = this.localRotation.z.Lerp(this.targetRotation.z, dTime*2);
+        this.localRotation.y = this.localRotation.y.Lerp(this.targetRotation.y, dTime*2);
+
+        sw("this.targetRotation", this.targetRotation.ToString());
+        sw("this.rotation", this.rotation.ToString());
+
+        //this.localRotation.lerp(this.targetRotation, dTime*4);
 
         this._super(dTime);
 
