@@ -39,7 +39,6 @@ module.exports = function(db) {
             deferred.resolve(Topic.get(topicId));
         });
         return deferred.promise;
-
     };
 
     Topic.lock = function(topicId) {

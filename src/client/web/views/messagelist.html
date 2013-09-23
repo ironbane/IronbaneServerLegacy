@@ -3,19 +3,22 @@
 		You have no messages
 	</div>
 	<div ng-show="messages.length > 0">
+		{{message}}
 		<table>
 			<th></th>
 			<th></th>
 			<th>subject</th>
+			<th>From</th>
 			<th>Date</th>
 			<tr ng-repeat="message in messages" >
 				<td></td>
 				<td><input type="checkbox" value="{{message.id}}" ng-model="message.checked"></td>
 				<td><a ng-href="/message/{{message.id}}">{{message.subject}}</a></td>
-				<td>{{message.date * 1000 | date:'medium'}}</td>
+				<td>{{message.from_user}}</td>
+				<td>{{message.datesend * 1000 | date:'medium'}}</td>
 			</tr>
 		</table>
-		<button ng-click="">New Post</button>
+		<button ng-click="newPost()">New Post</button>
 		<button ng-show="selectedCount > 0" ng-click="deletePost()">Delete</button>
 	</div>
 </div>

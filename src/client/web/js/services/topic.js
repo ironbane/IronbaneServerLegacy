@@ -62,6 +62,8 @@ angular.module('IronbaneApp')
                 return $http.get('/api/forum/topics/' + topicId)
                     .then(function(response) {
                         return response;
+                    }, function(error){
+                        return $q.reject(error);
                     });
 
             };
