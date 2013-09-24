@@ -678,6 +678,20 @@ var WorldHandler = Class.extend({
 
     return foundUnit;
   },
+  BuildWaypointListFromUnitIds: function(list) {
+    var newList = [];
+    _.each(list, function(number) {
+      var unit = worldHandler.FindUnit(-number);
+      if ( unit ) {
+        // Passing by reference on purpose, for dynamic waypoints in the future
+        newList.push({
+          id: number,
+          pos: unit.position
+        });
+      }
+    });
+    return newList;
+  },
   // Only for players!!!!
   FindPlayerByName: function(name) {
 

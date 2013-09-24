@@ -51,13 +51,11 @@ var Actor = MovingUnit.extend({
           currentState = new MovingObstacle();
           break;
         case UnitTypeEnum.TURRET:
+        case UnitTypeEnum.TURRET_KILLABLE:
           currentState = new Turret();
           break;
         case UnitTypeEnum.TURRET_STRAIGHT:
           currentState = new TurretStraight();
-          break;
-        case UnitTypeEnum.TURRET_KILLABLE:
-          currentState = new TurretKillable();
           break;
         case UnitTypeEnum.WANDERER:
           currentState = new Wander();

@@ -21,20 +21,17 @@ var TurretStraight = State.extend({
 
     this.attackTimeout = 0.0;
   },
-  Enter: function(npc) {
-
-    npc.maxSpeed = 0.0;
-
-
-
+  Enter: function(unit) {
+    this.originalMaxSpeed = unit.maxSpeed;
+    unit.maxSpeed = 0.0;
   },
-  Execute: function(npc, dTime) {
+  Execute: function(unit, dTime) {
 
-    // log("state "+npc.rotation.y);
+    // log("state "+unit.rotation.y);
 
     if ( this.attackTimeout > 0 ) this.attackTimeout -= dTime;
 
-    var player = npc.FindNearestTarget(npc.template.aggroradius, true, true);
+    var player = unit.FindNearestTarget(unit.template.aggroradius, true, true);
 
 
     if ( player ) {
@@ -44,19 +41,19 @@ var TurretStraight = State.extend({
 
       if ( this.attackTimeout <= 0 ) {
 
-        this.attackTimeout = npc.weapon.delay;
+        this.attackTimeout = unit.weapon.delay;
 
         //log("[Turret] Attempting attack!");
 
-        // npc.AttemptAttack(player);
+        // unit.AttemptAttack(player);
 
-        // console.log(npc.rotation);
+        // console.log(unit.rotation);
 
-        var angle = npc.rotation.y.ToRadians();
+        var angle = unit.rotation.y.ToRadians();
 
 
-        npc.ShootProjectile(npc.position.clone()
-          .add(npc.heading.clone().multiplyScalar(5)), false);
+        unit.ShootProjectile(unit.position.clone()
+          .add(unit.heading.clone().multiplyScalar(5)), false);
 
 
       // Attack!
@@ -69,6 +66,6 @@ var TurretStraight = State.extend({
 
   },
   Exit: function(unit) {
-
+    unit.maxSpeed = this.originalMaxSpeed;
   }
 });

@@ -29,17 +29,17 @@ var ExploreAndLookForEnemies = State.extend({
 
             this.minimumExploreTime = 5.0;
 	},
-	Enter: function(npc) {
+	Enter: function(unit) {
 
-            this.targetPosition = npc.position.clone();
+            this.targetPosition = unit.position.clone();
 
-            npc.maxSpeed = 2.0;
+            unit.maxSpeed = 2.0;
 
 	},
-	Execute: function(npc, dTime) {
+	Execute: function(unit, dTime) {
 
 
-            if ( npc.health <= 0 || npc.template.disabled ) return;
+            if ( unit.health <= 0 || unit.template.disabled ) return;
 
             if ( this.walkBackTimeout > 0 ) this.walkBackTimeout -= dTime;
             if ( this.minimumExploreTime > 0 ) this.minimumExploreTime -= dTime;
@@ -47,54 +47,54 @@ var ExploreAndLookForEnemies = State.extend({
             if ( this.changeToNewPositionTimeout > 0 ) this.changeToNewPositionTimeout -= dTime;
 
             if ( this.changeToNewPositionTimeout <= 0.0 ) {
-                 //var distance = DistanceSq(npc.position, npc.targetPosition);
-                 //this.targetPosition = npc.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
+                 //var distance = DistanceSq(unit.position, unit.targetPosition);
+                 //this.targetPosition = unit.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
                  //this.targetPosition.set(getRandomInt(0, 45), getRandomInt(0, 10), getRandomInt(0, 20));
                  this.test = !this.test;
                  this.changeToNewPositionTimeout = getRandomFloat(1, 5);
 
                  // Get a random waypoint nearby and travel to it
-                 if ( npc.connectedNodeList.length === 0 ) {
+                 if ( unit.connectedNodeList.length === 0 ) {
                     // log("[ExploreAndLookForEnemies] No nodes found...");
                      // No nodes found...
                      // Adjust the X and Z things
-                     this.targetPosition.x = npc.startPosition.x+getRandomInt(-20,20);
-                     this.targetPosition.z = npc.startPosition.z+getRandomInt(-20,20);
+                     this.targetPosition.x = unit.startPosition.x+getRandomInt(-20,20);
+                     this.targetPosition.z = unit.startPosition.z+getRandomInt(-20,20);
                 }
                 else {
-                    var randomNode = ChooseRandom(npc.connectedNodeList);
+                    var randomNode = ChooseRandom(unit.connectedNodeList);
                     this.targetPosition = ConvertVector3(randomNode.pos).add(new THREE.Vector3(getRandomFloat(-1, 1), 0, getRandomFloat(-1, 1)));
                    // log("[ExploreAndLookForEnemies] Traveling to node "+randomNode.id+"...");
                 }
-                // npc.maxSpeed = getRandomFloat(2.0, 4.0);
+                // unit.maxSpeed = getRandomFloat(2.0, 4.0);
 
 
                  //this.targetPosition.set(this.test ? 0 : 25, 0, this.test ? 0 : 10);
 
                  // log("[ExploreAndLookForEnemies] New target position: "+this.targetPosition.ToString());
-                 // log("[ExploreAndLookForEnemies] Current NPC nodepath: "+npc.targetNodePosition.ToString());
+                 // log("[ExploreAndLookForEnemies] Current NPC nodepath: "+unit.targetNodePosition.ToString());
             }
 
-            //npc.steeringForce = npc.steeringBehaviour.Wander();
-            npc.TravelToPosition(this.targetPosition, true);
+            //unit.steeringForce = unit.steeringBehaviour.Wander();
+            unit.TravelToPosition(this.targetPosition, true);
 
 
-            if ( npc.template.spawnguardradius > 0 ) {
-                if ( VectorDistance(npc.startPosition, npc.position) > npc.template.spawnguardradius ) this.walkBackTimeout = 3.0;
+            if ( unit.template.spawnguardradius > 0 ) {
+                if ( VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius ) this.walkBackTimeout = 3.0;
 
-                if ( npc.walkBackTimeout > 0.0 ) {
-                    // npc.steeringForce = npc.steeringBehaviour.Seek(npc.startPosition);
-                    npc.TravelToPosition(npc.startPosition);
+                if ( unit.walkBackTimeout > 0.0 ) {
+                    // unit.steeringForce = unit.steeringBehaviour.Seek(unit.startPosition);
+                    unit.TravelToPosition(unit.startPosition);
                 }
             }
 
-            var player = npc.FindNearestTarget(npc.template.aggroradius, true);
+            var player = unit.FindNearestTarget(unit.template.aggroradius, true);
 
-            if ( player && player.InRangeOfPosition(npc.position, npc.template.spawnguardradius+npc.template.aggroradius) &&
+            if ( player && player.InRangeOfPosition(unit.position, unit.template.spawnguardradius+unit.template.aggroradius) &&
                 this.minimumExploreTime <= 0 &&
-                npc.InLineOfSight(player) ) {
+                unit.InLineOfSight(player) ) {
                 // log("[ExploreAndLookForEnemies] Found enemy!");
-                npc.stateMachine.ChangeState(new ChaseEnemy(player));
+                unit.stateMachine.ChangeState(new ChaseEnemy(player));
                 //this.steeringForce = this.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST);
                 //this.steeringForce = this.steeringBehaviour.Pursuit(player);
             }
@@ -103,17 +103,17 @@ var ExploreAndLookForEnemies = State.extend({
             }
 
 	},
-	Exit: function(npc) {
+	Exit: function(unit) {
 
 	},
-        HandleMessage: function(npc, message, data) {
+        HandleMessage: function(unit, message, data) {
 
             switch (message) {
               case "attacked":
                 // We're attacked!
 
                 // Change state to ChaseEnemy
-                npc.stateMachine.ChangeState(new ChaseEnemy(data.attacker));
+                unit.stateMachine.ChangeState(new ChaseEnemy(data.attacker));
 
                 break;
             }

@@ -291,7 +291,10 @@ var Mesh = Unit.extend({
     this.mesh = new THREE.Mesh( result.geometry, new THREE.MeshFaceMaterial(result.materials) );
     this.mesh.unit = this;
 
-    this.mesh.castShadow = true;
+    if ( !(this instanceof DynamicMesh) ) {
+      this.mesh.castShadow = true;
+    }
+
 
     this.mesh.geometry.dynamic = true;
 
