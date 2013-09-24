@@ -1,8 +1,7 @@
 // user.js - routes concerning users, login, registration, etc.
 module.exports = function(app, db) {
     var User = require('../../entity/user')(db),
-        log = require('util').log,
-        _ = require('underscore');
+        log = require('util').log;
 
     app.post('/login', function(req, res, next) {
         app.passport.authenticate('local', function(err, user, info) {
@@ -58,7 +57,14 @@ module.exports = function(app, db) {
                 name: req.user.name,
                 email: req.user.email,
                 roles: req.user.roles || [],
-                birthday: req.user.info_birthday
+                info_birthday: req.user.info_birthday,
+                info_realname: req.user.info_realname,
+                info_country : req.user.info_country,
+                info_location: req.user.info_location,
+                info_occupation: req.user.info_occupation,
+                info_interests: req.user.info_interests,
+                info_website: req.user.info_website,
+                show_email: req.user.show_email
             });
         } else {
             res.send(404, 'no user signed in');
@@ -127,8 +133,7 @@ module.exports = function(app, db) {
 
     //currently still stubbed
     app.post('/api/user/preferences', app.ensureAuthenticated, function(req, res) {
-        log("received: " + JSON.stringify(req.body));
-        log("user: " + JSON.stringify(req.user));
+        
         //update the server user instance with the parameters in the req.body
         req.user.$update(req.body);
         //save it. 2 options:
@@ -140,7 +145,7 @@ module.exports = function(app, db) {
                 res.send(user);
             }, function(err){
                 res.send(500, err);
-            })
+            });
 
     });
 

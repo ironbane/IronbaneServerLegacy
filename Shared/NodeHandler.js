@@ -66,13 +66,15 @@ var NodeHandler = Class.extend({
             worldHandler.world[zone][cellPos.x][cellPos.z]['graph']['nodes'].push(newNode);
         }
         else {
-            var graphData = terrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z).graphData;
+            var cell = terrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z);
+            var graphData = cell.graphData;
             if ( graphData['nodes'] === undefined ) {
                 graphData['nodes'] = [];
             }
             graphData['nodes'].push(newNode);
 
-            terrainHandler.GetCellByWorldPosition(position).ReloadWaypointsOnly();
+            //terrainHandler.GetCellByWorldPosition(position).ReloadWaypointsOnly();
+
         }
 
     },
@@ -85,6 +87,7 @@ var NodeHandler = Class.extend({
         twoway = twoway || false;
 
         var nodeInfoFrom = this.GetNodeArrayIndex(zone, from);
+        var nodeInfoTo = this.GetNodeArrayIndex(zone, to);
 
         if ( SERVER ) {
             worldHandler.world[zone][nodeInfoFrom.cx][nodeInfoFrom.cz]['graph']['nodes'][nodeInfoFrom.index]['edges'].push(to);
@@ -92,22 +95,25 @@ var NodeHandler = Class.extend({
                 = _.uniq(worldHandler.world[zone][nodeInfoFrom.cx][nodeInfoFrom.cz]['graph']['nodes'][nodeInfoFrom.index]['edges']);
         }
         else {
-            var graphData = terrainHandler.GetCellByGridPosition(nodeInfoFrom.cx, nodeInfoFrom.cz).graphData;
+            var cell = terrainHandler.GetCellByGridPosition(nodeInfoFrom.cx, nodeInfoFrom.cz);
+            var graphData = cell.graphData;
 
             if ( !graphData.nodes ) return;
 
+            var nodeFrom = graphData.nodes[nodeInfoFrom.index];
+            var nodeTo = graphData.nodes[nodeInfoTo.index];
 
-            graphData.nodes[nodeInfoFrom.index]['edges'].push(to);
-            graphData.nodes[nodeInfoFrom.index]['edges']
-                = _.uniq(graphData.nodes[nodeInfoFrom.index]['edges']);
+            nodeFrom['edges'].push(to);
+            nodeFrom['edges'] = _.uniq(nodeFrom['edges']);
 
-            if ( !twoway ) {
+            // if ( !twoway ) {
+            //     var subpos = ConvertVector3(nodeFrom.pos);
+            //     var vec = subpos.sub(ConvertVector3(nodeTo.pos));
 
-                _.each(terrainHandler.cells, function(cell) {
-                    cell.ReloadWaypointsOnly();
-                });
-
-            }
+            //     var aH = new THREE.ArrowHelper(vec.clone().normalize(), ConvertVector3(nodeTo.pos).clone().add(new THREE.Vector3(0, 0.5, 0)), vec.length()-1, 0xff0000);
+            //     cell.waypointMeshes.push(aH);
+            //     ironbane.scene.add(aH);
+            // }
         }
 
         if ( twoway ) {

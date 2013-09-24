@@ -34,9 +34,15 @@ module.exports = function() {
     var persistentWorldChanges = config.get('persistentWorldChanges');
 
     if (!cryptSalt) {
-        setInterval(function() {
-            console.log("Warning: no password hash set! Edit config.json and set the cryptSalt variable.");
-        }, 1000);
+        var warn = function() {
+            console.log("Warning: no password hash set! Your server works, but is very insecure. Edit config.json and set the cryptSalt variable.");
+        };
+        if ( isProduction ) {
+            setInterval(warn, 1000);
+        }
+        else {
+            setTimeout(warn, 3000);
+        }
     }
 
     // System start

@@ -12,10 +12,27 @@ module.exports = function(db) {
             _.extend(this, json || {});
         },
 
-        $update: function() {
+        $update: function(parameters) {
+            //validate
+            var crypto = require('crypto'),
+                pHash = crypto.createHash('md5'),
+                cryptSalt = config.get('cryptSalt');
+            this.email = parameters.email;
+            this.info_realname = parameters.info_realname;
+            this.info_country = parameters.info_country;
+            this.info_location = parameters.info_location;
+            this.info_birthday = parameters.info_birthday;
+            this.info_occupation = parameters.info_occupation;
+            this.info_interests = parameters.info_interests;
+            this.info_website = parameters.info_website;
+            this.show_email = parameters.show_email;
+
+            pHash.update(cryptSalt + parameters.passwordnewconfirm);
+            this.pass = pHash.digest('hex');
 
         },
         $save: function() {
+            log("saving!");
             var self = this;
             var deferred = Q.defer(),
                 crypto = require('crypto'),
@@ -26,7 +43,15 @@ module.exports = function(db) {
             if (self.id && self.id > 0) {
                 // then this is an update
                 // TODO: perform update (currently update done on php site)
-                deferred.resolve(self);
+                delete self.roles;
+                db.query("UPDATE bcs_users set ? where id = ?", [self,self.id], function(err, result){
+                    if(err){
+                        log(err);
+                        return deferred.reject(err);
+                    }
+                    return deferred.resolve(self);
+                    
+                });
             } else {
                 // new user
                 self.reg_date = (new Date()).valueOf() / 1000;
@@ -252,12 +277,17 @@ module.exports = function(db) {
 
     User.getUserByNameView = function(username) {
         var deferred = Q.defer();
-        db.query('select name, reg_date, count(forum_posts.id) as totalposts from bcs_users inner join forum_posts on forum_posts.user = bcs_users.id where bcs_users.name=?', [username], function(err, results) {
+        db.query('select name, reg_date, count(forum_posts.id) as totalposts, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, show_email, email from bcs_users inner join forum_posts on forum_posts.user = bcs_users.id where bcs_users.name=?', [username], function(err, results) {
             if (err) {
                 deferred.reject(err);
                 return;
             }
-            deferred.resolve(results);
+            var user = results[0];
+            if(user.show_email===0){
+                delete user.email;
+                delete user.show_email;
+            }
+            deferred.resolve(user);
         });
         return deferred.promise;
     };

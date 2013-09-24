@@ -372,7 +372,7 @@ var mouseClickFunction = function(event) {
           });
         }
       }
-      else if ( levelEditor.editorGUI.enablePathPlacer ) {
+      else if ( levelEditor.editorGUI.ppShowWaypoints ) {
 
         var position = currentMouseToWorldData.point;
 

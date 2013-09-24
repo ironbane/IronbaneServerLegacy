@@ -103,6 +103,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/SoundHandler.js",
                     "<%= gameScriptPath %>/Engine/TextureHandler.js",
                     "<%= gameScriptPath %>/Engine/MeshHandler.js",
+                    "<%= gameScriptPath %>/Engine/PathFinder.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
                     "<%= gameScriptPath %>/Game/Hud.js",
                     "<%= gameScriptPath %>/Game/PhysicsObject.js",

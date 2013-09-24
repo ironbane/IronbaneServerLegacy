@@ -29,6 +29,55 @@ module.exports = function(db) {
         }
     });
 
+    Topic.unlock = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set locked = 0 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+    };
+
+    Topic.lock = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set locked = 1 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+    };
+
+    Topic.unsticky = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set sticky = 0 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+
+    };
+
+    Topic.sticky = function(topicId) {
+        var deferred = Q.defer();
+        db.query("UPDATE forum_topics set sticky = 1 WHERE id = ? ", topicId, function(err, result) {
+            if(err) {
+                deferred.reject(err);
+                return;
+            }
+            deferred.resolve(Topic.get(topicId));
+        });
+        return deferred.promise;
+    };
+
     Topic.newPost = function(params) {
         log(JSON.stringify(params));
         var deferred = Q.defer();
@@ -46,10 +95,6 @@ module.exports = function(db) {
                     time: params.time,
                     user: params.user
                 };
-            log("topic id :" + post.topic_id);
-            log("content : " + post.content);
-            log("time : " + post.time);
-            log("user : " + post.user);
 
             db.query('insert into forum_posts set ?', [post], function(err, result) {
                 if (err) {
@@ -83,10 +128,10 @@ module.exports = function(db) {
                     p.content = html;
                 });
                 p.user = {name: p.name, avatar : p.forum_avatar, sig:p.forum_sig, postcount: p.postcount};
-                p.postcount = undefined;
-                p.name = undefined;
-                p.forum_sig = undefined;
-                p.forum_avatar = undefined;
+                delete p.postcount;
+                delete p.name;
+                delete p.forum_sig;
+                delete p.forum_avatar;
             });
             db.query('UPDATE forum_topics set views = views + 1 where id = ?', [topicId], function(results) {
 

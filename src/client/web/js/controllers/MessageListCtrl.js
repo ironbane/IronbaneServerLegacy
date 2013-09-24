@@ -1,8 +1,18 @@
 angular.module('IronbaneApp')
-    .controller('MessageListCtrl', ['$scope', 'Article', '$log', '$location', '$window',
-        function($scope, Article, $log, $location, $window) {
-            $scope.messages = [{'id':1, 'subject': "message"},
-            {'id':2, 'subject': "How are you?"}];
+    .controller('MessageListCtrl', ['$scope', 'Message', '$log', '$location', '$window',
+        function($scope, Message, $log, $location, $window) {
+            Message.getAll()
+            .then(function(messages) {
+                $scope.messages = messages;
+            }, function(error) {
+                $scope.message = error;
+            });
+
+            $scope.newPost = function(){
+                
+                $scope.message = "new post";  
+                $location.path('/messages/new');
+            };
 
             $scope.$watch('messages', function(messages){
 			    $scope.selectedCount = 0;
@@ -14,11 +24,8 @@ angular.module('IronbaneApp')
 			  }, true);
 
             $scope.deletePost = function(){
-            	angular.forEach($scope.messages, function(message){
-            		if(message.checked){
-            			$scope.messages.splice($scope.messages.indexOf(message),1);
-            		}
-            	});
+            	
+                $scope.message = "deletePost";        
             };                    
         }
     ]);

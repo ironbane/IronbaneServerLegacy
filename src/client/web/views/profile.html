@@ -3,12 +3,13 @@
     <a href="/forum">Ironbane forum</a><br>
     Joined: {{profile.reg_date * 1000 | date:'medium'}} <br>
     Total posts: {{profile.totalposts}} <br>
-    Country : {{profile.country}} <br>
-Location : {{profile.location}} <br>
-Website : {{profile.website}} <br>
-Occupation : {{profile.occupation}}  <br>
-Interests : {{profile.interests}} <br>
-Real name : {{profile.realname}} <br>
-Age : {{profile.age}} <br>
-Gender : {{profile.gender}}
+    Country : {{profile.info_country}} <br>
+	Location : {{profile.info_location}} <br>
+	Website : {{profile.info_website}} <br>
+	Occupation : {{profile.info_occupation}}  <br>
+	Interests : {{profile.info_interests}} <br>
+	Real name : {{profile.info_realname}} <br>
+	Age : {{profile.age}} <br>
+	Gender : {{profile.info_gender}}<br>
+	<span ng-show="profile.show_email == 1">email-address : {{profile.email}}</span>
 </div>

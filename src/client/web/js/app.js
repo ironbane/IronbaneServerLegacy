@@ -25,6 +25,10 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
             templateUrl: '/views/messagelist',
             controller: 'MessageListCtrl'
         })
+        .when('/messages/new', {
+            templateUrl: '/views/newmessage',
+            controller: 'MessageSendCtrl'
+        })
         .when('/login', {
             templateUrl: '/views/login',
             controller: 'LoginCtrl'
