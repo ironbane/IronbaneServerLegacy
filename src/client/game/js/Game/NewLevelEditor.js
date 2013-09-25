@@ -305,9 +305,10 @@ var NewLevelEditor = PhysicsObject.extend({
             this.Undo();
 
             // Make it invisible as it will be deleted shortly
-            this.selectedObject.unit.mesh.visible = false;
+
 
             if ( this.selectedObject.unit instanceof Mesh ) {
+                this.selectedObject.unit.mesh.visible = false;
                 (function(oldPos, newPos, newRot, id, metadata) {
                     setTimeout(function() {
                         socketHandler.socket.emit('deleteModel', oldPos, function() {

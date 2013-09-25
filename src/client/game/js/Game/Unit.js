@@ -344,14 +344,21 @@ var Unit = PhysicsObject.extend({
 
       // For all server-controlled units, simulate their actual position by walking to their targetPosition
       // instead of laggy teleports all the time
-      if ( !(this instanceof Player) && !(this instanceof Projectile) && !le("mpTransformMode") ) {
+      if ( !(this instanceof Player) && !(this instanceof Projectile) ) {
 
-        this.localPosition.x = this.localPosition.x.Lerp(this.targetPosition.x, dTime*2);
-        this.localPosition.z = this.localPosition.z.Lerp(this.targetPosition.z, dTime*2);
+        if ( !(le("mpTransformMode")
+            && ironbane.newLevelEditor
+            && ironbane.newLevelEditor.selectedObject
+            && ironbane.newLevelEditor.selectedObject.unit === this )) {
+            this.localPosition.x = this.localPosition.x.Lerp(this.targetPosition.x, dTime*2);
+            this.localPosition.z = this.localPosition.z.Lerp(this.targetPosition.z, dTime*2);
 
-        if ( !this.enableGravity ) {
-          this.localPosition.y = this.localPosition.y.Lerp(this.targetPosition.y, dTime*2);
+            if ( !this.enableGravity ) {
+              this.localPosition.y = this.localPosition.y.Lerp(this.targetPosition.y, dTime*2);
+            }
         }
+
+
       }
 
       this.RotateTowardsTargetPosition(dTime);
