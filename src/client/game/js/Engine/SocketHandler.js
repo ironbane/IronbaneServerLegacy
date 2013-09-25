@@ -228,6 +228,9 @@ var SocketHandler = Class.extend({
                     unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.WAYPOINT:
+                    // Only GMs can see waypoints
+                    if ( !showEditor ) return;
+
                     unit = new Waypoint(ConvertVector3(data.position), data.id);
                     break;
                 case UnitTypeEnum.LOOTABLE:
@@ -760,6 +763,11 @@ var SocketHandler = Class.extend({
                 var unit = FindUnit(unitdata.id);
                 if (unit) {
                     if (unit != ironbane.player) {
+
+                        if ( le("mpTransformMode")
+                            && ironbane.newLevelEditor
+                            && ironbane.newLevelEditor.selectedObject
+                            && ironbane.newLevelEditor.selectedObject.unit === unit ) continue;
 
                         if (!_.isUndefined(unitdata.p)) {
                             unit.targetPosition.x = unitdata.p.x;

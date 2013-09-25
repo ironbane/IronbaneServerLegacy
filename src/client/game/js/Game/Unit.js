@@ -322,11 +322,11 @@ var Unit = PhysicsObject.extend({
 
     //var radians = (this.rotation.y + 90) * (Math.PI/180);
 
-    if ( ironbane.player ) {
+    if ( ironbane.player && this instanceof Fighter) {
       if ( this instanceof Player ) {
         this.unitStandingOn = null;
       }
-      else if ( !(this instanceof Projectile) ) {
+      else {
         if ( !this.InRangeOfUnit(ironbane.player, 15) ) {
           this.allowRaycastGround = false;
           this.enableGravity = false;
@@ -344,7 +344,7 @@ var Unit = PhysicsObject.extend({
 
       // For all server-controlled units, simulate their actual position by walking to their targetPosition
       // instead of laggy teleports all the time
-      if ( !(this instanceof Player) && !(this instanceof Projectile) ) {
+      if ( !(this instanceof Player) && !(this instanceof Projectile) && !le("mpTransformMode") ) {
 
         this.localPosition.x = this.localPosition.x.Lerp(this.targetPosition.x, dTime*2);
         this.localPosition.z = this.localPosition.z.Lerp(this.targetPosition.z, dTime*2);

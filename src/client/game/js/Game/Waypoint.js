@@ -28,5 +28,8 @@ var Waypoint = Billboard.extend({
 
         this._super(position, 0, id, texture, true, -id);
 
+        this.enableGravity = false;
+
+        this.dynamic = true;
     }
 });

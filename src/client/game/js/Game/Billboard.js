@@ -33,13 +33,15 @@ var Billboard = Unit.extend({
         //        this.targetPosition.x = 1.0;
         //        this.targetPosition.z = 1.0;
 
-
+        this.octree = new THREE.Octree({undeferred: true});
 
 
         this.dynamic = false;
         this.enableGravity = false;
 
         this.collider = null;
+
+        this.canSelectWithEditor = true;
 
     },
     Add: function () {
@@ -97,6 +99,11 @@ var Billboard = Unit.extend({
 
         ironbane.scene.add(this.mesh);
 
+        var me = this;
+
+        this.mesh.traverse( function ( object ) {
+            me.octree.add( object, {useFaces:true} );
+        });
 
     },
     Tick: function(dTime) {

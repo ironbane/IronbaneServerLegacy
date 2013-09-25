@@ -290,13 +290,17 @@ var TerrainHandler = Class.extend({
       for(var u=0;u<ironbane.unitList.length;u++) {
         var unit = ironbane.unitList[u];
 
-        if ( !(unit instanceof Mesh) ) continue;
+        if ( unit instanceof Mesh  ) {
+          if ( !unit.boundingSphere ) continue;
 
-        if ( !unit.boundingSphere ) continue;
-
-        if ( unit.InRangeOfPosition(testMeshesNearPosition, unit.boundingSphere.radius+extraRange) ) {
+          if ( unit.InRangeOfPosition(testMeshesNearPosition, unit.boundingSphere.radius+extraRange) ) {
+            meshList.push(unit);
+          }
+        }
+        if ( unit instanceof Billboard || unit instanceof Fighter  ) {
           meshList.push(unit);
         }
+
       }
     }
 

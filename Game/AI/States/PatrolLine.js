@@ -39,7 +39,7 @@ var PatrolLine = State.extend({
                 this.waypointIndex++;
 
                 if ( this.waypointIndex >= this.waypoints.length ) {
-                    this.waypointIndex = this.waypoints.length - 1;
+                    this.waypointIndex = this.waypoints.length - 2;
                     this.forward = false;
                 }
             }

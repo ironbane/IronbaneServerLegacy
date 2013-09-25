@@ -246,11 +246,18 @@ var NewLevelEditor = PhysicsObject.extend({
     },
     DeleteSelectedObject: function() {
 
-      var me = this;
+        var me = this;
 
-      socketHandler.socket.emit('deleteModel', this.selectedObjectOldPosition.clone().Round(2), function() {
-        me.ClearSelectedObject();
-      });
+        if ( this.selectedObject.unit instanceof Mesh ) {
+            socketHandler.socket.emit('deleteModel', this.selectedObjectOldPosition.clone().Round(2), function() {
+                me.ClearSelectedObject();
+            });
+        }
+        else {
+            socketHandler.socket.emit('deleteNPC', this.selectedObject.unit.id, function() {
+                me.ClearSelectedObject();
+            });
+        }
 
 
     },
@@ -300,34 +307,42 @@ var NewLevelEditor = PhysicsObject.extend({
             // Make it invisible as it will be deleted shortly
             this.selectedObject.unit.mesh.visible = false;
 
-            (function(oldPos, newPos, newRot, id, metadata) {
-                setTimeout(function() {
-                    socketHandler.socket.emit('deleteModel', oldPos, function() {
-                        socketHandler.socket.emit('addModel', {
-                            position:newPos,
-                            type: 5,
-                            rX:newRot.x.ToDegrees(),
-                            rY:newRot.y.ToDegrees(),
-                            rZ:newRot.z.ToDegrees(),
-                            param:id
-                        }, function() {
-                            if ( !_.isEmpty(metadata) ) {
-                              socketHandler.socket.emit('paintModel', {
-                                pos: newPos,
-                                id: id,
-                                metadata: metadata,
-                                global : false
-                              });
-                            }
+            if ( this.selectedObject.unit instanceof Mesh ) {
+                (function(oldPos, newPos, newRot, id, metadata) {
+                    setTimeout(function() {
+                        socketHandler.socket.emit('deleteModel', oldPos, function() {
+                            socketHandler.socket.emit('addModel', {
+                                position:newPos,
+                                type: 5,
+                                rX:newRot.x.ToDegrees(),
+                                rY:newRot.y.ToDegrees(),
+                                rZ:newRot.z.ToDegrees(),
+                                param:id
+                            }, function() {
+                                if ( !_.isEmpty(metadata) ) {
+                                  socketHandler.socket.emit('paintModel', {
+                                    pos: newPos,
+                                    id: id,
+                                    metadata: metadata,
+                                    global : false
+                                  });
+                                }
+                            });
                         });
-                    });
-                }, 100);
-            })(oldPos,
-            newPos,
-            newRot,
-            this.selectedObject.unit.meshData.id,
-            this.selectedObject.unit.metadata);
+                    }, 100);
+                })(oldPos,
+                newPos,
+                newRot,
+                this.selectedObject.unit.meshData.id,
+                this.selectedObject.unit.metadata);
+            }
+            else {
 
+                socketHandler.socket.emit('moveNPC', {
+                    position:newPos,
+                    id: this.selectedObject.unit.id
+                });
+            }
         }
 
         this.selectedObject = null;
