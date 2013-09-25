@@ -35,7 +35,7 @@ var MovingUnit = Unit.extend({
     },
     Tick: function(dTime) {
 
-        var acceleration = this.steeringForce.multiplyScalar(this.mass);
+        var acceleration = this.steeringForce.divideScalar(this.mass);
 
         this.velocity.add(acceleration.multiplyScalar(dTime));
 

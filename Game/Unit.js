@@ -24,7 +24,7 @@ var Unit = Class.extend({
     // Physics...
     //
 
-    this.mass = 10.0;
+    this.mass = 0.1;
 
     // Server-side velocity, is not sent to the client
     this.velocity = new THREE.Vector3();
