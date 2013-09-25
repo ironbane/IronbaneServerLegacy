@@ -785,7 +785,11 @@ var SocketHandler = Class.extend({
                             unit.unitStandingOn = null;
                         }
 
-                        if (Math.abs(unit.localPosition.y - unitdata.p.y) > 1) unit.localPosition.y = unitdata.p.y;
+                        // Only for fighters, otherwise zeppelins etc start to bug
+                        if ( unit instanceof Fighter ) {
+                            if (Math.abs(unit.localPosition.y - unitdata.p.y) > 1) unit.localPosition.y = unitdata.p.y;
+                        }
+
 
                     }
                 }
