@@ -28,60 +28,60 @@ var Wander = State.extend({
             this.targetPosition = new THREE.Vector3();
 
 	},
-	Enter: function(npc) {
+	Enter: function(unit) {
 
-            this.targetPosition = npc.position.clone();
+            this.targetPosition = unit.position.clone();
 
-            npc.maxSpeed = 2.0;
+            unit.maxSpeed = 2.0;
 
 	},
-	Execute: function(npc, dTime) {
+	Execute: function(unit, dTime) {
 
 
-            if ( npc.health <= 0 || npc.template.disabled ) return;
+            if ( unit.health <= 0 || unit.template.disabled ) return;
 
 
-            if ( VectorDistance(npc.position, this.targetPosition) < 1.0 ) {
+            if ( VectorDistance(unit.position, this.targetPosition) < 1.0 ) {
             	// TIme to change to a new node!
-                 //var distance = DistanceSq(npc.position, npc.targetPosition);
-                 //this.targetPosition = npc.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
+                 //var distance = DistanceSq(unit.position, unit.targetPosition);
+                 //this.targetPosition = unit.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
                  //this.targetPosition.set(getRandomInt(0, 45), getRandomInt(0, 10), getRandomInt(0, 20));
 
                  // Get a random waypoint nearby and travel to it
-                 if ( npc.connectedNodeList.length === 0 ) {
+                 if ( unit.connectedNodeList.length === 0 ) {
                     log("[Wander] Error: No nodes found!");
                 }
                 else {
-                    var randomNode = ChooseRandom(npc.connectedNodeList);
+                    var randomNode = ChooseRandom(unit.connectedNodeList);
                     this.targetPosition = ConvertVector3(randomNode.pos);
                     log("[Wander] Traveling to node "+randomNode.id+"...");
                 }
 
 
-                npc.maxSpeed = getRandomInt(1, 3);
+                unit.maxSpeed = getRandomInt(1, 3);
 
 
                  //this.targetPosition.set(this.test ? 0 : 25, 0, this.test ? 0 : 10);
 
                  log("[Wander] New target position: "+this.targetPosition.ToString());
-                 //log("[ExploreAndLookForEnemies] Current NPC nodepath: "+npc.targetNodePosition.ToString());
+                 //log("[ExploreAndLookForEnemies] Current NPC nodepath: "+unit.targetNodePosition.ToString());
             }
 
-            //npc.steeringForce = npc.steeringBehaviour.Wander();
-            npc.TravelToPosition(this.targetPosition);
+            //unit.steeringForce = unit.steeringBehaviour.Wander();
+            unit.TravelToPosition(this.targetPosition);
 
 	},
-	Exit: function(npc) {
+	Exit: function(unit) {
 
 	},
-    HandleMessage: function(npc, message, data) {
+    HandleMessage: function(unit, message, data) {
 
         // switch (message) {
         //   case "attacked":
         //     // We're attacked!
 
         //     // Change state to ChaseEnemy
-        //     npc.stateMachine.ChangeState(new ChaseEnemy(data.attacker));
+        //     unit.stateMachine.ChangeState(new ChaseEnemy(data.attacker));
 
         //     break;
         // }

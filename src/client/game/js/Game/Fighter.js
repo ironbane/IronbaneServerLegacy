@@ -64,7 +64,7 @@ var Fighter = Unit.extend({
     this.spriteStatus = this.SpriteStatusEnum.STAND;
     this.spriteForward = true;
 
-this.walkSoundTimer = 0.0;
+    this.walkSoundTimer = 0.0;
 
 
     this.spriteStep = 0;
@@ -113,6 +113,10 @@ this.walkSoundTimer = 0.0;
         if ( unit.health <= 0 ) unit.Die(true);
       }, 0);
     })(this);
+
+    this.octree = new THREE.Octree({undeferred: true});
+
+    this.canSelectWithEditor = true;
   },
   Add: function() {
 
@@ -202,6 +206,10 @@ this.walkSoundTimer = 0.0;
     me.mesh.unit = me;
     me.mesh.geometry.dynamic = true;
     ironbane.scene.add(me.mesh);
+
+    this.mesh.traverse( function ( object ) {
+        me.octree.add( object, {useFaces:true} );
+    });
   },
   UpdateWeapon: function(weapon) {
 

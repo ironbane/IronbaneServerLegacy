@@ -33,6 +33,8 @@ var signTemplate = 9;
 var lootableMeshTemplate = 10;
 var heartPieceTemplate = 11;
 var musicPlayerTemplate = 71;
+var waypointTemplate = 95;
+var trainTemplate = 96;
 
 var UnitTypeEnum = {
   PLAYER: 0,
@@ -50,6 +52,7 @@ var UnitTypeEnum = {
   SIGN: 12,
   HEARTPIECE: 13,
   MUSICPLAYER: 14,
+  WAYPOINT: 15,
 
   // NPC's
   MONSTER:20,

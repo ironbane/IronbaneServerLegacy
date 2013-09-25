@@ -20,21 +20,16 @@
  */
 
 var Waypoint = Billboard.extend({
-    Init: function(position, nodeData) {
-
-        this.nodeData = nodeData;
-
-
-        id = ironbane.waypointOffset-nodeData.id;
+    Init: function(position, id) {
 
         var texture = "misc/waypoint";
-        if ( levelEditor.selectedNode && levelEditor.selectedNode.id == this.nodeData.id ) {
-            texture = "misc/waypoint_red";
-        }
 
-        //this.drawNameMesh = true;
+        this.drawNameMesh = true;
 
-        this._super(position, 0, id, texture, true, this.nodeData.id);
+        this._super(position, 0, id, texture, true, -id);
 
+        this.enableGravity = false;
+
+        this.dynamic = true;
     }
 });

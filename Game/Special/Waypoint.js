@@ -18,14 +18,17 @@
 
 
 
-var Telegram = Class.extend({
-	Init: function(sender, receiver, message, extraInfo) {
-	
-		this.sender = sender;
-		this.receiver = receiver;
-		
-		this.message = message;		
-		
-		this.extraInfo = extraInfo;
-	}
+var Waypoint = Unit.extend({
+    Init: function(data) {
+
+        this._super(data);
+
+
+    },
+    Tick: function(dTime) {
+
+        this._super(dTime);
+
+
+    }
 });

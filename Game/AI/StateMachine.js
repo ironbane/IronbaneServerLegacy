@@ -37,7 +37,6 @@ var StateMachine = Class.extend({
 		if ( this.currentState ) this.currentState.Execute(this.owner, dTime);
 	},
 	SetGlobalState: function(globalState) {
-
 		this.globalState.Exit(this.owner);
 		this.globalState = globalState;
     	this.globalState.Enter(this.owner);

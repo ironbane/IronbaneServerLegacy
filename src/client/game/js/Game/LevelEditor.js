@@ -158,6 +158,20 @@ var EditorGUI = function() {
     });
   };
 
+  this.eptrMesh = firstOfObject(ModelEnum);
+  this.eptrScriptName = "";
+  this.eptrAdd = function() {
+    // Location doesn't matter, will auto teleport to first waypoint
+    socketHandler.socket.emit('addNPC', {
+      position: ironbane.player.position,
+      template: trainTemplate,
+      param: levelEditor.editorGUI.eptrMesh,
+      data: {
+        scriptName:levelEditor.editorGUI.eptrScriptName
+      }
+    });
+  };
+
   this.eptAddExit = function() {
     socketHandler.socket.emit('addNPC', {
       position: ironbane.player.position,
@@ -212,6 +226,13 @@ var EditorGUI = function() {
         fontSize: levelEditor.editorGUI.epsFontSize,
         rotY: ironbane.player.rotation.y.Round()
       }
+    });
+  }
+
+  this.epwAdd = function() {
+    socketHandler.socket.emit('addNPC', {
+      position: ironbane.player.position,
+      template: waypointTemplate
     });
   }
 
@@ -711,7 +732,7 @@ var LevelEditor = Class.extend({
     var fToggleableObstacle = fEntityPlacer.addFolder('Toggleable Obstacle');
     guiControls['eptoMesh'] = fToggleableObstacle.add(this.editorGUI, 'eptoMesh', ModelEnum);
     guiControls['eptoMovementType'] = fToggleableObstacle.add(this.editorGUI, 'eptoMovementType', ToggleableObstacleMovementTypeEnum);
-    guiControls['eptoStartOpen'] = fMovingObstacle.add(this.editorGUI, 'eptoStartOpen');
+    guiControls['eptoStartOpen'] = fToggleableObstacle.add(this.editorGUI, 'eptoStartOpen');
     guiControls['eptoSpeedMultiplier'] = fToggleableObstacle.add(this.editorGUI, 'eptoSpeedMultiplier');
     guiControls['eptoDistanceMultiplier'] = fToggleableObstacle.add(this.editorGUI, 'eptoDistanceMultiplier');
     guiControls['eptoAdd'] = fToggleableObstacle.add(this.editorGUI, 'eptoAdd');
@@ -734,6 +755,14 @@ var LevelEditor = Class.extend({
     guiControls['epsText'] = fSigns.add(this.editorGUI, 'epsText');
     guiControls['epsFontSize'] = fSigns.add(this.editorGUI, 'epsFontSize');
     guiControls['epsAdd'] = fSigns.add(this.editorGUI, 'epsAdd');
+
+    var fWaypoints = fEntityPlacer.addFolder('Waypoints');
+    guiControls['epwAdd'] = fWaypoints.add(this.editorGUI, 'epwAdd');
+
+    var fTrains = fEntityPlacer.addFolder('Trains');
+    guiControls['eptrMesh'] = fTrains.add(this.editorGUI, 'eptrMesh', ModelEnum);
+    guiControls['eptrScriptName'] = fTrains.add(this.editorGUI, 'eptrScriptName');
+    guiControls['eptrAdd'] = fTrains.add(this.editorGUI, 'eptrAdd');
 
     var fLootableMeshes = fEntityPlacer.addFolder('Lootable Meshes');
     guiControls['eplmMesh'] = fLootableMeshes.add(this.editorGUI, 'eplmMesh', ModelEnum);

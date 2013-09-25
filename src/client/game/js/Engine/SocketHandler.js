@@ -227,6 +227,12 @@ var SocketHandler = Class.extend({
                 case UnitTypeEnum.SIGN:
                     unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
                     break;
+                case UnitTypeEnum.WAYPOINT:
+                    // Only GMs can see waypoints
+                    if ( !showEditor ) return;
+
+                    unit = new Waypoint(ConvertVector3(data.position), data.id);
+                    break;
                 case UnitTypeEnum.LOOTABLE:
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
@@ -758,21 +764,20 @@ var SocketHandler = Class.extend({
                 if (unit) {
                     if (unit != ironbane.player) {
 
+                        if ( le("mpTransformMode")
+                            && ironbane.newLevelEditor
+                            && ironbane.newLevelEditor.selectedObject
+                            && ironbane.newLevelEditor.selectedObject.unit === unit ) continue;
+
                         if (!_.isUndefined(unitdata.p)) {
                             unit.targetPosition.x = unitdata.p.x;
                             unit.targetPosition.z = unitdata.p.z;
                             unit.targetPosition.y = unitdata.p.y;
-
-                            // sw("unit.targetPosition", unit.targetPosition);
                         }
-                        //this.targetPosition.y = unit.position.y;
 
-
-
-                        if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx;
-                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y = unitdata.ry;
-                        if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
-
+                        if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx.ToRadians();
+                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y = unitdata.ry.ToRadians();
+                        if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz.ToRadians();
 
                         if (!_.isUndefined(unitdata.u)) {
                             unit.unitStandingOn = FindUnit(unitdata.u);
@@ -782,18 +787,6 @@ var SocketHandler = Class.extend({
 
                         if (Math.abs(unit.localPosition.y - unitdata.p.y) > 1) unit.localPosition.y = unitdata.p.y;
 
-
-                        //						// If players are still too far away from their target we can't set their speed to 0
-                        //						// Do some prediction
-                        //						var distance = unit.targetPosition.clone().sub(unit.position).length();
-                        ////						player.tSpeed = Math.max(player.tSpeed, distance * 10);
-                        ////                                                player.tSpeed = Math.min(player.tSpeed, distance * 10);
-                        //
-                        ////                        unit.targetSpeed = Math.max(distance*100, 50);
-                        ////                        unit.targetSpeed = Math.min(distance*100, max_speed);
-                        //                        unit.targetSpeed = Math.max(distance*50, player.tSpeed);
-                        //
-                        //                        debug.SetWatch('unit.targetSpeed', unit.targetSpeed);
                     }
                 }
             }

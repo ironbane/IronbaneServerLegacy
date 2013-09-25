@@ -32,8 +32,6 @@ var WorldHandler = Class.extend({
 
     this.switches = {};
 
-    this.LoadWorldLight();
-
     this.awake = false;
     this.hasLoadedWorld = false;
 
@@ -164,7 +162,7 @@ var WorldHandler = Class.extend({
 
     this.world = {};
 
-    walk(dataPath, function(err, results) {
+    util.walk(dataPath, function(err, results) {
       if (err) throw err;
     var rl = results.length;
       for (var r=0;r<rl;r++) {
@@ -384,6 +382,12 @@ var WorldHandler = Class.extend({
         unit = new ToggleableObstacle(data);
         break;
       case UnitTypeEnum.TRAIN:
+
+        // Convert data rotations to regular members
+        data.rotx = 0;
+        data.roty = 0;
+        data.rotz = 0;
+
         unit = new Train(data);
         break;
       case UnitTypeEnum.LEVER:
@@ -406,6 +410,9 @@ var WorldHandler = Class.extend({
         data.rotz = data.data.rotZ;
 
         unit = new Sign(data);
+        break;
+      case UnitTypeEnum.WAYPOINT:
+        unit = new Waypoint(data);
         break;
       case UnitTypeEnum.LOOTABLE:
 
@@ -670,6 +677,20 @@ var WorldHandler = Class.extend({
     });
 
     return foundUnit;
+  },
+  BuildWaypointListFromUnitIds: function(list) {
+    var newList = [];
+    _.each(list, function(number) {
+      var unit = worldHandler.FindUnit(-number);
+      if ( unit ) {
+        // Passing by reference on purpose, for dynamic waypoints in the future
+        newList.push({
+          id: number,
+          pos: unit.position
+        });
+      }
+    });
+    return newList;
   },
   // Only for players!!!!
   FindPlayerByName: function(name) {

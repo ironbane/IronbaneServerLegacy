@@ -53,10 +53,13 @@ module.exports = function() {
     var window = {};
 
     // Custom
-    var NameGen = require('./External/namegen');
+    var NameGen = require('./External/namegen.js');
     var wrench = require('wrench');
     var util = require('util');
     var crypto = require('crypto');
+    var path = require('path');
+
+    var util = require('./Engine/util.js')
 
     var fsi = require('./External/fsi.js');
 
@@ -77,14 +80,10 @@ module.exports = function() {
         //insecureAuth:false
     });
 
-    process.on('uncaughtException', function(e) {
-        debugger;
-        console.log(e.stack);
-    });
 
+    // These are all to be converted to modules
     var includes = [
             './Engine/Vector3.js',
-            './Engine/Util.js',
             './Init.js',
             './Shared/seedrandom.js',
             './Shared/Shared.js',
@@ -99,19 +98,16 @@ module.exports = function() {
             './Engine/ChatHandler.js',
             './Game/AI/graph.js',
             './Game/AI/astar.js',
-            './Game/AI/Telegram.js',
-            './Game/AI/MessageDispatcher.js',
             './Game/AI/State.js',
             './Game/AI/StateMachine.js',
-            './Game/AI/MonsterScripts.js',
             './Game/AI/States/ChaseEnemy.js',
             './Game/AI/States/ExploreAndLookForEnemies.js',
             './Game/AI/States/NPCGlobalState.js',
             './Game/AI/States/EmptyState.js',
             './Game/AI/States/SellMerchandise.js',
+            './Game/AI/States/Patrol.js',
             './Game/AI/States/Turret.js',
             './Game/AI/States/TurretStraight.js',
-            './Game/AI/States/TurretKillable.js',
             './Game/AI/States/Wander.js',
             './Game/item.js',
             './Game/SteeringBehaviour.js',
@@ -129,33 +125,90 @@ module.exports = function() {
             './Game/Special/TeleportEntrance.js',
             './Game/Special/TeleportExit.js',
             './Game/Special/Sign.js',
+            './Game/Special/Waypoint.js',
             './Game/Special/HeartPiece.js',
             './Game/Special/MusicPlayer.js',
             './Server.js'
     ];
 
+    // Include scripts from the assets
+    var scriptPath = assetDir + 'scripts';
+
+    var actorScripts = {};
+
+    util.walk(scriptPath, function(err, results) {
+        if (err) throw err;
+
+        _.each(results, function(result) {
+
+            //console.log(result);
+            if ( path.extname(result) === ".js" ) {
+                includes = includes.concat([
+                    result
+                ]);
+            }
+
+        });
+
+        start(includes);
+
+
+    });
+
+
+
     // create game server, do it first so that the other 2 "servers" can query it
-    var IronbaneGame = require('./src/server/game');
+    var IronbaneGame;
 
     // create express.io server
-    var HttpServer = require('./src/server/http/server').Server,
-        httpServer = new HttpServer({db: mysql});
+    var HttpServer,
+        httpServer;
 
     // for the global access coming...todo: refactor
-    var io = httpServer.server.io,
+    var io,
+        ioApp;
+
+    function start(scripts) {
+        // create game server, do it first so that the other 2 "servers" can query it
+        IronbaneGame = require('./src/server/game');
+
+        // create express.io server
+        HttpServer = require('./src/server/http/server').Server;
+        httpServer = new HttpServer({db: mysql});
+
+        // for the global access coming...todo: refactor
+        io = httpServer.server.io;
         ioApp = httpServer.server;
 
-    // load these files AFTER the servers as they rely on some global stuff from them
-    for (var f = 0; f < includes.length; f++) {
-        log("Loading: " + includes[f]);
-        eval(fs.readFileSync(includes[f]) + '');
-    }
 
-    // this replaces MainLoop, must go here since server hasn't been defined earlier...
-    IronbaneGame.on('tick', function(elapsed) {
-        // eventually we wouldn't be accessing the global var here...
-        server.Tick(elapsed);
-    });
+        for (var f = 0; f < includes.length; f++) {
+            log("Loading: " + includes[f]);
+            eval(fs.readFileSync(includes[f]) + '');
+        }
+
+        // All set! Tell WorldHandler to load
+        worldHandler.LoadWorldLight();
+
+        // this replaces MainLoop, must go here since server hasn't been defined earlier...
+        IronbaneGame.on('tick', function(elapsed) {
+            // eventually we wouldn't be accessing the global var here...
+            server.Tick(elapsed);
+        });
+
+        // start it up, todo: only per config?
+        startREPL();
+
+        setInterval(keepAlive, 10000);
+
+        setInterval(function autoSave() {
+            log("Auto-saving all players...");
+            worldHandler.LoopUnits(function(unit) {
+                if (unit instanceof Player) {
+                    unit.Save();
+                }
+            });
+        }, 60 * 1 * 1000);
+    }
 
     // Necessary to prevent 'Mysql has gone away' errors
     // Use it check for restarting on git push
@@ -195,16 +248,7 @@ module.exports = function() {
         });
         return;
     }
-    setInterval(keepAlive, 10000);
 
-    setInterval(function autoSave() {
-        log("Auto-saving all players...");
-        worldHandler.LoopUnits(function(unit) {
-            if (unit instanceof Player) {
-                unit.Save();
-            }
-        });
-    }, 60 * 1 * 1000);
 
     // setup REPL for console server mgmt
     var startREPL = function() {
@@ -229,7 +273,6 @@ module.exports = function() {
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
     };
-    // start it up, todo: only per config?
-    startREPL();
+
 
 };

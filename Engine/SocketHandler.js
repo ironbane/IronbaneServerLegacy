@@ -1496,6 +1496,42 @@ var SocketHandler = Class.extend({
 
             });
 
+            socket.on("moveNPC", function (data) {
+
+                // Later report them!
+                if ( !socket.unit || socket.unit.editor === false ) return;
+
+                data.position = ConvertVector3(data.position);
+                data.position = data.position.Round(2);
+
+                var unit = worldHandler.FindUnit(parseInt(data.id, 10));
+
+                if ( !unit ) return;
+
+                var zone = unit.zone;
+
+                var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
+
+                if ( _.isUndefined(worldHandler.world[zone]) ) return;
+                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
+                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+
+                mysql.query('UPDATE ib_units SET'+
+                    ' x = ?,'+
+                    ' y = ?,'+
+                    ' z = ?'+
+                    ' WHERE id = ?',
+                [
+                    data.position.x,
+                    data.position.y,
+                    data.position.z,
+                    Math.abs(unit.id)
+                ]);
+
+                unit.position.copy(data.position);
+
+            });
+
             socket.on("paintModel", function (data) {
 
                 //data.pos, data.metadata;
