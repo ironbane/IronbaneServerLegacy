@@ -1,14 +1,13 @@
 // register.js
 angular.module('IronbaneApp')
-.controller('RegisterCtrl', ['$scope', '$http', '$log', function($scope, $http, $log) {
+.controller('RegisterCtrl', ['User','$scope', '$http', '$log', function(User, $scope, $http, $log) {
     // for now just make the request, todo: move to user service
     $scope.register = function() {
         if ($scope.registerForm.$valid) {
-            $http.post('/api/user', $scope.user)
-                .success(function(response) {
+            User.register($scope.user.username, $scope.user.password, $scope.user.email)
+                .then(function(response) {
                     $log.log('registration success', response);
-                })
-                .error(function(response) {
+                }, function(response) {
                     $log.warn('registration error', response);
                 });
         } else {
