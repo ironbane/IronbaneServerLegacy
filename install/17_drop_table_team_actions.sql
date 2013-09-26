@@ -1,1 +1,1 @@
-DROP TABLE `ib_team_actions`
+DROP TABLE IF EXISTS `ib_team_actions`
