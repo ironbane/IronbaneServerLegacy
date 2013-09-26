@@ -959,7 +959,14 @@ var LevelEditor = Class.extend({
       if ( levelEditor.editorGUI.mpRotY <= -1 ) levelEditor.editorGUI.mpRotY = 355;
       if ( levelEditor.editorGUI.mpRotZ <= -1 ) levelEditor.editorGUI.mpRotZ = 355;
 
-      //if ( levelEditor.previewMesh ) levelEditor.previewMesh.UpdateRotation();
+      // if ( levelEditor.previewMesh ) {
+      //   levelEditor.previewMesh.rotation.set(
+      //     levelEditor.editorGUI.mpRotX.ToRadians(),
+      //     levelEditor.editorGUI.mpRotY.ToRadians(),
+      //     levelEditor.editorGUI.mpRotZ.ToRadians()
+      //   );
+      //   levelEditor.previewMesh.changeRotationNextTick = true;
+      // }
 
       for (var i=0;i<levelEditor.editorGUI.gui.__folders['Model Placer'].__controllers.length;i++) {
         levelEditor.editorGUI.gui.__folders['Model Placer'].__controllers[i].updateDisplay();
@@ -1092,11 +1099,14 @@ var LevelEditor = Class.extend({
 
     if ( this.previewMesh ) {
 
-      this.previewMesh.rotation.x = levelEditor.editorGUI.mpRotX;
-      this.previewMesh.rotation.y = levelEditor.editorGUI.mpRotY;
-      this.previewMesh.rotation.z = levelEditor.editorGUI.mpRotZ;
-
-      if ( levelEditor.previewMesh ) levelEditor.previewMesh.UpdateRotationByVertices();
+      if ( this.previewMesh ) {
+        this.previewMesh.localRotation.set(
+          levelEditor.editorGUI.mpRotX.ToRadians(),
+          levelEditor.editorGUI.mpRotY.ToRadians(),
+          levelEditor.editorGUI.mpRotZ.ToRadians()
+        );
+        this.previewMesh.changeRotationNextTick = true;
+      }
 
       if ( currentMouseToWorldData ) {
 
