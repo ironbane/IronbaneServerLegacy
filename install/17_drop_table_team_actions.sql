@@ -1,0 +1,1 @@
+DROP TABLE `ib_team_actions`
