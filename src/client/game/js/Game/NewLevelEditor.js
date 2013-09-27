@@ -112,7 +112,7 @@ var NewLevelEditor = PhysicsObject.extend({
                             pos: obj.position.clone().Round(2),
                             id: obj.meshData.id,
                             metadata: le("mpClearMode") ? {} : obj.metadata,
-                            global : le("mpSetForAllModels") ? true : false
+                            global : false
                           });
 
                         }
@@ -304,11 +304,11 @@ var NewLevelEditor = PhysicsObject.extend({
             // Move the object back to where it was, so the delete works properly
             this.Undo();
 
-            // Make it invisible as it will be deleted shortly
-
-
             if ( this.selectedObject.unit instanceof Mesh ) {
+
+                // Make it invisible as it will be deleted shortly
                 this.selectedObject.unit.mesh.visible = false;
+
                 (function(oldPos, newPos, newRot, id, metadata) {
                     setTimeout(function() {
                         socketHandler.socket.emit('deleteModel', oldPos, function() {
@@ -394,7 +394,7 @@ var NewLevelEditor = PhysicsObject.extend({
 
         if ( this.selectedObject ) {
             this.selectedObject.rotation.setFromQuaternion(this.selectedObject.quaternion);
-            //this.selectedObject.rotation.Round();
+            this.selectedObject.unit.changeRotationNextTick = true;
         }
 
     }

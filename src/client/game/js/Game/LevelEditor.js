@@ -117,7 +117,6 @@ var EditorGUI = function() {
   this.mpIgnoreOtherModels = false;
   this.mpIgnoreBoundingBox = false;
   this.mpGridSnap = true;
-  this.mpHeightOffset = 0;
 
   // Entity placer mode
   this.epmoMesh = firstOfObject(ModelEnum);
@@ -285,7 +284,6 @@ var EditorGUI = function() {
 
   // Model painter
   this.enableModelPainter = false;
-  this.mpSetForAllModels = false;
   this.mpClearMode = false;
 
   // NPC editor
@@ -712,11 +710,9 @@ var LevelEditor = Class.extend({
     guiControls['mpIgnoreOtherModels'] = fModelPlacer.add(this.editorGUI, 'mpIgnoreOtherModels');
     guiControls['mpIgnoreBoundingBox'] = fModelPlacer.add(this.editorGUI, 'mpIgnoreBoundingBox');
     guiControls['mpGridSnap'] = fModelPlacer.add(this.editorGUI, 'mpGridSnap');
-    guiControls['mpHeightOffset'] = fModelPlacer.add(this.editorGUI, 'mpHeightOffset', -19.9, 19.9);
 
     guiControls['enableModelPainter'] = fModelPainter.add(this.editorGUI, 'enableModelPainter');
     guiControls['mpClearMode'] = fModelPainter.add(this.editorGUI, 'mpClearMode');
-    guiControls['mpSetForAllModels'] = fModelPainter.add(this.editorGUI, 'mpSetForAllModels');
 
     fModelPainter.add(this.editorGUI, 'selectTile');
 
@@ -1050,7 +1046,6 @@ var LevelEditor = Class.extend({
 
     position = position.Round(2);
 
-    //position.y += levelEditor.editorGUI.mpHeightOffset;
 
     // We emit, and must add the Object ourselves because it is static
     // Set the cell to reload
@@ -1156,40 +1151,9 @@ var LevelEditor = Class.extend({
 
         }
 
-
-        this.previewMesh.localPosition.y += levelEditor.editorGUI.mpHeightOffset;
         this.previewMesh.Tick(dTime);
       }
     }
-
-    // var old = levelEditor.editorGUI.mpHeightOffset;
-    // if ( keyTracker[33] ) levelEditor.editorGUI.mpHeightOffset += 0.5;
-    // if ( keyTracker[34] ) levelEditor.editorGUI.mpHeightOffset -= 0.5;
-
-
-    // _.each(levelEditor.editorGUI.gui.__folders['Model Placer'].__controllers, function (controller) {
-    //   controller.updateDisplay();
-    // });
-
-    //this.SetTileHeight(1, 1, this.heightTest);
-    // if ( currentMouseToWorldData ) {
-    //   //            debug.SetWatch("currentMouseToWorldData.point", ConvertVector3(currentMouseToWorldData.point).ToString());
-    //   //            debug.SetWatch("currentMouseToWorldData.normal", ConvertVector3(currentMouseToWorldData.face.normal).ToString());
-    //   //            debug.SetWatch("currentMouseToWorldData.rotation", ConvertVector3(currentMouseToWorldData.object.rotation).ToString());
-    //   //
-    //   //            if ( !_.isUndefined(currentMouseToWorldData.object.unit) ) {
-    //   //                debug.SetWatch("currentMouseToWorldData.unit.name", currentMouseToWorldData.object.unit.name);
-    //   //            }
-
-    //   // Alter the normal to rotate with the mesh;
-    //   var normal = currentMouseToWorldData.face.normal;
-    //   var rotationMatrix = (new THREE.Matrix4()).extractRotation(currentMouseToWorldData.object.matrix);
-
-    //   normal = rotationMatrix.multiplyVector3(normal);
-    // //debug.SetWatch("altered normal", normal.Round(2).ToString());
-
-
-    // }
 
     if ( levelEditor.selectedNode && ironbane.player ) {
       if ( DistanceSq(levelEditor.selectedNode['pos'], ironbane.player.position) > 15*15 ) {

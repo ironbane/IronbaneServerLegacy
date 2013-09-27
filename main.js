@@ -208,6 +208,15 @@ module.exports = function() {
                 }
             });
         }, 60 * 1 * 1000);
+
+
+        // Schedule an auto-restart to prevent EM readfile errors
+        // We can only prevent this by upgrading to a real dedicated server, which we will do
+        // when we have more people. Currently IB runs on a VPS.
+        setTimeout(function() {
+                chatHandler.Announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
+                setTimeout(function() {process.exit();}, 60000);
+        }, 60 * 60 * 24 * 1000);
     }
 
     // Necessary to prevent 'Mysql has gone away' errors
