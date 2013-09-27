@@ -523,7 +523,7 @@ var mouseIntervalFunction = function(event){
 
 
 
-  if ( ironbane.player ) {
+  if ( ironbane.player && !le("globalEnable") ) {
 
     if ( ironbane.player.dead ) return;
 
