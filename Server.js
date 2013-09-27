@@ -20,8 +20,6 @@ var Server = Class.extend({
     Init: function() {
 
 
-        //this.unitList = new Array();
-
         this.npcIDCount = -1;
         this.itemIDCount = -1;
 
@@ -49,33 +47,6 @@ var Server = Class.extend({
         this.startTime = (new Date()).getTime();
 
         this.lastBackupTime = this.startTime;
-
-
-        // this.characterImageBounds = {};
-
-        // var imageTypes = ["skin", "eyes", ""]
-     //        var dataPath = clientDir+'images/characters/base/head';
-
-     // walk(dataPath, function(err, results) {
-     //     if (err) throw err;
-
-     //     for (var r in results) {
-     //        var index = results[r];
-     //        index = index.replace(dataPath+'/', '');
-
-     //        index = (index.split("."))[0];
-
-     //        index = parseInt(index)
-
-     //        console.log (typeof index)
-
-     //        console.log(index);
-     //     }
-     // });
-
-
-
-        //setTimeout(function(){server.AutoBackup();}, 3600 * 24 * 1000);
 
     },
     AutoBackup: function() {
@@ -128,29 +99,9 @@ var Server = Class.extend({
         }
 
 
-
-
-        //log(dTime);
-
         worldHandler.Tick(dTime);
 
-        // Tick and send out snapshot
-        // First build the snapshot
 
-        // var snapshot = { };
-
-        // snapshot.players = new Array();
-
-        // var clients = io.sockets.clients();
-
-        // log(unitList);
-
-        // for(var x=0;x<this.unitList.length;x++) {
-        // var ud = this.unitList[x];
-        // snapshot.players.push({id:ud.id,tx:ud.position.x,y:ud.position.y,tz:ud.position.z,tRotY:ud.rotY,tSpeed:ud.speed});
-        // }
-
-        // io.sockets.emit("snapshot", snapshot);
 
 
         for(var z in worldHandler.world) {
@@ -268,9 +219,6 @@ var Server = Class.extend({
                         }
 
                     }
-
-                //this.SaveCell(z, cx, cz);
-
 
                 }
             }

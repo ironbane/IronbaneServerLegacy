@@ -48,7 +48,7 @@ var Patrol = State.extend({
     },
     Execute: function(unit, dTime) {
 
-        if ( VectorDistance(unit.position, this.targetPosition) < 1.0 ) {
+        if ( VectorDistance(unit.position, this.targetPosition) < 1.0*unit.mass && !this.sentTimeout ) {
             if ( this.options.navMode === "line" ) {
                 if ( this.forward ) {
                     this.waypointIndex++;
@@ -75,19 +75,19 @@ var Patrol = State.extend({
                 }
             }
 
-            if ( !this.sentTimeout ) {
-                var me = this;
-                setTimeout(function() {
-                    var newWaypoint = me.waypoints[me.waypointIndex];
 
-                    me.targetPosition = newWaypoint.pos;
+            var me = this;
+            setTimeout(function() {
+                var newWaypoint = me.waypoints[me.waypointIndex];
 
-                    unit.HandleMessage("changeWaypoint", newWaypoint);
+                me.targetPosition = newWaypoint.pos;
 
-                    me.sentTimeout = false;
-                }, this.options.pause);
-                this.sentTimeout = true;
-            }
+                unit.HandleMessage("changeWaypoint", newWaypoint);
+
+                me.sentTimeout = false;
+            }, this.options.pause);
+            this.sentTimeout = true;
+
 
 
         }
@@ -96,7 +96,7 @@ var Patrol = State.extend({
             unit.steeringForce = unit.steeringBehaviour.Seek(this.targetPosition);
         }
         else {
-            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST);
+            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST*unit.mass);
         }
 
 

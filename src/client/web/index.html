@@ -30,6 +30,7 @@
 </head>
 <body>
     <section id="pageWrap">
+
         <header class="logo">
             <div class="gradient"></div>
             <div class="left-pillar"></div>
@@ -56,6 +57,10 @@
                         <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
                     </ul>
                 </div>
+
+  <div id="loading"> 
+    <img src="images/ajax-loader.gif" class="ajax-loader"/>
+  </div>
                 <ng-view></ng-view>
             </div>
             <div class="middle-right-pillar"></div>

@@ -9,7 +9,16 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
             angular.copy(user, $rootScope.currentUser);
         });
 }])
-.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+.config(['$routeProvider', '$locationProvider','$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
+    
+    $httpProvider.responseInterceptors.push('myHttpInterceptor');
+    var spinnerFunction = function (data, headersGetter) {
+        // todo start the spinner here
+        $('#loading').show();
+        return data;
+    };
+    $httpProvider.defaults.transformRequest.push(spinnerFunction);
+  
     $locationProvider.html5Mode(true);
 
     $routeProvider

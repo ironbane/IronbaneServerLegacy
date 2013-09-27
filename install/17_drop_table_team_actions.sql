@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS `ib_team_actions`

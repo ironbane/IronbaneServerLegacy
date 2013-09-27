@@ -24,7 +24,7 @@ var Unit = Class.extend({
     // Physics...
     //
 
-    this.mass = 10.0;
+    this.mass = 0.1;
 
     // Server-side velocity, is not sent to the client
     this.velocity = new THREE.Vector3();
@@ -238,7 +238,9 @@ var Unit = Class.extend({
       if ( unit.id < 0 ) {
         packet.template = unit.template.id;
 
-        if ( unit.template.type === UnitTypeEnum.TRAIN ) {
+        if ( unit.template.type === UnitTypeEnum.TRAIN ||
+          unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
+          unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
           packet.rotX = unit.rotation.x.Round();
           packet.rotZ = unit.rotation.z.Round();
         }
