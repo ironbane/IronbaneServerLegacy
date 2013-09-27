@@ -10,10 +10,15 @@ IronbaneApp
             $stateProvider
                 .state('mainMenu', {
                     templateUrl: '/game/templates/mainMenu.html',
-                    controller: ['$scope', '$state', '$log',
-                        function($scope, $state, $log) {
+                    resolve: {
+                        authenticated: ['$rootScope', function($rootScope) {
+                            return $rootScope.currentUser.authenticated;
+                        }]
+                    },
+                    controller: ['$scope', '$state', '$log', 'authenticated',
+                        function($scope, $state, $log, authenticated) {
                             $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
-                            if($scope.currentUser.authenticated) {
+                            if(authenticated) {
                                 $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
                             } else {
                                 $state.go('mainMenu.unauthenticated');

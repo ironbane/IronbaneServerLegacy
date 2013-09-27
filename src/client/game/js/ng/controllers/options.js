@@ -1,7 +1,11 @@
 IronbaneApp
-.controller('OptionsCtrl', ['$scope', '$log', '$state', function($scope, $log, $state) {
+.controller('OptionsCtrl', ['$scope', '$log', '$state', 'authenticated', function($scope, $log, $state, authenticated) {
     $scope.back = function() {
-        $state.go('mainMenu');
+        if(authenticated) {
+            $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
+        } else {
+            $state.go('mainMenu.unauthenticated');
+        }
     };
 
     $scope.toggleAudio = function() {
