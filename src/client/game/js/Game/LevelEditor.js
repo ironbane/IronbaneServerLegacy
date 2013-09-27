@@ -284,7 +284,6 @@ var EditorGUI = function() {
 
   // Model painter
   this.enableModelPainter = false;
-  this.mpSetForAllModels = false;
   this.mpClearMode = false;
 
   // NPC editor
@@ -714,7 +713,6 @@ var LevelEditor = Class.extend({
 
     guiControls['enableModelPainter'] = fModelPainter.add(this.editorGUI, 'enableModelPainter');
     guiControls['mpClearMode'] = fModelPainter.add(this.editorGUI, 'mpClearMode');
-    guiControls['mpSetForAllModels'] = fModelPainter.add(this.editorGUI, 'mpSetForAllModels');
 
     fModelPainter.add(this.editorGUI, 'selectTile');
 

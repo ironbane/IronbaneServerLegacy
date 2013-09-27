@@ -112,7 +112,7 @@ var NewLevelEditor = PhysicsObject.extend({
                             pos: obj.position.clone().Round(2),
                             id: obj.meshData.id,
                             metadata: le("mpClearMode") ? {} : obj.metadata,
-                            global : le("mpSetForAllModels") ? true : false
+                            global : false
                           });
 
                         }
