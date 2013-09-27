@@ -2,7 +2,13 @@
     <h5>Display</h5>
     <button ng-click="toggleFullScreen()">Toggle Fullscreen</button>
     <h5>Audio</h5>
-    <button class="audio-button" ng-click="toggleAudio()">Toggle Sound</button>
+    <button class="audio-button" ng-click="audioEnabled=!audioEnabled">
+        <span class="icon-stack">
+            <i ng-class="{'icon-volume-off': volume.master === 0, 'icon-volume-up': volume.master >= 50, 'icon-volume-down': volume.master < 50 && volume.master > 0}"></i>
+            <i ng-class="{'icon-ban-circle icon-stack-base text-error': !audioEnabled}"></i>
+        </span>
+        Toggle Sound
+    </button>
     <div ng-class="{disabled: !audioEnabled}" class="volume-control"><label for="masterVolume">Master</label><input ng-disabled="!audioEnabled" id="masterVolume" type="range" min="0" max="100" ng-model="volume.master" /></div>
     <div ng-class="{disabled: !audioEnabled}" class="volume-control"><label for="musicVolume">Music</label><input ng-disabled="!audioEnabled" id="musicVolume" type="range" min="0" max="100" ng-model="volume.music" /></div>
     <div ng-class="{disabled: !audioEnabled}" class="volume-control"><label for="effectsVolume">Effects</label><input ng-disabled="!audioEnabled" id="effectsVolume" type="range" min="0" max="100" ng-model="volume.effects" /></div>
