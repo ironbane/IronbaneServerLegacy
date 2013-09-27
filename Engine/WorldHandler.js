@@ -532,6 +532,7 @@ var WorldHandler = Class.extend({
 
     // Instead of saving instantly, we load the cell, overwrite it with the terrain we have, and save it! And empty terrain!
 
+
     var buffer_objects = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].objects));
     var buffer_graph = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].graph));
     var buffer_units = this.world[zone][cellX][cellZ].units;
@@ -584,21 +585,21 @@ var WorldHandler = Class.extend({
     // Delete the things from the terrain in the deleteBuffer
     if ( !_.isUndefined(worldHandler.world[zone][cellX][cellZ].deleteBuffer) ) {
 
-      _.each(worldHandler.world[zone][cellX][cellZ].deleteBuffer, function(obj) {
+      _.each(worldHandler.world[zone][cellX][cellZ].deleteBuffer, function(deleteObj) {
 
-        var data = ConvertVector3(obj);
-        data = data.Round(2);
+        var deleteObjPos = ConvertVector3(deleteObj).Round(2);
 
         _.each(worldHandler.world[zone][cellX][cellZ].objects, function(loopObj) {
 
-          var obj = ConvertVector3(loopObj);
-          obj = obj.Round(2);
+          var loopObjPos = ConvertVector3(loopObj).Round(2);
 
-          if ( data.x === obj.x && data.y === obj.y && data.z === obj.z ) {
+          if ( deleteObjPos.x === loopObjPos.x
+            && deleteObjPos.y === loopObjPos.y
+            && deleteObjPos.z === loopObjPos.z ) {
             worldHandler.world[zone][cellX][cellZ].objects =
               _.without(worldHandler.world[zone][cellX][cellZ].objects, loopObj);
             worldHandler.world[zone][cellX][cellZ].deleteBuffer =
-              _.without(worldHandler.world[zone][cellX][cellZ].deleteBuffer, loopObj);
+              _.without(worldHandler.world[zone][cellX][cellZ].deleteBuffer, deleteObj);
 
           }
         });
