@@ -97,7 +97,11 @@ var SocketHandler = Class.extend({
                 if (!noDisconnectTrigger) {
                     socketHandler.serverOnline = false;
 
-                    hudHandler.MessageAlert('It appears the server crashed! Either that, or there is something wrong with your internet connection. I\'m terribly sorry about that.<br><br>In case the server crashed, an auto-restart will most-likely occur. Please refresh the page in a few seconds.', 'nobutton');
+                    hudHandler.MessageAlert('The connection with the server was lost.<br><br>Trying to reconnect...', 'nobutton');
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
                 }
 
 
