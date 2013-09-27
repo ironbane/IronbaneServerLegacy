@@ -4,7 +4,7 @@
     <h5>Audio</h5>
     <button class="audio-button" ng-click="audioEnabled=!audioEnabled">
         <span class="icon-stack">
-            <i ng-class="{'icon-volume-off': volume.master === 0, 'icon-volume-up': volume.master >= 50, 'icon-volume-down': volume.master < 50 && volume.master > 0}"></i>
+            <i ng-class="{'icon-volume-off': volume.master == 0, 'icon-volume-up': volume.master >= 50, 'icon-volume-down': volume.master < 50 && volume.master > 0}"></i>
             <i ng-class="{'icon-ban-circle icon-stack-base text-error': !audioEnabled}"></i>
         </span>
         Toggle Sound

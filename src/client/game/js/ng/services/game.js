@@ -234,10 +234,6 @@ IronbaneApp
             }
 
             if (!game.showingGame && doneLoading) {
-                if (!$window.socketHandler.inGame) {
-                    $window.hudHandler.MakeSoundButton();
-                }
-
                 game.showingGame = true;
 
                 $state.go('loading.area');
