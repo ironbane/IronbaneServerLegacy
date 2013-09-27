@@ -394,7 +394,7 @@ var NewLevelEditor = PhysicsObject.extend({
 
         if ( this.selectedObject ) {
             this.selectedObject.rotation.setFromQuaternion(this.selectedObject.quaternion);
-            //this.selectedObject.rotation.Round();
+            this.selectedObject.unit.changeRotationNextTick = true;
         }
 
     }
