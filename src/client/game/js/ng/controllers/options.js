@@ -8,7 +8,20 @@ IronbaneApp
         }
     };
 
-    $scope.toggleAudio = function() {
-        $log.log('toggle audio!');
+    $scope.toggleFullScreen = function() {
+
     };
+
+    $scope.audioEnabled = true;
+
+    $scope.volume = {
+        master: 80,
+        music: 80,
+        effects: 80
+    };
+
+    $scope.$watch('volume.master', function(volume) {
+        $scope.volume.music = volume;
+        $scope.volume.effects = volume;
+    });
 }]);

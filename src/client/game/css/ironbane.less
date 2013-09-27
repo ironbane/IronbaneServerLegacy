@@ -121,6 +121,33 @@ input[type=password] {
     margin: 8px;
 }
 
+// SLIDERS
+input[type=range] {
+    -webkit-appearance: none;
+    background-color: silver;
+    width: 200px;
+    height: 20px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+     -webkit-appearance: none;
+    background-color: #666;
+    opacity: 0.5;
+    width: 10px;
+    height: 26px;
+}
+
+.options-dialog {
+    h5 {margin: 0;margin-bottom: 2px;}
+    .volume-control {
+        text-align: left;
+        padding: 8px 0 8px 40px;
+        label {
+            width: 55px;
+        }
+    }
+}
+
 button {
     background-color: #357768;
     border: 3px solid #1f453c;
