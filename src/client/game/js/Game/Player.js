@@ -302,6 +302,7 @@ var Player = Fighter.extend({
       var intersects = terrainHandler.RayTest(ray, {
         testMeshesNearPosition:ironbane.camera.position,
         unitReference: this,
+        noBillboards: true,
         unitRayName: "camera"
       });
 
