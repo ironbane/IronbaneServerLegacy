@@ -1490,6 +1490,19 @@ var HUDHandler = Class.extend({
                 }
             };
 
+            var randomizeAppearance = function() {
+                if (selectedMale) {
+                    selectedSkin = getRandomInt(skinIdMaleStart, skinIdMaleEnd);
+                    selectedHair = getRandomInt(hairIdMaleStart, hairIdMaleEnd);
+                    selectedEyes = getRandomInt(eyesIdMaleStart, eyesIdMaleEnd);
+                }
+                else {
+                    selectedSkin = getRandomInt(skinIdFemaleStart, skinIdFemaleEnd);
+                    selectedHair = getRandomInt(hairIdFemaleStart, hairIdFemaleEnd);
+                    selectedEyes = getRandomInt(eyesIdFemaleStart, eyesIdFemaleEnd);
+                }
+            };
+
             var refreshChar = function() {
                 constrainCustomizers();
 
@@ -1501,6 +1514,8 @@ var HUDHandler = Class.extend({
 
             $('#btnGenderChange').click(function() {
                 selectedMale = !selectedMale;
+
+                randomizeAppearance();
 
                 $(this).html(selectedMale ? 'Boy' : 'Girl');
                 refreshChar();
@@ -1535,6 +1550,8 @@ var HUDHandler = Class.extend({
                 selectedHair--;
                 refreshChar();
             });
+
+            randomizeAppearance();
 
             refreshChar();
 
