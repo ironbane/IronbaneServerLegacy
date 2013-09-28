@@ -79,6 +79,7 @@ module.exports = function(db) {
     };
 
     Topic.newPost = function(params) {
+        params.time = (new Date()).valueOf() / 1000; // convert to mysql unix_timestamp
         log(JSON.stringify(params));
         var deferred = Q.defer();
         db.query('insert into forum_topics set board_id = ?, time = ?, title = ?', [params.boardId, params.time, params.title], function(err, topicResult) {
@@ -93,6 +94,7 @@ module.exports = function(db) {
                     topic_id: topicId,
                     content: params.content,
                     time: params.time,
+                    
                     user: params.user
                 };
 
@@ -109,20 +111,25 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    Topic.getPostsView = function(topicId) {
+    Topic.getPostsView = function(topicId, mintime) {
         var deferred = Q.defer();
+        var minimumtime = parseInt(mintime,10) || 0;
+        log("getting view for " + topicId + " with minimumtime "  + minimumtime);
 
         var postsQ = ' (select count(id) from forum_posts where user = us.id) as postcount, ';
-        db.query('SELECT ' + postsQ + 'fp.content, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ?', [topicId], function(err, results) {
+        db.query('SELECT ' + postsQ + 'fp.content, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
             if (err) {
                 deferred.reject(err);
                 return;
             }
+            log("no query errors");
+            log(results.length);
 
             if (results.length === 0) {
                 deferred.reject(results);
                 return;
             }
+            log("doing a parse");
             _.each(results, function(p) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
@@ -136,8 +143,6 @@ module.exports = function(db) {
             db.query('UPDATE forum_topics set views = views + 1 where id = ?', [topicId], function(results) {
 
             });
-
-
             deferred.resolve(results);
         });
 

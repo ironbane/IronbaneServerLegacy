@@ -30,6 +30,8 @@ module.exports = function(db) {
     Post.prototype.$save = function() {
         var deferred = Q.defer(),
             post = this;
+            post.time = parseInt((new Date()).valueOf() / 1000,10); // convert to mysql unix_timestamp
+                    
 
         if(post.id) {
             // update post
