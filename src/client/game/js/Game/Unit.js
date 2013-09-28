@@ -110,7 +110,7 @@ var Unit = PhysicsObject.extend({
       }, 0);
     })(this);
 
-    this.rayOffsetList = [new THREE.Vector3(0.0, 0.5, 0.0)];
+    this.rayOffsetList = [new THREE.Vector3(0.0, 1.0, 0.0)];
 
     this.rayOffsetListPlayer = [new THREE.Vector3(0.1, 0.5, 0.1),new THREE.Vector3(-0.1, 0.5, -0.1)];
 
@@ -474,7 +474,7 @@ var Unit = PhysicsObject.extend({
             var succesfulRays = 0;
             var struckUnit = null;
 
-            var distanceCheck = 0.5;
+            var distanceCheck = 1.0;
 
 
             var intersects = terrainHandler.RayTest(ray, {
@@ -556,28 +556,32 @@ var Unit = PhysicsObject.extend({
           // Even when building underground we'll have a valid raycastGroundPosition since we're standing on a mesh
           // 8/6/13: Removed again due to skybox-only approach
           // 6/7/13: Only allow for the main player
-          if ( (this instanceof Player) &&
-            GetZoneConfig("enableFluid") && this.position.y <= GetZoneConfig('fluidLevel') ) {
-            if ( !raycastGroundPosition ) {
-              // We didn't find anything for our shadow
-              // Reverse a raycast
-              ray = new THREE.Raycaster( this.position, new THREE.Vector3(0, 1, 0));
+          // 28/09/13: removed yet again, because ideally players should never fall through the terrain
+          // A failsafe mechanism would be welcome, but due to the nature of our octree coll search mechanism
+          // the raycastGroundPosition sometimes returns null even though there is actually terrain below
+          // if ( (this instanceof Player) &&
+          //   GetZoneConfig("enableFluid") && this.position.y <= GetZoneConfig('fluidLevel') ) {
+          //   if ( !raycastGroundPosition ) {
+          //     // We didn't find anything for our shadow
+          //     // Reverse a raycast
+          //     // Keep casting upwards until we have a match. There should always be a match at some point
+          //       ray = new THREE.Raycaster( this.position, new THREE.Vector3(0, 1, 0));
 
-              var intersects = terrainHandler.RayTest(ray, {
-                testMeshesNearPosition:this.position,
-                unitReference: this,
-                unitRayName: "colunderneath"
-              });
+          //       var intersects = terrainHandler.RayTest(ray, {
+          //         testMeshesNearPosition:this.position,
+          //         unitReference: this,
+          //         unitRayName: "colunderneath"
+          //       });
 
-              if ( (intersects.length > 0 ) ) {
-                raycastNormal = intersects[0].face.normal;
-                raycastGroundPosition = intersects[0].point;
-                //this.position = ConvertVector3(intersects[0].point);
-                this.localPosition.y = intersects[0].point.y;
-              //bm("underneath!");
-              }
-            }
-          }
+          //       if ( (intersects.length > 0 ) ) {
+          //         raycastNormal = intersects[0].face.normal;
+          //         raycastGroundPosition = intersects[0].point;
+          //         //this.position = ConvertVector3(intersects[0].point);
+          //         this.localPosition.y = intersects[0].point.y;
+          //       //bm("underneath!");
+          //       }
+          //   }
+          // }
         }
 
 
