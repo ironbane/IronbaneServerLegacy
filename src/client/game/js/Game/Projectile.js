@@ -652,7 +652,7 @@ var Projectile = Unit.extend({
         }
 
         if ( !_.isUndefined(this.type.impactSound) && !this.damageDone ) {
-            soundHandler.Play(CheckForFunctionReturnValue(this.type.impactSound), this.position);
+            ironbane.soundHandler.play(CheckForFunctionReturnValue(this.type.impactSound), this.position);
         }
 
     },

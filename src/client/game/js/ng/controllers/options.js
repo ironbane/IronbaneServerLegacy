@@ -1,5 +1,5 @@
 IronbaneApp
-.controller('OptionsCtrl', ['$scope', '$log', '$state', 'authenticated', 'storage', function($scope, $log, $state, authenticated, storage) {
+.controller('OptionsCtrl', ['$scope', '$log', '$state', 'authenticated', 'storage', 'AudioManager', function($scope, $log, $state, authenticated, storage, AudioManager) {
     $scope.back = function() {
         if(authenticated) {
             $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
@@ -24,4 +24,13 @@ IronbaneApp
             $scope.volume.effects = volume;
         }
     });
+
+    $scope.$watch('audioEnabled', function(enabled) {
+        if(enabled) {
+            AudioManager.play('music/maintheme');
+        } else {
+            AudioManager.stopAll();
+        }
+    });
+
 }]);

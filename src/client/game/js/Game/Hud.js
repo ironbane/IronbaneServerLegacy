@@ -131,7 +131,7 @@ var HUDHandler = Class.extend({
         }, 0);
 
         var clickAction = function() {
-            soundHandler.Play("click");
+            ironbane.soundHandler.play("click");
         };
 
         var handleClick = function(noSound) {
@@ -163,12 +163,12 @@ var HUDHandler = Class.extend({
                 $("#btnToggleSound").html("&#9834;");
                 $("#btnToggleSound").css("color", "");
 
-                soundHandler.Play("music/maintheme");
+                ironbane.soundHandler.play("music/maintheme");
             } else {
                 $("#btnToggleSound").html("<del>&#9834;</del>");
                 $("#btnToggleSound").css("color", "red");
 
-                soundHandler.StopAll();
+                ironbane.soundHandler.stopAll();
             }
 
             localStorage.allowSound = value;
@@ -398,7 +398,7 @@ var HUDHandler = Class.extend({
 
             hudHandler.UpdateEquippedItems();
 
-            soundHandler.Play(ChooseRandom(["bag1"]));
+            ironbane.soundHandler.play(ChooseRandom(["bag1"]));
 
         });
     },
@@ -526,7 +526,7 @@ var HUDHandler = Class.extend({
 
 
 
-            soundHandler.Play(ChooseRandom(["bag1"]));
+            ironbane.soundHandler.play(ChooseRandom(["bag1"]));
 
         });
     },
@@ -962,12 +962,12 @@ var HUDHandler = Class.extend({
     HideMenuScreen: function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
         $('#chatBox, #itemBar, #coinBar, #statBar').show();
-        soundHandler.FadeOut("music/maintheme", 5000);
+        ironbane.soundHandler.fadeOut("music/maintheme", 5000);
     },
     ShowMenuScreen: function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('#chatBox, #itemBar, #lootBag, #coinBar, #statBar').hide();
-        soundHandler.FadeIn("music/maintheme", 5000);
+        ironbane.soundHandler.fadeIn("music/maintheme", 5000);
     },
     GetLastCharacterPlayed: function() {
         var lastChar = 0;

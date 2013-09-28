@@ -977,7 +977,7 @@ var Player = Fighter.extend({
             }, 400, function() {
 
 
-              if ( currentHoverDiv == 'ii'+item.id ) {
+              if ( currentHoverDiv === 'ii'+item.id ) {
                 $('#tooltip').hide();
                 setTimeout(function(){
                   $('#tooltip').hide();
@@ -990,10 +990,10 @@ var Player = Fighter.extend({
 
               switch (template.subtype) {
                  case 'cash':
-            soundHandler.Play(ChooseRandom(["getCoin1","getCoin2", "getCoin3"]), this.position);
+            ironbane.soundHandler.play(ChooseRandom(["getCoin1","getCoin2", "getCoin3"]), this.position);
             break;
                 case "restorative":
-                  soundHandler.Play(ChooseRandom(["bubble1", "bubble2", "bubble3"]));
+                  ironbane.soundHandler.play(ChooseRandom(["bubble1", "bubble2", "bubble3"]));
                   break;
               }
 
@@ -1003,18 +1003,16 @@ var Player = Fighter.extend({
           break;
         case 'armor':
 
-          _.each(socketHandler.playerData.items, function(i) {
-            if ( items[i.template].type == 'armor' &&
-              items[i.template].subtype == items[item.template].subtype
-              && i != item) {
-              i.equipped = 0;
-            }
-          });
+        _.each(socketHandler.playerData.items, function(i) {
+          if (items[i.template].type === 'armor' && items[i.template].subtype === items[item.template].subtype && i !== item) {
+            i.equipped = 0;
+          }
+        });
 
           // Set to equipped
           item.equipped = item.equipped ? 0 : 1;
 
-          soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
+          ironbane.soundHandler.play(item.equipped ? "equip/equip1" : "equip/equip2");
 
           // Send a request to equipment
           // Other players will update the view
@@ -1040,13 +1038,13 @@ var Player = Fighter.extend({
           item.equipped = item.equipped ? 0 : 1;
 
 
-          soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
+          ironbane.soundHandler.play(item.equipped ? "equip/equip1" : "equip/equip2");
 
           switch (template.subtype) {
             case 'sword':
             case 'dagger':
             case 'axe':
-              // soundHandler.Play(item.equipped ? ChooseRandom(["equipSword1","equipSword2","equipSword3"]) : "equip2");
+              // ironbane.soundHandler.play(item.equipped ? ChooseRandom(["equipSword1","equipSword2","equipSword3"]) : "equip2");
               break;
 
             case 'book':
@@ -1067,7 +1065,7 @@ var Player = Fighter.extend({
                 hudHandler.HideBook();
               }
 
-              // soundHandler.Play(item.equipped ? "equip1" : "equip2");
+              // ironbane.soundHandler.play(item.equipped ? "equip1" : "equip2");
 
               break;
             case 'map':
@@ -1079,12 +1077,12 @@ var Player = Fighter.extend({
                 hudHandler.HideMap();
               }
 
-              // soundHandler.Play(item.equipped ? "equip1" : "equip2");
+              // ironbane.soundHandler.play(item.equipped ? "equip1" : "equip2");
 
               break;
 
             default:
-              // soundHandler.Play(item.equipped ? "equip1" : "equip2");
+              // ironbane.soundHandler.play(item.equipped ? "equip1" : "equip2");
               break;
           }
 

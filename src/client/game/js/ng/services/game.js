@@ -1,7 +1,7 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TimerService', '$state',
-        function($log, $window, $http, $timeout, $filter, TimerService, $state) { // using $window to reveal the globals        // make this private so that it can't be called directly
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TimerService', '$state', 'AudioManager',
+        function($log, $window, $http, $timeout, $filter, TimerService, $state, AudioManager) { // using $window to reveal the globals        // make this private so that it can't be called directly
 
         var loop = function(game) {
             if(!game.isRunning) {
@@ -24,6 +24,9 @@ IronbaneApp
         };
 
         var Game = function() {
+            // reference AudioManager here for now (until it can be properly injected later)
+            this.soundHandler = AudioManager;
+
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
 
@@ -226,7 +229,7 @@ IronbaneApp
                 if (!$window.isProduction) {
                     $state.go('loading.cells');
                 }
-            } else if (!$window.soundHandler.loadedMainMenuMusic) {
+            } else if (!AudioManager.loadedMainMenuMusic) {
                 doneLoading = false;
                 if (!$window.isProduction) {
                     $state.go('loading.music');

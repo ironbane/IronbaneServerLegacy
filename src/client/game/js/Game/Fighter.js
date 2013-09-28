@@ -738,7 +738,7 @@ var Fighter = Unit.extend({
       this.spriteStatus = this.SpriteStatusEnum.WALK;
       if(this.walkSoundTimer <= 0 ) {
         if(this instanceof Player) {
-          //soundHandler.Play("Footsteps");
+          //ironbane.soundHandler.play("Footsteps");
       }
       this.walkSoundTimer = walkSoundTime;
     }
@@ -816,13 +816,13 @@ var Fighter = Unit.extend({
 
       switch (weapon.subtype) {
         case 'bow':
-          soundHandler.Play("battle/fireArrow", this.position);
+          ironbane.soundHandler.play("battle/fireArrow", this.position);
           break;
         case 'staff':
-          soundHandler.Play("battle/fireStaff", this.position);
+          ironbane.soundHandler.play("battle/fireStaff", this.position);
           break;
         default:
-          soundHandler.Play("battle/swing", this.position);
+          ironbane.soundHandler.play("battle/swing", this.position);
           break;
       }
     }
@@ -862,14 +862,14 @@ var Fighter = Unit.extend({
     this.allowJump = false;
 
     // if(this.template.type !== UnitTypeEnum.PLAYER) {
-    //   soundHandler.Play(this.npctype + "/jump", this.position);
+    //   ironbane.soundHandler.play(this.npctype + "/jump", this.position);
     // }
     // else
     // {
-    //   soundHandler.Play("player/jump/", this.position);
+    //   ironbane.soundHandler.play("player/jump/", this.position);
     // }
 
-    soundHandler.Play("jump", this.position);
+    ironbane.soundHandler.play("jump", this.position);
   },
   DoMeleeHitAnimation: function(position, power) {
 
@@ -912,10 +912,10 @@ var Fighter = Unit.extend({
 
 
       // if ( this.armor > 0 ) {
-      //   soundHandler.Play("hit1", this.position);
+      //   ironbane.soundHandler.play("hit1", this.position);
       // }
       // else {
-      //   soundHandler.Play("hit2", this.position);
+      //   ironbane.soundHandler.play("hit2", this.position);
       // }
 
       //        if ( attacker != ironbane.player && pos ) {
@@ -940,14 +940,14 @@ var Fighter = Unit.extend({
 
   playSound: function(sound) {
 
-    soundHandler.Play(sound, this.position);
+    ironbane.soundHandler.play(sound, this.position);
 
     // if(this.template.type !== UnitTypeEnum.PLAYER) {
-    //   soundHandler.Play("npcs/" +this.npctype + "/" + sound, this.position);
+    //   ironbane.soundHandler.play("npcs/" +this.npctype + "/" + sound, this.position);
     // }
     // else
     // {
-    //   soundHandler.Play("player/" + sound, this.position);
+    //   ironbane.soundHandler.play("player/" + sound, this.position);
     // }
 
   },

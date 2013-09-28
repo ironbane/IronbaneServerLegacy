@@ -73,6 +73,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/services/timer.js",
                     "<%= gameScriptPath %>/ng/services/news.js",
                     "<%= gameScriptPath %>/ng/services/alerts.js",
+                    "<%= gameScriptPath %>/ng/services/audio.js",
                     "<%= gameScriptPath %>/ng/controllers/charSelect.js",
                     "<%= gameScriptPath %>/ng/controllers/charCreate.js",
                     "<%= gameScriptPath %>/ng/controllers/login.js",
@@ -95,12 +96,10 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/External/Stats.js",
                     "<%= gameScriptPath %>/External/SteeringBehaviourLight.js",
 
-
                     "<%= gameScriptPath %>/Engine/Debug.js",
                     "<%= gameScriptPath %>/Engine/Events.js",
                     "<%= gameScriptPath %>/Engine/Input.js",
                     "<%= gameScriptPath %>/Engine/SocketHandler.js",
-                    "<%= gameScriptPath %>/Engine/SoundHandler.js",
                     "<%= gameScriptPath %>/Engine/TextureHandler.js",
                     "<%= gameScriptPath %>/Engine/MeshHandler.js",
                     "<%= gameScriptPath %>/Engine/PathFinder.js",

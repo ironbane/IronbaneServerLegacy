@@ -208,7 +208,15 @@ IronbaneApp
     .service('AudioManager', ['$window', 'DEFAULT_VOLUME', 'MUSIC', 'SOUND_EFFECTS', 'storage', function($window, DEFAULT_VOLUME, MUSIC, SOUND_EFFECTS, storage) {
         var manager = this;
 
+        manager.enabled = storage.get('allowSound') || true; // default to true (todo: feature detect adjustments)
+
         manager.loadedMainMenuMusic = false;
+
+        manager.volume = {
+            master: storage.get('volume.master') || 80,
+            music: storage.get('volume.music') || 80,
+            effects: storage.get('volume.effects') || 80
+        };
 
         var _sounds = {}; // internal sound cache
 
@@ -221,11 +229,7 @@ IronbaneApp
         var preload = function() {
             // TODO: Add a list of all NPC sounds using unitTemplates
             // Check if the sounds exist and load em
-
-            var soundList = MUSIC.concat(SOUND_EFFECTS);
-
-            var self = this;
-            _.each(soundList, function(sound) {
+            var initSound = function(sound, category) {
                 if (!_.isObject(sound)) {
                     sound = {
                         file: sound
@@ -236,6 +240,7 @@ IronbaneApp
                 sound.loops = (sound.loops !== undefined) ? sound.loops : 1;
                 var key = sound.file.substring(0, sound.file.length - 4);
                 _sounds[key] = {
+                    category: category,
                     sound: $window.soundManager.createSound({
                         id: key,
                         url: ironbane_root_directory + 'sound/' + sound.file,
@@ -249,7 +254,16 @@ IronbaneApp
                     loops: sound.loops,
                     baseVolume: sound.volume
                 };
+            };
+
+            _.each(MUSIC, function(data) {
+                initSound(data, 'music');
             });
+
+            _.each(SOUND_EFFECTS, function(data) {
+                initSound(data, 'effect');
+            });
+
         };
 
         // Start SoundManager2
@@ -262,7 +276,7 @@ IronbaneApp
             onready: preload,
             defaultOptions: {
                 // set global default volume for all sound objects
-                volume: storage.get('volume.master') || DEFAULT_VOLUME
+                volume: manager.volume.master
             }
         });
 
@@ -285,13 +299,19 @@ IronbaneApp
             }
         };
 
+        var setSoundVolume = function(sound, volume) {
+            if(sound in _sounds) {
+                _sounds[sound].sound.setVolume(volume);
+            }
+        };
+
         // public methods:
 
         // basic search the sound db
         this.getAllSounds = function(soundID) {
             if(!soundID) {return [];}
 
-            return _.map(_sounds, function(value, key) {
+            return _.filter(_sounds, function(value, key) {
                 if(key.search(soundID) >= 0) {
                     return value;
                 }
@@ -300,7 +320,7 @@ IronbaneApp
 
         // should return whether or not the play was successful for other methods
         this.play = function(soundID, position, once) {
-            if (!storage.get('allowSound')) {
+            if (!manager.enabled) {
                 return false;
             }
 
@@ -342,15 +362,43 @@ IronbaneApp
             return this.play(soundID, position, true);
         };
 
-        this.setVolume = function(sound, volume) {
-            if(sound in _sounds) {
-                _sounds[sound].sound.setVolume(volume);
-            }
+        // set the audio managers master volumes
+        this.setVolume = function(masterVol, musicVol, effectsVol) {
+            manager.volume.master = masterVol || 80;
+            manager.volume.music = musicVol || 80;
+            manager.volume.effects = effectsVol || 80;
+
+            // now adjust all volumes accordingly
+            var music = _.where(_sounds, {category: 'music'});
+            var effects = _.where(_sounds, {category: 'effect'});
+            // todo: adjust based on master volume?
+            _.each(music, function(song) {
+                song.sound.setVolume(manager.volume.music);
+            });
+            _.each(effects, function(effect) {
+                effect.sound.setVolume(manager.volume.effects);
+            });
         };
 
         // just a pass thru
         this.stopAll = function() {
             $window.soundManager.stopAll();
+        };
+
+        this.stopMusic = function() {
+            var music = _.where(_sounds, {category: 'music'});
+
+            _.each(music, function(song) {
+                song.sound.stop();
+            });
+        };
+
+        this.stopEffects = function() {
+            var effects = _.where(_sounds, {category: 'effect'});
+
+            _.each(effects, function(sound) {
+                sound.sound.stop();
+            });
         };
 
         this.fadeIn = function(sound, time) {
@@ -364,7 +412,7 @@ IronbaneApp
                     volume: 100
                 }, time)
                 .onUpdate(function() {
-                    self.setVolume(sound, this.volume);
+                    setSoundVolume(sound, this.volume);
                 }).start();
             }
         };
@@ -380,7 +428,7 @@ IronbaneApp
                     volume: 0
                 }, time)
                 .onUpdate(function() {
-                    self.setVolume(sound, this.volume);
+                    setSoundVolume(sound, this.volume);
                 }).start();
             }
         };

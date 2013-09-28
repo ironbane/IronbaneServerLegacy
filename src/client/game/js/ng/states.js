@@ -15,14 +15,16 @@ IronbaneApp
                             return $rootScope.currentUser.authenticated;
                         }]
                     },
-                    controller: ['$scope', '$state', '$log', 'authenticated',
-                        function($scope, $state, $log, authenticated) {
+                    controller: ['$scope', '$state', '$log', 'authenticated', 'AudioManager',
+                        function($scope, $state, $log, authenticated, AudioManager) {
                             $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
                             if(authenticated) {
                                 $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
                             } else {
                                 $state.go('mainMenu.unauthenticated');
                             }
+
+                            AudioManager.play('music/maintheme');
                     }]
                 })
                 .state('mainMenu.unauthenticated', {

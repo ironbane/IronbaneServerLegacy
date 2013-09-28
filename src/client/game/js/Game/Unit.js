@@ -378,7 +378,7 @@ var Unit = PhysicsObject.extend({
           if ( this.waterSplashSoundTimeout >= 0 ) this.waterSplashSoundTimeout -= dTime;
           else {
             this.waterSplashSoundTimeout = 0.5;
-            soundHandler.Play("splash", this.position);
+            ironbane.soundHandler.play("splash", this.position);
           }
           }
 
@@ -401,7 +401,7 @@ var Unit = PhysicsObject.extend({
           else {
             this.velocity.lerp(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
 
-            soundHandler.Play("stepWater", this.position);
+            ironbane.soundHandler.play("stepWater", this.position);
           }
         }
 

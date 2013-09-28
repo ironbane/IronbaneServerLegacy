@@ -405,7 +405,7 @@ var TerrainHandler = Class.extend({
       this.status === terrainHandlerStatusEnum.LOADED &&
       socketHandler.loggedIn ) {
 
-      // soundHandler.Play("enterGame");
+      // ironbane.soundHandler.play("enterGame");
 
       socketHandler.readyToReceiveUnits = true;
 
@@ -468,14 +468,14 @@ var TerrainHandler = Class.extend({
     if ( this.targetMusic != this.currentMusic ) {
       var me = this;
       if ( this.currentMusic ) {
-        soundHandler.FadeOut(this.currentMusic, 5.00);
+        ironbane.soundHandler.fadeOut(this.currentMusic, 5.00);
 
         setTimeout(function() {
-          soundHandler.FadeIn(me.targetMusic, 5.00) ;
+          ironbane.soundHandler.fadeIn(me.targetMusic, 5.00) ;
         }, 5000);
       }
       else {
-        soundHandler.FadeIn(this.targetMusic, 5.00) ;
+        ironbane.soundHandler.fadeIn(this.targetMusic, 5.00) ;
       }
 
       this.currentMusic = this.targetMusic;
