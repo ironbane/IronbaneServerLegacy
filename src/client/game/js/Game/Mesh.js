@@ -387,10 +387,13 @@ var Mesh = Unit.extend({
         break;
     }
 
+    var p = terrainHandler.GetReferenceLocationNoClone();
+
     // Disable lights if they are too far
     _.each(this.lightsToMaintain, function(light) {
 
-      if ( !ironbane.player.InRangeOfPosition(light.parent.position, 30) ) {
+      //if ( !ironbane.player.InRangeOfPosition(light.parent.position, 30) ) {
+      if ( VectorDistanceSq(p, light.parent.position) > 30*30 ) {
         light.visible = false;
       }
       else {
