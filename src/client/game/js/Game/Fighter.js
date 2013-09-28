@@ -114,8 +114,6 @@ var Fighter = Unit.extend({
       }, 0);
     })(this);
 
-    this.octree = new THREE.Octree({undeferred: true});
-
     this.canSelectWithEditor = true;
   },
   Add: function() {
@@ -205,11 +203,20 @@ var Fighter = Unit.extend({
     me.mesh.material.side = THREE.DoubleSide;
     me.mesh.unit = me;
     me.mesh.geometry.dynamic = true;
+
+    // Because of a bug with the raycaster, rotations are not taken into account
+    // when casting rays. We need to rotate the geometry of the mesh instead.
+    // We therefore need the starting rotations of all the vertices here
+    // so we can do a manual rotation for each vertex later in Tick()
+    this.startVertices = [];
+
+    _.each(this.mesh.geometry.vertices, function(vertex) {
+      this.startVertices.push(vertex.clone());
+    }, this);
+
+
     ironbane.scene.add(me.mesh);
 
-    this.mesh.traverse( function ( object ) {
-        me.octree.add( object, {useFaces:true} );
-    });
   },
   UpdateWeapon: function(weapon) {
 

@@ -305,7 +305,7 @@ var TerrainHandler = Class.extend({
 
         if ( !noBillboards ) {
           if ( unit instanceof Billboard || unit instanceof Fighter  ) {
-            billboardList.push(unit);
+            billboardList.push(unit.mesh);
           }
         }
 
