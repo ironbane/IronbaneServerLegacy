@@ -79,6 +79,7 @@ var Player = Fighter.extend({
 
         this.lastFoundLootBag = null;
 
+        this.lookAtPosition = new THREE.Vector3();
 
         this.pathFinder = IB.PathFinder();
     },
@@ -404,14 +405,14 @@ var Player = Fighter.extend({
 
       }
       if ( this.unitStandingOn ) {
-        ironbane.camera.lookAtPosition.copy(lookAtTarget);
+        this.lookAtPosition.copy(lookAtTarget);
       }
       else {
-        ironbane.camera.lookAtPosition.lerp(lookAtTarget, dTime * 10);
+        this.lookAtPosition.lerp(lookAtTarget, dTime * 10);
       }
 
 
-      ironbane.camera.lookAt(ironbane.camera.lookAtPosition);
+      ironbane.camera.lookAt(this.lookAtPosition);
     }
     //var factor = 6 / Math.max(Math.max(Math.abs(this.speed), 6), 0.1);
 

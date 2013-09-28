@@ -391,6 +391,8 @@ var TerrainHandler = Class.extend({
   },
   Tick: function(dTime) {
 
+    var p = this.GetReferenceLocation();
+
     if ( this.waterMesh ) {
       this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
@@ -403,7 +405,6 @@ var TerrainHandler = Class.extend({
         }
       }
 
-      var p = this.GetReferenceLocationNoClone();
       var cellPos = WorldToCellCoordinates(p.x, p.z, 10);
       var worldPos = CellToWorldCoordinates(cellPos.x, cellPos.z, 10);
 
@@ -442,7 +443,7 @@ var TerrainHandler = Class.extend({
 
     }
 
-    var p = this.GetReferenceLocation();
+
     var cp = WorldToCellCoordinates(p.x, p.z, cellSize);
 
     debug.SetWatch('Player Cell X', cp.x);
