@@ -780,7 +780,8 @@ var SocketHandler = Class.extend({
                         }
 
                         if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx.ToRadians();
-                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y = unitdata.ry.ToRadians();
+                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y =
+                            unit instanceof Fighter ? unitdata.ry : unitdata.ry.ToRadians();
                         if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz.ToRadians();
 
                         if (!_.isUndefined(unitdata.u)) {
