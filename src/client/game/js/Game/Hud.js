@@ -1428,35 +1428,65 @@ var HUDHandler = Class.extend({
             custButtons += '<button id="btnGenderChange" class="ibutton" style="width:70px;">Boy</button>';
             custButtons += '<br>';
             custButtons += 'Skin<br>';
-            custButtons += '<button id="btnSkinPrev" class="ibutton" style="width:30px;">&#9664;</button>';
-            custButtons += '<button id="btnSkinNext" class="ibutton" style="width:30px">&#9654;</button>';
+            custButtons += '<button id="btnSkinPrev" class="ibutton" style="width:30px;">←</button>';
+            custButtons += '<button id="btnSkinNext" class="ibutton" style="width:30px">→</button>';
             $('#charCustomizationButtonsLeft').html(custButtons);
 
             custButtons = '';
             custButtons += 'Hair<br>';
-            custButtons += '<button id="btnHairPrev" class="ibutton" style="width:30px;">&#9664;</button>';
-            custButtons += '<button id="btnHairNext" class="ibutton" style="width:30px">&#9654;</button>';
+            custButtons += '<button id="btnHairPrev" class="ibutton" style="width:30px;">←</button>';
+            custButtons += '<button id="btnHairNext" class="ibutton" style="width:30px">→</button>';
             custButtons += 'Eyes<br>';
-            custButtons += '<button id="btnEyesPrev" class="ibutton" style="width:30px;">&#9664;</button>';
-            custButtons += '<button id="btnEyesNext" class="ibutton" style="width:30px">&#9654;</button>';
+            custButtons += '<button id="btnEyesPrev" class="ibutton" style="width:30px;">←</button>';
+            custButtons += '<button id="btnEyesNext" class="ibutton" style="width:30px">→</button>';
             $('#charCustomizationButtonsRight').html(custButtons);
 
             var custChar = '';
             var constrainCustomizers = function() {
                 if (selectedMale) {
-                    selectedSkin = Math.min(skinIdMaleEnd, selectedSkin);
-                    selectedSkin = Math.max(skinIdMaleStart, selectedSkin);
-                    selectedEyes = Math.min(eyesIdMaleEnd, selectedEyes);
-                    selectedEyes = Math.max(eyesIdMaleStart, selectedEyes);
-                    selectedHair = Math.min(hairIdMaleEnd, selectedHair);
-                    selectedHair = Math.max(hairIdMaleStart, selectedHair);
+                    if ( selectedSkin > skinIdMaleEnd ) {
+                        selectedSkin = skinIdMaleStart;
+                    }
+                    if ( selectedSkin < skinIdMaleStart ) {
+                        selectedSkin = skinIdMaleEnd;
+                    }
+
+                    if ( selectedEyes > eyesIdMaleEnd ) {
+                        selectedEyes = eyesIdMaleStart;
+                    }
+                    if ( selectedEyes < eyesIdMaleStart ) {
+                        selectedEyes = eyesIdMaleEnd;
+                    }
+
+                    if ( selectedHair > hairIdMaleEnd ) {
+                        selectedHair = hairIdMaleStart;
+                    }
+                    if ( selectedHair < hairIdMaleStart ) {
+                        selectedHair = hairIdMaleEnd;
+                    }
+
                 } else {
-                    selectedSkin = Math.min(skinIdFemaleEnd, selectedSkin);
-                    selectedSkin = Math.max(skinIdFemaleStart, selectedSkin);
-                    selectedEyes = Math.min(eyesIdFemaleEnd, selectedEyes);
-                    selectedEyes = Math.max(eyesIdFemaleStart, selectedEyes);
-                    selectedHair = Math.min(hairIdFemaleEnd, selectedHair);
-                    selectedHair = Math.max(hairIdFemaleStart, selectedHair);
+                    if ( selectedSkin > skinIdFemaleEnd ) {
+                        selectedSkin = skinIdFemaleStart;
+                    }
+                    if ( selectedSkin < skinIdFemaleStart ) {
+                        selectedSkin = skinIdFemaleEnd;
+                    }
+
+                    if ( selectedEyes > eyesIdFemaleEnd ) {
+                        selectedEyes = eyesIdFemaleStart;
+                    }
+                    if ( selectedEyes < eyesIdFemaleStart ) {
+                        selectedEyes = eyesIdFemaleEnd;
+                    }
+
+                    if ( selectedHair > hairIdFemaleEnd ) {
+                        selectedHair = hairIdFemaleStart;
+                    }
+                    if ( selectedHair < hairIdFemaleStart ) {
+                        selectedHair = hairIdFemaleEnd;
+                    }
+
                 }
             };
 
