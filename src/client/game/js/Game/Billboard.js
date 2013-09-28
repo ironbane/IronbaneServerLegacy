@@ -74,7 +74,7 @@ var Billboard = Unit.extend({
               },
               vSun: {
                 type: 'v3',
-                value: new THREE.Vector3(0, 0, 0)
+                value: new THREE.Vector3(0, 1, 0)
               },
               texture1: {
                 type: 't',
