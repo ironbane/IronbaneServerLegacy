@@ -26,7 +26,7 @@ var Lever = ToggleableObstacle.extend({
 
 
 
-    this._super(position, new THREE.Vector3(), id, 17, {
+    this._super(position, new THREE.Euler(), id, 17, {
       'movementType':4,
       'rotY':0,
       'on':metadata.on
@@ -40,7 +40,7 @@ var Lever = ToggleableObstacle.extend({
 
     var mp = this.on ? 1 : 0;
 
-    this.targetRotation.x = this.startRotation.x + 90 * mp;
+    this.targetRotation.x = this.startRotation.x + Math.PI/2 * mp;
 
     this.changeRotation = true;
 
@@ -51,7 +51,7 @@ var Lever = ToggleableObstacle.extend({
 
     var mp = this.on ? 1 : 0;
 
-    this.targetRotation.x = this.startRotation.x + 90 * mp;
+    this.targetRotation.x = this.startRotation.x + Math.PI/2 * mp;
 
 
     soundHandler.Play("misc/switch");
