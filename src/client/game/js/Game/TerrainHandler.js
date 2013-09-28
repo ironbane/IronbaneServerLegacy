@@ -242,8 +242,8 @@ var TerrainHandler = Class.extend({
                       false : options.noTerrain;
     var noMeshes = _.isUndefined(options.noMeshes) ?
                       false : options.noMeshes;
-    var noBillboards = _.isUndefined(options.noBillboards) ?
-                      false : options.noBillboards;
+    var allowBillboards = _.isUndefined(options.allowBillboards) ?
+                      false : options.allowBillboards;
     var extraRange = _.isUndefined(options.extraRange) ?
                       1.0 : options.extraRange;
     var reverseRaySortOrder = _.isUndefined(options.reverseRaySortOrder) ?
@@ -303,7 +303,7 @@ var TerrainHandler = Class.extend({
           }
         }
 
-        if ( !noBillboards ) {
+        if ( allowBillboards ) {
           if ( unit instanceof Billboard || unit instanceof Fighter  ) {
             billboardList.push(unit.mesh);
           }

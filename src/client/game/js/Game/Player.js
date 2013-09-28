@@ -302,7 +302,6 @@ var Player = Fighter.extend({
       var intersects = terrainHandler.RayTest(ray, {
         testMeshesNearPosition:ironbane.camera.position,
         unitReference: this,
-        noBillboards: true,
         unitRayName: "camera"
       });
 
@@ -1175,7 +1174,7 @@ var Player = Fighter.extend({
     var intersects = terrainHandler.RayTest(ray, {
       testMeshesNearPosition:this.position,
       extraRange: 20,
-
+      allowBillboards: true,
       unitReference: this,
       unitRayName: "mouse"
     });
