@@ -362,6 +362,32 @@ IronbaneApp
             return this.play(soundID, position, true);
         };
 
+        // music is not positional (unless we're talking like from a juke box in game, then use effects or something else)
+        this.playMusic = function(soundId) {
+            // sound is off!
+            if (!manager.enabled) {
+                return false;
+            }
+
+            // song not found!
+            if(!(soundId in _sounds)) {
+                return false;
+            }
+
+            // this song already playing!
+            if(_sounds[soundId].sound.playState !== 0) {
+                return false;
+            }
+
+            // finally make sure all other music tracks are stopped
+            this.stopMusic();
+
+            // now play the song
+            _sounds[soundId].sound.play();
+
+            return true;
+        };
+
         // set the audio managers master volumes
         this.setVolume = function(masterVol, musicVol, effectsVol) {
             manager.volume.master = masterVol || 80;

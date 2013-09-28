@@ -23,11 +23,16 @@ IronbaneApp
         if ($scope.volume.effects > volume) {
             $scope.volume.effects = volume;
         }
+
+        // trigger immediate volume adjustment
+        AudioManager.setVolume($scope.volume.master, $scope.volume.music, $scope.volume.effects);
     });
 
     $scope.$watch('audioEnabled', function(enabled) {
+        AudioManager.enabled = enabled;
+
         if(enabled) {
-            AudioManager.play('music/maintheme');
+            AudioManager.playMusic('music/maintheme');
         } else {
             AudioManager.stopAll();
         }

@@ -24,7 +24,7 @@ IronbaneApp
                                 $state.go('mainMenu.unauthenticated');
                             }
 
-                            AudioManager.play('music/maintheme');
+                            AudioManager.playMusic('music/maintheme');
                     }]
                 })
                 .state('mainMenu.unauthenticated', {
