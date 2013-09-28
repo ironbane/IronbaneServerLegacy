@@ -74,10 +74,26 @@ var Billboard = Unit.extend({
         this.meshHeight = (this.texture.image.height/16);
 
         var uniforms = {
-            uvScale : { type: 'f', value: 1.0 },
-            size : { type: 'v2', value: new THREE.Vector2(1,1) },
-            hue : { type: 'v3', value: new THREE.Vector3(1,1,1) },
-            texture1 : { type: 't', value: this.texture }
+              uvScale: {
+                type: 'v2',
+                value: new THREE.Vector2(1, 1)
+              },
+              size: {
+                type: 'v2',
+                value: new THREE.Vector2(1, 1)
+              },
+              hue: {
+                type: 'v3',
+                value: new THREE.Vector3(1, 1, 1)
+              },
+              vSun: {
+                type: 'v3',
+                value: new THREE.Vector3(0, 0, 0)
+              },
+              texture1: {
+                type: 't',
+                value: this.texture
+              }
         };
 
         var shaderMaterial = new THREE.ShaderMaterial({
