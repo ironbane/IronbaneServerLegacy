@@ -198,7 +198,10 @@ var TerrainHandler = Class.extend({
   GetReferenceLocationNoClone: function() {
     var p;
 
-    if ( ironbane.player ) {
+    if ( le("globalEnable") ) {
+      p = ironbane.camera.position;
+    }
+    else if ( ironbane.player ) {
       p = ironbane.player.position;
     }
     else if ( socketHandler.spawnLocation ) {
