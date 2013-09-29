@@ -21,7 +21,7 @@ var SoundHandler = Class.extend({
             file: "music/maintheme.mp3",
             volume: 0.5,
             loops: 999,
-            preload: true
+            preload: gotFlashInstalled
         }, {
             file: "music/castle.mp3",
             volume: 0.5
@@ -30,16 +30,16 @@ var SoundHandler = Class.extend({
             volume: 0.5
         }, {
             file: "music/ironbane2.mp3",
-            //preload: true,
+            //preload: gotFlashInstalled
             volume: 0.5
         }, {
             file: "music/ironbane4.mp3",
             volume: 0.5
-            //preload: true
+            //preload: gotFlashInstalled
         }, {
             file: "music/ironbane5.mp3",
             volume: 0.5,
-            //preload: true,
+            //preload: gotFlashInstalled
             loops: 1
         }, {
             file: "music/ironbane6.mp3",
@@ -69,41 +69,41 @@ var SoundHandler = Class.extend({
 
         {
             file: "misc/switch.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "misc/bag1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "misc/bag2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "misc/drop.ogg",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "equip/equipsword1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "equip/equipsword2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "equip/equipsword3.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "equip/equip1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "equip/equip2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         "environment/splash1.wav",
@@ -111,67 +111,67 @@ var SoundHandler = Class.extend({
 
         {
             file: "battle/arrowhit1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/arrowhit2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/arrowhit3.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "battle/swing1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/swing2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/swing3.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "battle/hit1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/hit2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/hit3.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "battle/die1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/die2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/die3.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         {
             file: "battle/firestaff.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/firearrow1.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
         {
             file: "battle/firearrow2.wav",
-            preload: true
+            preload: gotFlashInstalled
         },
 
         "player/getcoin1.wav",
@@ -219,13 +219,13 @@ var SoundHandler = Class.extend({
 
         {
             file: "fighter/jump.wav",
-            preload:true
+            preload:gotFlashInstalled
         },
 
         "placeholder"
     ],
     sounds: {},
-    loadedMainMenuMusic: false,
+    loadedMainMenuMusic: !gotFlashInstalled,
     Init: function() {
         var self = this;
 
