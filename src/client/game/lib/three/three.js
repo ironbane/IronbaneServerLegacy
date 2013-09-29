@@ -13154,7 +13154,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 
 	// NICK EDIT START
-	this.linewidth = 5;
+	this.linewidth = 2;
 	// NICK EDIT END
 	this.linecap = 'round';
 	this.linejoin = 'round';
