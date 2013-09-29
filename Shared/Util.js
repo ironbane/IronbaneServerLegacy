@@ -317,14 +317,41 @@ if ( !SERVER ) {
       target.y = this.position.y;
     }
 
-    this.matrix.lookAt( target, this.position, this.up );
 
-    if ( this.rotationAutoUpdate ) {
-      this.rotation.setFromRotationMatrix( this.matrix, this.rotation.order );
+
+    if ( this.unit ) {
+
+      var matrix = new THREE.Matrix4();
+
+      matrix.lookAt( target, this.position, this.up );
+
+      this.unit.mesh.geometry.dynamic = true;
+      this.unit.mesh.geometry.verticesNeedUpdate = true;
+
+      for (var i = 0; i < this.unit.mesh.geometry.vertices.length; i++) {
+        this.unit.mesh.geometry.vertices[i].copy(this.unit.startVertices[i]);
+      }
+
+      var q = new THREE.Quaternion();
+      var e = new THREE.Euler();
+
+      e.setFromRotationMatrix(matrix);
+
+      this.unit.localRotation.copy(e);
+
+      _.each(this.unit.mesh.geometry.vertices, function(vertex) {
+        //vertex.applyEuler(e);
+        vertex.applyMatrix4(matrix);
+      }, this);
+
+    } else {
+
+      this.matrix.lookAt( target, this.position, this.up );
+
+      if ( this.rotationAutoUpdate ) {
+        this.rotation.setFromRotationMatrix( this.matrix, this.rotation.order );
+      }
     }
-
-    return;
-    var target = position.clone();
 
   }
 

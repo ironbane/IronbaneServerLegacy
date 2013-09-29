@@ -1,14 +1,23 @@
 // topic.js
 angular.module('IronbaneApp')
-.controller('TopicCtrl', ['Topic','$log','$scope', 'ResolveData', function(Topic, $log, $scope, ResolveData) {
+.controller('TopicCtrl', ['User','Post','Topic','$log','$scope', 'ResolveData', function(User, Post, Topic, $log, $scope, ResolveData) {
     $scope.board = ResolveData.board;
 
     $scope.posts = ResolveData.posts;
     $scope.topic = ResolveData.topic.data;
 
-    $scope.$on('postSaveSuccess', function(event, post) {
-        post.user = $scope.$root.currentUser; // somehow need to get currentUser updated with forum data (avatar, posts, etc.)
-        $scope.posts.push(post);
+    $scope.$on('postSaveSuccess', function(event, returnedPosts) {
+        $log.log("save success: ");
+        $log.log(returnedPosts);
+        angular.forEach(returnedPosts, function(post) {
+        $log.log(post);
+            var p = new Post(post);
+            p.user.avatar = p.user.avatar || User.getDefaultAvatar();
+            $log.log(p);
+            $scope.posts.push(p);
+        });
+        //post.user = $scope.$root.currentUser; // somehow need to get currentUser updated with forum data (avatar, posts, etc.)
+        //$scope.posts.push(post);
     });
 
     $scope.lock = function(){

@@ -30,27 +30,13 @@ var Billboard = Unit.extend({
 
         this._super(position, rotY, id, customName, param);
 
-        //        this.targetPosition.x = 1.0;
-        //        this.targetPosition.z = 1.0;
-
-        this.octree = new THREE.Octree({undeferred: true});
-
-
         this.dynamic = false;
         this.enableGravity = false;
-
-        this.collider = null;
 
         this.canSelectWithEditor = true;
 
     },
     Add: function () {
-
-    //console.warn(this.position.x);
-
-
-    // Get material
-
 
         var texture = this.customPath ? 'images/'  + this.param+'.png' : billboardSpritePath + ''+this.param+'.png';
         this.texture = textureHandler.GetTexture( texture, true);
@@ -74,10 +60,26 @@ var Billboard = Unit.extend({
         this.meshHeight = (this.texture.image.height/16);
 
         var uniforms = {
-            uvScale : { type: 'f', value: 1.0 },
-            size : { type: 'v2', value: new THREE.Vector2(1,1) },
-            hue : { type: 'v3', value: new THREE.Vector3(1,1,1) },
-            texture1 : { type: 't', value: this.texture }
+              uvScale: {
+                type: 'v2',
+                value: new THREE.Vector2(1, 1)
+              },
+              size: {
+                type: 'v2',
+                value: new THREE.Vector2(1, 1)
+              },
+              hue: {
+                type: 'v3',
+                value: new THREE.Vector3(1, 1, 1)
+              },
+              vSun: {
+                type: 'v3',
+                value: new THREE.Vector3(0, 1, 0)
+              },
+              texture1: {
+                type: 't',
+                value: this.texture
+              }
         };
 
         var shaderMaterial = new THREE.ShaderMaterial({
@@ -97,13 +99,18 @@ var Billboard = Unit.extend({
 
         this.mesh.geometry.dynamic = true;
 
+        // Because of a bug with the raycaster, rotations are not taken into account
+        // when casting rays. We need to rotate the geometry of the mesh instead.
+        // We therefore need the starting rotations of all the vertices here
+        // so we can do a manual rotation for each vertex later in Tick()
+        this.startVertices = [];
+
+        _.each(this.mesh.geometry.vertices, function(vertex) {
+          this.startVertices.push(vertex.clone());
+        }, this);
+
+
         ironbane.scene.add(this.mesh);
-
-        var me = this;
-
-        this.mesh.traverse( function ( object ) {
-            me.octree.add( object, {useFaces:true} );
-        });
 
     },
     Tick: function(dTime) {

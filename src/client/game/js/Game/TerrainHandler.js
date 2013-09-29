@@ -242,6 +242,8 @@ var TerrainHandler = Class.extend({
                       false : options.noTerrain;
     var noMeshes = _.isUndefined(options.noMeshes) ?
                       false : options.noMeshes;
+    var allowBillboards = _.isUndefined(options.allowBillboards) ?
+                      false : options.allowBillboards;
     var extraRange = _.isUndefined(options.extraRange) ?
                       1.0 : options.extraRange;
     var reverseRaySortOrder = _.isUndefined(options.reverseRaySortOrder) ?
@@ -286,6 +288,9 @@ var TerrainHandler = Class.extend({
 
     var meshList = [];
 
+    // Do normal raycasts for billboards
+    var billboardList = [];
+
     if ( !noMeshes ) {
       for(var u=0;u<ironbane.unitList.length;u++) {
         var unit = ironbane.unitList[u];
@@ -297,8 +302,14 @@ var TerrainHandler = Class.extend({
             meshList.push(unit);
           }
         }
-        if ( unit instanceof Billboard || unit instanceof Fighter  ) {
-          meshList.push(unit);
+
+        if ( allowBillboards ) {
+          if ( unit instanceof Billboard || unit instanceof Fighter  ) {
+
+            if ( unit instanceof Fighter && unit.health <= 0 ) continue;
+
+            billboardList.push(unit.mesh);
+          }
         }
 
       }
@@ -326,15 +337,26 @@ var TerrainHandler = Class.extend({
       //30-6-2013 - Ingmar : check on existence of ironbane.player, during load of the game, the terrainhandler is loading first and then the player.
       // player does not have yet to exist here, so wait a few cycles
       if(ironbane.player) {
-      if ( DistanceSq(this.lastOctreeBuildPosition, ironbane.player.position) > 10*10 ) {
-          this.RebuildOctree();
-      }
+        if ( DistanceSq(this.lastOctreeBuildPosition, ironbane.player.position) > 10*10 ) {
+            this.RebuildOctree();
+        }
 
-      var subIntersects = ray.intersectOctreeObjects( this.octreeResults );
-      intersects = intersects.concat(subIntersects);
+        var subIntersects = ray.intersectOctreeObjects( this.octreeResults );
+        intersects = intersects.concat(subIntersects);
+      }
     }
 
-}
+    var subIntersects = ray.intersectObjects( billboardList );
+
+    _.each(subIntersects, function(i) {
+        if ( i.object.unit ) {
+            i.face.normalWithRotations = i.face.normal.clone();
+            i.face.normalWithRotations.applyEuler(i.object.unit.localRotation);
+        }
+    });
+
+    intersects = intersects.concat(subIntersects);
+
     if ( reverseRaySortOrder ) {
       intersects.sort(function(a,b) { return b.distance - a.distance; } );
     }
@@ -369,6 +391,8 @@ var TerrainHandler = Class.extend({
   },
   Tick: function(dTime) {
 
+    var p = this.GetReferenceLocation();
+
     if ( this.waterMesh ) {
       this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
@@ -381,7 +405,6 @@ var TerrainHandler = Class.extend({
         }
       }
 
-      var p = this.GetReferenceLocationNoClone();
       var cellPos = WorldToCellCoordinates(p.x, p.z, 10);
       var worldPos = CellToWorldCoordinates(cellPos.x, cellPos.z, 10);
 
@@ -420,7 +443,7 @@ var TerrainHandler = Class.extend({
 
     }
 
-    var p = this.GetReferenceLocation();
+
     var cp = WorldToCellCoordinates(p.x, p.z, cellSize);
 
     debug.SetWatch('Player Cell X', cp.x);

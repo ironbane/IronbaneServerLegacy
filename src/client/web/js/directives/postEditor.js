@@ -12,7 +12,6 @@ angular.module('IronbaneApp')
             $scope.save = function() {
                 // todo: validate form
                 var post = new Post({
-                    time: (new Date()).valueOf() / 1000, // convert to mysql unix_timestamp
                     content: $scope.post.body,
                     user: $scope.$root.currentUser.id // temp for now
                 });
