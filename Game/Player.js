@@ -218,10 +218,7 @@ var Player = Fighter.extend({
 
     this.Save();
 
-
     chatHandler.LeaveGame(this);
-
-
 
     var cx = this.cellX;
     var cz = this.cellZ;
@@ -246,7 +243,6 @@ var Player = Fighter.extend({
         }
       }
     }
-
 
 
   }
