@@ -110,7 +110,7 @@ var Unit = PhysicsObject.extend({
       }, 0);
     })(this);
 
-    this.rayOffsetList = [new THREE.Vector3(0.0, 1.0, 0.0)];
+    this.rayOffsetList = [new THREE.Vector3(0.0, 0.5, 0.0)];
 
     this.rayOffsetListPlayer = [new THREE.Vector3(0.1, 0.5, 0.1),new THREE.Vector3(-0.1, 0.5, -0.1)];
 
@@ -474,7 +474,7 @@ var Unit = PhysicsObject.extend({
             var succesfulRays = 0;
             var struckUnit = null;
 
-            var distanceCheck = 1.0;
+            var distanceCheck = 0.5;
 
 
             var intersects = terrainHandler.RayTest(ray, {
