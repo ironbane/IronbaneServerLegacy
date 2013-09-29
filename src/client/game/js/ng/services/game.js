@@ -28,7 +28,7 @@ IronbaneApp
 
             // adjustable framerate
             this._lastFrameTime = 0;
-            this._maxFrameTime = 0.1;
+            this._maxFrameTime = 0.03;
             this._elapsedTime = 0;
 
             this.scene = null;
