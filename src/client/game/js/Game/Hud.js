@@ -155,6 +155,11 @@ var HUDHandler = Class.extend({
     MakeSoundButton: function() {
         var checkSoundToggle = function(value) {
 
+            if ( !gotFlashInstalled ) {
+                value = false;
+                hudHandler.MessageAlert("Flash was not detected.<br><br>Sound effects are disabled.");
+            }
+
             // We can only change the toggle in the main menu, so always stop/play
             // the theme music
             hudHandler.allowSound = value;

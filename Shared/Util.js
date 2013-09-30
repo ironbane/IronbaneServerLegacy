@@ -554,6 +554,16 @@ if ( !SERVER ) {
     mesh = null;
   }
 
+
+  var hasFlash = function() {
+      return !(((typeof navigator.plugins == "undefined" || navigator.plugins.length == 0) ?
+        !!(new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) :
+        navigator.plugins["Shockwave Flash"]) === undefined);
+  };
+
+
+  var gotFlashInstalled = hasFlash();
+
 }
 
 
