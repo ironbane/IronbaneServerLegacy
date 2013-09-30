@@ -365,6 +365,7 @@ var NewLevelEditor = PhysicsObject.extend({
             testMeshesNearPosition: ironbane.camera.position,
             noTerrain: levelEditor.editorGUI.enableModelPlacer && levelEditor.editorGUI.mpTransformMode,
             extraRange: 500,
+            allowBillboards: true,
             unitReference: this,
             unitRayName: "mouse"
         });
