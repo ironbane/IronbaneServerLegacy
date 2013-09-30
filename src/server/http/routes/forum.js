@@ -89,7 +89,7 @@ module.exports = function(app, db) {
             boardId: req.params.boardId,
             title: req.body.title,
             content: req.body.content,
-            user: req.body.user
+            user: req.user.id
         };
 
         Topic.newPost(post)
@@ -161,7 +161,7 @@ module.exports = function(app, db) {
         var post = new Post({
             topic_id: req.params.topicId,
             content: req.body.content,
-            user: req.body.user
+            user: req.user.id
         });
 
         post.$save().then(function(result) {
