@@ -716,6 +716,9 @@ var SocketHandler = Class.extend({
                         }
 
                         obj.Destroy();
+
+                        ironbane.unitList = _.without(ironbane.unitList, obj);
+
                     }
                 });
 
@@ -725,7 +728,6 @@ var SocketHandler = Class.extend({
                         if (!ConvertVector3(obj).equals(pos)) newList.push(obj);
                     });
                     cell.objectData = newList;
-
                 }
             });
 

@@ -204,6 +204,8 @@ $(document).keydown(function(event){
 
             socketHandler.inGame = false;
 
+            socketHandler.readyToReceiveUnits = false;
+
             for (var u = 0; u < ironbane.unitList.length; u++) {
               ironbane.unitList[u].Destroy();
             }
@@ -213,6 +215,8 @@ $(document).keydown(function(event){
             terrainHandler.Destroy();
 
             terrainHandler.status = terrainHandlerStatusEnum.INIT;
+
+            ironbane.player.Destroy();
 
             ironbane.player = null;
 

@@ -225,8 +225,9 @@ var Skybox = PhysicsObject.extend({
 
 
       if ( GetZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
-        this.ambientLight.color.setRGB(0.3, 0.3, 0.3);
+        this.ambientLight.color.setRGB(0.2, 0.2, 0.3);
         this.sunLight.color.setRGB( 0.0, 0.0, 0.0 );
+        this.moonLight.color.setRGB(0.2, 0.2, 0.3);
       }
       else {
         this.sunLight.color.setRGB( str + (alr * 0.6), stg + (alg * 0.6), stb  + (alb * 0.6));

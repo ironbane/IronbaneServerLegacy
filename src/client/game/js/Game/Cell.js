@@ -376,7 +376,7 @@ var Cell = Class.extend({
 
                                     var graphData = terrainHandler.GetCellByGridPosition(x, z).graphData;
 
-                                    if ( graphData.nodes === undefined ) continue;
+                                    if ( !graphData || graphData.nodes === undefined ) continue;
 
                                     var subnodes = graphData.nodes;
 
