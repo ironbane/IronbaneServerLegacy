@@ -104,7 +104,7 @@ module.exports = function(db) {
                     log(err + ' while inserting post');
                     return;
                 }
-                deferred.resolve(result);
+                deferred.resolve(params.time);
             });
         });
 
@@ -122,14 +122,11 @@ module.exports = function(db) {
                 deferred.reject(err);
                 return;
             }
-            log("no query errors");
-            log(results.length);
 
             if (results.length === 0) {
                 deferred.reject(results);
                 return;
             }
-            log("doing a parse");
             _.each(results, function(p) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
