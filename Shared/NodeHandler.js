@@ -36,7 +36,7 @@ var NodeHandler = Class.extend({
 
                     var graphData = terrainHandler.GetCellByGridPosition(x, z).graphData;
 
-                    if ( graphData["nodes"] === undefined ) continue;
+                    if ( !graphData || graphData["nodes"] === undefined ) continue;
 
                     var graphArr = graphData["nodes"];
                     var index = _.indexOf(graphArr, (_.where(graphArr, {id:id}))[0]);
