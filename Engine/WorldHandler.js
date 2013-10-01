@@ -172,15 +172,14 @@ var WorldHandler = Class.extend({
 
         //log(data);
 
-        var zone = data[0];
-        var cx = data[1];
-        var cz = data[2];
+        var zone = parseInt(data[0], 10);
+        var cx = parseInt(data[1], 10);
+        var cz = parseInt(data[2], 10);
 
         var file = data[3];
-
-        if ( !isNumber(zone) ) continue;
-        if ( !isNumber(cx) ) continue;
-        if ( !isNumber(cz) ) continue;
+        if ( !_.isNumber(zone) ) continue;
+        if ( !_.isNumber(cx) ) continue;
+        if ( !_.isNumber(cz) ) continue;
 
 
         worldHandler.BuildWorldStructure(zone, cx, cz);

@@ -788,10 +788,10 @@ function RawVector3(vec) {
   return {x:vec.x, y:vec.y, z:vec.z};
 }
 
-function isNumber(n) {
+/*function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
+*/
 function CheckForFunctionReturnValue(v, data) {
   return typeof(v)=="function"?v(data):v;
 }
@@ -982,6 +982,7 @@ String.prototype.capitaliseFirstLetter = function() {
 
 //Copyright 2009 Nicholas C. Zakas. All rights reserved.
 //MIT Licensed
+/*
 function timedChunk(items, process, context, callback){
     var todo = items.concat();   //create a clone of the original
 
@@ -1000,3 +1001,4 @@ function timedChunk(items, process, context, callback){
         }
     }, 25);
 }
+*/
