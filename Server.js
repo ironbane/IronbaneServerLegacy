@@ -195,10 +195,10 @@ var Server = Class.extend({
 
                                 if ( !(ud instanceof Player) && (ud instanceof Fighter) ) {
                                     // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
-                                    ud.rotation.y = (Math.atan2(ud.heading.z, ud.heading.x)).ToDegrees();
+                                    ud.rotation.y = (Math.atan2(ud.heading.z, ud.heading.x));
 
-                                    if ( ud.rotation.y < 0 ) ud.rotation.y += 360;
-                                    ud.rotation.y = 360 - ud.rotation.y;
+                                    if ( ud.rotation.y < 0 ) ud.rotation.y += (Math.PI*2);
+                                    ud.rotation.y = (Math.PI*2) - ud.rotation.y;
 
                                 }
 

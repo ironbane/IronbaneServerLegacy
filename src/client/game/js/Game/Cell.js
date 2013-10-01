@@ -251,7 +251,7 @@ var Cell = Class.extend({
             var meshData = preMeshes[param] ? preMeshes[param] : null;
 
             // Eulers are expressed in radians, so convert!
-            var rotation = new THREE.Euler(gObject.rX.ToRadians(), gObject.rY.ToRadians(), gObject.rZ.ToRadians());
+            var rotation = new THREE.Euler(gObject.rX, gObject.rY, gObject.rZ);
 
 
             // Special meshes do not get "baked" into the cell modelGeometry

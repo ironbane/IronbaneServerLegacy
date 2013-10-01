@@ -146,7 +146,7 @@ IronbaneApp
 
             if (unit) {
                 unit.health = data.h;
-                unit.localPosition.copy(ConvertVector3(data.p));
+                unit.object3D.position.copy(ConvertVector3(data.p));
 
                 if (unit === ironbane.player) {
                     terrainHandler.transitionState = transitionStateEnum.START;
@@ -229,7 +229,7 @@ IronbaneApp
 
                 terrainHandler.ChangeZone(data.zone);
 
-                ironbane.player.localPosition.copy(data.pos);
+                ironbane.player.object3D.position.copy(data.pos);
                 ironbane.player.unitStandingOn = null;
             });
         });
@@ -433,8 +433,8 @@ IronbaneApp
                             unit.unitStandingOn = null;
                         }
 
-                        if (Math.abs(unit.localPosition.y - unitdata.p.y) > 1) {
-                            unit.localPosition.y = unitdata.p.y;
+                        if (Math.abs(unit.object3D.position.y - unitdata.p.y) > 1) {
+                            unit.object3D.position.y = unitdata.p.y;
                         }
                     }
                 }

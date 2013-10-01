@@ -48,7 +48,7 @@ var ToggleableObstacle = Train.extend({
 
        this.Toggle(this.on);
 
-        this.targetPosition = this.localPosition.clone();
+        this.targetPosition = this.object3D.position.clone();
         this.targetRotation = this.rotation.clone();
 
 

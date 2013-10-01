@@ -225,9 +225,9 @@ var NewLevelEditor = PhysicsObject.extend({
             socketHandler.socket.emit('addModel', {
                 position:newPos,
                 type: 5,
-                rX:newRot.x.ToDegrees(),
-                rY:newRot.y.ToDegrees(),
-                rZ:newRot.z.ToDegrees(),
+                rX:newRot.x,
+                rY:newRot.y,
+                rZ:newRot.z,
                 param:id
             }, function() {
                 if ( !_.isEmpty(metadata) ) {
@@ -273,8 +273,8 @@ var NewLevelEditor = PhysicsObject.extend({
             // Check that the unit can be selected
             if ( !mesh.unit.canSelectWithEditor ) return;
 
-            this.selectedObjectOldPosition = mesh.unit.localPosition.clone();
-            this.selectedObjectOldRotation = mesh.unit.localRotation.clone();
+            this.selectedObjectOldPosition = mesh.unit.object3D.position.clone();
+            this.selectedObjectOldRotation = mesh.unit.object3D.rotation.clone();
 
 
             this.selectionBox.visible = true;
@@ -315,9 +315,9 @@ var NewLevelEditor = PhysicsObject.extend({
                             socketHandler.socket.emit('addModel', {
                                 position:newPos,
                                 type: 5,
-                                rX:newRot.x.ToDegrees(),
-                                rY:newRot.y.ToDegrees(),
-                                rZ:newRot.z.ToDegrees(),
+                                rX:newRot.x,
+                                rY:newRot.y,
+                                rZ:newRot.z,
                                 param:id
                             }, function() {
                                 if ( !_.isEmpty(metadata) ) {

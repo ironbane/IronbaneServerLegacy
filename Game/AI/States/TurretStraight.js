@@ -49,7 +49,7 @@ var TurretStraight = State.extend({
 
         // console.log(unit.rotation);
 
-        var angle = unit.rotation.y.ToRadians();
+        var angle = unit.rotation.y;
 
 
         unit.ShootProjectile(unit.position.clone()

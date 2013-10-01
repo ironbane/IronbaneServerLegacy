@@ -132,7 +132,7 @@ var EditorGUI = function() {
         movementType:parseInt(levelEditor.editorGUI.epmoMovementType, 10),
         speedMultiplier:parseFloat(levelEditor.editorGUI.epmoSpeedMultiplier),
         distanceMultiplier:parseFloat(levelEditor.editorGUI.epmoDistanceMultiplier),
-        rotY: ironbane.player.rotation.y.Round()
+        rotY: ironbane.player.rotation.y
       }
     });
   };
@@ -151,7 +151,7 @@ var EditorGUI = function() {
         movementType:parseInt(levelEditor.editorGUI.eptoMovementType, 10),
         speedMultiplier:parseFloat(levelEditor.editorGUI.eptoSpeedMultiplier),
         distanceMultiplier:parseFloat(levelEditor.editorGUI.eptoDistanceMultiplier),
-        rotY: ironbane.player.rotation.y.Round(),
+        rotY: ironbane.player.rotation.y,
         startOpen : levelEditor.editorGUI.eptoStartOpen
       }
     });
@@ -223,7 +223,7 @@ var EditorGUI = function() {
       data: {
         text: levelEditor.editorGUI.epsText,
         fontSize: levelEditor.editorGUI.epsFontSize,
-        rotY: ironbane.player.rotation.y.Round()
+        rotY: ironbane.player.rotation.y
       }
     });
   }
@@ -246,7 +246,7 @@ var EditorGUI = function() {
       data: {
         loot:levelEditor.editorGUI.eplmLootItems,
         respawnTime: levelEditor.editorGUI.eplmRespawnTime,
-        rotY: ironbane.player.rotation.y.Round()
+        rotY: ironbane.player.rotation.y
       }
     });
   }
@@ -948,12 +948,12 @@ var LevelEditor = Class.extend({
       }
 
 
-      if ( levelEditor.editorGUI.mpRotX >= 360 ) levelEditor.editorGUI.mpRotX = 0;
-      if ( levelEditor.editorGUI.mpRotY >= 360 ) levelEditor.editorGUI.mpRotY = 0;
-      if ( levelEditor.editorGUI.mpRotZ >= 360 ) levelEditor.editorGUI.mpRotZ = 0;
-      if ( levelEditor.editorGUI.mpRotX <= -1 ) levelEditor.editorGUI.mpRotX = 355;
-      if ( levelEditor.editorGUI.mpRotY <= -1 ) levelEditor.editorGUI.mpRotY = 355;
-      if ( levelEditor.editorGUI.mpRotZ <= -1 ) levelEditor.editorGUI.mpRotZ = 355;
+      if ( levelEditor.editorGUI.mpRotX > (Math.PI*2) ) levelEditor.editorGUI.mpRotX -= (Math.PI*2);
+      if ( levelEditor.editorGUI.mpRotY > (Math.PI*2) ) levelEditor.editorGUI.mpRotY -= (Math.PI*2);
+      if ( levelEditor.editorGUI.mpRotZ > (Math.PI*2) ) levelEditor.editorGUI.mpRotZ -= (Math.PI*2);
+      if ( levelEditor.editorGUI.mpRotX < 0 ) levelEditor.editorGUI.mpRotX += (Math.PI*2);
+      if ( levelEditor.editorGUI.mpRotY < 0 ) levelEditor.editorGUI.mpRotY += (Math.PI*2);
+      if ( levelEditor.editorGUI.mpRotZ < 0 ) levelEditor.editorGUI.mpRotZ += (Math.PI*2);
 
       // if ( levelEditor.previewMesh ) {
       //   levelEditor.previewMesh.rotation.set(
@@ -1065,9 +1065,9 @@ var LevelEditor = Class.extend({
     });
 
     var unit = new Mesh(position,
-      new THREE.Euler(rotX.ToRadians(),
-        rotY.ToRadians(),
-        rotZ.ToRadians()), 0, id, metadata);
+      new THREE.Euler(rotX,
+        rotY,
+        rotZ), 0, id, metadata);
 
     unit.canSelectWithEditor = true;
 
@@ -1095,10 +1095,10 @@ var LevelEditor = Class.extend({
     if ( this.previewMesh ) {
 
       if ( this.previewMesh ) {
-        this.previewMesh.localRotation.set(
-          levelEditor.editorGUI.mpRotX.ToRadians(),
-          levelEditor.editorGUI.mpRotY.ToRadians(),
-          levelEditor.editorGUI.mpRotZ.ToRadians()
+        this.previewMesh.object3D.rotation.set(
+          levelEditor.editorGUI.mpRotX,
+          levelEditor.editorGUI.mpRotY,
+          levelEditor.editorGUI.mpRotZ
         );
         this.previewMesh.changeRotationNextTick = true;
       }
@@ -1109,7 +1109,7 @@ var LevelEditor = Class.extend({
         this.previewMesh.initialStaticUpdateDone = false;
 
 
-        this.previewMesh.localPosition.copy(currentMouseToWorldData.point);
+        this.previewMesh.object3D.position.copy(currentMouseToWorldData.point);
 
         // Get the normal, and add half the bounding box
         var normal = currentMouseToWorldData.face.normal.clone();
@@ -1137,7 +1137,7 @@ var LevelEditor = Class.extend({
           offset.z *= normal.z;
 
           if ( !le("mpIgnoreBoundingBox") ) {
-            this.previewMesh.localPosition.add(offset);
+            this.previewMesh.object3D.position.add(offset);
           }
         }
 
@@ -1145,9 +1145,9 @@ var LevelEditor = Class.extend({
         // Snap to grid if set
         if ( le("mpGridSnap") ) {
 
-          this.previewMesh.localPosition.x = Math.round(this.previewMesh.localPosition.x);
-          //this.previewMesh.localPosition.y = Math.round(this.previewMesh.localPosition.y);
-          this.previewMesh.localPosition.z = Math.round(this.previewMesh.localPosition.z);
+          this.previewMesh.object3D.position.x = Math.round(this.previewMesh.object3D.position.x);
+          //this.previewMesh.object3D.position.y = Math.round(this.previewMesh.object3D.position.y);
+          this.previewMesh.object3D.position.z = Math.round(this.previewMesh.object3D.position.z);
 
         }
 

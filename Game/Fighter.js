@@ -71,15 +71,7 @@ var Fighter = Actor.extend({
 
       aimError = !_.isUndefined(aimError) ? aimError : 0;
 
-      // var offset = victim.velocity.clone().multiplyScalar(0.6);
-      // var angle = getRandomFloat(0,getRandomFloat(0,1)) * Math.PI * 2;
-      // offset.add(new THREE.Vector3(Math.cos(angle)*aimError,
-      //  0, Math.sin(angle)*aimError));
-
       var offset = new THREE.Vector3();
-      // var angle = getRandomFloat(0,getRandomFloat(0,1)) * Math.PI * 2;
-      // offset.add(new THREE.Vector3(Math.cos(angle)*aimError,
-      //  0, Math.sin(angle)*aimError));
 
       swingWeapon = !_.isUndefined(swingWeapon) ? swingWeapon : true;
       weaponID = weaponID || this.weapon.id;
