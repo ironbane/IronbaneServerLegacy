@@ -306,8 +306,19 @@ module.exports = function(grunt) {
         three_obj: {
              src: ['<%= cfg.get("assetDir") %>**/*.obj']
         },
-        convertradians: {
+        levelutil: {
              src: ['<%= cfg.get("assetDir") %>**/objects.json']
+        },
+        dbutil: {
+            options: {
+                host: '<%= cfg.get("mysql_host") %>',
+                user: '<%= cfg.get("mysql_user") %>',
+                password: '<%= cfg.get("mysql_password") %>',
+                database: '<%= cfg.get("mysql_database") %>'
+            },
+            src: {
+
+            }
         },
         // db script mgmt
         dbupgrade: {
