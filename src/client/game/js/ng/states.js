@@ -15,9 +15,10 @@ IronbaneApp
                             return $rootScope.currentUser.authenticated;
                         }]
                     },
-                    controller: ['$scope', '$state', '$log', 'authenticated', 'AudioManager',
-                        function($scope, $state, $log, authenticated, AudioManager) {
-                            $scope.gameVersion = '0.3.1 alpha'; // todo: get elsewhere
+                    controller: ['$scope', '$state', '$log', 'authenticated', 'AudioManager', 'GAME_VERSION',
+                        function($scope, $state, $log, authenticated, AudioManager, GAME_VERSION) {
+                            $scope.gameVersion = GAME_VERSION + ' alpha';
+
                             if(authenticated) {
                                 $state.go('mainMenu.charSelect', {startingIndex: 0}); // todo: starting index based on last used char
                             } else {

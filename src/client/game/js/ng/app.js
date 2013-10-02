@@ -1,8 +1,9 @@
-// app.js - interim angular app
+// app.js - main file for angular version
 var IronbaneApp = angular.module('Ironbane', ['ngSanitize', 'ui.bootstrap', 'ui.router', 'User', 'Friends', 'IBCommon', 'angularLocalStorage']);
 
 IronbaneApp
-    .constant('GAME_HOST', window.ironbane_hostname) // todo: fill these in using server/grunt instead?
+    .constant('GAME_VERSION', window.ironbane_version)
+    .constant('GAME_HOST', window.ironbane_hostname)
     .constant('GAME_PORT', window.ironbane_port)
     .run(['User', '$rootScope',
         function(User, $rootScope) {
