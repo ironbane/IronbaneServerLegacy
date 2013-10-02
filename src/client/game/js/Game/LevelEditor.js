@@ -933,7 +933,7 @@ var LevelEditor = Class.extend({
       if ( !levelEditor.editorGUI.globalEnable ) return;
       //bm('delta: '+delta+', deltaX: '+deltaX+', deltaY: '+deltaY+'');
 
-      var value = delta * 5;
+      var value = delta * 0.05;
 
       if ( keyTracker[16] && keyTracker[18] ) {
         levelEditor.editorGUI.mpRotX += value;
