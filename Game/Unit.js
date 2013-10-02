@@ -185,7 +185,7 @@ var Unit = Class.extend({
       var packet = {
         id:id,
         position:unit.position,
-        rotY:unit.rotation.y.Round(),
+        rotY:unit.rotation.y,
         param:unit.param
       };
 
@@ -241,8 +241,8 @@ var Unit = Class.extend({
         if ( unit.template.type === UnitTypeEnum.TRAIN ||
           unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
           unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
-          packet.rotX = unit.rotation.x.Round();
-          packet.rotZ = unit.rotation.z.Round();
+          packet.rotX = unit.rotation.x;
+          packet.rotZ = unit.rotation.z;
         }
 
         if ( unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
