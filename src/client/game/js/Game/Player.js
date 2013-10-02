@@ -467,9 +467,9 @@ var Player = Fighter.extend({
     //   this.object3D.rotation.y = this.targetRotation.y;
     // }
 
-    sw("o.rotation.y", this.object3D.rotation.y);
-    sw("targetRotation.y", this.targetRotation.y);
-    sw("rotation.y", this.rotation.y);
+    // sw("o.rotation.y", this.object3D.rotation.y);
+    // sw("targetRotation.y", this.targetRotation.y);
+    // sw("rotation.y", this.rotation.y);
 
 
 

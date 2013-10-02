@@ -71,9 +71,6 @@ var Train = DynamicMesh.extend({
         this.object3D.rotation.z = this.object3D.rotation.z.Lerp(this.targetRotation.z, dTime*2);
         this.object3D.rotation.y = this.object3D.rotation.y.Lerp(this.targetRotation.y, dTime*2);
 
-        sw("this.targetRotation", this.targetRotation.ToString());
-        sw("this.rotation", this.rotation.ToString());
-
         //this.object3D.rotation.lerp(this.targetRotation, dTime*4);
 
         this._super(dTime);
