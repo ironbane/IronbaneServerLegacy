@@ -202,9 +202,9 @@ var Server = Class.extend({
 
                                 }
 
-                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round();
-                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round();
-                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round();
+                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round(2);
+                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round(2);
+                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round(2);
 
                                 snapshot.push(packet);
 
