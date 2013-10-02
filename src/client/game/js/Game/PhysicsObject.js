@@ -169,6 +169,7 @@ var PhysicsObject = Class.extend({
 
 
         this.velocity.Truncate(this.maxSpeed);
+        this.velocity.y = this.velocity.y.clamp(-10, 10);
 
 
         // Add velocity, but relative to our object3D
