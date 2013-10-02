@@ -1835,7 +1835,7 @@ var SocketHandler = Class.extend({
 
                     var p = ConvertVector3(data.p);
 
-                    var radians = (socket.unit.rotation.y + 90) * (Math.PI/180);
+                    var radians = socket.unit.rotation.y + (Math.PI/2);
 
                     socket.unit.heading.x = Math.sin(radians);
                     socket.unit.heading.y = 0;
@@ -1877,7 +1877,8 @@ var SocketHandler = Class.extend({
                         socket.unit.position.copy(train.position);
                     }
                     else {
-                        if ( !socket.unit.InRangeOfPosition(p, errorMargin) ) {
+                        var checkPos = p.clone().setY(socket.unit.position.y);
+                        if ( !socket.unit.InRangeOfPosition(checkPos, errorMargin) ) {
                             return;
                         }
 

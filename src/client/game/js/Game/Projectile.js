@@ -249,9 +249,9 @@ var Projectile = Unit.extend({
 
         this.changedRotation = new THREE.Vector3();
 
-        this.rotY = (Math.atan2(this.velocity.z, this.velocity.x)).ToDegrees();
-        if ( this.rotY < 0 ) this.rotY += 360;
-        this.rotY = 360 - this.rotY ;
+        this.rotY = (Math.atan2(this.velocity.z, this.velocity.x));
+        if ( this.rotY < 0 ) this.rotY += (Math.PI*2);
+        this.rotY = (Math.PI*2) - this.rotY ;
         this.targetRotY = this.rotY;
 
         this.lifeTime = this.type.lifeTime;
@@ -506,7 +506,7 @@ var Projectile = Unit.extend({
                         unit.damageDone = true;
 
 //                        unit.velocity.set(0,0,0)
-//                        unit.localPosition.copy(unitList[0].position);
+//                        unit.object3D.position.copy(unitList[0].position);
 //                        unit.dynamic = false;
 //                        unit.unitStandingOn = unitList[0];
 
@@ -545,7 +545,7 @@ var Projectile = Unit.extend({
                         unit.damageDone = true;
 
 //                        unit.velocity.set(0,0,0)
-//                        unit.localPosition.copy(ironbane.player.position);
+//                        unit.object3D.position.copy(ironbane.player.position);
 //                        unit.dynamic = false;
 //                        unit.unitStandingOn = ironbane.player;
 
@@ -578,7 +578,7 @@ var Projectile = Unit.extend({
                         unit.damageDone = true;
 
 //                        unit.velocity.set(0,0,0)
-//                        unit.localPosition.copy(u.position);
+//                        unit.object3D.position.copy(u.position);
 //                        unit.dynamic = false;
 //                        unit.unitStandingOn = u;
 
@@ -592,9 +592,9 @@ var Projectile = Unit.extend({
             }
         }
 
-         this.rotY = (Math.atan2(this.heading.z, this.heading.x)).ToDegrees();
-                    if ( this.rotY < 0 ) this.rotY += 360;
-                    this.rotY = 360 - this.rotY ;
+        this.rotY = (Math.atan2(this.heading.z, this.heading.x));
+        if ( this.rotY < 0 ) this.rotY += (Math.PI*2);
+        this.rotY = (Math.PI*2) - this.rotY ;
 
 
 
@@ -697,8 +697,6 @@ var Projectile = Unit.extend({
             }
 
         }
-
-        //bm('x: '+(x).Round(2)+', y: '+(y).Round(2)+', result: '+result.Round(2).ToDegrees());
 
         return result;
     }

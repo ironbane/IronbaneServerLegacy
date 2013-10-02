@@ -33,16 +33,16 @@ var Train = Actor.extend({
 
         this._super(dTime);
 
-        this.rotation.y = (Math.atan2(this.heading.z, this.heading.x)).ToDegrees();
+        this.rotation.y = (Math.atan2(this.heading.z, this.heading.x));
 
-        if ( this.rotation.y < 0 ) this.rotation.y += 360;
-        this.rotation.y = 360 - this.rotation.y;
+        if ( this.rotation.y < 0 ) this.rotation.y += (Math.PI*2);
+        this.rotation.y = (Math.PI*2) - this.rotation.y;
 
-        while ( this.rotation.x < 0 ) this.rotation.x += 360;
-        while ( this.rotation.x > 360 ) this.rotation.x -= 360;
+        while ( this.rotation.x < 0 ) this.rotation.x += (Math.PI*2);
+        while ( this.rotation.x > (Math.PI*2) ) this.rotation.x -= (Math.PI*2);
 
-        while ( this.rotation.z < 0 ) this.rotation.z += 360;
-        while ( this.rotation.z > 360 ) this.rotation.z -= 360;
+        while ( this.rotation.z < 0 ) this.rotation.z += (Math.PI*2);
+        while ( this.rotation.z > (Math.PI*2) ) this.rotation.z -= (Math.PI*2);
 
     }
 });

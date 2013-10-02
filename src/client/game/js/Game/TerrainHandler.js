@@ -326,7 +326,7 @@ var TerrainHandler = Class.extend({
         _.each(subIntersects, function(i) {
             if ( i.object.unit ) {
                 i.face.normalWithRotations = i.face.normal.clone();
-                i.face.normalWithRotations.applyEuler(i.object.unit.localRotation);
+                i.face.normalWithRotations.applyEuler(i.object.unit.object3D.rotation);
             }
         });
 
@@ -354,7 +354,7 @@ var TerrainHandler = Class.extend({
     _.each(subIntersects, function(i) {
         if ( i.object.unit ) {
             i.face.normalWithRotations = i.face.normal.clone();
-            i.face.normalWithRotations.applyEuler(i.object.unit.localRotation);
+            i.face.normalWithRotations.applyEuler(i.object.unit.object3D.rotation);
         }
     });
 

@@ -71,8 +71,6 @@ var Player = Fighter.extend({
 
         this.mouseRayCastCheckTimeout = 0.0;
 
-        this.localRotationY = rotation.y;
-
         this.isLookingAround = false;
 
         this.onChangeZone(terrainHandler.zone);
@@ -252,7 +250,7 @@ var Player = Fighter.extend({
 
 
 
-    var rotrad = (270-this.rotation.y) * (Math.PI/180);
+    var rotrad = ((Math.PI*1.5)-this.rotation.y);
     //rotrad = 0;
 
     var uc = this.thirdPersonReference.clone();
@@ -361,7 +359,7 @@ var Player = Fighter.extend({
     //debug.SetWatch("manualLerp ", manualLerp );
 
 
-    var radians = (this.rotation.y + 90) * (Math.PI/180);
+    var radians = (this.rotation.y + (Math.PI/2));
 
 
 
@@ -443,39 +441,36 @@ var Player = Fighter.extend({
 
     if ( this.canMove ) {
       if(keyTracker[37]||keyTracker[65]){
-        this.localRotationY += (rotSpeed * dTime);
+        this.object3D.rotation.y += (rotSpeed * dTime);
       }
       if(keyTracker[39]||keyTracker[68]){
-        this.localRotationY -= (rotSpeed * dTime);
+        this.object3D.rotation.y -= (rotSpeed * dTime);
       }//
     }
 
+    // if ( this.unitStandingOn ) {
+    //   this.targetRotation.y = this.object3D.rotationY + this.unitStandingOn.object3D.rotation.y;
+    //   //sw("this.unitStandingOn.rotation.y.ToDegrees()", this.unitStandingOn.object3D.rotationY.y;
+    // }
+    // else {
+      this.targetRotation.y = this.object3D.rotation.y;
+    // }
 
-
-
-    if ( this.unitStandingOn ) {
-      this.targetRotation.y = this.localRotationY + this.unitStandingOn.localRotation.y.ToDegrees();
-      //sw("this.unitStandingOn.rotation.y.ToDegrees()", this.unitStandingOn.localRotationY.y.ToDegrees());
-    }
-    else {
-      this.targetRotation.y = this.localRotationY;
-    }
-    //
     while ( this.targetRotation.y < 0 ) {
-      //this.rotation.y += 360;
-      this.targetRotation.y += 360;
+      this.targetRotation.y += (Math.PI*2);
     }
-    while ( this.targetRotation.y > 360 ) {
-      //this.rotation.y -= 360;
-      this.targetRotation.y -= 360;
+    while ( this.targetRotation.y > (Math.PI*2) ) {
+      this.targetRotation.y -= (Math.PI*2);
     }
 
-    if ( !this.unitStandingOn ) {
-      this.localRotationY = this.targetRotation.y;
-    }
+    // if ( !this.unitStandingOn ) {
+    //   this.object3D.rotation.y = this.targetRotation.y;
+    // }
 
-    // sw("this.localRotationY", this.localRotationY);
-    // sw("this.targetRotation.y", this.targetRotation.y);
+    sw("o.rotation.y", this.object3D.rotation.y);
+    sw("targetRotation.y", this.targetRotation.y);
+    sw("rotation.y", this.rotation.y);
+
 
 
     //if ( !this.freeFall ) {
@@ -514,7 +509,7 @@ var Player = Fighter.extend({
       if(keyTracker[32]){
 
         if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
-          this.localPosition.y += dTime * 5;
+          this.object3D.position.y += dTime * 5;
         }
         else if ( this.lastJumpTimer <= 0 &&
           (this.isTouchingGround ||
@@ -537,7 +532,7 @@ var Player = Fighter.extend({
       if(keyTracker[16]){
 
         if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
-          this.localPosition.y -= dTime * 5;
+          this.object3D.position.y -= dTime * 5;
         }
       }
 
@@ -869,7 +864,7 @@ var Player = Fighter.extend({
     }
 
     var data = {
-      p: this.localPosition.clone().Round(2),
+      p: this.object3D.position.clone().Round(2),
       r: this.targetRotation.y.Round(2),
       //s: this.speed.Round(2),
       los: npcLOS

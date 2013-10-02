@@ -18,11 +18,6 @@
  * A unit is a PhysicsObject that has a spriteset, always faces the camera and adjusts it's UVs to show a sprite dependant on the camera vs rotation angle
  */
 
-
-
-
-var rotation_speed = 100;
-
 var unitFriction = 3;
 var unitMaxSpeed = 5;
 var unitMaxSpeedBackwards = 3;
@@ -123,21 +118,21 @@ var Unit = PhysicsObject.extend({
     // We need a vector from the unit to the camera
     var uc = ironbane.camera.position.clone();
     uc.sub(this.position);
-    var rotrad = this.rotation.y * (Math.PI/180);
+    var rotrad = this.rotation.y;
     // Rotate vector with our own rotation
     var tx = ((uc.x * Math.cos(rotrad)) - (uc.z * Math.sin(rotrad)));
     var tz = ((uc.x * Math.sin(rotrad)) + (uc.z * Math.cos(rotrad)));
     uc.x = tx;
     uc.z = tz;
 
-    var result = parseInt(Math.atan2(uc.z, uc.x) * (180/Math.PI), 10);
+    var result = Math.atan2(uc.z, uc.x);
 
-    result += 180;
+    result += Math.PI;
 
 
 
-    while ( result < 0 ) result += 360;
-    while ( result > 360 ) result -= 360;
+    while ( result < 0 ) result += (Math.PI*2);
+    while ( result > (Math.PI*2) ) result -= (Math.PI*2);
 
     //console.warn(result);
 
@@ -145,25 +140,25 @@ var Unit = PhysicsObject.extend({
 
     var index = 0;
 
-    if ( result >= 22.5 && result <= 67.5 ) {
+    if ( result >= 0.39 && result <= 1.17 ) {
       index = 7;
     }
-    else if ( result > 67.5 && result <= 112.5 ) {
+    else if ( result > 1.17 && result <= 1.96 ) {
       index = 6;
     }
-    else if ( result > 112.5 && result <= 157.5 ) {
+    else if ( result > 1.96 && result <= 2.74 ) {
       index = 5;
     }
-    else if ( result > 157.5 && result <= 202.5 ) {
+    else if ( result > 2.74 && result <= 3.53 ) {
       index = 4;
     }
-    else if ( result > 202.5 && result <= 247.5 ) {
+    else if ( result > 3.53 && result <= 4.31 ) {
       index = 3;
     }
-    else if ( result > 247.5 && result <= 292.5 ) {
+    else if ( result > 4.31 && result <= 5.10 ) {
       index = 2;
     }
-    else if ( result > 292.5 && result <= 337.5 ) {
+    else if ( result > 5.10 && result <= 5.89 ) {
       index = 1;
     }
     else {
@@ -320,7 +315,7 @@ var Unit = PhysicsObject.extend({
       this.size = this.targetSize;
     }
 
-    //var radians = (this.rotation.y + 90) * (Math.PI/180);
+
 
     if ( ironbane.player && this instanceof Fighter) {
       if ( this instanceof Player ) {
@@ -350,11 +345,11 @@ var Unit = PhysicsObject.extend({
             && ironbane.newLevelEditor
             && ironbane.newLevelEditor.selectedObject
             && ironbane.newLevelEditor.selectedObject.unit === this )) {
-            this.localPosition.x = this.localPosition.x.Lerp(this.targetPosition.x, dTime*2);
-            this.localPosition.z = this.localPosition.z.Lerp(this.targetPosition.z, dTime*2);
+            this.object3D.position.x = this.object3D.position.x.Lerp(this.targetPosition.x, dTime*2);
+            this.object3D.position.z = this.object3D.position.z.Lerp(this.targetPosition.z, dTime*2);
 
             if ( !this.enableGravity ) {
-              this.localPosition.y = this.localPosition.y.Lerp(this.targetPosition.y, dTime*2);
+              this.object3D.position.y = this.object3D.position.y.Lerp(this.targetPosition.y, dTime*2);
             }
         }
 
@@ -447,7 +442,7 @@ var Unit = PhysicsObject.extend({
 
             var distanceInside = 0.5-intersects[0].distance;
 
-            this.localPosition.add(raycastNormal.clone().multiplyScalar(distanceInside));
+            this.object3D.position.add(raycastNormal.clone().multiplyScalar(distanceInside));
 
             this.velocity.add(raycastNormal.clone().multiplyScalar(-this.velocity.clone().dot(raycastNormal)));
 
@@ -533,7 +528,7 @@ var Unit = PhysicsObject.extend({
                   dvec.applyMatrix4(rotationMatrix);
                 }
 
-                this.localPosition.add(dvec);
+                this.object3D.position.add(dvec);
 
                 if ( !(this instanceof Projectile) ) {
                   this.velocity.sub(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
@@ -577,7 +572,7 @@ var Unit = PhysicsObject.extend({
           //         raycastNormal = intersects[0].face.normal;
           //         raycastGroundPosition = intersects[0].point;
           //         //this.position = ConvertVector3(intersects[0].point);
-          //         this.localPosition.y = intersects[0].point.y;
+          //         this.object3D.position.y = intersects[0].point.y;
           //       //bm("underneath!");
           //       }
           //   }
@@ -607,7 +602,7 @@ var Unit = PhysicsObject.extend({
 
             var distanceInside = 0.5-intersects[0].distance;
 
-            this.localPosition.add(topNormal.clone().multiplyScalar(distanceInside));
+            this.object3D.position.add(topNormal.clone().multiplyScalar(distanceInside));
 
             var moveVector = topNormal.clone();
 
@@ -632,7 +627,6 @@ var Unit = PhysicsObject.extend({
     }
 
 
-
     if ( raycastNormal ) {
       this.groundNormal = raycastNormal;
     }
@@ -640,13 +634,9 @@ var Unit = PhysicsObject.extend({
 
     var offset = this.renderOffset.clone().multiplyScalar(this.renderOffsetMultiplier);
 
-
-
     // Additional offset for special units (hacky...)
 
     if ( this.id < 0 && this.name == "Ghost" ) offset.y += 0.5;
-
-
 
 
     var renderPosition = this.position.clone().add(offset);
@@ -663,7 +653,7 @@ var Unit = PhysicsObject.extend({
       this.debugMesh.position.x = renderPosition.x;
       this.debugMesh.position.z = renderPosition.z;
       this.debugMesh.position.y = renderPosition.y + 0.03;
-      this.debugMesh.rotation.y = this.rotation.y * (Math.PI/180);
+      this.debugMesh.rotation.y = this.rotation.y;
     }
     if ( this.shadowMesh && raycastGroundPosition ) {
       this.shadowMesh.position.x = renderPosition.x;
@@ -679,8 +669,7 @@ var Unit = PhysicsObject.extend({
         this.shadowMesh.LookFlatAt(raycastNormal.clone().add(this.shadowMesh.position));
       }
 
-      this.shadowMesh.rotation.z = this.rotation.y * (Math.PI/180);
-    //this.shadowMesh.LookFlatAt(ironbane.camera.position, 0);
+      this.shadowMesh.rotation.z = this.rotation.y;
     }
     else if ( this.shadowMesh && !raycastGroundPosition ) {
       this.shadowMesh.position.y = -1000;
@@ -711,31 +700,31 @@ var Unit = PhysicsObject.extend({
   },
   RotateTowardsTargetPosition: function(dTime) {
     var side = true;
-    if(this.targetRotation.y < this.rotation.y) {
-      side = Math.abs(this.targetRotation.y - this.rotation.y) < 180;
+    if(this.targetRotation.y < this.object3D.rotation.y) {
+      side = Math.abs(this.targetRotation.y - this.object3D.rotation.y) < (Math.PI);
     } else {
-      side = ((this.targetRotation.y - this.rotation.y) > 180);
+      side = ((this.targetRotation.y - this.object3D.rotation.y) > (Math.PI));
     }
 
-    var distance = Math.abs(this.targetRotation.y - this.rotation.y);
+    var distance = Math.abs(this.targetRotation.y - this.object3D.rotation.y);
 
     var speed = rotation_speed;
 
     if ( this.slowWalk ) speed *= 1.5;
 
-    if( distance > 2 ) {
+    if( distance > 0.01 ) {
       if (side) {
-        this.rotation.y -= (speed * dTime);
+        this.object3D.rotation.y -= (speed * dTime);
       }
       else if (!side) {
-        this.rotation.y += (speed * dTime);
+        this.object3D.rotation.y += (speed * dTime);
       }
     }
 
-    if(this.rotation.y < 0) {
-      this.rotation.y = this.rotation.y + 360;
-    } else if(this.rotation.y > 360) {
-      this.rotation.y = this.rotation.y -360;
+    if(this.object3D.rotation.y < 0) {
+      this.object3D.rotation.y = this.object3D.rotation.y + (Math.PI*2);
+    } else if(this.object3D.rotation.y > (Math.PI*2)) {
+      this.object3D.rotation.y = this.object3D.rotation.y -(Math.PI*2);
     }
   }
 });

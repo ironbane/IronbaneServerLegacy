@@ -30,7 +30,9 @@ var PhysicsObject = Class.extend({
        // this.enableCollisionDetection = false;
        // this.hasCollision = false;
 
-        // These values are READ-ONLY! Will be written by the object3D world matrix
+        // These values are global, not local and are READ-ONLY!
+        // They will be written by the object3D world matrix
+        // To change these change the values of the object3D member
         this.position = (position || new THREE.Vector3(0.0, 0.0, 0.0)).clone();
         this.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
         this.scale = (scale || new THREE.Vector3(1.0, 1.0, 1.0)).clone();
@@ -61,11 +63,6 @@ var PhysicsObject = Class.extend({
         this.object3D.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
         this.object3D.scale = (scale || new THREE.Vector3(1.0, 1.0, 1.0)).clone();
 
-        this.localPosition = this.object3D.position;
-        this.localRotation = this.object3D.rotation;
-        this.localScale = this.object3D.scale;
-
-
         // Pre-calculate to avoid arrows being stuck in the ground
         this.object3D.updateMatrixWorld();
         this.position.getPositionFromMatrix(this.object3D.matrixWorld);
@@ -76,9 +73,6 @@ var PhysicsObject = Class.extend({
 
         // Only applies to the local position!
         this.velocity = (velocity || new THREE.Vector3(0.0, 0.0, 0.0)).clone();
-
-        // Applies to gloval position! Also gets emptied every tick
-        this.globalVelocity = new THREE.Vector3();
 
         this.steeringForce = new THREE.Vector3();
 
@@ -111,31 +105,8 @@ var PhysicsObject = Class.extend({
     Tick: function(dTime) {
 
 
-        this.oldPosition = this.localPosition.clone();
+        this.oldPosition = this.object3D.position.clone();
 
-
-        if ( this.localPosition.y < -100 ) {
-            this.localPosition.y = 100;
-        }
-
-//        while ( this.rotation.x < 0 ) {
-//            this.rotation.x += 360;
-//        }
-//        while ( this.rotation.x > 360 ) {
-//            this.rotation.x -= 360;
-//        }
-//        while ( this.rotation.y < 0 ) {
-//            this.rotation.y += 360;
-//        }
-//        while ( this.rotation.y > 360 ) {
-//            this.rotation.y -= 360;
-//        }
-//        while ( this.rotation.z < 0 ) {
-//            this.rotation.z += 360;
-//        }
-//        while ( this.rotation.z > 360 ) {
-//            this.rotation.z -= 360;
-//        }
 
 
             if ( this.unitStandingOn != this.lastUnitStandingOn ) {
@@ -146,11 +117,11 @@ var PhysicsObject = Class.extend({
                     ironbane.scene.add(this.object3D);
 
 
-                    this.localPosition.copy(this.position);
+                    this.object3D.position.copy(this.position);
 
                     if ( this instanceof Player ) {
                         // Add the object's rotation to rotY
-                        this.localRotationY += this.lastUnitStandingOn.localRotation.y.ToDegrees();
+                        this.object3D.rotation.y += this.lastUnitStandingOn.object3D.rotation.y;
                     }
 
                 }
@@ -158,17 +129,17 @@ var PhysicsObject = Class.extend({
 
                     var str = "";
 
-                    this.localPosition.copy(this.position.clone().sub(this.unitStandingOn.position));
+                    this.object3D.position.copy(this.position.clone().sub(this.unitStandingOn.position));
 
                     var rotationMatrix = new THREE.Matrix4();
                     rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
 
 
-                    this.localPosition.applyMatrix4(rotationMatrix);
+                    this.object3D.position.applyMatrix4(rotationMatrix);
 
                     if ( this instanceof Player ) {
                         // Add the object's rotation to rotY
-                        this.localRotationY -= this.unitStandingOn.localRotation.y.ToDegrees();
+                        this.object3D.rotation.y -= this.unitStandingOn.object3D.rotation.y;
                     }
 
 
@@ -212,13 +183,7 @@ var PhysicsObject = Class.extend({
                     vel.applyMatrix4(rotationMatrix);
         }
 
-
-        vel.add(this.globalVelocity);
-        this.globalVelocity.set(0,0,0);
-
-        this.localPosition.add(vel.multiplyScalar(dTime));
-
-
+        this.object3D.position.add(vel.multiplyScalar(dTime));
 
         if ( this.velocity.length() > 0.01 ) {
             if ( !(this instanceof Fighter) ) {
@@ -235,19 +200,45 @@ var PhysicsObject = Class.extend({
 
             this.position.getPositionFromMatrix(this.object3D.matrixWorld);
 
+            var me = this;
+
+
+            if ( this instanceof Mesh && this.mesh ) {
+                this.object3D.updateMatrixWorld(true);
+            }
+
             this.object3D.traverse( function ( object ) {
                 if ( object.unit ) {
                     object.unit.position.getPositionFromMatrix(object.matrixWorld);
+                    object.unit.rotation.copy(me.object3D.rotation);
+                    //object.unit.rotation.x += object.unit.object3D.rotation.x;
+                    object.unit.rotation.y += object.unit.object3D.rotation.y;
+                    //object.unit.rotation.z += object.unit.object3D.rotation.z;
                 }
             });
 
 
-          if ( this instanceof Mesh && this.mesh ) {
-            //this.mesh.rotation.setFromQuaternion(this.object3D.quaternion);
-            this.UpdateRotationByVertices();
-          }
-          //
-          this.initialStaticUpdateDone = true;
+            if ( this instanceof Mesh && this.mesh ) {
+                this.UpdateRotationByVertices();
+            }
+            if ( this instanceof Fighter || this instanceof Billboard ) {
+                // this.object3D.quaternion.setFromEuler(this.object3D.rotation);
+                // this.object3D.updateMatrixWorld(true);
+                // var rotationMatrix = (new THREE.Matrix4()).extractRotation(this.object3D.matrixWorld);
+                // this.rotation.setFromRotationMatrix(rotationMatrix);
+                if ( !this.unitStandingOn ) {
+                    this.rotation.copy(this.object3D.rotation);
+                }
+
+
+                // if ( this.unitStandingOn ) {
+                //     this.rotation.x += this.unitStandingOn.object3D.rotation.x;
+                //     this.rotation.y += this.unitStandingOn.object3D.rotation.y;
+                //     this.rotation.z += this.unitStandingOn.object3D.rotation.z;
+                // }
+            }
+            //
+            this.initialStaticUpdateDone = true;
         }
 
         // Copy the matrix into a vector

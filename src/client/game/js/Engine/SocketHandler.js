@@ -205,13 +205,13 @@ var SocketHandler = Class.extend({
 
             switch (template.type) {
                 case UnitTypeEnum.MOVINGOBSTACLE:
-                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
+                    unit = new MovingObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TRAIN:
-                    unit = new Train(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
+                    unit = new Train(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.TOGGLEABLEOBSTACLE:
-                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX.ToRadians(), data.rotY.ToRadians(), data.rotZ.ToRadians()), data.id, data.param, data.metadata);
+                    unit = new ToggleableObstacle(ConvertVector3(data.position), new THREE.Euler(data.rotX, data.rotY, data.rotZ), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.LEVER:
                     unit = new Lever(ConvertVector3(data.position), data.id, data.metadata);
@@ -229,7 +229,7 @@ var SocketHandler = Class.extend({
                     unit = new HeartPiece(ConvertVector3(data.position), data.id);
                     break;
                 case UnitTypeEnum.SIGN:
-                    unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
+                    unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.WAYPOINT:
                     // Only GMs can see waypoints
@@ -241,12 +241,12 @@ var SocketHandler = Class.extend({
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
                     } else {
-                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, data.param, data.metadata);
+                      unit = new LootableMesh(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, data.param, data.metadata);
                     }
                     break;
                 default:
                     // return;
-                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY.ToRadians(), 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
+                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
                     break;
             }
 
@@ -437,7 +437,7 @@ var SocketHandler = Class.extend({
             if (unit) {
 
                 unit.health = data['h'];
-                unit.localPosition.copy(ConvertVector3(data['p']));
+                unit.object3D.position.copy(ConvertVector3(data['p']));
 
                 if (unit === ironbane.player) {
 
@@ -563,7 +563,7 @@ var SocketHandler = Class.extend({
 
                 terrainHandler.ChangeZone(data.zone);
 
-                ironbane.player.localPosition.copy(data.pos);
+                ironbane.player.object3D.position.copy(data.pos);
                 ironbane.player.unitStandingOn = null;
 
 
@@ -670,9 +670,9 @@ var SocketHandler = Class.extend({
 
 
                             levelEditor.PlaceModel(ConvertVector3(data.pos),
-                                rotation.x.ToDegrees(),
-                                rotation.y.ToDegrees(),
-                                rotation.z.ToDegrees(),
+                                rotation.x,
+                                rotation.y,
+                                rotation.z,
                                 param, metadata);
 
                             cell.objects = _.without(cell.objects, obj);
@@ -781,10 +781,9 @@ var SocketHandler = Class.extend({
                             unit.targetPosition.y = unitdata.p.y;
                         }
 
-                        if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx.ToRadians();
-                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y =
-                            unit instanceof Fighter ? unitdata.ry : unitdata.ry.ToRadians();
-                        if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz.ToRadians();
+                        if (!_.isUndefined(unitdata.rx)) unit.targetRotation.x = unitdata.rx;
+                        if (!_.isUndefined(unitdata.ry)) unit.targetRotation.y = unitdata.ry;
+                        if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
 
                         if (!_.isUndefined(unitdata.u)) {
                             unit.unitStandingOn = FindUnit(unitdata.u);
@@ -794,7 +793,7 @@ var SocketHandler = Class.extend({
 
                         // Only for fighters, otherwise zeppelins etc start to bug
                         if ( unit instanceof Fighter ) {
-                            if (Math.abs(unit.localPosition.y - unitdata.p.y) > 1) unit.localPosition.y = unitdata.p.y;
+                            if (Math.abs(unit.object3D.position.y - unitdata.p.y) > 1) unit.object3D.position.y = unitdata.p.y;
                         }
 
 

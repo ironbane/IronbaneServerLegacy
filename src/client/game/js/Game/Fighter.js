@@ -20,7 +20,7 @@ var charactersSpritePath = 'images/characters/';
 var NPCSpritePath = 'images/npcs/';
 
 
-var rotation_speed = 100;
+var rotation_speed = 2;
 
 var fighterAcceleration = 20;
 var fighterFriction = 3;
@@ -310,13 +310,13 @@ var Fighter = Unit.extend({
 
     // Update speed (used for walking animations
     if ( !(this instanceof Player) ) {
-      //            var targetVelX = (this.targetPosition.x-this.localPosition.x)/dTime/10;
-      //            var targetVelZ = (this.targetPosition.z-this.localPosition.z)/dTime/10;
+      //            var targetVelX = (this.targetPosition.x-this.object3D.position.x)/dTime/10;
+      //            var targetVelZ = (this.targetPosition.z-this.object3D.position.z)/dTime/10;
       //this.speed = this.fakeVelocity.length();
 
       //this.speed = (new THREE.Vector3(targetVelX, 0, targetVelZ)).length();
 
-      var bogusVelocity = this.oldPosition.clone().sub(this.localPosition).divideScalar(dTime);
+      var bogusVelocity = this.oldPosition.clone().sub(this.object3D.position).divideScalar(dTime);
 
       this.fakeVelocity.copy(bogusVelocity);
       this.fakeVelocity.multiplyScalar(-1);
@@ -418,7 +418,7 @@ var Fighter = Unit.extend({
     if ( this.health > 0 ) {
       this._super(dTime);
 
-      var radians = (this.rotation.y + 90) * (Math.PI/180);
+      var radians = (this.rotation.y + (Math.PI/2));
       this.heading.x = Math.sin(radians);
       this.heading.z = Math.cos(radians);
       this.side = this.heading.clone().Perp();

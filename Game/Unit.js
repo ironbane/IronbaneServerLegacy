@@ -64,7 +64,7 @@ var Unit = Class.extend({
 
 
     // Update the heading based on the rotation
-    var radians = (this.rotation.y + 90) * (Math.PI/180);
+    var radians = (this.rotation.y + (Math.PI/2));
 
     this.heading.x = Math.sin(radians);
     this.heading.y = 0;
