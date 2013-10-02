@@ -1,25 +1,18 @@
 <div class="content-body">
     <section class="forum-listing">
-        
         <section class="forum-group">
+        
+        <a href = "/forum">Ironbane forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}
             <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }} - {{ topic.title }}</h1>
-            <article class="topic board">
-                <header>
-                    <a class="thread-post" ng-href="{{ topic.url + '#' + topic.id }}">
-                        <time class="thread-time" datetime="{{ topic.time * 1000 | date }}">{{ topic.time * 1000 | date:'medium' }}</time>
-                    </a>
-                </header>
-                <div class="post-body">
-                    <p ng-bind-html-unsafe="topic.content"></p>
-                </div>
-            </article>
+          
+        </section>  
 
+        <span ng-show="topic.locked">This topic is locked</span>
             <ul class="board-list">
                 <li class="board" ng-repeat="post in posts">
                     <header>
-                        <a class="thread-post" ng-href="{{ post.url + '#' + post.id }}">
                             <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
-                        </a>
+                        
                         <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
                     </header>
                     <forumuserprofile user="post.user"/>
@@ -30,7 +23,6 @@
                      <br class="clear">
                 </li>
             </ul>
-        </section>
     </section>
     <br class="clear">
     <div ng-show="currentUser.$hasRole('EDITOR')">

@@ -1863,7 +1863,7 @@ var SocketHandler = Class.extend({
                     socket.unit.rotation.y = parseInt(data.r, 10);
 
                     // Check if the teleports are way off
-                    var errorMargin = 10;
+                    var errorMargin = 20;
 
                     if ( !_.isUndefined(data.u) ) {
                         socket.unit.localPosition.copy(p);

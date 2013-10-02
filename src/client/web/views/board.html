@@ -9,7 +9,7 @@
                 <table>
                 <tr>
                 <th></th><th>title</th><th>replies</th><th>views</th><th>last posted by</th></tr>
-                    <tr ng-repeat="topic in topics">
+                    <tr ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
                         
                         <td><img ng-show="topic.sticky" src="../images/icons/svg/pin.svg" style="max-height:30px;max-width:30px;"/>
                             <img ng-show="topic.locked" src="../images/icons/svg/padlock-green.svg" style="max-height:30px;max-width:30px;"/>
@@ -32,7 +32,6 @@
                             <time datetime="{{ topic.lastposttime * 1000 | date }}">{{ topic.lastposttime * 1000 | date:'medium' }}</time>
                         </a>
                         </td>
-
                     </tr>
                 </li>
             </ul>

@@ -9,11 +9,11 @@ angular.module('IronbaneApp')
         restrict: 'AE',
         templateUrl: '/partials/postEditor.html',
         controller: ['$scope', 'Post', '$log', function($scope, Post, $log) {
+            
             $scope.save = function() {
                 // todo: validate form
                 var post = new Post({
-                    content: $scope.post.body,
-                    user: $scope.$root.currentUser.id // temp for now
+                    content: $scope.post.body
                 });
 
                 if($scope.topic === undefined) {

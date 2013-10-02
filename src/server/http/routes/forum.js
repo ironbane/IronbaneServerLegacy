@@ -89,12 +89,17 @@ module.exports = function(app, db) {
             boardId: req.params.boardId,
             title: req.body.title,
             content: req.body.content,
-            user: req.body.user
+            user: req.user.id
         };
 
         Topic.newPost(post)
-            .then(function(results) {
-                res.send(results);
+            .then(function(posttime) {
+                Board.getView(req.params.boardId, posttime).then(function(done){ 
+                res.send(done);
+            }, function(error){
+                log(error);
+                res.send(500, error);
+            });
             }, function(err) {
                 res.send(500, err);
             });
@@ -156,18 +161,16 @@ module.exports = function(app, db) {
         var post = new Post({
             topic_id: req.params.topicId,
             content: req.body.content,
-            user: req.body.user
+            user: req.user.id
         });
 
         post.$save().then(function(result) {
             // before sending back to the client, we need to parse the bbcode
             // this should prolly be done in Post entity? or static method?
-            log("parsing");
             bbcode.parse(result.content, function(html) {
                 result.content = html;
             });
             Topic.getPostsView(result.topic_id, result.time).then(function(done){ 
-                log("postview found");
                 res.send(done);
             }, function(error){
                 log(error);

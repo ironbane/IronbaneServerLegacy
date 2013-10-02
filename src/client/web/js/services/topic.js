@@ -72,7 +72,6 @@ angular.module('IronbaneApp')
                 $log.log("getting topics for " + boardId);
                 return $http.get('/api/forum/' + boardId + '/topics')
                     .then(function(response) {
-                        $log.log(response.data);
                         var topics = [];
 
                         // upgrade objects

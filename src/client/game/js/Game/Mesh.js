@@ -393,7 +393,7 @@ var Mesh = Unit.extend({
     _.each(this.lightsToMaintain, function(light) {
 
       //if ( !ironbane.player.InRangeOfPosition(light.parent.position, 30) ) {
-      if ( VectorDistanceSq(p, light.parent.position) > 30*30 ) {
+      if ( light.parent && VectorDistanceSq(p, light.parent.position) > 30*30 ) {
         light.visible = false;
       }
       else {
