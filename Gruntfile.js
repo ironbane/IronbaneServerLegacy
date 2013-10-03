@@ -86,6 +86,7 @@ module.exports = function(grunt) {
                     "Shared/Shared.js",
                     "Shared/NodeHandler.js",
                     "Shared/seedrandom.js",
+                    "Shared/Buffs.js",
 
                     "<%= gameScriptPath %>/External/Init.js",
                     "<%= gameScriptPath %>/External/Stats.js",

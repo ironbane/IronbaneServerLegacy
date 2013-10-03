@@ -87,6 +87,7 @@ module.exports = function() {
             './Init.js',
             './Shared/seedrandom.js',
             './Shared/Shared.js',
+            './Shared/Buffs.js',
             './Shared/Util.js',
             './Shared/NodeHandler.js',
             './Engine/ConsoleCommand.js',
