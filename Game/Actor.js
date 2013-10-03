@@ -118,24 +118,24 @@ var Actor = MovingUnit.extend({
 
         if ( !subNode ) {
 
-          // ERROR!
-          // Not sure why, so send someone here and investigate
+          // // ERROR!
+          // // Not sure why, so send someone here and investigate
 
-          var msg = "Pathfinding node error! Please" +
-          " investigate the connection<br>between node <b>"+node.id +
-          "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
-          ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
+          // var msg = "Pathfinding node error! Please" +
+          // " investigate the connection<br>between node <b>"+node.id +
+          // "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
+          // ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
-          chatHandler.AnnounceMods(msg, "red");
+          // chatHandler.AnnounceMods(msg, "red");
 
-          log("ERROR: "+msg);
+          // log("ERROR: "+msg);
 
-          setTimeout(AnnounceOccurredError(msg, 15), 15000);
+          // setTimeout(AnnounceOccurredError(msg, 15), 15000);
 
-          setTimeout(AnnounceOccurredError(msg, 60), 60000);
+          // setTimeout(AnnounceOccurredError(msg, 60), 60000);
 
 
-          // debugger;
+          // // debugger;
 
           return;
 
