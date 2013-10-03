@@ -209,7 +209,7 @@ var PhysicsObject = Class.extend({
             }
 
             this.object3D.traverse( function ( object ) {
-                if ( object.unit ) {
+                if ( object.unit && object.unit instanceof Fighter ) {
                     object.unit.position.getPositionFromMatrix(object.matrixWorld);
                     object.unit.rotation.copy(me.object3D.rotation);
                     //object.unit.rotation.x += object.unit.object3D.rotation.x;
