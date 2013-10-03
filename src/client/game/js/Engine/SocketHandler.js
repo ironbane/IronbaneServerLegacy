@@ -232,8 +232,8 @@ var SocketHandler = Class.extend({
                     unit = new Sign(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, data.param, data.metadata);
                     break;
                 case UnitTypeEnum.WAYPOINT:
-                    // Only GMs can see waypoints
-                    if ( !showEditor ) return;
+                    // Don't show on production
+                    if ( isProduction ) return;
 
                     unit = new Waypoint(ConvertVector3(data.position), data.id);
                     break;
