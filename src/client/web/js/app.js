@@ -1,5 +1,5 @@
 // app.js
-angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
+angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User','$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
@@ -216,7 +216,20 @@ angular.module('IronbaneApp', ['ui.utils', 'ui.bootstrap', 'IBCommon', 'User'])
         })
         .when('/editor/users/:id', {
             templateUrl: '/views/useredit',
-            controller: 'useredit'
+            controller: 'useredit',
+            resolve: {
+                ResolveData: ['User', '$q', '$route', '$location', function(User, $q, $route, $location) {
+                    var deferred = $q.defer();
+                    User.get($route.current.params.id)
+                        .then(function(user) {
+                            return user
+                            deferred.resolve({user: user});
+                        }, function(err) {
+                           deferred.reject();
+                        });
+                        return deferred.promise;
+                }]
+            }
         })
         .otherwise({redirectTo: '/'});
 }]);

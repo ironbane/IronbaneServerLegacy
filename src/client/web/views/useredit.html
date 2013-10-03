@@ -1,0 +1,17 @@
+<div class="article-wrap">
+    
+    <h2>{{ user.name }}</h2>
+    <form name="articleForm">
+        <input id = "chkBan" type="checkbox" ng-model="banned"/>
+        <label for = "chkBan">Banned</label>
+        <input id = "chkAdmin" type="checkbox" ng-model="admin"/>
+        <label for = "chkAdmin">Admin</label>
+        <input id = "chkMod" type="checkbox" ng-model="moderator"/>
+        <label for = "chkMod">Moderator</label>
+        <input id = "chkEdit" type="checkbox" ng-model="editor"/>
+        <label for = "chkEdit">Editor</label>
+        <button ng-click="update()">Update</button>
+      
+        
+    </form>
+</div>
