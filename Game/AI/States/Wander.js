@@ -32,8 +32,9 @@ var Wander = State.extend({
 
             this.targetPosition = unit.position.clone();
 
-            unit.maxSpeed = 2.0;
 
+
+            this.hasReachedWaypoint = false;
 	},
 	Execute: function(unit, dTime) {
 
@@ -41,30 +42,27 @@ var Wander = State.extend({
             if ( unit.health <= 0 || unit.template.disabled ) return;
 
 
-            if ( VectorDistance(unit.position, this.targetPosition) < 1.0 ) {
-            	// TIme to change to a new node!
-                 //var distance = DistanceSq(unit.position, unit.targetPosition);
-                 //this.targetPosition = unit.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
-                 //this.targetPosition.set(getRandomInt(0, 45), getRandomInt(0, 10), getRandomInt(0, 20));
+            if ( VectorDistance(unit.position, this.targetPosition) < 1.0 &&
+                !this.hasReachedWaypoint ) {
 
+                this.hasReachedWaypoint = true;
                  // Get a random waypoint nearby and travel to it
                  if ( unit.connectedNodeList.length === 0 ) {
-                    log("[Wander] Error: No nodes found!");
+                    // log("[Wander] Error: No nodes found!");
                 }
                 else {
-                    var randomNode = ChooseRandom(unit.connectedNodeList);
-                    this.targetPosition = ConvertVector3(randomNode.pos);
-                    log("[Wander] Traveling to node "+randomNode.id+"...");
+
+                    var me = this;
+
+                    setTimeout(function() {
+                        var randomNode = ChooseRandom(unit.connectedNodeList);
+                        me.targetPosition = ConvertVector3(randomNode.pos);
+                        me.hasReachedWaypoint = false;
+                    }, getRandomInt(1,60) * 1000);
+
+                    // log("[Wander] Traveling to node "+randomNode.id+"...");
                 }
 
-
-                unit.maxSpeed = getRandomInt(1, 3);
-
-
-                 //this.targetPosition.set(this.test ? 0 : 25, 0, this.test ? 0 : 10);
-
-                 log("[Wander] New target position: "+this.targetPosition.ToString());
-                 //log("[ExploreAndLookForEnemies] Current NPC nodepath: "+unit.targetNodePosition.ToString());
             }
 
             //unit.steeringForce = unit.steeringBehaviour.Wander();
