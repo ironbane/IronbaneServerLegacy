@@ -67,7 +67,8 @@ var Mesh = Unit.extend({
 
 
     this.object3D.setRotationFromEuler(this.rotation);
-    this.object3D.rotation.setFromQuaternion(this.object3D.quaternion);
+    this.object3D.rotation.copy(this.rotation);
+    //this.object3D.rotation.setFromQuaternion(this.object3D.quaternion);
     //this.object3D.rotation.Round()
 
 
@@ -343,7 +344,7 @@ var Mesh = Unit.extend({
 
     var me = this;
     _.each(this.mesh.geometry.vertices, function(vertex) {
-      vertex.applyEuler(me.localRotation);
+      vertex.applyEuler(me.object3D.rotation);
     });
 
     // this.mesh.geometry.computeCentroids();

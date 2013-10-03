@@ -140,7 +140,7 @@ var ChatBubble = PhysicsObject.extend({
         }
         var offset = ((this.unit == ironbane.player || this.unit.id < 0) ? 1.5 : 2.0) + (count * 0.6);
 
-        this.localPosition = this.unit.position.clone().add(new THREE.Vector3(0, offset, 0));
+        this.object3D.position = this.unit.position.clone().add(new THREE.Vector3(0, offset, 0));
 
         this.lifeTime -= dTime;
 
@@ -149,7 +149,7 @@ var ChatBubble = PhysicsObject.extend({
         this._super(dTime);
 
         if ( this.textMesh ) {
-            this.textMesh.position.copy(this.localPosition);
+            this.textMesh.position.copy(this.object3D.position);
 
             this.textMesh.LookFlatAt(ironbane.camera.position);
 

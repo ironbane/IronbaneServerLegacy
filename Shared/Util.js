@@ -337,7 +337,7 @@ if ( !SERVER ) {
 
       e.setFromRotationMatrix(matrix);
 
-      this.unit.localRotation.copy(e);
+      //this.unit.object3D.rotation.copy(e);
 
       _.each(this.unit.mesh.geometry.vertices, function(vertex) {
         //vertex.applyEuler(e);

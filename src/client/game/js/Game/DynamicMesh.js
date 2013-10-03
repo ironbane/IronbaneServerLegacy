@@ -62,7 +62,7 @@ var DynamicMesh = Mesh.extend({
 
         //this.object3D.setRotationFromEuler(this.rotation);
         //this.object3D.rotation.setFromQuaternion(this.object3D.quaternion);
-        this.object3D.quaternion.setFromEuler(this.localRotation);
+        this.object3D.quaternion.setFromEuler(this.object3D.rotation);
 
         this._super(dTime);
 
@@ -82,7 +82,7 @@ var DynamicMesh = Mesh.extend({
     //     }
 
     //     //this.object3D.matrixWorld.makeRotationFromEuler(rot);
-    //     this.localRotation.copy(rot);
+    //     this.object3D.rotation.copy(rot);
     //     //this.mesh.rotation.copy(rot);
 
     //     this.mesh.geometry.verticesNeedUpdate = true;

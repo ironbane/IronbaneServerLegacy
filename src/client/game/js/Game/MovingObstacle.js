@@ -38,86 +38,87 @@ var MovingObstacle = DynamicMesh.extend({
 
             switch (this.movementType) {
                 case MovingObstacleMovementTypeEnum.SineWaveX:
-                    this.localPosition.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveY:
-                    this.localPosition.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveZ:
-                    this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveXY:
-                    this.localPosition.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveXZ:
-                    this.localPosition.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveYZ:
-                    this.localPosition.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveXYZ:
-                    this.localPosition.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.SineWaveXYZ2:
-                    this.localPosition.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier*0.9)*this.distanceMultiplier);
-                    this.localPosition.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
-                    this.localPosition.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier*1.1)*this.distanceMultiplier);
+                    this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier*0.9)*this.distanceMultiplier);
+                    this.object3D.position.y = this.startPosition.y + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);
+                    this.object3D.position.z = this.startPosition.z + (Math.sin((time/1000.0)*this.speedMultiplier*1.1)*this.distanceMultiplier);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationX:
                     this.changeRotationNextTick = true;
-                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationY:
                     this.changeRotationNextTick = true;
-                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationZ:
                     this.changeRotationNextTick = true;
-                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXY:
                     this.changeRotationNextTick = true;
-                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXZ:
                     this.changeRotationNextTick = true;
-                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationYZ:
                     this.changeRotationNextTick = true;
-                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXYZ:
                     this.changeRotationNextTick = true;
-                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.x = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.z = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
                     break;
                 case MovingObstacleMovementTypeEnum.RotationXYZ2:
                     this.changeRotationNextTick = true;
-                    this.localRotation.x = ((time/1000.0)*this.speedMultiplier*0.9)%(Math.PI*2);
-                    this.localRotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
-                    this.localRotation.z = ((time/1000.0)*this.speedMultiplier*1.1)%(Math.PI*2);
+                    this.object3D.rotation.x = ((time/1000.0)*this.speedMultiplier*0.9)%(Math.PI*2);
+                    this.object3D.rotation.y = ((time/1000.0)*this.speedMultiplier)%(Math.PI*2);
+                    this.object3D.rotation.z = ((time/1000.0)*this.speedMultiplier*1.1)%(Math.PI*2);
                     break;
                 default:
                     this.changeRotationNextTick = true;
-                    this.localPosition.lerp(this.targetPosition, dTime*2);
-                    this.localRotation.lerp(this.targetRotation, dTime*20);
+                    this.object3D.position.lerp(this.targetPosition, dTime*2);
+                    this.object3D.rotation.lerp(this.targetRotation, dTime*20);
                     break;
             }
 
 
+            //sw("this.object3D.rotation", this.object3D.rotation.ToString());
             // Trim rotations
 
-// this.localPosition.y = 1;
+// this.object3D.position.y = 1;
 //
 //                    this.changeRotationNextTick = true;
 //                    this.rotation.x = 180;
