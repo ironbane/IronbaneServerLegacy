@@ -29,7 +29,7 @@ $(document).keydown(function(event){
     
     if ( hasChatFocus ) return;
 
-    // This prevents the SNAFU with item floating above itembar when pressing enter when an alertBox is active
+    // This prevents the SNAFU with items floating above itembar when pressing enter when an alertBox is active
     if ( event.keyCode == 13 && hudHandler.alertBoxActive ) {
 	hudHandler.ReloadInventory();
 	}      

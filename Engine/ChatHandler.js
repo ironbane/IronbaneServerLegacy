@@ -193,7 +193,7 @@ var commands = {
     requiresEditor: true,
     action: function(unit, realparams, errorMessage) {
       var target = worldHandler.FindPlayerByName(realparams[0]);
-      if (target) { 
+      if (target) {
         target.Teleport(normalSpawnZone, normalSpawnPosition);
         chatHandler.AnnouncePersonally(target, "You were teleported back to town.", "lightgreen");
       } else {
