@@ -188,6 +188,21 @@ var commands = {
         errorMessage: errorMessage
       };
     }
+  },
+  "unstuck": {
+    requiresEditor: true,
+    action: function(unit, realparams, errorMessage) {
+      var target = worldHandler.FindPlayerByName(realparams[0]);
+      if (target) {
+        target.Teleport(normalSpawnZone, normalSpawnPosition);
+        chatHandler.AnnouncePersonally(target, "You were teleported back to town.", "lightgreen");
+      } else {
+        chatHandler.AnnouncePersonally(unit, "Playername " + realparams[0] + " not found", "red");
+      }
+      return {
+        errorMessage: errorMessage
+      };
+    }
   }
 };
 
