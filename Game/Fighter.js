@@ -132,6 +132,7 @@ var Fighter = Actor.extend({
         victim.armor = Math.max(victim.armor, 0);
 
         this.HandleMessage("hurtTarget", {damage:damage});
+        victim.HandleMessage("attacked", {attacker:this, damage:damage});
       }
       else {
         victim.health += Math.abs(damage);
@@ -140,11 +141,13 @@ var Fighter = Actor.extend({
 
 
         this.HandleMessage("healTarget", {damage:damage});
+        victim.HandleMessage("healed", {attacker:this, damage:damage});
       }
+
     }
 
 
-    victim.HandleMessage("attacked", {attacker:this});
+
 
     victim.EmitNearby("getMeleeHit", {
       victim:victim.id,
