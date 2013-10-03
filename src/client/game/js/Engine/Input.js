@@ -24,18 +24,19 @@ var badKeys = new Array(9,13,27,32,33,34,35,36,37,38,39,40);
 var editorKeys = new Array(73,74,75,76);
 var keyTracker = {};
 
-
 // Use direct keycodes for keypress, keyTracker for true keydown holds
 $(document).keydown(function(event){
     
-  
-    
     if ( hasChatFocus ) return;
-    
+
+    // This prevents the SNAFU with item floating above itembar when pressing enter when an alertBox is active
+    if ( event.keyCode == 13 && hudHandler.alertBoxActive ) {
+	hudHandler.ReloadInventory();
+	}      
+
     keyTracker[event.keyCode] = true;
 
-
-    if ( event.keyCode == 13 && socketHandler.inGame ) {
+    if ( event.keyCode == 13 && socketHandler.inGame) {
         $('#chatInputBox').show();
         setTimeout(function(){
         $('#chatInput').focus();
