@@ -193,17 +193,12 @@ var commands = {
     requiresEditor: true,
     action: function(unit, realparams, errorMessage) {
       var target = worldHandler.FindPlayerByName(realparams[0]);
-<<<<<<< HEAD
       if (target) { 
         target.Teleport(normalSpawnZone, normalSpawnPosition);
         chatHandler.AnnouncePersonally(target, "You were teleported back to town.", "lightgreen");
       } else {
         chatHandler.AnnouncePersonally(unit, "Playername " + realparams[0] + " not found", "red");
       }
-=======
-      target.Teleport(normalSpawnZone, normalSpawnPosition);
-      chatHandler.AnnouncePersonally(target, "You were teleported back to town.", "lightgreen");
->>>>>>> 06dc327... Added "/unstuck username" functionality.
       return {
         errorMessage: errorMessage
       };
