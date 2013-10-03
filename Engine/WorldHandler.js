@@ -349,6 +349,14 @@ var WorldHandler = Class.extend({
     data.template = dataHandler.units[data.template];
     // Depending on the param, load different classes
 
+    // Set the appearance on the NPC so we can customize it later
+    data.skin = data.template.skin;
+    data.eyes = data.template.eyes;
+    data.hair = data.template.hair;
+    data.head = data.template.head;
+    data.body = data.template.body;
+    data.feet = data.template.feet;
+
 
     var unit = null;
 
@@ -640,7 +648,13 @@ var WorldHandler = Class.extend({
     astar.cleanUp(this.world[zone][cellX][cellZ].graph);
 
     // Rebuild the zone waypoints
-    worldHandler.BuildZoneWaypoints();
+    if ( this.buildZoneWaypointsTimer ) {
+      clearTimeout(this.buildZoneWaypointsTimer);
+    }
+    this.buildZoneWaypointsTimer = setTimeout(function() {
+      worldHandler.BuildZoneWaypoints();
+    }, 5000);
+
 
     str = JSON.stringify(this.world[zone][cellX][cellZ].graph, null, 4);
     fs.writeFileSync(path+"/graph.json", str);
