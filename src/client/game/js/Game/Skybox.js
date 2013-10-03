@@ -238,7 +238,8 @@ var Skybox = PhysicsObject.extend({
 
         var moonFactorReverse = 1 - moonFactor;
 
-        this.ambientLight.color.setRGB( 0.4 * moonFactorReverse, 0.4 * moonFactorReverse, 0.4 * moonFactorReverse );
+        this.ambientLight.color.setRGB( 0.4 * moonFactorReverse + 0.2 * moonFactor, 0.4 * moonFactorReverse + 0.2 * moonFactor, 0.4 * moonFactorReverse  + 0.2 * moonFactor);
+
         // Night
         this.moonLight.color.setRGB(0.2 * moonFactor, 0.2 * moonFactor, 0.9 * moonFactor);
       }
