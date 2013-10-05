@@ -160,6 +160,8 @@ var WorldHandler = Class.extend({
   },
   LoadWorldLight: function() {
 
+    var cellsLoaded = {};
+
     this.world = {};
 
     util.walk(dataPath, function(err, results) {
@@ -206,10 +208,18 @@ var WorldHandler = Class.extend({
         worldHandler.world[zone][cx][cz].units = [];
         worldHandler.world[zone][cx][cz].hasLoadedUnits = false;
 
-        log("Loaded cell ("+cx+","+cz+") in zone "+zone);
+        //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
+        if ( !cellsLoaded[zone] ) cellsLoaded[zone] = 0;
+        cellsLoaded[zone]++;
 
         worldHandler.LoadUnits(zone, cx, cz);
       }
+
+      _.each(cellsLoaded, function(z, v) {
+        log("Loaded "+z+" cells in zone "+v);
+      });
+
+
 
       worldHandler.hasLoadedWorld = true;
 
