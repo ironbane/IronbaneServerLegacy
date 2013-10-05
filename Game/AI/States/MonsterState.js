@@ -21,7 +21,8 @@ var MonsterState = State.extend({
 
         this.wanderRange = 10;
 
-        this.chaseSpeed = 4;
+        this.chaseSpeed = 5;
+        this.walkSpeed = 2;
 
         this.threatTable = [];
 
@@ -33,7 +34,7 @@ var MonsterState = State.extend({
     },
     Enter: function(unit) {
 
-        this.normalSpeed = unit.maxSpeed;
+        unit.maxSpeed = this.walkSpeed;
 
         var me = this;
         this.waypointList = [];
@@ -56,8 +57,9 @@ var MonsterState = State.extend({
 
             var target = unit.FindNearestTarget(unit.template.aggroradius, true);
 
-            if ( target &&
-                unit.InLineOfSight(target) ) {
+            if ( target
+                && !( unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius )
+                && unit.InLineOfSight(target) ) {
 
                 unit.maxSpeed = this.chaseSpeed;
                 // log("[MonsterState] Found enemy!");
@@ -72,9 +74,9 @@ var MonsterState = State.extend({
 
         }
 
-        _.each(this.threatTable, function(t) {
-            console.log(t.attacker.name+": "+t.threat);
-        });
+        // _.each(this.threatTable, function(t) {
+        //     console.log(t.attacker.name+": "+t.threat);
+        // });
 
 
     },
@@ -87,6 +89,9 @@ var MonsterState = State.extend({
         var sorted = _.sortBy(this.threatTable, function(e) {
             return -e.threat;
         });
+
+
+        unit.maxSpeed = this.chaseSpeed;
 
         unit.stateMachine.ChangeState(new ChaseEnemy(sorted[0].attacker));
 
@@ -114,12 +119,13 @@ var MonsterState = State.extend({
 
                 break;
             case "stopChase":
+            case "respawned":
                 // We lost the enemy or gave  up
 
                 // Go back to wandering
                 unit.stateMachine.ChangeState(new Wander(this.waypointList, this.wanderConfig));
 
-                unit.maxSpeed = this.normalSpeed;
+                unit.maxSpeed = this.walkSpeed;
 
                 this.threatTable = [];
 

@@ -30,8 +30,6 @@ var ChaseEnemy = State.extend({
         //   pfu:unit.id
         //   });
 
-        this.chaseTimeBeforeGivingUp = 8;
-
         this.minimumChaseTime = 5.0;
     },
     Execute: function(unit, dTime) {
@@ -48,9 +46,15 @@ var ChaseEnemy = State.extend({
 
         var distance = DistanceSq(this.enemy.position, unit.position);
 
-        if ( (((this.enemy.id > 0 && (this.enemy.socket.disconnected || this.enemy.chInvisibleByMonsters) ) ||
-            this.enemy.health <= 0 ||
-            this.chaseTimeBeforeGivingUp <= 0 || (unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius))
+
+
+
+        if ( (
+            (
+                (this.enemy.id > 0 && (this.enemy.socket.disconnected || this.enemy.chInvisibleByMonsters) )
+                || this.enemy.health <= 0
+                || (unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius)
+            )
             && this.minimumChaseTime <= 0)
             ) {
 
@@ -60,7 +64,7 @@ var ChaseEnemy = State.extend({
         }
         else if ( distance < Math.pow(WeaponRanges[unit.weapon.subtype], 2) ) {
 
-            this.chaseTimeBeforeGivingUp = 8;
+            //this.chaseTimeBeforeGivingUp = 8;
 
             if ( unit.InLineOfSight(this.enemy) ) {
                 // log("[ChaseEnemy] Attacking!");
@@ -88,8 +92,6 @@ var ChaseEnemy = State.extend({
 
         }
         else {
-
-            if ( this.chaseTimeBeforeGivingUp > 0 ) this.chaseTimeBeforeGivingUp -= dTime;
 
             // log("[ChaseEnemy] Within aggro range, moving closer...");
 

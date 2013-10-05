@@ -332,6 +332,7 @@ var Fighter = Actor.extend({
                 this.SetWeaponsAndLoot();
             }
             this.position = this.startPosition.clone();
+            this.targetNodePosition = this.position.clone();
             this.HandleMessage("respawned", {});
         }
 
