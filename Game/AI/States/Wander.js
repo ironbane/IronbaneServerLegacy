@@ -19,54 +19,58 @@
 
 
 var Wander = State.extend({
-	Init: function() {
+	Init: function(waypoints, options) {
+
+        this.waypoints = waypoints;
+
+        this.targetPosition = new THREE.Vector3();
 
 
+        this.options = options || {};
 
-
-
-            this.targetPosition = new THREE.Vector3();
+        this.options.minWaitTime = this.options.minWaitTime === undefined ?
+            1 : this.options.minWaitTime;
+        this.options.maxWaitTime = this.options.maxWaitTime === undefined ?
+            20 : this.options.maxWaitTime;
 
 	},
 	Enter: function(unit) {
 
-            this.targetPosition = unit.position.clone();
+        this.targetPosition = unit.position.clone();
 
-
-
-            this.hasReachedWaypoint = false;
+        this.hasReachedWaypoint = false;
 	},
 	Execute: function(unit, dTime) {
 
 
-            if ( unit.health <= 0 || unit.template.disabled ) return;
+        if ( unit.health <= 0 || unit.template.disabled ) return;
 
 
-            if ( VectorDistance(unit.position, this.targetPosition) < 1.0 &&
-                !this.hasReachedWaypoint ) {
+        if ( VectorDistance(unit.position, this.targetPosition) < 1.0 &&
+            !this.hasReachedWaypoint ) {
 
-                this.hasReachedWaypoint = true;
-                 // Get a random waypoint nearby and travel to it
-                 if ( unit.connectedNodeList.length === 0 ) {
-                    // log("[Wander] Error: No nodes found!");
-                }
-                else {
+            this.hasReachedWaypoint = true;
+             // Get a random waypoint nearby and travel to it
+             if ( unit.connectedNodeList.length === 0 ) {
+                // log("[Wander] Error: No nodes found!");
+            }
+            else {
 
-                    var me = this;
+                var me = this;
+                var newPoint = ChooseRandom(me.waypoints);
 
-                    setTimeout(function() {
-                        var randomNode = ChooseRandom(unit.connectedNodeList);
-                        me.targetPosition = ConvertVector3(randomNode.pos);
-                        me.hasReachedWaypoint = false;
-                    }, getRandomInt(1,60) * 1000);
+                setTimeout(function() {
+                    me.targetPosition = newPoint;
+                    me.hasReachedWaypoint = false;
+                }, getRandomInt(this.options.minWaitTime,this.options.maxWaitTime) * 1000);
 
-                    // log("[Wander] Traveling to node "+randomNode.id+"...");
-                }
-
+                // log("[Wander] Traveling to node "+randomNode.id+"...");
             }
 
-            //unit.steeringForce = unit.steeringBehaviour.Wander();
-            unit.TravelToPosition(this.targetPosition);
+        }
+
+        //unit.steeringForce = unit.steeringBehaviour.Wander();
+        unit.TravelToPosition(this.targetPosition);
 
 	},
 	Exit: function(unit) {

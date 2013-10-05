@@ -620,6 +620,11 @@ var Fighter = Actor.extend({
                 continue;
               }
 
+              if ( !onlyPlayers && unit.id < 0 && unit.template.friendly === this.template.friendly ) {
+                // Don't attack our own kind!
+                continue;
+              }
+
               // Check if we are looking at the target
               if ( !this.InLineOfSight(unit, noHeadingCheck) ) {
                 //log("not in line of sight!");

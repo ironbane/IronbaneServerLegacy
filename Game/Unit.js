@@ -217,7 +217,7 @@ var Unit = Class.extend({
 
         }
         else {
-          if ( unit.weapon && unit.template.displayweapon ) {
+          if ( unit.weapon && unit.displayweapon ) {
             packet.weapon = unit.weapon.id;
           }
         }

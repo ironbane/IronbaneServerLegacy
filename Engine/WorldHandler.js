@@ -367,6 +367,8 @@ var WorldHandler = Class.extend({
     data.body = data.template.body;
     data.feet = data.template.feet;
 
+    data.displayweapon = data.template.displayweapon;
+
 
     var unit = null;
 
@@ -382,28 +384,34 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.MOVINGOBSTACLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new MovingObstacle(data);
         break;
       case UnitTypeEnum.TOGGLEABLEOBSTACLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new ToggleableObstacle(data);
         break;
       case UnitTypeEnum.TRAIN:
 
-        // Convert data rotations to regular members
-        data.rotx = 0;
-        data.roty = 0;
-        data.rotz = 0;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new Train(data);
         break;
@@ -421,10 +429,12 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.SIGN:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new Sign(data);
         break;
@@ -433,10 +443,12 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.LOOTABLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new Lootable(data, true);
         break;

@@ -48,6 +48,8 @@ var Patrol = State.extend({
     },
     Execute: function(unit, dTime) {
 
+        return;
+
         if ( VectorDistance(unit.position, this.targetPosition) < 1.0*unit.mass && !this.sentTimeout ) {
             if ( this.options.navMode === "line" ) {
                 if ( this.forward ) {

@@ -23,6 +23,10 @@ var CameraStatusEnum = {
 
 var Player = Fighter.extend({
     Init: function(position, rotation, id, name) {
+
+      // Add a small offset
+      position.y += 1;
+
         this._super(position, rotation, id, name, 0,
             socketHandler.playerData.size, socketHandler.playerData.health, socketHandler.playerData.armor,
             socketHandler.playerData.healthMax, socketHandler.playerData.armorMax);

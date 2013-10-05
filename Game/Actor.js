@@ -42,7 +42,7 @@ var Actor = MovingUnit.extend({
       var currentState = null;
       switch(this.template.type) {
         case UnitTypeEnum.MONSTER:
-          currentState = new ExploreAndLookForEnemies();
+          currentState = new MonsterState();
           break;
         case UnitTypeEnum.VENDOR:
           currentState = new SellMerchandise();
@@ -57,15 +57,11 @@ var Actor = MovingUnit.extend({
         case UnitTypeEnum.TURRET_STRAIGHT:
           currentState = new TurretStraight();
           break;
-        case UnitTypeEnum.WANDERER:
-          currentState = new Wander();
-          break;
-        default:
-          currentState = new EmptyState();
-          break;
       }
 
-      this.stateMachine.ChangeState(currentState);
+    if ( currentState ) {
+        this.stateMachine.SetGlobalState(currentState);
+    }
 
       //identifier = identifier.replace(/ /g,"");
 
