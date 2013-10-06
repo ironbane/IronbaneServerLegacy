@@ -48,8 +48,6 @@ var Patrol = State.extend({
     },
     Execute: function(unit, dTime) {
 
-        return;
-
         if ( VectorDistance(unit.position, this.targetPosition) < 1.0*unit.mass && !this.sentTimeout ) {
             if ( this.options.navMode === "line" ) {
                 if ( this.forward ) {
@@ -90,9 +88,8 @@ var Patrol = State.extend({
             }, this.options.pause);
             this.sentTimeout = true;
 
-
-
         }
+
 
         if ( this.options.seek ) {
             unit.steeringForce = unit.steeringBehaviour.Seek(this.targetPosition);

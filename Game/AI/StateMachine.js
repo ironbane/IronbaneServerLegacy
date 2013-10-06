@@ -33,7 +33,7 @@ var StateMachine = Class.extend({
 	},
 	Update: function(dTime) {
 
-        if ( this.owner.health <= 0 || this.owner.template.disabled ) return;
+        if ( (this.owner instanceof Fighter && this.owner.health <= 0) || this.owner.template.disabled ) return;
 
 		if ( this.globalState ) this.globalState.Execute(this.owner, dTime);
 
