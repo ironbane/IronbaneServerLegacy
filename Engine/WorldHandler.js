@@ -412,6 +412,11 @@ var WorldHandler = Class.extend({
           data.roty = data.data.rotY;
           data.rotz = data.data.rotZ;
         }
+        else if ( !data || !data.scriptName ) {
+          // Can't live without a script!
+          log("Warning: no script found for Train "+data.id);
+          return;
+        }
 
         unit = new Train(data);
         break;
