@@ -179,6 +179,17 @@ var commands = {
       };
     }
   },
+  "help": {
+    // Should be a hudhandler message in the future. Good enough for now
+    requiresEditor: false,
+    action: function(unit, realparams, errorMessage) {
+      var message = "MOVE (W,A,S,D)<br>STRAFE (Q,E)<br>Walk slower, turn faster (shift)<br>Attack (right mouse click)<br>CHAT (enter)<br>If you get stuck (/stuck in chatbox)";
+      chatHandler.AnnouncePersonally(unit, message, "yellow");
+      return {
+        errorMessage: errorMessage
+      };
+    }
+  },
   "stuck": {
     requiresEditor: false,
     action: function(unit, realparams, errorMessage) {

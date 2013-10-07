@@ -17,52 +17,44 @@
 
 var TeleportEntrance = Unit.extend({
     Init: function(data) {
-
         this._super(data);
-
 
         // Prevent from being used immediately
         this.useTimeout = 3.0;
-
     },
     Awake: function() {
+        this._super();
 
-      this._super();
-
-      this.FindTargetExit();
-
+        this.FindTargetExit();
     },
     FindTargetExit: function() {
-
-        if (this.data && !_.isUndefined(this.data.targetExit) ) {
-
+        if (this.data && !_.isUndefined(this.data.targetExit)) {
             this.data.targetExit = -Math.abs(this.data.targetExit);
 
             this.targetExit = worldHandler.FindUnit(this.data.targetExit);
 
-            if ( !(this.targetExit instanceof TeleportExit) ) this.targetExit = null;
-        }
-        else {
+            if (!(this.targetExit instanceof TeleportExit)) {
+                this.targetExit = null;
+            }
+        } else {
             this.targetExit = null;
         }
-
-
     },
     Tick: function(dTime) {
-
         this._super(dTime);
 
-        if ( this.targetExit ) {
-            if ( this.useTimeout > 0 ) {
+        if (this.targetExit) {
+            if (this.useTimeout > 0) {
                 this.useTimeout -= dTime;
-            }
-            else {
+            } else {
                 var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
 
-                for(var u=0;u<units.length;u++) {
-                    if ( !(units[u] instanceof Player) ) continue;
+                for (var u = 0; u < units.length; u++) {
+                    if (!(units[u] instanceof Player)) {
+                        continue;
+                    }
 
-                    if ( units[u].InRangeOfUnit(this, 1) ) {
+                    if (units[u].InRangeOfUnit(this, 1)) {
 
                         log("Teleport!");
 
@@ -74,7 +66,5 @@ var TeleportEntrance = Unit.extend({
                 }
             }
         }
-
-
     }
 });
