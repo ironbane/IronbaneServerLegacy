@@ -15,20 +15,11 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
-
 var Waypoint = Unit.extend({
     Init: function(data) {
-
         this._super(data);
-
-
     },
     Tick: function(dTime) {
-
         this._super(dTime);
-
-
     }
 });
