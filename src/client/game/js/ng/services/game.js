@@ -1,7 +1,7 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TimerService', '$state', 'AudioManager',
-        function($log, $window, $http, $timeout, $filter, TimerService, $state, AudioManager) { // using $window to reveal the globals        // make this private so that it can't be called directly
+    .factory('Game', ['$rootScope', '$log', '$window', '$http', '$timeout', '$filter', 'TimerService', '$state', 'AudioManager',
+        function($rootScope, $log, $window, $http, $timeout, $filter, TimerService, $state, AudioManager) { // using $window to reveal the globals        // make this private so that it can't be called directly
 
         var loop = function(game) {
             if(!game.isRunning) {
@@ -246,8 +246,9 @@ IronbaneApp
                         opacity: 1.00
                     }, 1000, function() {
                         $("#gameFrame").css('opacity', '');
+                        $state.go('mainMenu');
+                        $rootScope.$apply();
                     });
-                    $state.go('mainMenu');
                 }, 500);
             }
 

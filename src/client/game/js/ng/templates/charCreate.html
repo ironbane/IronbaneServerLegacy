@@ -1,28 +1,30 @@
-<div id="charSelect" style="height: 321px;">
-    <label for="ncname">Name</label>
-    <div class="spacersmall"></div>
-    <input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12">
-    <div id="charCustomizationContainer">
-        <div id="charCustomizationButtonsLeft">Gender
+<div class="character-creator dialog">
+    <input type="text" name="name" ng-model="character.name" placeholder="name" ng-maxlength="12" />
+    <div class="customization-container">
+        <div class="customize-buttons left">
+            Gender
             <br>
-            <button id="btnGenderChange" class="ibutton" style="width:70px;">Boy</button>
-            <br>Skin
+            <button ng-click="toggleGender()">{{ character.gender }}</button>
             <br>
-            <button id="btnSkinPrev" class="ibutton" style="width:30px;">◀</button>
-            <button id="btnSkinNext" class="ibutton" style="width:30px">▶</button>
+            Skin
+            <br>
+            <button ng-click="prevSkin()">◀</button>
+            <button ng-click="nextSkin()">▶</button>
         </div>
-        <div id="charCustomizationPreview">
-            <div id="charSkinLayer" style="background-image: url(http://ironbane.com:8085/game/images/characters/cache/1000_1000_1000_0_0_0_1.png);"></div>
+        <div class="character-preview">
+            <img ng-src="charImage" />
         </div>
-        <div id="charCustomizationButtonsRight">Hair
+        <div class="customize-buttons right">
+            Hair
             <br>
-            <button id="btnHairPrev" class="ibutton" style="width:30px;">◀</button>
-            <button id="btnHairNext" class="ibutton" style="width:30px">▶</button>Eyes
+            <button ng-click="prevHair()">◀</button>
+            <button ng-click="nextHair()">▶</button>
+            Eyes
             <br>
-            <button id="btnEyesPrev" class="ibutton" style="width:30px;">◀</button>
-            <button id="btnEyesNext" class="ibutton" style="width:30px">▶</button>
+            <button ng-click="prevEyes()">◀</button>
+            <button ng-click="nextEyes()">▶</button>
         </div>
     </div>
-    <button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button>
-    <button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>
+    <button ng-click="create()">Create</button>
+    <button ng-click="cancel()">Cancel</button>
 </div>

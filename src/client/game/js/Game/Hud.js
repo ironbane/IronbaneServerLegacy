@@ -152,38 +152,6 @@ var HUDHandler = Class.extend({
             handleClick(true);
         }, 1000);
     },
-    MakeSoundButton: function() {
-        var checkSoundToggle = function(value) {
-
-            if ( !gotFlashInstalled ) {
-                value = false;
-                hudHandler.MessageAlert("Flash was not detected.<br><br>Sound effects are disabled.");
-            }
-
-            // We can only change the toggle in the main menu, so always stop/play
-            // the theme music
-            hudHandler.allowSound = value;
-
-            if (value) {
-                $("#btnToggleSound").html("&#9834;");
-                $("#btnToggleSound").css("color", "");
-
-                ironbane.soundHandler.play("music/maintheme");
-            } else {
-                $("#btnToggleSound").html("<del>&#9834;</del>");
-                $("#btnToggleSound").css("color", "red");
-
-                ironbane.soundHandler.stopAll();
-            }
-
-            localStorage.allowSound = value;
-        };
-        checkSoundToggle(hudHandler.allowSound);
-        $("#btnToggleSound").unbind('click');
-        $("#btnToggleSound").click(function() {
-            checkSoundToggle(!hudHandler.allowSound);
-        });
-    },
     ShowMainMenuHUD: function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
     },

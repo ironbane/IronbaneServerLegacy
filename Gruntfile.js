@@ -1,7 +1,5 @@
 module.exports = function(grunt) {
 
-    var conf = require('./nconf');
-
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
