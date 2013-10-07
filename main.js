@@ -22,7 +22,7 @@ module.exports = function() {
     var cryptSalt = config.get('cryptSalt');
 
     // profiling...
-    if (isProduction && config.get('use_nodetime')) {
+    if (!isProduction && config.get('use_nodetime')) {
         require('nodetime').profile(config.get('nodetime'));
     }
 
