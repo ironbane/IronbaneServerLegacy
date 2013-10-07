@@ -156,19 +156,19 @@ module.exports = function(db) {
         // min length
         if(name.length < 2) {
             deferred.reject('minimum 2 char length');
-            return;
+            return deferred.promise;
         }
 
         if(name.length > 12) {
             deferred.reject('max 12 char length');
-            return;
+            return deferred.promise;
         }
 
         // note doesn't allow international, do we want to globalize someday?
-        var alphaNum = /([a-zA-Z0-9]+)$/;
+        var alphaNum = /^([a-zA-Z0-9_-]+)$/;
         if(alphaNum.test(name) === false) {
-            deferred.reject('alphanumeric names only');
-            return;
+            deferred.reject('Use alphanumeric characters, - and _ in names only');
+            return deferred.promise;
         }
 
         deferred.resolve('valid name');
@@ -205,7 +205,7 @@ module.exports = function(db) {
                 });
             }, function(err) {
                 console.log('create character validation failed! ', err, createObj);
-                deferred.reject('validation failed: ' + err);
+                deferred.reject('Character name error: ' + err);
             });
 
         return deferred.promise;
