@@ -712,7 +712,7 @@ var Unit = PhysicsObject.extend({
 
     if ( this.slowWalk ) speed *= 1.5;
 
-    if( distance > 0.01 ) {
+    if( distance > 0.03 ) {
       if (side) {
         this.object3D.rotation.y -= (speed * dTime);
       }

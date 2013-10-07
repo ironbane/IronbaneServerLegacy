@@ -88,9 +88,8 @@ var Patrol = State.extend({
             }, this.options.pause);
             this.sentTimeout = true;
 
-
-
         }
+
 
         if ( this.options.seek ) {
             unit.steeringForce = unit.steeringBehaviour.Seek(this.targetPosition);

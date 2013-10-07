@@ -160,7 +160,7 @@ var NodeHandler = Class.extend({
             _.each(terrainHandler.cells, function(cell) {
                     var graphData = cell.graphData;
 
-                    if ( graphData["nodes"] === undefined ) return;
+                    if ( !graphData || graphData["nodes"] === undefined ) return;
 
                     var graphArr = graphData["nodes"];
 

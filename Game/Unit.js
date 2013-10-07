@@ -185,7 +185,7 @@ var Unit = Class.extend({
       var packet = {
         id:id,
         position:unit.position,
-        rotY:unit.rotation.y.Round(),
+        rotY:unit.rotation.y,
         param:unit.param
       };
 
@@ -199,19 +199,16 @@ var Unit = Class.extend({
 
         packet.size = unit.size;
 
+        packet.skin = unit.skin;
+        packet.eyes = unit.eyes;
+        packet.hair = unit.hair;
+        packet.head = unit.head;
+        packet.body = unit.body;
+        packet.feet = unit.feet;
+
         if ( unit.id > 0 ) {
-
-
-
           // Add additional data to the packet
           packet.name = unit.name;
-
-          packet.skin = unit.skin;
-          packet.eyes = unit.eyes;
-          packet.hair = unit.hair;
-          packet.head = unit.head;
-          packet.body = unit.body;
-          packet.feet = unit.feet;
 
           var item = unit.GetEquippedWeapon();
           if ( item ) {
@@ -220,16 +217,7 @@ var Unit = Class.extend({
 
         }
         else {
-
-          // Add additional data to the packet
-          packet.skin = unit.template.skin;
-          packet.eyes = unit.template.eyes;
-          packet.hair = unit.template.hair;
-          packet.head = unit.template.head;
-          packet.body = unit.template.body;
-          packet.feet = unit.template.feet;
-
-          if ( unit.weapon && unit.template.displayweapon ) {
+          if ( unit.weapon && unit.displayweapon ) {
             packet.weapon = unit.weapon.id;
           }
         }
@@ -241,8 +229,8 @@ var Unit = Class.extend({
         if ( unit.template.type === UnitTypeEnum.TRAIN ||
           unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
           unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
-          packet.rotX = unit.rotation.x.Round();
-          packet.rotZ = unit.rotation.z.Round();
+          packet.rotX = unit.rotation.x;
+          packet.rotZ = unit.rotation.z;
         }
 
         if ( unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE ) {

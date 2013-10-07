@@ -42,7 +42,7 @@ var Actor = MovingUnit.extend({
       var currentState = null;
       switch(this.template.type) {
         case UnitTypeEnum.MONSTER:
-          currentState = new ExploreAndLookForEnemies();
+          currentState = new MonsterState();
           break;
         case UnitTypeEnum.VENDOR:
           currentState = new SellMerchandise();
@@ -57,15 +57,11 @@ var Actor = MovingUnit.extend({
         case UnitTypeEnum.TURRET_STRAIGHT:
           currentState = new TurretStraight();
           break;
-        case UnitTypeEnum.WANDERER:
-          currentState = new Wander();
-          break;
-        default:
-          currentState = new EmptyState();
-          break;
       }
 
-      this.stateMachine.ChangeState(currentState);
+    if ( currentState ) {
+        this.stateMachine.SetGlobalState(currentState);
+    }
 
       //identifier = identifier.replace(/ /g,"");
 
@@ -118,24 +114,24 @@ var Actor = MovingUnit.extend({
 
         if ( !subNode ) {
 
-          // ERROR!
-          // Not sure why, so send someone here and investigate
+          // // ERROR!
+          // // Not sure why, so send someone here and investigate
 
-          var msg = "Pathfinding node error! Please" +
-          " investigate the connection<br>between node <b>"+node.id +
-          "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
-          ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
+          // var msg = "Pathfinding node error! Please" +
+          // " investigate the connection<br>between node <b>"+node.id +
+          // "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
+          // ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
-          chatHandler.AnnounceMods(msg, "red");
+          // chatHandler.AnnounceMods(msg, "red");
 
-          log("ERROR: "+msg);
+          // log("ERROR: "+msg);
 
-          setTimeout(AnnounceOccurredError(msg, 15), 15000);
+          // setTimeout(AnnounceOccurredError(msg, 15), 15000);
 
-          setTimeout(AnnounceOccurredError(msg, 60), 60000);
+          // setTimeout(AnnounceOccurredError(msg, 60), 60000);
 
 
-          // debugger;
+          // // debugger;
 
           return;
 

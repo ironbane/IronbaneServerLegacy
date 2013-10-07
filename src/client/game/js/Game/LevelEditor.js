@@ -277,7 +277,7 @@ var EditorGUI = function() {
   this.ppAutoScanMode = false;
   this.ppAutoDeleteMode = false;
   this.ppUseSmallNodes = false;
-  this.ppAllowElevation = false;
+  this.ppMaxElevationDiff = 1.0;
 
   // Model placer
   this.enableModelPlacer = false;
@@ -696,7 +696,7 @@ var LevelEditor = Class.extend({
     guiControls['ppAutoScanMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoScanMode');
     guiControls['ppAutoDeleteMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoDeleteMode');
     guiControls['ppUseSmallNodes'] = fPathPlacer.add(this.editorGUI, 'ppUseSmallNodes');
-    guiControls['ppAllowElevation'] = fPathPlacer.add(this.editorGUI, 'ppAllowElevation');
+    guiControls['ppMaxElevationDiff'] = fPathPlacer.add(this.editorGUI, 'ppMaxElevationDiff');
 
 
     guiControls['enableModelPlacer'] = fModelPlacer.add(this.editorGUI, 'enableModelPlacer');
@@ -933,7 +933,7 @@ var LevelEditor = Class.extend({
       if ( !levelEditor.editorGUI.globalEnable ) return;
       //bm('delta: '+delta+', deltaX: '+deltaX+', deltaY: '+deltaY+'');
 
-      var value = delta * 5;
+      var value = delta * 0.05;
 
       if ( keyTracker[16] && keyTracker[18] ) {
         levelEditor.editorGUI.mpRotX += value;

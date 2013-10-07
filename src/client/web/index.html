@@ -15,7 +15,6 @@
     <script src="/lib/jquery-2.0.0.min.js"></script>
     <script src="/lib/angular-1.1.4/angular.min.js"></script>
     <script src="/lib/angular-ui/ui-utils.js"></script>
-    <script src="/lib/angular-ui/ui-bootstrap-0.6.0.js"></script>
 
 
 <script type="text/javascript" src="/lib/markitup/jquery.markitup.js"></script>
@@ -48,13 +47,12 @@
                         <li><a href="/">About</a></li>
                         <li><a href="/forum">Forum</a></li>
                         <li><a href="/game" target="_self">Play!</a></li>
-                        <li><a href="/article/get-involved">Get Involved</a></li>
                         <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
                         <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
                         <li><a href="/article/faq">FAQ</a></li>
                         <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
                         <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
-                        <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/uploads">Uploads</a></li>
+                        <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/admin">memory</a></li>
                     </ul>
                 </div>
 
@@ -72,8 +70,8 @@
                 <ul class="horizontal-list pipe-list">
                     <li><a href="article/terms">Terms of Use</a></li>
                     <li><a href="article/privacy">Privacy Policy</a></li>
-
                     <li><a href="http://twitter.com/Ironbane">Twitter</a></li>
+                        <li><a href="/article/get-involved">Get Involved</a></li>
 
                 </ul>
             </div>

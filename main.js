@@ -22,7 +22,7 @@ module.exports = function() {
     var cryptSalt = config.get('cryptSalt');
 
     // profiling...
-    if (isProduction && config.get('use_nodetime')) {
+    if (!isProduction && config.get('use_nodetime')) {
         require('nodetime').profile(config.get('nodetime'));
     }
 
@@ -87,6 +87,7 @@ module.exports = function() {
             './Init.js',
             './Shared/seedrandom.js',
             './Shared/Shared.js',
+            './Shared/Buffs.js',
             './Shared/Util.js',
             './Shared/NodeHandler.js',
             './Engine/ConsoleCommand.js',
@@ -101,7 +102,8 @@ module.exports = function() {
             './Game/AI/State.js',
             './Game/AI/StateMachine.js',
             './Game/AI/States/ChaseEnemy.js',
-            './Game/AI/States/ExploreAndLookForEnemies.js',
+            './Game/AI/States/FleeEnemy.js',
+            './Game/AI/States/MonsterState.js',
             './Game/AI/States/NPCGlobalState.js',
             './Game/AI/States/EmptyState.js',
             './Game/AI/States/SellMerchandise.js',

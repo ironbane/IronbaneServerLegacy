@@ -160,6 +160,8 @@ var WorldHandler = Class.extend({
   },
   LoadWorldLight: function() {
 
+    var cellsLoaded = {};
+
     this.world = {};
 
     util.walk(dataPath, function(err, results) {
@@ -172,15 +174,14 @@ var WorldHandler = Class.extend({
 
         //log(data);
 
-        var zone = data[0];
-        var cx = data[1];
-        var cz = data[2];
+        var zone = parseInt(data[0], 10);
+        var cx = parseInt(data[1], 10);
+        var cz = parseInt(data[2], 10);
 
         var file = data[3];
-
-        if ( !isNumber(zone) ) continue;
-        if ( !isNumber(cx) ) continue;
-        if ( !isNumber(cz) ) continue;
+        if ( !_.isNumber(zone) ) continue;
+        if ( !_.isNumber(cx) ) continue;
+        if ( !_.isNumber(cz) ) continue;
 
 
         worldHandler.BuildWorldStructure(zone, cx, cz);
@@ -207,10 +208,18 @@ var WorldHandler = Class.extend({
         worldHandler.world[zone][cx][cz].units = [];
         worldHandler.world[zone][cx][cz].hasLoadedUnits = false;
 
-        log("Loaded cell ("+cx+","+cz+") in zone "+zone);
+        //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
+        if ( !cellsLoaded[zone] ) cellsLoaded[zone] = 0;
+        cellsLoaded[zone]++;
 
         worldHandler.LoadUnits(zone, cx, cz);
       }
+
+      _.each(cellsLoaded, function(z, v) {
+        log("Loaded "+z+" cells in zone "+v);
+      });
+
+
 
       worldHandler.hasLoadedWorld = true;
 
@@ -350,6 +359,16 @@ var WorldHandler = Class.extend({
     data.template = dataHandler.units[data.template];
     // Depending on the param, load different classes
 
+    // Set the appearance on the NPC so we can customize it later
+    data.skin = data.template.skin;
+    data.eyes = data.template.eyes;
+    data.hair = data.template.hair;
+    data.head = data.template.head;
+    data.body = data.template.body;
+    data.feet = data.template.feet;
+
+    data.displayweapon = data.template.displayweapon;
+
 
     var unit = null;
 
@@ -365,28 +384,39 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.MOVINGOBSTACLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new MovingObstacle(data);
         break;
       case UnitTypeEnum.TOGGLEABLEOBSTACLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new ToggleableObstacle(data);
         break;
       case UnitTypeEnum.TRAIN:
 
-        // Convert data rotations to regular members
-        data.rotx = 0;
-        data.roty = 0;
-        data.rotz = 0;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
+        else if ( !data || !data.scriptName ) {
+          // Can't live without a script!
+          log("Warning: no script found for Train "+data.id);
+          return;
+        }
 
         unit = new Train(data);
         break;
@@ -404,10 +434,12 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.SIGN:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new Sign(data);
         break;
@@ -416,10 +448,12 @@ var WorldHandler = Class.extend({
         break;
       case UnitTypeEnum.LOOTABLE:
 
-        // Convert data rotations to regular members
-        data.rotx = data.data.rotX;
-        data.roty = data.data.rotY;
-        data.rotz = data.data.rotZ;
+        if ( data.data ) {
+          // Convert data rotations to regular members
+          data.rotx = data.data.rotX;
+          data.roty = data.data.rotY;
+          data.rotz = data.data.rotZ;
+        }
 
         unit = new Lootable(data, true);
         break;
@@ -641,7 +675,13 @@ var WorldHandler = Class.extend({
     astar.cleanUp(this.world[zone][cellX][cellZ].graph);
 
     // Rebuild the zone waypoints
-    worldHandler.BuildZoneWaypoints();
+    if ( this.buildZoneWaypointsTimer ) {
+      clearTimeout(this.buildZoneWaypointsTimer);
+    }
+    this.buildZoneWaypointsTimer = setTimeout(function() {
+      worldHandler.BuildZoneWaypoints();
+    }, 5000);
+
 
     str = JSON.stringify(this.world[zone][cellX][cellZ].graph, null, 4);
     fs.writeFileSync(path+"/graph.json", str);

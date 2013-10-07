@@ -19,56 +19,58 @@
 
 
 var Wander = State.extend({
-	Init: function() {
+	Init: function(waypoints, options) {
+
+        this.waypoints = waypoints;
+
+        this.targetPosition = new THREE.Vector3();
 
 
+        this.options = options || {};
 
-
-
-            this.targetPosition = new THREE.Vector3();
+        this.options.minWaitTime = this.options.minWaitTime === undefined ?
+            1 : this.options.minWaitTime;
+        this.options.maxWaitTime = this.options.maxWaitTime === undefined ?
+            20 : this.options.maxWaitTime;
 
 	},
 	Enter: function(unit) {
 
-            this.targetPosition = unit.position.clone();
+        this.targetPosition = unit.position.clone();
 
-            unit.maxSpeed = 2.0;
-
+        this.hasReachedWaypoint = false;
 	},
 	Execute: function(unit, dTime) {
 
 
-            if ( unit.health <= 0 || unit.template.disabled ) return;
+        if ( unit.health <= 0 || unit.template.disabled ) return;
 
 
-            if ( VectorDistance(unit.position, this.targetPosition) < 1.0 ) {
-            	// TIme to change to a new node!
-                 //var distance = DistanceSq(unit.position, unit.targetPosition);
-                 //this.targetPosition = unit.position.clone().add(new THREE.Vector3(getRandomInt(-10, 10), getRandomInt(-5, 5), getRandomInt(-10, 10)));
-                 //this.targetPosition.set(getRandomInt(0, 45), getRandomInt(0, 10), getRandomInt(0, 20));
+        if ( VectorDistance(unit.position, this.targetPosition) < 1.0 &&
+            !this.hasReachedWaypoint ) {
 
-                 // Get a random waypoint nearby and travel to it
-                 if ( unit.connectedNodeList.length === 0 ) {
-                    log("[Wander] Error: No nodes found!");
-                }
-                else {
-                    var randomNode = ChooseRandom(unit.connectedNodeList);
-                    this.targetPosition = ConvertVector3(randomNode.pos);
-                    log("[Wander] Traveling to node "+randomNode.id+"...");
-                }
+            this.hasReachedWaypoint = true;
+             // Get a random waypoint nearby and travel to it
+             if ( unit.connectedNodeList.length === 0 ) {
+                // log("[Wander] Error: No nodes found!");
+            }
+            else {
 
+                var me = this;
+                var newPoint = ChooseRandom(me.waypoints);
 
-                unit.maxSpeed = getRandomInt(1, 3);
+                setTimeout(function() {
+                    me.targetPosition = newPoint;
+                    me.hasReachedWaypoint = false;
+                }, getRandomInt(this.options.minWaitTime,this.options.maxWaitTime) * 1000);
 
-
-                 //this.targetPosition.set(this.test ? 0 : 25, 0, this.test ? 0 : 10);
-
-                 log("[Wander] New target position: "+this.targetPosition.ToString());
-                 //log("[ExploreAndLookForEnemies] Current NPC nodepath: "+unit.targetNodePosition.ToString());
+                // log("[Wander] Traveling to node "+randomNode.id+"...");
             }
 
-            //unit.steeringForce = unit.steeringBehaviour.Wander();
-            unit.TravelToPosition(this.targetPosition);
+        }
+
+        //unit.steeringForce = unit.steeringBehaviour.Wander();
+        unit.TravelToPosition(this.targetPosition);
 
 	},
 	Exit: function(unit) {

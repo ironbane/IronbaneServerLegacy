@@ -38,9 +38,10 @@ module.exports.parse = function(file, callback){
 module.exports.parseSync = function(file){
 	return parse(fs.readFileSync(file, 'utf8'));
 };
-function isNumber(n) {
+/*function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
+*/
 function parse(data){
 	var value = {};
 	var lines = data.split(/\r\n|\r|\n/);

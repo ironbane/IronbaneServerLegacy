@@ -52,7 +52,7 @@ IB.PathFinder = function() {
 
                 // First cast to the ground to see where the terrain is
                 var ray = new THREE.Raycaster(
-                    position.clone().clone().add(new THREE.Vector3(0, (le("ppAllowElevation") ? NODESIZE : 0.5), 0)),
+                    position.clone().clone().add(new THREE.Vector3(0, le("ppMaxElevationDiff"), 0)),
                     new THREE.Vector3(0, -1, 0)
                 );
 
@@ -89,7 +89,7 @@ IB.PathFinder = function() {
                 //setTimeout(function() {
                     // First cast to the ground to see where the terrain is
                     var ray = new THREE.Raycaster(
-                        position.clone().add(offset.clone().multiplyScalar(NODESIZE).setY((le("ppAllowElevation") ? NODESIZE : 0.5))),
+                        position.clone().add(offset.clone().multiplyScalar(NODESIZE).setY(le("ppMaxElevationDiff"))),
                         new THREE.Vector3(0, -1, 0)
                     );
 
@@ -108,7 +108,7 @@ IB.PathFinder = function() {
                     // 0         ---
                     // -NODESIZE --/
 
-                    if ( height > (le("ppAllowElevation") ? NODESIZE : 0.5) ) return;
+                    if ( height > le("ppMaxElevationDiff") ) return;
 
 
                     // Now check if there is an obstacle in between
