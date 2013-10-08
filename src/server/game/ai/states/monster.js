@@ -14,8 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var State = require('../state');
-var _ = require('underscore');
+var State = require('../state'),
+    _ = require('underscore'),
+    THREE = require('../../../../common/three'),
+    ConvertVector3 = THREE.ConvertVector3,
+    VectorDistance = THREE.VectorDistance;
 
 var outsideSpawnGuardRadius = function(unit) {
     return unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius;

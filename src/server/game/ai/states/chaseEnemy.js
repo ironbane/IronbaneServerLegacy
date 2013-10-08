@@ -14,7 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var State = require('../state');
+var State = require('../state'),
+    _ = require('underscore'),
+    THREE = require('../../../../common/three'),
+    VectorDistance = THREE.VectorDistance,
+    DistanceSq = THREE.DistanceSq;
 
 // some shortcuts for readable code
 var isDead = function(unit) {

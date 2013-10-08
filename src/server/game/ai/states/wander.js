@@ -14,7 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var State = require('../state');
+var State = require('../state'),
+    _ = require('underscore'),
+    THREE = require('../../../../common/three'),
+    VectorDistance = THREE.VectorDistance;
 
 var Wander = State.extend({
     init: function(waypoints, options) {
@@ -40,12 +43,12 @@ var Wander = State.extend({
                 // log("[Wander] Error: No nodes found!");
             } else {
                 var me = this;
-                var newPoint = ChooseRandom(me.waypoints);
+                var newPoint = _.sample(me.waypoints);
 
                 setTimeout(function() {
                     me.targetPosition = newPoint;
                     me.hasReachedWaypoint = false;
-                }, getRandomInt(this.options.minWaitTime, this.options.maxWaitTime) * 1000);
+                }, _.sample(_.range(this.options.minWaitTime, this.options.maxWaitTime)) * 1000);
 
                 // log("[Wander] Traveling to node "+randomNode.id+"...");
             }
