@@ -48,7 +48,7 @@ var MonsterState = State.extend({
             return;
         }
 
-        unit.stateMachine.ChangeState(new Wander(me.waypointList, me.wanderConfig));
+        unit.stateMachine.changeState(new Wander(me.waypointList, me.wanderConfig));
     },
     execute: function(unit, dTime) {
         if (!(unit.stateMachine.currentState instanceof ChaseEnemy)) {
@@ -57,7 +57,7 @@ var MonsterState = State.extend({
             if (target && !outsideSpawnGuardRadius(unit) && unit.InLineOfSight(target)) {
                 unit.maxSpeed = this.chaseSpeed;
                 // log("[MonsterState] Found enemy!");
-                unit.stateMachine.ChangeState(new ChaseEnemy(target));
+                unit.stateMachine.changeState(new ChaseEnemy(target));
             }
         }
     },
@@ -67,7 +67,7 @@ var MonsterState = State.extend({
             return -e.threat;
         });
         unit.maxSpeed = this.chaseSpeed;
-        unit.stateMachine.ChangeState(new ChaseEnemy(sorted[0].attacker));
+        unit.stateMachine.changeState(new ChaseEnemy(sorted[0].attacker));
     },
     handleMessage: function(unit, message, data) {
         switch (message) {
@@ -95,7 +95,7 @@ var MonsterState = State.extend({
                 // We lost the enemy or gave  up
 
                 // Go back to wandering
-                unit.stateMachine.ChangeState(new Wander(this.waypointList, this.wanderConfig));
+                unit.stateMachine.changeState(new Wander(this.waypointList, this.wanderConfig));
                 unit.maxSpeed = this.walkSpeed;
                 this.threatTable = [];
                 break;

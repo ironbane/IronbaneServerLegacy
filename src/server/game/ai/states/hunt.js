@@ -86,7 +86,7 @@ var ExploreAndLookForEnemies = State.extend({
             this.minimumExploreTime <= 0 &&
             unit.InLineOfSight(player)) {
             // log("[ExploreAndLookForEnemies] Found enemy!");
-            unit.stateMachine.ChangeState(new ChaseEnemy(player));
+            unit.stateMachine.changeState(new ChaseEnemy(player));
             //this.steeringForce = this.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST);
             //this.steeringForce = this.steeringBehaviour.Pursuit(player);
         }
@@ -96,7 +96,7 @@ var ExploreAndLookForEnemies = State.extend({
             case "attacked":
                 // We're attacked!
                 // Change state to ChaseEnemy
-                unit.stateMachine.ChangeState(new ChaseEnemy(data.attacker));
+                unit.stateMachine.changeState(new ChaseEnemy(data.attacker));
                 break;
         }
     }
