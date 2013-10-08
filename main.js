@@ -37,10 +37,9 @@ module.exports = function() {
         var warn = function() {
             console.log("Warning: no password hash set! Your server works, but is very insecure. Edit config.json and set the cryptSalt variable.");
         };
-        if ( isProduction ) {
+        if (isProduction) {
             setInterval(warn, 1000);
-        }
-        else {
+        } else {
             setTimeout(warn, 3000);
         }
     }
@@ -80,71 +79,65 @@ module.exports = function() {
         //insecureAuth:false
     });
 
+    // load AI as a module
+    var AI = require('./src/server/game/ai');
+    // temp pass them on to global for access below
+    global.StateMachine = AI.StateMachine;
+    global.State = AI.State;
+    _.extend(global, AI.States);
 
     // These are all to be converted to modules
     var includes = [
-            './Engine/Vector3.js',
-            './Init.js',
-            './Shared/seedrandom.js',
-            './Shared/Shared.js',
-            './Shared/Buffs.js',
-            './Shared/Util.js',
-            './Shared/NodeHandler.js',
-            './Engine/ConsoleCommand.js',
-            './Engine/ConsoleHandler.js',
-            './Engine/Switch.js',
-            './Engine/SocketHandler.js',
-            './Engine/WorldHandler.js',
-            './Engine/DataHandler.js',
-            './Engine/ChatHandler.js',
-            './Game/AI/graph.js',
-            './Game/AI/astar.js',
-            './Game/AI/State.js',
-            './Game/AI/StateMachine.js',
-            './Game/AI/States/ChaseEnemy.js',
-            './Game/AI/States/FleeEnemy.js',
-            './Game/AI/States/MonsterState.js',
-            './Game/AI/States/NPCGlobalState.js',
-            './Game/AI/States/EmptyState.js',
-            './Game/AI/States/SellMerchandise.js',
-            './Game/AI/States/Patrol.js',
-            './Game/AI/States/Turret.js',
-            './Game/AI/States/TurretStraight.js',
-            './Game/AI/States/Wander.js',
-            './Game/item.js',
-            './Game/SteeringBehaviour.js',
-            './Game/Unit.js',
-            './Game/MovingUnit.js',
-            './Game/Actor.js',
-            './Game/Fighter.js',
-            './Game/NPC.js',
-            './Game/Lootable.js',
-            './Game/Player.js',
-            './Game/Special/MovingObstacle.js',
-            './Game/Special/ToggleableObstacle.js',
-            './Game/Special/Train.js',
-            './Game/Special/Lever.js',
-            './Game/Special/TeleportEntrance.js',
-            './Game/Special/TeleportExit.js',
-            './Game/Special/Sign.js',
-            './Game/Special/Waypoint.js',
-            './Game/Special/HeartPiece.js',
-            './Game/Special/MusicPlayer.js',
-            './Server.js'
+        './Engine/Vector3.js',
+        './Init.js',
+        './Shared/seedrandom.js',
+        './Shared/Shared.js',
+        './Shared/Buffs.js',
+        './Shared/Util.js',
+        './Shared/NodeHandler.js',
+        './Engine/ConsoleCommand.js',
+        './Engine/ConsoleHandler.js',
+        './Engine/Switch.js',
+        './Engine/SocketHandler.js',
+        './Engine/WorldHandler.js',
+        './Engine/DataHandler.js',
+        './Engine/ChatHandler.js',
+        './Game/AI/graph.js',
+        './Game/AI/astar.js',
+        './Game/item.js',
+        './Game/SteeringBehaviour.js',
+        './Game/Unit.js',
+        './Game/MovingUnit.js',
+        './Game/Actor.js',
+        './Game/Fighter.js',
+        './Game/NPC.js',
+        './Game/Lootable.js',
+        './Game/Player.js',
+        './Game/Special/MovingObstacle.js',
+        './Game/Special/ToggleableObstacle.js',
+        './Game/Special/Train.js',
+        './Game/Special/Lever.js',
+        './Game/Special/TeleportEntrance.js',
+        './Game/Special/TeleportExit.js',
+        './Game/Special/Sign.js',
+        './Game/Special/Waypoint.js',
+        './Game/Special/HeartPiece.js',
+        './Game/Special/MusicPlayer.js',
+        './Server.js'
     ];
 
     // Include scripts from the assets
     var scriptPath = assetDir + 'scripts';
 
     var actorScripts = {};
-
     util.walk(scriptPath, function(err, results) {
-        if (err) throw err;
+        if (err) {
+            throw err;
+        }
 
         _.each(results, function(result) {
-
             //console.log(result);
-            if ( path.extname(result) === ".js" ) {
+            if (path.extname(result) === ".js") {
                 includes = includes.concat([
                     result
                 ]);
@@ -153,11 +146,7 @@ module.exports = function() {
         });
 
         start(includes);
-
-
     });
-
-
 
     // create game server, do it first so that the other 2 "servers" can query it
     var IronbaneGame;
@@ -176,7 +165,9 @@ module.exports = function() {
 
         // create express.io server
         HttpServer = require('./src/server/http/server').Server;
-        httpServer = new HttpServer({db: mysql});
+        httpServer = new HttpServer({
+            db: mysql
+        });
 
         // for the global access coming...todo: refactor
         io = httpServer.server.io;
@@ -211,13 +202,14 @@ module.exports = function() {
             });
         }, 60 * 1 * 1000);
 
-
         // Schedule an auto-restart to prevent EM readfile errors
         // We can only prevent this by upgrading to a real dedicated server, which we will do
         // when we have more people. Currently IB runs on a VPS.
         setTimeout(function() {
-                chatHandler.Announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
-                setTimeout(function() {process.exit();}, 60000);
+            chatHandler.Announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
+            setTimeout(function() {
+                process.exit();
+            }, 60000);
         }, 60 * 60 * 24 * 1000);
     }
 
@@ -260,7 +252,6 @@ module.exports = function() {
         return;
     }
 
-
     // setup REPL for console server mgmt
     var startREPL = function() {
         var repl = require('repl'); // native node
@@ -284,6 +275,4 @@ module.exports = function() {
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
     };
-
-
 };

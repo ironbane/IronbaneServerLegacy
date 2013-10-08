@@ -38,9 +38,9 @@ var StateMachine = Class.extend({
         }
     },
     setGlobalState: function(globalState) {
-        this.globalState.Exit(this.owner);
+        this.globalState.exit(this.owner);
         this.globalState = globalState;
-        this.globalState.Enter(this.owner);
+        this.globalState.enter(this.owner);
     },
     changeState: function(newState) {
         this.previousState = this.currentState;

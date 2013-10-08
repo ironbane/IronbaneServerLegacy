@@ -15,6 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var State = require('../state');
+var _ = require('underscore');
 
 var outsideSpawnGuardRadius = function(unit) {
     return unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius;

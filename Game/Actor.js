@@ -66,7 +66,7 @@ var Actor = MovingUnit.extend({
 
         this._super();
     },
-    buildWaypoints: function() {
+    BuildWaypoints: function() {
         // Calculate realistic routes where we can go to
         this.connectedNodeList = [];
 
