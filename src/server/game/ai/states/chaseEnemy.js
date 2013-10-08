@@ -16,6 +16,8 @@
 */
 var State = require('../state'),
     _ = require('underscore'),
+    Constants = require('../../../../common/constants'),
+    WeaponRanges = Constants.WeaponRanges,
     THREE = require('../../../../common/three'),
     VectorDistance = THREE.VectorDistance,
     DistanceSq = THREE.DistanceSq;

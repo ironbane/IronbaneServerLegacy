@@ -79,6 +79,11 @@ module.exports = function() {
         //insecureAuth:false
     });
 
+    // load constants (was Shared.js)
+    var IB = require('./src/common/constants');
+    // inject into global until rest is modular
+    _.extend(global, IB);
+
     // load AI as a module
     var AI = require('./src/server/game/ai');
     // temp pass them on to global for access below
@@ -91,7 +96,6 @@ module.exports = function() {
         './Engine/Vector3.js',
         './Init.js',
         './Shared/seedrandom.js',
-        './Shared/Shared.js',
         './Shared/Buffs.js',
         './Shared/Util.js',
         './Shared/NodeHandler.js',
