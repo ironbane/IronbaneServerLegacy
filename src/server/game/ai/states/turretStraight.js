@@ -14,43 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var Turret = require('./turret');
 
-var SellMerchandise = State.extend({
-    Init: function() {
-
-
-    },
-    Enter: function(unit) {
-
-        this.restockTimer = 300.0;
-    },
-    Execute: function(unit, dTime) {
-
-
-        this.restockTimer -= dTime;
-
-        if ( this.restockTimer <= 0 ) {
-            this.restockTimer = 300.0;
-
-
-            // Restock a random item
-            unit.SetWeaponsAndLoot();
-
-            // unit.Say(ChooseRandom([
-            //  "I've got new stuff!",
-            //  "Restocked merchandise!",
-            //  "New and better deals!"
-            // ]));
-
-        }
-
-    },
-    Exit: function(unit) {
-
-
-    },
-    HandleMessage: function(unit, message, data) {
-
-
+var TurretStraight = Turret.extend({
+    attack: function(unit, victim) {
+        var angle = unit.rotation.y;
+        unit.ShootProjectile(unit.position.clone().add(unit.heading.clone().multiplyScalar(5)), false);
     }
 });
+
+module.exports = TurretStraight;

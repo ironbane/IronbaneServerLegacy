@@ -52,6 +52,7 @@ module.exports = function(grunt) {
             game: {
                 src: [ // order matters!
                     "src/client/game/shared.js",
+                    "src/common/constants.js",
 
                     // common modules must be loaded before app.js as they are dependencies
                     "src/client/common/js/user/module.js",

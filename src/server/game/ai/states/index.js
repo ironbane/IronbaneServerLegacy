@@ -15,27 +15,19 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// load all possible states here (instead of dynamic)
+var States = {};
 
-var NPCGlobalState = State.extend({
-	Init: function() {
+States.EmptyState = require('./emptyState');
+States.NPCGlobalState = require('./npcGlobalState');
+States.Turret = require('./turret');
+States.TurretStraight = require('./turretStraight');
+States.ChaseEnemy = require('./chaseEnemy');
+States.ExploreAndLookForEnemies = require('./hunt');
+States.FleeEnemy = require('./fleeEnemy');
+States.Patrol = require('./patrol');
+States.Wander = require('./wander');
+States.SellMerchandise = require('./vendor');
+States.MonsterState = require('./monster');
 
-
-	},
-	Enter: function(unit) {
-
-
-	},
-	Execute: function(unit, dTime) {
-
-
-	},
-	Exit: function(unit) {
-
-
-	},
-    HandleMessage: function(unit, message, data) {
-
-
-
-    }
-});
+module.exports = States;
