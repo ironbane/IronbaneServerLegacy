@@ -14,27 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var State = require('../state');
 
-
-var State = Class.extend({
-	Init: function() {
-
-
-	},
-	Enter: function(unit) {
-
-
-	},
-	Execute: function(unit, dTime) {
-
-
-	},
-	Exit: function(unit) {
-
-
-	},
-    HandleMessage: function(unit, telegram) {
-
-
-    }
-});
+var NPCGlobalState = State.extend();

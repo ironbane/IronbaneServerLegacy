@@ -14,12 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var State = require('../state');
 
 // Requires nodes!
-
-
 var Patrol = State.extend({
-    Init: function(waypoints, options) {
+    init: function(waypoints, options) {
         this.waypoints = waypoints;
         this.options = options || {};
         this.options.pause = this.options.pause || 0;
@@ -28,53 +27,47 @@ var Patrol = State.extend({
         this.options.firstWaypoint = this.options.firstWaypoint === undefined ? this.waypoints[0] : this.options.firstWaypoint;
         this.sentTimeout = false;
     },
-    Enter: function(unit) {
-
+    enter: function(unit) {
         this.waypointIndex = 0;
 
         _.each(this.waypoints, function(w, i) {
-            if ( w.id === this.options.firstWaypoint ) {
+            if (w.id === this.options.firstWaypoint) {
                 this.waypointIndex = i;
             }
         }, this);
 
         this.targetPosition = this.waypoints[this.waypointIndex].pos;
 
-        if ( this.options.navMode === "line" ) {
+        if (this.options.navMode === "line") {
             this.forward = true;
         }
-
-
     },
-    Execute: function(unit, dTime) {
-
-        if ( VectorDistance(unit.position, this.targetPosition) < 1.0*unit.mass && !this.sentTimeout ) {
-            if ( this.options.navMode === "line" ) {
-                if ( this.forward ) {
+    execute: function(unit, dTime) {
+        if (VectorDistance(unit.position, this.targetPosition) < 1.0 * unit.mass && !this.sentTimeout) {
+            if (this.options.navMode === "line") {
+                if (this.forward) {
                     this.waypointIndex++;
 
-                    if ( this.waypointIndex >= this.waypoints.length ) {
+                    if (this.waypointIndex >= this.waypoints.length) {
                         this.waypointIndex = this.waypoints.length - 2;
                         this.forward = false;
                     }
-                }
-                else {
+                } else {
                     this.waypointIndex--;
 
-                    if ( this.waypointIndex < 0 ) {
+                    if (this.waypointIndex < 0) {
                         this.waypointIndex = 1;
                         this.forward = true;
                     }
                 }
             }
-            if ( this.options.navMode === "circuit" ) {
-                this.waypointIndex++;
 
-                if ( this.waypointIndex >= this.waypoints.length ) {
+            if (this.options.navMode === "circuit") {
+                this.waypointIndex++;
+                if (this.waypointIndex >= this.waypoints.length) {
                     this.waypointIndex = 0;
                 }
             }
-
 
             var me = this;
             setTimeout(function() {
@@ -87,23 +80,14 @@ var Patrol = State.extend({
                 me.sentTimeout = false;
             }, this.options.pause);
             this.sentTimeout = true;
-
         }
 
-
-        if ( this.options.seek ) {
+        if (this.options.seek) {
             unit.steeringForce = unit.steeringBehaviour.Seek(this.targetPosition);
+        } else {
+            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST * unit.mass);
         }
-        else {
-            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST*unit.mass);
-        }
-
-
-    },
-    Exit: function(unit) {
-
-    },
-    HandleMessage: function(unit, message, data) {
-
     }
 });
+
+module.exports = Patrol;
