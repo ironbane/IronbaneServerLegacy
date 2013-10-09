@@ -18,7 +18,9 @@ var State = require('../state'),
     _ = require('underscore'),
     THREE = require('../../../../common/three'),
     ConvertVector3 = THREE.ConvertVector3,
-    VectorDistance = THREE.VectorDistance;
+    VectorDistance = THREE.VectorDistance,
+    Wander = require('./wander'),
+    ChaseEnemy = require('./chaseEnemy');
 
 var outsideSpawnGuardRadius = function(unit) {
     return unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius;

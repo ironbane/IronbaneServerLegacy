@@ -14,7 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var State = require('../state');
+var State = require('../state'),
+    THREE = require('../../../../common/three'),
+    ConvertVector3 = THREE.ConvertVector3,
+    VectorDistance = THREE.VectorDistance,
+    ChaseEnemy = require('./chaseEnemy');
 
 var ExploreAndLookForEnemies = State.extend({
     init: function() {
