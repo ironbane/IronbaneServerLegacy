@@ -115,13 +115,22 @@ var Fighter = Actor.extend({
 
     if ( !victim.chGodMode ) {
 
-      if ( damage > 0 ) {
+      if(victim.id > 0 &&  damage < 0) {
+        victim.health += Math.abs(damage);
+
+        victim.health = Math.min(victim.healthMax, victim.health);
+
+
+        this.HandleMessage("healTarget", {damage:damage});
+        victim.HandleMessage("healed", {attacker:this, damage:damage});
+      }
+
+      else{
 
         // 22/12/12 No more PvP... :(
         if ( this.id > 0 && victim.id > 0 ) return;
-
-
-        var remaining = damage - victim.armor;
+        damage = Math.abs(damage);
+      var remaining = damage - victim.armor;
         victim.armor -= damage;
 
         if ( remaining > 0 ) {
@@ -134,20 +143,7 @@ var Fighter = Actor.extend({
         this.HandleMessage("hurtTarget", {damage:damage});
         victim.HandleMessage("attacked", {attacker:this, damage:damage});
       }
-      else {
-        victim.health += Math.abs(damage);
-
-        victim.health = Math.min(victim.healthMax, victim.health);
-
-
-        this.HandleMessage("healTarget", {damage:damage});
-        victim.HandleMessage("healed", {attacker:this, damage:damage});
-      }
-
     }
-
-
-
 
     victim.EmitNearby("getMeleeHit", {
       victim:victim.id,
