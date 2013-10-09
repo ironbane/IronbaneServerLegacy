@@ -84,6 +84,9 @@ module.exports = function() {
     // inject into global until rest is modular
     _.extend(global, IB);
 
+    // Load DataHandler global for now (holds memory DB of item and unit templates)
+    global.dataHandler = require('./src/server/game/dataHandler')(mysql);
+
     // load AI as a module
     var AI = require('./src/server/game/ai');
     // temp pass them on to global for access below
@@ -104,7 +107,6 @@ module.exports = function() {
         './Engine/Switch.js',
         './Engine/SocketHandler.js',
         './Engine/WorldHandler.js',
-        './Engine/DataHandler.js',
         './Engine/ChatHandler.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
