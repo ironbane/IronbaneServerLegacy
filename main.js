@@ -87,6 +87,12 @@ module.exports = function() {
     // Load DataHandler global for now (holds memory DB of item and unit templates)
     global.dataHandler = require('./src/server/game/dataHandler')(mysql);
 
+    // for now
+    global.worldHandler = {};
+
+    // Load Chat module
+    var Chat = require('./src/server/game/chat')(global.dataHandler.items, global.dataHandler.units, global.worldHandler);
+
     // load AI as a module
     var AI = require('./src/server/game/ai');
     // temp pass them on to global for access below
@@ -280,5 +286,7 @@ module.exports = function() {
         // context variables get attached to "global" of this instance
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
+
+        serverREPL.context.Chat = Chat;
     };
 };

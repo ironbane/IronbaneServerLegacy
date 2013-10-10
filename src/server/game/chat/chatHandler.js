@@ -14,12 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var Class = require('../../../common/class');
 
-module.exports = function(items, units, world) {
-    var Chat = {};
+var ChatHandler = Class.extend({
 
-    Chat.ChatHandler = require('./chatHandler');
-    Chat.Commands = require('./commands')(items, units, world);
+});
 
-    return Chat;
-};
+module.exports = ChatHandler;

@@ -74,6 +74,19 @@ var SocketHandler = Class.extend({
             socket.unit = unit;
             socket.unit.socket = socket;
 
+            // join several rooms / channels by default
+            if(unit.isGuest) {
+                socket.join('guests');
+            }
+            if(unit.editor) {
+                socket.join('editors');
+            }
+            // join a channel in your own name for private messaging
+            socket.join(unit.name);
+            // join a zone based channel (todo: join/leave on changing zones)
+            socket.join('zone_' + unit.zone);
+            // cell and/or "nearby" type channels? (to localize chat bubbles)
+
             // Update us, and all players that are nearby
             var cx = unit.cellX;
             var cz = unit.cellZ;
@@ -282,21 +295,25 @@ var SocketHandler = Class.extend({
             });
 
             // Send to everyone!
-            socket.on("chatMessage", function (data) {
-                if ( !socket.unit ) return;
+            socket.on("chatMessage", function(data) {
+                if (!socket.unit) {
+                    return;
+                }
 
-                if ( !_.isString(data.message) ) {
-                    chatHandler.AnnounceNick("Warning: Hacked client in "+
-                        "[chatMessage]<br>User "+socket.unit.name+"", "red");
+                if (!_.isString(data.message)) {
+                    chatHandler.AnnounceNick("Warning: Hacked client in " +
+                        "[chatMessage]<br>User " + socket.unit.name + "", "red");
                     return;
                 }
 
                 data.message = data.message.substr(0, 100);
 
                 // No empty messages
-                if ( !data.message ) return;
+                if (!data.message) {
+                    return;
+                }
 
-                if ( !socket.unit.editor && socket.unit.lastChatTime > (new Date()).getTime()-2000 ) {
+                if (!socket.unit.editor && socket.unit.lastChatTime > (new Date()).getTime() - 2000) {
                     chatHandler.AnnouncePersonally(socket.unit,
                         "Please don't spam the server.", "yellow");
                     return;
@@ -305,9 +322,11 @@ var SocketHandler = Class.extend({
                 socket.unit.lastChatTime = (new Date()).getTime();
 
 
-                if ( data.message.length <= 0 ) return;
+                if (data.message.length <= 0) {
+                    return;
+                }
 
-                log(socket.unit.name + ': '+data.message);
+                log(socket.unit.name + ': ' + data.message);
 
                 chatHandler.Say(socket.unit, data.message);
             });
