@@ -19,6 +19,16 @@ module.exports = function(db) {
             this.moderator = parameters.moderator;
         },
 
+        $adminResetPassword: function(){
+
+            var crypto = require('crypto'),
+                pHash = crypto.createHash('md5'),
+                cryptSalt = config.get('cryptSalt');
+                 pHash.update(cryptSalt + "welcome");
+            this.pass = pHash.digest('hex');
+
+        },
+
         $update: function(parameters) {
             //validate
             var crypto = require('crypto'),
@@ -56,6 +66,7 @@ module.exports = function(db) {
                 db.query("UPDATE bcs_users set ? where id = ?", [self,self.id], function(err, result){
                     if(err){
                         log(err);
+                        log(JSON.stringify(self));
                         return deferred.reject(err);
                     }
                     return deferred.resolve(self);
