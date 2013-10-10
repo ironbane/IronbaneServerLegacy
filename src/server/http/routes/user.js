@@ -149,6 +149,21 @@ module.exports = function(app, db) {
 
     });
 
+    app.post('/api/user/:id', function(req, res) {
+        log("request for update: ");
+        log(req.body);
+        User.getById(req.params.id)
+        .then(function(updateUser){
+            updateUser.$adminUpdate(req.body);
+            updateUser.$save()
+                .then(function(user){
+                    res.send(user);
+                }, function(error){
+                    res.send(500, error);
+                });
+            });
+    });
+
     app.post('/api/user/avatar', app.ensureAuthenticated, function(req, res) {
          
     });
@@ -161,6 +176,14 @@ module.exports = function(app, db) {
             }, function(err) {
                 res.send(500, err);
             });
+    });
+
+    app.get('/api/users/:id', function(req, res){
+        User.getById(req.params.id).then(function(user){
+            res.send(user);
+        }, function(error){
+            res.send(error, 500);
+        });
     });
 
     app.get('/api/users', function(req, res){

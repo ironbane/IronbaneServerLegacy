@@ -1,17 +1,18 @@
 <div class="article-wrap">
-    
+<a href="/editor/users">back to userlist </a>    
     <h2>{{ user.name }}</h2>
     <form name="articleForm">
-        <input id = "chkBan" type="checkbox" ng-model="banned"/>
+        <input id = "chkBan" type="checkbox" ng-model="user.banned" ng-checked="user.banned"/>
         <label for = "chkBan">Banned</label>
-        <input id = "chkAdmin" type="checkbox" ng-model="admin"/>
+        <input id = "chkAdmin" type="checkbox" ng-model="user.admin" ng-checked="user.admin"/>
         <label for = "chkAdmin">Admin</label>
-        <input id = "chkMod" type="checkbox" ng-model="moderator"/>
+        <input id = "chkMod" type="checkbox" ng-model="user.moderator" ng-checked="user.moderator"/>
         <label for = "chkMod">Moderator</label>
-        <input id = "chkEdit" type="checkbox" ng-model="editor"/>
+        <input id = "chkEdit" type="checkbox" ng-model="user.editor" ng-checked="user.editor"/>
         <label for = "chkEdit">Editor</label>
-        <button ng-click="update()">Update</button>
+        <button ng-click="updateUser()">Update</button>
       
         
     </form>
+    {{message}}
 </div>

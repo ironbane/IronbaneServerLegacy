@@ -12,6 +12,13 @@ module.exports = function(db) {
             _.extend(this, json || {});
         },
 
+        $adminUpdate: function(parameters){
+            this.banned = parameters.banned;
+            this.admin = parameters.admin;
+            this.editor = parameters.editor;
+            this.moderator = parameters.moderator;
+        },
+
         $update: function(parameters) {
             //validate
             var crypto = require('crypto'),
@@ -27,10 +34,12 @@ module.exports = function(db) {
             this.info_website = parameters.info_website;
             this.show_email = parameters.show_email;
 
+
             pHash.update(cryptSalt + parameters.passwordnewconfirm);
             this.pass = pHash.digest('hex');
 
         },
+
         $save: function() {
             log("saving!");
             var self = this;
@@ -207,14 +216,17 @@ module.exports = function(db) {
 
         db.query('select * from bcs_users where id = ?', [id], function(err, results) {
             if (err) {
-                deferred.reject(err);
-                return;
+                return deferred.reject(err);
+                
             }
 
             if (results.length === 0) {
-                deferred.reject("no user found");
+                return deferred.reject("no user found");
             } else {
+                log("getting user");
+
                 var user = new User(results[0]);
+                log(JSON.stringify(user));
                 // add in security roles
                 user.$initRoles();
                 deferred.resolve(user);
