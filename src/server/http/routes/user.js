@@ -64,7 +64,8 @@ module.exports = function(app, db) {
                 info_occupation: req.user.info_occupation,
                 info_interests: req.user.info_interests,
                 info_website: req.user.info_website,
-                show_email: req.user.show_email
+                show_email: req.user.show_email,
+                newsletter: req.user.newsletter
             });
         } else {
             res.send(404, 'no user signed in');
@@ -165,7 +166,7 @@ module.exports = function(app, db) {
     app.post('/api/user/admin/resetpassword/:id', function(req, res){
         User.getById(req.params.id)
         .then(function(updateUser){
-            
+
             updateUser.$adminResetPassword();
             updateUser.$save()
                 .then(function(user){

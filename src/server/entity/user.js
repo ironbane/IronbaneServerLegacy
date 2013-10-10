@@ -43,6 +43,7 @@ module.exports = function(db) {
             this.info_interests = parameters.info_interests;
             this.info_website = parameters.info_website;
             this.show_email = parameters.show_email;
+            this.newsletter = parameters.newsletter;
 
 
             pHash.update(cryptSalt + parameters.passwordnewconfirm);
