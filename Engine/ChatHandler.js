@@ -183,7 +183,7 @@ var commands = {
     // Should be a hudhandler message in the future. Good enough for now
     requiresEditor: false,
     action: function(unit, realparams, errorMessage) {
-      var message = "MOVE (W,A,S,D)<br>STRAFE (Q,E)<br>Walk slower, turn faster (shift)<br>Attack (right mouse click)<br>CHAT (enter)<br>If you get stuck (/stuck in chatbox)";
+      var message = "MOVE (W,A,S,D)<br>STRAFE (Q,E)<br>Walk slower, turn faster (shift)<br>Attack (left mouse click)<br>CHAT (enter)<br>If you get stuck (/stuck in chatbox)";
       chatHandler.AnnouncePersonally(unit, message, "yellow");
       return {
         errorMessage: errorMessage
@@ -251,13 +251,21 @@ var ChatHandler = Class.extend({
           realparams = realparams.concat(param.split(' '));
         }
 
+	// If user is not an admin and used a command, the command itself must be void and not polute the chat output;
+	if(!unit.editor) message = 'voidThis';
       }
 
       var command = realparams[0].substr(1);
 
       realparams.shift();
 
-      var feedback = "(" + unit.name + ") " + message + "";
+	// This voids the command in chat output for players
+      if(message != 'voidThis') {
+         var feedback = "(" + unit.name + ") " + message + "";
+      } else {
+         var feedback = "";
+      }
+
       var errorMessage = "";
 
       var showFeedback = true;
