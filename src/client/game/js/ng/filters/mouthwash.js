@@ -348,10 +348,14 @@ IronbaneApp
             return;
         }
 
+	// Strip all unicode, best would be to strip all but latin chars, but this type of regexp is not supported by node for the moment.
+	input = input.replace(/[\u0080-\uffff]/g, '');
+
         var clean = " " + input + " ";
 
         angular.forEach(badWords, function(word) {
             angular.forEach(word, function(value, key) {
+		// Add detection for word in string of stripped inputvar
                 clean = clean.replace(" " + key + " ", " " + value + " ");
             });
         });
