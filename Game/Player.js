@@ -66,7 +66,7 @@ var Player = Fighter.extend({
 
         this.respawnTimer = 10.0;
 
-        chatHandler.DiedSpecial(this, "lava");
+        chatHandler.announceDiedSpecial(this, "lava");
     }
 
     this._super(dTime);
@@ -119,7 +119,7 @@ var Player = Fighter.extend({
   Kick: function(reason) {
     // Immunity
     if (this.editor) {
-      chatHandler.Announce(this.name + ' has immunity.', "yellow");
+      chatHandler.announce(this.name + ' has immunity.', "yellow");
       return;
     }
 
@@ -128,7 +128,7 @@ var Player = Fighter.extend({
     var me = this;
 
     var message = this.name + ' has been kicked. (' + reason + ')';
-    chatHandler.Announce(message, "yellow");
+    chatHandler.announce(message, "yellow");
 
     setTimeout(function() {
       me.socket.disconnect();
@@ -138,7 +138,7 @@ var Player = Fighter.extend({
   Ban: function(hours, reason) {
     // Immunity
     if (this.editor) {
-      chatHandler.Announce(this.name + ' has immunity.', "red");
+      chatHandler.announce(this.name + ' has immunity.', "red");
       return;
     }
 
@@ -154,7 +154,7 @@ var Player = Fighter.extend({
     var how = hours ? "permanently banned" : "banned for " + hours + " hours";
 
     var message = this.name + ' has been ' + how + '. (' + reason + ')';
-    chatHandler.Announce(message, "red");
+    chatHandler.announce(message, "red");
 
     mysql.query('INSERT INTO ib_bans SET ?', {
       ip: me.socket.ip,
@@ -218,7 +218,7 @@ var Player = Fighter.extend({
 
     this.Save();
 
-    chatHandler.LeaveGame(this);
+    chatHandler.announceLoginStatus(this, 'leave');
 
     var cx = this.cellX;
     var cz = this.cellZ;

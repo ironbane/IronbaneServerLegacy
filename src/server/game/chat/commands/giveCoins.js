@@ -24,12 +24,12 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 
     return {
         requiresEditor: true,
-        action: function(unit, realparams, errorMessage) {
+        action: function(unit, target, params, errorMessage) {
             // find a "cash" item
             var moneybag = _.where(items, {
                     type: 'cash'
                 })[0],
-                amount = parseInt(realparams[0], 10);
+                amount = parseInt(params[0], 10);
 
             if (moneybag) {
                 if (!unit.GiveItem(moneybag, {

@@ -24,10 +24,26 @@ var ChatHandler = Class.extend({
     },
     // was "Say", now /say is a command instead
     processInput: function(unit, message) {
-        if (message.substr(0, 1) === "/") {
-            var params = message.split(/(".*?")/);
+        var command,
+            target,
+            commandOpener = message.substr(0, 1);
 
-            var realparams = [];
+        if (commandOpener !== '/' && commandOpener !== '@') {
+            console.warn('Unsupported direct input to ChatMessage by: ', unit.name, ' >> ', message);
+            return;
+        }
+
+        // strip off the commandOpener now we have it
+        message = message.substr(1);
+
+        var params = message.split(/(".*?")/),
+            realparams = [];
+
+        if(params.length === 1) {
+            // there are no quoted params, so just do space delim
+            realparams = message.split(' ');
+        } else {
+            // there are one or more quoted params, gather them up
             for (var p = 0; p < params.length; p++) {
                 var param = params[p].trim();
 
@@ -41,48 +57,64 @@ var ChatHandler = Class.extend({
                     realparams = realparams.concat(param.split(' '));
                 }
             }
-
-            var command = realparams[0].substr(1);
-            realparams.shift();
-
-            var feedback = "(" + unit.name + ") " + message + "";
-            var errorMessage = "";
-            var showFeedback = true;
-
-            if (this.commands[command] && ((!this.commands[command].requiresEditor && !unit.editor) || unit.editor)) {
-                var result = this.commands[command].action(unit, realparams, errorMessage);
-                errorMessage = result.errorMessage;
-            } else {
-                errorMessage = "That command does not exist!";
-            }
-
-            if (errorMessage) {
-                feedback += "<br>" + errorMessage;
-            }
-
-            if (showFeedback) {
-                this.announcePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
-            }
-        } else {
-            // todo: move this to "say" command
-            if (!unit.editor) {
-                message = sanitize(message).entityEncode();
-            }
-
-            //unit.EmitNearby("say", {id:unit.id,message:message}, 0, true);
-            unit.Say(message);
-
-            var messageData = {
-                type: 'say',
-                user: {
-                    name: unit.name,
-                    rank: unit.editor ? 'gm' : 'user'
-                },
-                message: message
-            };
-
-            this.io.sockets.emit("chatMessage", messageData);
         }
+
+        // commands starting with @ are assumed to be of type SAY as that is normal "chat" type behavior
+        if(commandOpener === '@') {
+            command = 'say';
+        } else {
+            command = realparams.shift();
+            // for the case of say, if we use /say, then if we want to target a room use : , like: /say:zone_1 hey what's up or /say:"leeroy jenkins" don't attack!
+            if(command.indexOf(':') >= 0) {
+                var cmdparts = command.split(':');
+                command = cmdparts[0];
+                if(cmdparts[1] !== '') {
+                    // non quoted string target
+                    target = cmdparts[1];
+                }
+                command.replace(':', '');
+                target = realparams.shift();
+            }
+        }
+
+        var feedback = "(" + unit.name + ") " + message + "";
+        var errorMessage = "";
+        var showFeedback = true;
+
+        if (this.commands[command] && ((!this.commands[command].requiresEditor && !unit.editor) || unit.editor)) {
+            var result = this.commands[command].action(unit, target, realparams, errorMessage);
+            errorMessage = result.errorMessage;
+        } else {
+            errorMessage = "That command does not exist!";
+        }
+
+        if (errorMessage) {
+            feedback += "<br>" + errorMessage;
+        }
+
+        if (showFeedback) {
+            this.announcePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
+        }
+    },
+    say: function(unit, message, room) {
+        var messageType = room ? ('say:' + room) : 'say';
+
+        if (!unit.editor) {
+            message = sanitize(message).entityEncode();
+        }
+
+        unit.Say(message);
+
+        var messageData = {
+            type: messageType,
+            user: {
+                name: unit.name,
+                rank: unit.editor ? 'gm' : 'user'
+            },
+            message: message
+        };
+
+        this.io.sockets.emit("chatMessage", messageData);
     },
     announce: function(message, color) {
         log("[Announce] " + message);

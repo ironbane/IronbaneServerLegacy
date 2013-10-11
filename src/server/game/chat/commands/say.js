@@ -15,14 +15,21 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-module.exports = function(io, items, units, worldHandler) {
-    var Chat = {};
+// chat command API
+// items - item templates (from datahandler)
+// units - unit templates (from datahandler)
+// worldHandler - worldHandler reference
+// chatHandler - reference to general chat utils
+module.exports = function(items, units, worldHandler, chatHandler) {
+    return {
+        requiresEditor: false,
+        action: function(unit, target, params, errorMessage) {
 
-    Chat.ChatHandler = require('./chatHandler');
-    Chat.instance = new Chat.ChatHandler(io); // for the global reference, later lives only within here?
-    Chat.Commands = require('./commands')(items, units, worldHandler, Chat.instance);
-    // this is a little loopy, how to make better?
-    Chat.instance.commands = Chat.commands;
+            chatHandler.say(unit, params.join(' '), target);
 
-    return Chat.instance;
+            return {
+                errorMessage: errorMessage
+            };
+        }
+    };
 };

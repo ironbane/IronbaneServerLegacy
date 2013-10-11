@@ -25,17 +25,17 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 
     return {
         requiresEditor: true,
-        action: function(unit, realparams, errorMessage) {
+        action: function(unit, target, params, errorMessage) {
             // So, which item?
             var template = -1;
 
             // Try to convert to integer, if we passed an ID
-            var testConvert = parseInt(realparams[0], 10);
+            var testConvert = parseInt(params[0], 10);
             if (_.isNumber(testConvert) && !_.isNaN(testConvert)) {
                 template = items[testConvert];
             } else {
                 template = _.where(items, {
-                    name: realparams[0]
+                    name: params[0]
                 })[0];
             }
 

@@ -92,7 +92,6 @@ module.exports = function() {
         './Engine/Switch.js',
         './Engine/SocketHandler.js',
         './Engine/WorldHandler.js',
-        './Engine/ChatHandler.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
         './Game/item.js',
@@ -214,7 +213,7 @@ module.exports = function() {
         // We can only prevent this by upgrading to a real dedicated server, which we will do
         // when we have more people. Currently IB runs on a VPS.
         setTimeout(function() {
-            chatHandler.Announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
+            global.chatHandler.announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
             setTimeout(function() {
                 process.exit();
             }, 60000);
@@ -239,8 +238,8 @@ module.exports = function() {
             if (results.length) {
                 shuttingDown = true;
 
-                chatHandler.Announce("&lt;Server&gt; New update available!", "red");
-                chatHandler.Announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
+                global.chatHandler.announce("&lt;Server&gt; New update available!", "red");
+                global.chatHandler.announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
 
                 // Disconnect all clients first
                 io.sockets.emit("disconnect");

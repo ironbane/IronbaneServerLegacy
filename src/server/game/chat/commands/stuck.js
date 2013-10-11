@@ -23,9 +23,9 @@
 module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
-        action: function(unit, realparams, errorMessage) {
+        action: function(unit, target, params, errorMessage) {
             unit.Teleport(normalSpawnZone, normalSpawnPosition);
-            chatHandler.AnnouncePersonally(unit, "You were teleported back to town.", "lightgreen");
+            chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
             return {
                 errorMessage: errorMessage
             };
