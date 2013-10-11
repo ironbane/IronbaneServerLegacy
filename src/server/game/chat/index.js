@@ -15,11 +15,14 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-module.exports = function(items, units, world) {
+module.exports = function(io, items, units, worldHandler) {
     var Chat = {};
 
     Chat.ChatHandler = require('./chatHandler');
-    Chat.Commands = require('./commands')(items, units, world);
+    Chat.instance = new Chat.ChatHandler(io); // for the global reference, later lives only within here?
+    Chat.Commands = require('./commands')(items, units, worldHandler, Chat.instance);
 
-    return Chat;
+    Chat.instance.commands = Chat.commands;
+
+    return Chat.instance;
 };

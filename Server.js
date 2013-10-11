@@ -93,7 +93,7 @@ var Server = Class.extend({
 
                 ]);
 
-                chatHandler.Announce(msg);
+                chatHandler.announce(msg);
 
             }
         }

@@ -122,30 +122,30 @@ var WorldHandler = Class.extend({
     });
   },
   DoFullBackup: function() {
-    chatHandler.AnnounceMods("Backing up server...", "blue");
+      chatHandler.announceRoom('mods', "Backing up server...", "blue");
 
-    var deploySh = spawn('sh', [ 'serverbackup.sh' ], {
-      //cwd: process.env.HOME + '/myProject',
-      cwd: '/root',
-      env:_.extend(process.env, {
-        PATH: process.env.PATH + ':/usr/local/bin'
-      })
-    });
+      var deploySh = spawn('sh', [ 'serverbackup.sh' ], {
+        //cwd: process.env.HOME + '/myProject',
+        cwd: '/root',
+        env:_.extend(process.env, {
+          PATH: process.env.PATH + ':/usr/local/bin'
+        })
+      });
 
-    deploySh.stderr.on('data', function (data) {
-      chatHandler.AnnounceMods(data, "red");
-      //console.log('stderr: ' + data);
-    });
+      deploySh.stderr.on('data', function (data) {
+        chatHandler.announceRoom('mods', data, "red");
+        //console.log('stderr: ' + data);
+      });
 
-    // handle error so server doesn't crash...
-    deploySh.on('error', function(err) {
-        log('Error doing full backup!', err);
-    });
+      // handle error so server doesn't crash...
+      deploySh.on('error', function(err) {
+          log('Error doing full backup!', err);
+      });
 
-    deploySh.on('exit', function (code) {
-      chatHandler.AnnounceMods("Backup complete!", "blue");
-      //console.log('child process exited with code ' + code);
-    });
+      deploySh.on('exit', function (code) {
+          chatHandler.announceRoom('mods', "Backup complete!", "blue");
+          //console.log('child process exited with code ' + code);
+      });
   },
   CheckWorldStructure: function(zone, cx, cz) {
     if ( !_.isUndefined(zone) && _.isUndefined(worldHandler.world[zone]) ) return false;
@@ -562,7 +562,7 @@ var WorldHandler = Class.extend({
 
     var doClearObjects = clearObjects || false;
 
-    chatHandler.AnnounceMods("Saving cell "+cellX+", "+cellZ+" in zone "+zone+"...");
+    chatHandler.announceRoom('editors', "Saving cell " + cellX + ", " + cellZ + " in zone " + zone + "...");
 
     // Instead of saving instantly, we load the cell, overwrite it with the terrain we have, and save it! And empty terrain!
 

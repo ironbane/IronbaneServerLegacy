@@ -79,27 +79,6 @@ module.exports = function() {
         //insecureAuth:false
     });
 
-    // load constants (was Shared.js)
-    var IB = require('./src/common/constants');
-    // inject into global until rest is modular
-    _.extend(global, IB);
-
-    // Load DataHandler global for now (holds memory DB of item and unit templates)
-    global.dataHandler = require('./src/server/game/dataHandler')(mysql);
-
-    // for now
-    global.worldHandler = {};
-
-    // Load Chat module
-    var Chat = require('./src/server/game/chat')(global.dataHandler.items, global.dataHandler.units, global.worldHandler);
-
-    // load AI as a module
-    var AI = require('./src/server/game/ai');
-    // temp pass them on to global for access below
-    global.StateMachine = AI.StateMachine;
-    global.State = AI.State;
-    _.extend(global, AI.States);
-
     // These are all to be converted to modules
     var includes = [
         './Engine/Vector3.js',
@@ -185,11 +164,28 @@ module.exports = function() {
         io = httpServer.server.io;
         ioApp = httpServer.server;
 
-
         for (var f = 0; f < includes.length; f++) {
             log("Loading: " + includes[f]);
             eval(fs.readFileSync(includes[f]) + '');
         }
+
+        // load constants (was Shared.js)
+        var IB = require('./src/common/constants');
+        // inject into global until rest is modular
+        _.extend(global, IB);
+
+        // Load DataHandler global for now (holds memory DB of item and unit templates)
+        global.dataHandler = require('./src/server/game/dataHandler')(mysql);
+
+        // Load Chat module
+        global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
+
+        // load AI as a module
+        var AI = require('./src/server/game/ai');
+        // temp pass them on to global for access below
+        global.StateMachine = AI.StateMachine;
+        global.State = AI.State;
+        _.extend(global, AI.States);
 
         // All set! Tell WorldHandler to load
         worldHandler.LoadWorldLight();
@@ -286,7 +282,5 @@ module.exports = function() {
         // context variables get attached to "global" of this instance
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
-
-        serverREPL.context.Chat = Chat;
     };
 };

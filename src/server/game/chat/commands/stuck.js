@@ -18,9 +18,9 @@
 // chat command API
 // items - item templates (from datahandler)
 // units - unit templates (from datahandler)
-// world - worldHandler reference
-// commands - reference to the other commands available
-module.exports = function(items, units, world, commands) {
+// worldHandler - worldHandler reference
+// chatHandler - reference to general chat utils
+module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, realparams, errorMessage) {

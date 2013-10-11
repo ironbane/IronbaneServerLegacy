@@ -94,7 +94,7 @@ var Actor = MovingUnit.extend({
         var me = this;
 
         function AnnounceOccurredError(msg, amount) {
-            chatHandler.AnnounceMods(msg + "<br><i>Warning: this error happened " + amount + " seconds ago.</i>", "red");
+            chatHandler.announceRoom('mods', msg + "<br><i>Warning: this error happened " + amount + " seconds ago.</i>", "red");
         }
 
         function addEdgeNodes(list, zone, node) {
@@ -111,7 +111,7 @@ var Actor = MovingUnit.extend({
                     // "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
                     // ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
 
-                    // chatHandler.AnnounceMods(msg, "red");
+                    // chatHandler.announceRoom('mods', msg, "red");
 
                     // log("ERROR: "+msg);
 

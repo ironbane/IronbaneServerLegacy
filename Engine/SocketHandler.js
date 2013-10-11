@@ -79,7 +79,14 @@ var SocketHandler = Class.extend({
                 socket.join('guests');
             }
             if(unit.editor) {
+                // todo: split these based on roles?
                 socket.join('editors');
+                socket.join('mods');
+                socket.join('admins');
+            }
+            // to replace announceNick, tho should just send same to admins instead?
+            if(unit.playerID === 1) {
+                socket.join('__nick__');
             }
             // join a channel in your own name for private messaging
             socket.join(unit.name);
@@ -96,7 +103,7 @@ var SocketHandler = Class.extend({
             // In addition, we need the units that are near this unit, to add this unit to their otherUnits list
             // They will in turn tell their socket to add the unit
 
-            chatHandler.JoinGame(unit);
+            chatHandler.announceLoginStatus(unit, 'join');
 
             req.io.respond({
                 id: unit.id,
@@ -294,45 +301,40 @@ var SocketHandler = Class.extend({
                 socket.unit = null;
             });
 
-            // Send to everyone!
+            // chatMessage is the user input processor
             socket.on("chatMessage", function(data) {
                 if (!socket.unit) {
                     return;
                 }
 
                 if (!_.isString(data.message)) {
-                    chatHandler.AnnounceNick("Warning: Hacked client in " +
+                    chatHandler.announceRoom('__nick__', "Warning: Hacked client in " +
                         "[chatMessage]<br>User " + socket.unit.name + "", "red");
                     return;
                 }
 
+                // should trunc + add ellipses?
                 data.message = data.message.substr(0, 100);
 
                 // No empty messages
-                if (!data.message) {
+                if (!data.message || data.message.length <= 0) {
                     return;
                 }
 
                 if (!socket.unit.editor && socket.unit.lastChatTime > (new Date()).getTime() - 2000) {
-                    chatHandler.AnnouncePersonally(socket.unit,
-                        "Please don't spam the server.", "yellow");
+                    chatHandler.announcePersonally(socket.unit, "Please don't spam the server.", "yellow");
                     return;
                 }
-
                 socket.unit.lastChatTime = (new Date()).getTime();
 
-
-                if (data.message.length <= 0) {
-                    return;
-                }
-
                 log(socket.unit.name + ': ' + data.message);
-
-                chatHandler.Say(socket.unit, data.message);
+                chatHandler.processInput(socket.unit, data.message);
             });
 
             socket.on("doJump", function (data) {
-                if ( !socket.unit ) return;
+                if (!socket.unit) {
+                    return;
+                }
 
                 socket.unit.EmitNearby("doJump", {
                     id:socket.unit.id
@@ -1285,7 +1287,7 @@ var SocketHandler = Class.extend({
 
                 log("Shutting down by user request ("+socket.unit.id+")");
 
-                chatHandler.Announce("Server will restart in 5 seconds...", "red");
+                chatHandler.announce("Server will restart in 5 seconds...", "red");
 
                 setTimeout(function() {process.exit();}, 5000);
             });
@@ -1317,7 +1319,7 @@ var SocketHandler = Class.extend({
                 dataHandler.Load();
 
                 setTimeout(function(){
-                    chatHandler.Announce("Reloaded NPC & Item templates", "white");
+                    chatHandler.announce("Reloaded NPC & Item templates", "white");
                 }, 1000);
             });
 
@@ -1393,7 +1395,7 @@ var SocketHandler = Class.extend({
                     unit.Teleport(zone, pos);
                 }
                 else {
-                    chatHandler.AnnouncePersonally(socket.unit, "Could not find player "+data.name+"!", "red");
+                    chatHandler.announcePersonally(socket.unit, "Could not find player "+data.name+"!", "red");
                 }
 
             });
@@ -1604,7 +1606,7 @@ var SocketHandler = Class.extend({
                     });
 
 
-                    chatHandler.AnnouncePersonally(socket.unit,
+                    chatHandler.announcePersonally(socket.unit,
                         "The server needs to restart before you will see that texture change applied to all models!.", "cyan");
                 }
 
