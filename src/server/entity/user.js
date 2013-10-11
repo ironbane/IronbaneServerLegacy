@@ -12,6 +12,23 @@ module.exports = function(db) {
             _.extend(this, json || {});
         },
 
+        $adminUpdate: function(parameters){
+            this.banned = parameters.banned;
+            this.admin = parameters.admin;
+            this.editor = parameters.editor;
+            this.moderator = parameters.moderator;
+        },
+
+        $adminResetPassword: function(){
+
+            var crypto = require('crypto'),
+                pHash = crypto.createHash('md5'),
+                cryptSalt = config.get('cryptSalt');
+                 pHash.update(cryptSalt + "welcome");
+            this.pass = pHash.digest('hex');
+
+        },
+
         $update: function(parameters) {
             //validate
             var crypto = require('crypto'),
@@ -26,11 +43,14 @@ module.exports = function(db) {
             this.info_interests = parameters.info_interests;
             this.info_website = parameters.info_website;
             this.show_email = parameters.show_email;
+            this.newsletter = parameters.newsletter;
+
 
             pHash.update(cryptSalt + parameters.passwordnewconfirm);
             this.pass = pHash.digest('hex');
 
         },
+
         $save: function() {
             log("saving!");
             var self = this;
@@ -47,6 +67,7 @@ module.exports = function(db) {
                 db.query("UPDATE bcs_users set ? where id = ?", [self,self.id], function(err, result){
                     if(err){
                         log(err);
+                        log(JSON.stringify(self));
                         return deferred.reject(err);
                     }
                     return deferred.resolve(self);
@@ -207,14 +228,17 @@ module.exports = function(db) {
 
         db.query('select * from bcs_users where id = ?', [id], function(err, results) {
             if (err) {
-                deferred.reject(err);
-                return;
+                return deferred.reject(err);
+                
             }
 
             if (results.length === 0) {
-                deferred.reject("no user found");
+                return deferred.reject("no user found");
             } else {
+                log("getting user");
+
                 var user = new User(results[0]);
+                log(JSON.stringify(user));
                 // add in security roles
                 user.$initRoles();
                 deferred.resolve(user);

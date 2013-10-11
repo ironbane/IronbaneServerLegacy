@@ -1,5 +1,5 @@
 angular.module('IronbaneApp')
-.factory('myHttpInterceptor', function ($q, $window) {
+.factory('myHttpInterceptor', ['$q', function ($q) {
         return function (promise) {
             return promise.then(function (response) {
                 // do something on success
@@ -14,4 +14,4 @@ angular.module('IronbaneApp')
                 return $q.reject(response);
             });
         };
-    });
+    }]);

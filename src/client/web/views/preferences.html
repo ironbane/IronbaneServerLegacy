@@ -10,7 +10,7 @@ Case-sensitive, min. 4 characters, max. 20 characters.	<br>
 Confirm New Password: <input type="password" ng-model="user.passwordnewconfirm"/><span ng-show="user.passwordnew != user.passwordnewconfirm">password not matching</span><br>
 
 E-mail Address: <input type="email" ng-model="user.email"/><br>
-Show my e-mail address <input type="checkbox" ng-model="user.show_email"/><br>
+Show my e-mail address <input type="checkbox" ng-model="user.show_email" ng-checked="user.show_email"/><br>
 <h2>Optional stuff:</h2> <br>
 It would be awesome if you'd tell us a bit more who you are and what you do!
 This information will be put on your profile page. <br>
@@ -23,6 +23,7 @@ Birthday : <input type="date" ng-model="user.info_birthday"/><br>
 Occupation:	<input type="text" ng-model="user.info_occupation"/><br>
 Interests : <input type="text" ng-model="user.info_interests"/><br>	
 Website	: <input type="text" ng-model="user.info_website"/><br>
+Receive newsletter : <input type="checkbox" ng-model="user.newsletter" ng-checked="user.newsletter"/><br>
 	
 Signature : <input type="text" ng-model="user.forum_sig" maxlength=255></post-editor><br>
 Max. 255 characters.	

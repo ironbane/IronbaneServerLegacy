@@ -41,6 +41,15 @@ angular.module('User') // separate module for sharing with website
             });
     };
 
+    User.get = function(id) {
+        return $http.get('/api/users/' + id)
+        .then(function(response) {
+            return new User(response.data);
+        }, function(error){
+            return $q.reject("error retrieving user", error);
+        });
+    };
+
     // login user, sets currentUser
     User.login = function(username, password) {
         return $http.post('/login', {username: username, password: password})

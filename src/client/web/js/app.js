@@ -147,7 +147,7 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
                     var deferred = $q.defer();
                     Item.get($route.current.params.id)
                         .then(function(template) {
-                            if(template.id == null){
+                            if(template.id === null){
 
                                 $location.path('/editor/item_template');
                                 deferred.reject();
@@ -196,7 +196,7 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
                     var deferred = $q.defer();
                     Article.get($route.current.params.id)
                         .then(function(article) {
-                            if(article.articleId == null){
+                            if(article.articleId === null){
 
                                 $location.path('/editor/article');
                                 deferred.reject();
@@ -216,13 +216,12 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
         })
         .when('/editor/users/:id', {
             templateUrl: '/views/useredit',
-            controller: 'useredit',
+            controller: 'UserEditor',
             resolve: {
                 ResolveData: ['User', '$q', '$route', '$location', function(User, $q, $route, $location) {
                     var deferred = $q.defer();
                     User.get($route.current.params.id)
                         .then(function(user) {
-                            return user
                             deferred.resolve({user: user});
                         }, function(err) {
                            deferred.reject();

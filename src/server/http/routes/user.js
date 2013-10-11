@@ -64,7 +64,8 @@ module.exports = function(app, db) {
                 info_occupation: req.user.info_occupation,
                 info_interests: req.user.info_interests,
                 info_website: req.user.info_website,
-                show_email: req.user.show_email
+                show_email: req.user.show_email,
+                newsletter: req.user.newsletter
             });
         } else {
             res.send(404, 'no user signed in');
@@ -149,6 +150,33 @@ module.exports = function(app, db) {
 
     });
 
+    app.post('/api/user/:id', function(req, res) {
+        User.getById(req.params.id)
+        .then(function(updateUser){
+            updateUser.$adminUpdate(req.body);
+            updateUser.$save()
+                .then(function(user){
+                    res.send(user);
+                }, function(error){
+                    res.send(500, error);
+                });
+            });
+    });
+
+    app.post('/api/user/admin/resetpassword/:id', function(req, res){
+        User.getById(req.params.id)
+        .then(function(updateUser){
+
+            updateUser.$adminResetPassword();
+            updateUser.$save()
+                .then(function(user){
+                    res.send(user);
+                }, function(error){
+                    res.send(500, error);
+                });
+            });
+    });
+
     app.post('/api/user/avatar', app.ensureAuthenticated, function(req, res) {
          
     });
@@ -161,6 +189,14 @@ module.exports = function(app, db) {
             }, function(err) {
                 res.send(500, err);
             });
+    });
+
+    app.get('/api/users/:id', function(req, res){
+        User.getById(req.params.id).then(function(user){
+            res.send(user);
+        }, function(error){
+            res.send(error, 500);
+        });
     });
 
     app.get('/api/users', function(req, res){
