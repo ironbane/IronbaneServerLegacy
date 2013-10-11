@@ -71,7 +71,7 @@ module.exports = function(db) {
                         return deferred.reject(err);
                     }
                     return deferred.resolve(self);
-                    
+
                 });
             } else {
                 // new user
@@ -229,16 +229,16 @@ module.exports = function(db) {
         db.query('select * from bcs_users where id = ?', [id], function(err, results) {
             if (err) {
                 return deferred.reject(err);
-                
+
             }
 
             if (results.length === 0) {
                 return deferred.reject("no user found");
             } else {
-                log("getting user");
+                //log("getting user");
 
                 var user = new User(results[0]);
-                log(JSON.stringify(user));
+                //log(JSON.stringify(user));
                 // add in security roles
                 user.$initRoles();
                 deferred.resolve(user);
@@ -259,7 +259,7 @@ module.exports = function(db) {
 
         });
         return deferred.promise;
-    }
+    };
 
     // used for the login process
     User.authenticate = function(username, password) {

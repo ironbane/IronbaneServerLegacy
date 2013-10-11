@@ -15,34 +15,21 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var fs = require('q-io/fs'),
-    path = require('path'),
-    _ = require('underscore');
-
 // chat command API
 // items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
+    return {
+        requiresEditor: true,
+        action: function(unit, target, params, errorMessage) {
 
-    var Commands = {};
+            chatHandler.listRooms(unit);
 
-    // dynamically load all commands
-    fs.list(__dirname).then(function(files) {
-        _.each(files, function(file) {
-            if(file !== 'index.js') {
-                var cmd = require(__dirname + '/' + file)(items, units, worldHandler, chatHandler),
-                    cmdName = cmd.name || path.basename(file, '.js').toLowerCase();
-
-                console.log('loading chat command: ', file, 'named: ', cmdName);
-
-                Commands[cmdName] = cmd;
-            }
-        });
-    }, function(err) {
-        console.log('error listing chat commands!');
-    });
-
-    return Commands;
+            return {
+                errorMessage: errorMessage
+            };
+        }
+    };
 };

@@ -58,7 +58,7 @@ module.exports = function() {
     var crypto = require('crypto');
     var path = require('path');
 
-    var util = require('./Engine/util.js')
+    var util = require('./Engine/util.js');
 
     var fsi = require('./External/fsi.js');
 
@@ -163,11 +163,6 @@ module.exports = function() {
         io = httpServer.server.io;
         ioApp = httpServer.server;
 
-        for (var f = 0; f < includes.length; f++) {
-            log("Loading: " + includes[f]);
-            eval(fs.readFileSync(includes[f]) + '');
-        }
-
         // load constants (was Shared.js)
         var IB = require('./src/common/constants');
         // inject into global until rest is modular
@@ -176,15 +171,22 @@ module.exports = function() {
         // Load DataHandler global for now (holds memory DB of item and unit templates)
         global.dataHandler = require('./src/server/game/dataHandler')(mysql);
 
-        // Load Chat module
-        global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
-
         // load AI as a module
         var AI = require('./src/server/game/ai');
         // temp pass them on to global for access below
         global.StateMachine = AI.StateMachine;
         global.State = AI.State;
         _.extend(global, AI.States);
+
+        // READ REST OF OLD GLOBAL APP HERE
+        for (var f = 0; f < includes.length; f++) {
+            log("Loading: " + includes[f]);
+            eval(fs.readFileSync(includes[f]) + '');
+        }
+
+        // Load Chat module - after worldHandler, there is a dep
+        global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
+        console.log("chatHandler", chatHandler);
 
         // All set! Tell WorldHandler to load
         worldHandler.LoadWorldLight();
