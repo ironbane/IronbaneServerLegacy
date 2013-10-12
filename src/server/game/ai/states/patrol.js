@@ -15,6 +15,9 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var State = require('../state');
+var _ = require('underscore');
+var THREE = require('../../../../common/three');
+var VectorDistance = THREE.VectorDistance;
 
 // Requires nodes!
 var Patrol = State.extend({
@@ -85,7 +88,7 @@ var Patrol = State.extend({
         if (this.options.seek) {
             unit.steeringForce = unit.steeringBehaviour.Seek(this.targetPosition);
         } else {
-            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, Deceleration.FAST * unit.mass);
+            unit.steeringForce = unit.steeringBehaviour.Arrive(this.targetPosition, unit.mass);
         }
     }
 });
