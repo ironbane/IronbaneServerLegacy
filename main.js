@@ -29,8 +29,8 @@ module.exports = function() {
     var pkg = require('./package.json'),
         log = require('util').log; // built in timestampped logger
 
-    var clientDir = config.get('buildTarget') + 'game/';
-    var assetDir = config.get('assetDir');
+    global.clientDir = config.get('buildTarget') + 'game/';
+    global.assetDir = config.get('assetDir');
     var persistentWorldChanges = config.get('persistentWorldChanges');
 
     if (!cryptSalt) {
@@ -90,7 +90,6 @@ module.exports = function() {
         './Engine/ConsoleHandler.js',
         './Engine/Switch.js',
         './Engine/SocketHandler.js',
-        './Engine/WorldHandler.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
         './Game/item.js',
@@ -169,6 +168,7 @@ module.exports = function() {
 
         // Load DataHandler global for now (holds memory DB of item and unit templates)
         global.dataHandler = require('./src/server/game/dataHandler')(mysql);
+        global.worldHandler = require('./src/server/game/world')(mysql);
 
         // load AI as a module
         var AI = require('./src/server/game/ai');
@@ -178,17 +178,17 @@ module.exports = function() {
         _.extend(global, AI.States);
 
         // READ REST OF OLD GLOBAL APP HERE
-        for (var f = 0; f < includes.length; f++) {
-            log("Loading: " + includes[f]);
-            eval(fs.readFileSync(includes[f]) + '');
+        for (var f = 0; f < scripts.length; f++) {
+            log("Loading: " + scripts[f]);
+            eval(fs.readFileSync(scripts[f]) + '');
         }
 
         // Load Chat module - after worldHandler, there is a dep
         global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
-        console.log("chatHandler", chatHandler);
+        //console.log("chatHandler", chatHandler);
 
         // All set! Tell WorldHandler to load
-        worldHandler.LoadWorldLight();
+        global.worldHandler.LoadWorldLight();
 
         // this replaces MainLoop, must go here since server hasn't been defined earlier...
         IronbaneGame.on('tick', function(elapsed) {
