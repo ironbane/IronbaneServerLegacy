@@ -802,25 +802,24 @@ var WorldHandler = Class.extend({
     }
     return false;
   },
-  GetWaypointID: function(zone) {
-    if ( worldHandler.world[zone] === undefined ) return -1;
-    if ( worldHandler.world[zone].waypointIDCount === undefined || worldHandler.world[zone].waypointIDCount < 100) {
-      worldHandler.world[zone].waypointIDCount = 0;
-      for(var cx in worldHandler.world[zone]) {
-        for(var cz in worldHandler.world[zone][cx]) {
-          if ( worldHandler.world[zone][cx][cz].graph !== undefined ) {
-            if ( worldHandler.world[zone][cx][cz].graph.nodes !== undefined ) {
-              for(var n=0;n<worldHandler.world[zone][cx][cz].graph.nodes.length;n++) {
-                if ( worldHandler.world[zone][cx][cz].graph.nodes[n].id > worldHandler.world[zone].waypointIDCount ) {
-                  worldHandler.world[zone].waypointIDCount = worldHandler.world[zone][cx][cz].graph.nodes[n].id;
+    getWaypointID: function(zone) {
+        if (_.isUndefined(this.world[zone])) return -1;
+
+        // Todo: cache properly
+        var waypointIDCount = 0;
+
+        this.LoopCells(function(cell) {
+            if (!_.isUndefined(cell.graph)) {
+                if (!_.isUndefined(cell.graph.nodes)) {
+                    for (var n = 0; n < cell.graph.nodes.length; n++) {
+                        waypointIDCount = Math.max(waypointIDCount,
+                                cell.graph.nodes[n].id);
+                    }
                 }
-              }
             }
-          }
-        }
-      }
-    }
-    return ++worldHandler.world[zone].waypointIDCount;
+        });
+
+        return waypointIDCount;
   }
 });
 
