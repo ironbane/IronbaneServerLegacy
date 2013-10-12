@@ -134,7 +134,8 @@ var Unit = Class.extend({
     this.UpdateNearbyUnitsOtherUnitsLists();
 
     this.zone = zone;
-    this.position = position.clone();
+    // copy instead of clone so that this can be a plain obj
+    this.position.copy(position);
     this.UpdateCellPosition();
 
     if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
