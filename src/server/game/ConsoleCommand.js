@@ -14,10 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
+var Class = require('../../common/class');
 var ConsoleCommand = Class.extend({
-    Init: function(accessLevel, name, description, paramsyntax, paramdefaults, command) {
+    init: function(accessLevel, name, description, paramsyntax, paramdefaults, command) {
 
 		this.name = name;
 		this.description = description;
@@ -32,3 +31,5 @@ var ConsoleCommand = Class.extend({
 		this.command(params);
 	}
 });
+
+module.exports = ConsoleCommand;

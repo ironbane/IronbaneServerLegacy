@@ -40,8 +40,8 @@ var Fighter = Actor.extend({
             this.armorMax = this.template.armor;
         }
         else {
-            this.CalculateMaxHealth();
-            this.CalculateMaxArmor();
+            this.calculateMaxHealth();
+            this.calculateMaxArmor();
         }
 
         this.health = this.healthMax;

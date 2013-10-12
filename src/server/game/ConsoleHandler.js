@@ -15,6 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var Class = require('../../common/class');
+var log = require('util').log;
+var ConsoleCommand = require('./ConsoleCommand');
 module.exports = function(){
 var ConsoleHandler = Class.extend({
   init: function() {
@@ -24,6 +26,7 @@ var ConsoleHandler = Class.extend({
       EDITOR : 2,
       ADMIN : 3
     };
+    log("creating ConsoleHandler");
 
     this.ResetAccess();
 
@@ -330,5 +333,5 @@ var ConsoleHandler = Class.extend({
   }
 });
 
-return ConsoleHandler();
+return ConsoleHandler;
 };

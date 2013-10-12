@@ -1,5 +1,6 @@
 // commonjs wrapper for Shared.js replacement
 var _ = require('underscore');
+var THREE = require('./three');
 (function(exports) {
 
     var IB = {};
@@ -257,6 +258,34 @@ IB.WasLucky = function(maxchance) {
 
 IB.WasLucky100 = function(chance) {
   return chance >= mt_rand(1, 100);
+};
+
+Number.prototype.Round = function(digits) {
+  return roundNumber(this, digits);
+};
+
+function roundNumber(number, decimals) {
+  var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+  return parseFloat(newnumber);
+}
+
+IB.CheckVector = function(obj) {
+  return CheckData(obj, ["x","y","z"]);
+};
+
+IB.ConvertVector3 = function(vec) {
+  return new THREE.Vector3(vec.x, vec.y, vec.z);
+}
+
+IB.CheckData = function(obj, names) {
+  if ( _.isUndefined(obj) ) return false;
+  if ( !obj ) return false;
+
+  //for(var n in names) {
+  for(var n=0;n<names.length;n++){
+    if ( _.isUndefined(obj[names[n]]) ) return false;
+  }
+  return true;
 };
 
 IB.timeSince = function(since) {

@@ -16,6 +16,8 @@
 */
 var _  = require('underscore');
 var Class = require('./src/common/class');
+var Player = require('./src/server/game/units/units/Player');
+var Fighter = require('./src/server/game/units/units/Fighter');
 module.exports = function(mysql) {
 var Server = Class.extend({
     init: function() {
@@ -64,7 +66,7 @@ var Server = Class.extend({
         this.itemIDCount++;
         return this.itemIDCount;
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
 
         if ( this.versionWarningTimer > 0 ) {

@@ -321,3 +321,4 @@ var Player = Fighter.extend({
 
   }
 });
+module.exports = Player;

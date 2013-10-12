@@ -182,7 +182,7 @@ var _ = require('underscore');
       });
     },
     loopUnits: function(fn) {
-      this.LoopCells(function(cell) {
+      this.loopCells(function(cell) {
         if ( !_.isUndefined(cell.units) ) {
           _.each(cell.units, function(unit) {
             fn(unit);
@@ -602,7 +602,7 @@ var _ = require('underscore');
 
       var foundUnit = null;
 
-      this.LoopUnits(function(unit) {
+      this.loopUnits(function(unit) {
         if ( foundUnit ) return;
         if ( unit.id === id ) foundUnit = unit;
       });

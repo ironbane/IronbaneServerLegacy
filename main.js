@@ -17,6 +17,7 @@
 module.exports = function() {
 
     var config = require('./nconf');
+    var Player = require('./src/server/game/units/units/Player');
 
     var isProduction = config.get('isProduction');
     var cryptSalt = config.get('cryptSalt');
@@ -144,6 +145,11 @@ module.exports = function() {
         // Load DataHandler global for now (holds memory DB of item and unit templates)
         global.dataHandler = require('./src/server/game/dataHandler')(mysql);
         global.worldHandler = require('./src/server/game/world')(mysql);
+        var ch = require('./src/server/game/consoleHandler')();
+        global.consoleHandler = new ch();
+        var sh = require('./src/server/game/socketHandler')(mysql, io);
+        global.socketHandler = new sh();
+        global.mysql = mysql;
 
         // load AI as a module
         var AI = require('./src/server/game/ai');
@@ -164,12 +170,12 @@ module.exports = function() {
 
         // All set! Tell WorldHandler to load
         global.worldHandler.loadWorldLight();
-        var server = require('./Server')(mysql);
-        global.server = new server();
+        var s = require('./Server')(mysql);
+        global.server = new s();
         // this replaces MainLoop, must go here since server hasn't been defined earlier...
         IronbaneGame.on('tick', function(elapsed) {
             // eventually we wouldn't be accessing the global var here...
-            server.Tick(elapsed);
+            server.tick(elapsed);
         });
 
         // start it up, todo: only per config?
@@ -181,7 +187,7 @@ module.exports = function() {
             log("Auto-saving all players...");
             worldHandler.loopUnits(function(unit) {
                 if (unit instanceof Player) {
-                    unit.Save();
+                    unit.save();
                 }
             });
         }, 60 * 1 * 1000);

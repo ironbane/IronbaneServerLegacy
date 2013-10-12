@@ -429,6 +429,16 @@
 
             return this;
         },
+        Round: function(n) {
+  this.x = roundNumber(this.x, n);
+  this.y = roundNumber(this.y, n);
+  this.z = roundNumber(this.z, n);
+
+  return this;
+},
+Perp : function() {
+  return this.cross(new THREE.Vector3(0, 1, 0));
+},
         equals: function(v) {
             return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z));
         },

@@ -16,9 +16,9 @@
 */
 var Class = require('../../../common/class');
 var _ = require('underscore');
-//var Player = require('./units/Player');
 
 var THREE = require('../../../common/three');
+var log = require('util').log;
 var Unit = Class.extend({
   init: function(data) {
     _.extend(this, data);
@@ -409,13 +409,14 @@ var Unit = Class.extend({
 
     for (var x = cx - 1; x <= cx + 1; x++) {
       for (var z = cz - 1; z <= cz + 1; z++) {
-        if (!worldHandler.CheckWorldStructure(zone, x, z)) continue;
+        if (!worldHandler.checkWorldStructure(zone, x, z)) continue;
 
         if (!_.isUndefined(worldHandler.world[zone][x][z].units)) {
 
           var units = worldHandler.world[zone][x][z].units;
 
           for (var u = 0; u < units.length; u++) {
+            log(_.keys(Player));
             if (!(units[u] instanceof Player)) continue;
 
             // Don't send to ourselves...?

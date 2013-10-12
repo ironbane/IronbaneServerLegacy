@@ -14,15 +14,19 @@
         You should have received a copy of the GNU General Public License
         along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+module.exports = function(mysql, io){
 var characterIDCount = 1;
-
+var Class = require('../../common/class');
+var log = require('util').log;
+var _ = require('underscore');
+var Player = require('./units/units/Player');
+log(Player);
 var SocketHandler = Class.extend({
     bans: [],
     onlinePlayers: [],
-    Init: function() {
+    init: function() {
         var me = this;
-
+        log("starting socketHandler");
         this.UpdateBans();
 
         // temp until service implemented
@@ -336,7 +340,7 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                socket.unit.EmitNearby("doJump", {
+                socket.unit.emitNearby("doJump", {
                     id:socket.unit.id
                 });
             });
@@ -349,7 +353,7 @@ var SocketHandler = Class.extend({
 
                 if ( socket.unit ) {
                     socket.unit.readyToReceiveUnits = bool;
-                    socket.unit.UpdateOtherUnitsList();
+                    socket.unit.updateOtherUnitsList();
 
                     if ( bool ) {
                         // Check for new players
@@ -1899,7 +1903,7 @@ var SocketHandler = Class.extend({
                     }
                     else {
                         var checkPos = p.clone().setY(socket.unit.position.y);
-                        if ( !socket.unit.InRangeOfPosition(checkPos, errorMargin) ) {
+                        if ( !socket.unit.inRangeOfPosition(checkPos, errorMargin) ) {
                             return;
                         }
 
@@ -1934,4 +1938,5 @@ var SocketHandler = Class.extend({
     }
 });
 
-var socketHandler = new SocketHandler();
+return SocketHandler;
+}
