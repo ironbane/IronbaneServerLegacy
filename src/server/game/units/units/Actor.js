@@ -14,9 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var MovingUnit = require('./MovingUnit');
 
 var Actor = MovingUnit.extend({
-    Init: function(data) {
+    init: function(data) {
         this._super(data);
         this.stateMachine = new StateMachine(this, new EmptyState(), new EmptyState());
     },
@@ -143,3 +144,5 @@ var Actor = MovingUnit.extend({
         this.stateMachine.handleMessage(message, data);
     }
 });
+
+module.exports = Actor;

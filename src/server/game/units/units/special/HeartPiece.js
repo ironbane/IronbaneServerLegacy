@@ -15,12 +15,34 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-module.exports = function(io, items, units, worldHandler) {
-  var log  = require('util').log;
-    var ChatHandler = require('./chatHandler')(items, units, worldHandler);
-    var c = new ChatHandler(io);
-    log("chatting");
-    log(c);
-    return c;
+var Unit = require('../../Unit');
+var HeartPiece = Unit.extend({
+    Init: function(data) {
 
-};
+        this._super(data);
+
+
+
+    },
+    Tick: function(dTime) {
+
+        this._super(dTime);
+
+
+        var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
+
+        for(var u=0;u<units.length;u++) {
+            if ( units[u] instanceof Player){
+
+                if ( units[u].InRangeOfUnit(this, 1) ) {
+                    break;
+                }
+            }
+        }
+
+
+
+
+    }
+});
+module.exports = HeartPiece;

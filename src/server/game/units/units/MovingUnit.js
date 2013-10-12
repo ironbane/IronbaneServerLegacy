@@ -14,24 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var Unit = require('../Unit');
 
+var THREE = require('../../../../common/three');
 
 var MovingUnit = Unit.extend({
-    Init: function(data) {
-
-
+    init: function(data) {
         this._super(data);
-
         //the steering behavior class
         this.steeringBehaviour = new SteeringBehaviour(this);
-
         // this.testTimer = 0.0;
         this.targetPosition = new THREE.Vector3();
-
         this.steeringForce = new THREE.Vector3();
-
-
-
     },
     Tick: function(dTime) {
 
@@ -61,3 +55,4 @@ var MovingUnit = Unit.extend({
 
     }
 });
+module.exports = MovingUnit;

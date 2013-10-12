@@ -18,7 +18,7 @@
 var KickReason = {
   CHEAT: "Cheating"
 };
-
+var Fighter = require('./Fighter');
 var Player = Fighter.extend({
   Init: function(data) {
 

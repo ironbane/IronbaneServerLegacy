@@ -14,13 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var Unit = require('../../Unit');
+var MusicPlayer = Unit.extend({
+    Init: function(data) {
 
-module.exports = function(io, items, units, worldHandler) {
-  var log  = require('util').log;
-    var ChatHandler = require('./chatHandler')(items, units, worldHandler);
-    var c = new ChatHandler(io);
-    log("chatting");
-    log(c);
-    return c;
+        this._super(data);
 
-};
+
+    },
+    Tick: function(dTime) {
+
+        this._super(dTime);
+
+
+    }
+});
+module.exports = MusicPlayer;

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+var Unit = require('../Unit');
 var Lootable = Unit.extend({
     lifeTime: 0,
     Init: function(data, loadItems) {
@@ -112,3 +112,5 @@ var Lootable = Unit.extend({
         this._super(dTime);
     }
 });
+
+module.exports = Lootable;

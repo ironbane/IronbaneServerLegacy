@@ -15,15 +15,20 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-module.exports = function() {
+module.exports = function(mysql) {
   var Class = require('../../../common/class');
+  var units = require('../units/units');
+
+var _ = require('underscore');
+    var util = require('../../../../Engine/util.js');
     var dataPath = clientDir + 'data';
+    var fs = require('fs');
   var dataPathPersistent = assetDir + 'data';
   var log  = require('util').log;
+  log("+++" +units);
   var WorldHandler = Class.extend({
-    init: function(mysql) {
+    init: function() {
       this.db = mysql;
-      log("*****" + this.db);
       // World structure
       // [zone][cx][cz]
       this.world = {};
@@ -32,7 +37,7 @@ module.exports = function() {
       this.awake = false;
       this.hasLoadedWorld = false;
     },
-    Awake: function() {
+    awake: function() {
       this.BuildZoneWaypoints();
       // All units ready! Awaken!
       this.LoopUnits(function(u){
@@ -42,7 +47,7 @@ module.exports = function() {
       this.awake = true;
     //worldHandler.LoadSwitches();
     },
-    BuildZoneWaypoints: function() {
+    buildZoneWaypoints: function() {
       // Load all waypoints!
       var count = 0;
       for(var z in this.world) {
@@ -73,7 +78,7 @@ module.exports = function() {
       });
       log("Loaded "+count+" waypoints in total");
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
       if ( !this.hasLoadedWorld ) return;
       if ( !this.awake ) {
@@ -84,12 +89,12 @@ module.exports = function() {
         if ( hasLoadedUnits ) this.Awake();
       }
     },
-    SaveWorld: function() {
+    saveWorld: function() {
       this.LoopCellsWithIndex(function(z, cx, cz) {
         this.SaveCell(z, cx, cz);
       });
     },
-    DoFullBackup: function() {
+    doFullBackup: function() {
         chatHandler.announceRoom('mods', "Backing up server...", "blue");
 
         var deploySh = spawn('sh', [ 'serverbackup.sh' ], {
@@ -115,20 +120,21 @@ module.exports = function() {
             //console.log('child process exited with code ' + code);
         });
     },
-    CheckWorldStructure: function(zone, cx, cz) {
+    checkWorldStructure: function(zone, cx, cz) {
       if ( !_.isUndefined(zone) && _.isUndefined(this.world[zone]) ) return false;
       if ( !_.isUndefined(cx) && _.isUndefined(this.world[zone][cx]) ) return false;
       if ( !_.isUndefined(cz) && _.isUndefined(this.world[zone][cx][cz]) ) return false;
       return true;
     },
-    BuildWorldStructure: function(zone, cx, cz) {
+    buildWorldStructure: function(zone, cx, cz) {
       if ( !_.isUndefined(zone) && _.isUndefined(this.world[zone]) ) this.world[zone] = {};
       if ( !_.isUndefined(cx) && _.isUndefined(this.world[zone][cx]) ) this.world[zone][cx] = {};
       if ( !_.isUndefined(cz) && _.isUndefined(this.world[zone][cx][cz]) ) this.world[zone][cx][cz] = {};
     },
-    LoadWorldLight: function() {
+    loadWorldLight: function() {
       var cellsLoaded = {};
       this.world = {};
+      var me = this;
       util.walk(dataPath, function(err, results) {
         if (err) throw err;
       var rl = results.length;
@@ -145,7 +151,7 @@ module.exports = function() {
           if ( !_.isNumber(cx) ) continue;
           if ( !_.isNumber(cz) ) continue;
 
-          this.BuildWorldStructure(zone, cx, cz);
+          me.buildWorldStructure(zone, cx, cz);
           // Load navigation graph, even in a light world because we need it
           if ( file == "graph.json" ) {
             try {
@@ -153,7 +159,7 @@ module.exports = function() {
               var stats = fs.lstatSync(path+"/graph.json");
 
               if (stats.isFile()) {
-                this.world[zone][cx][cz].graph = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
+                me.world[zone][cx][cz].graph = JSON.parse(fs.readFileSync(path+"/graph.json", 'utf8'));
               }
             }
             catch (e) {
@@ -161,13 +167,13 @@ module.exports = function() {
             }
           }
           if ( file !== "objects.json" ) continue;
-          this.world[zone][cx][cz].objects = [];
-          this.world[zone][cx][cz].units = [];
-          this.world[zone][cx][cz].hasLoadedUnits = false;
+          me.world[zone][cx][cz].objects = [];
+          me.world[zone][cx][cz].units = [];
+          me.world[zone][cx][cz].hasLoadedUnits = false;
           //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
           if ( !cellsLoaded[zone] ) cellsLoaded[zone] = 0;
           cellsLoaded[zone]++;
-          this.LoadUnits(zone, cx, cz);
+          me.loadUnits(zone, cx, cz);
         }
         _.each(cellsLoaded, function(z, v) {
           log("Loaded "+z+" cells in zone "+v);
@@ -175,7 +181,7 @@ module.exports = function() {
         this.hasLoadedWorld = true;
       });
     },
-    LoopUnits: function(fn) {
+    loopUnits: function(fn) {
       this.LoopCells(function(cell) {
         if ( !_.isUndefined(cell.units) ) {
           _.each(cell.units, function(unit) {
@@ -184,7 +190,7 @@ module.exports = function() {
         }
       });
     },
-    LoopUnitsNear: function(zone, cellX, cellZ, fn) {
+    loopUnitsNear: function(zone, cellX, cellZ, fn) {
       this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
         if ( !_.isUndefined(cell.units) ) {
           _.each(cell.units, function(unit) {
@@ -193,7 +199,7 @@ module.exports = function() {
         }
       });
     },
-    LoopCells: function(fn) {
+    loopCells: function(fn) {
       _.each(this.world, function(zone) {
         _.each(zone, function(cellX) {
           _.each(cellX, function(cellZ) {
@@ -202,7 +208,7 @@ module.exports = function() {
         });
       });
     },
-    LoopCellsNear: function(zone, cellX, cellZ, fn) {
+    loopCellsNear: function(zone, cellX, cellZ, fn) {
       for(var x=cellX-1;x<=cellX+1;x++){
           for(var z=cellZ-1;z<=cellZ+1;z++){
               if ( this.CheckWorldStructure(zone, x, z) ) {
@@ -211,7 +217,7 @@ module.exports = function() {
           }
       }
     },
-    LoopCellsWithIndex: function(fn) {
+    loopCellsWithIndex: function(fn) {
       for(var zone in this.world) {
         if ( !this.world.hasOwnProperty(zone) ) continue;
         for(var cellX in this.world[zone]) {
@@ -223,19 +229,21 @@ module.exports = function() {
         }
       }
     },
-    LoadSwitches: function() {
+    loadSwitches: function() {
       this.switches = {};
+      var me = this;
       mysql.query('SELECT * FROM ib_switches',
         function (err, results, fields) {
           if (err) throw err;
           for(var u=0;u<results.length;u++) {
             var switchdata = results[u];
-            this.switches[switchdata.id] = new Switch(switchdata.id, switchdata.output1, switchdata.output2, switchdata.output3, switchdata.output4);
+            me.switches[switchdata.id] = new Switch(switchdata.id, switchdata.output1, switchdata.output2, switchdata.output3, switchdata.output4);
           }
         });
     },
-    LoadUnits: function(zone, cellX, cellZ) {
+    loadUnits: function(zone, cellX, cellZ) {
       var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize);
+      var me = this;
       (function(zone,cellX,cellZ){
         mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?',
           [zone,(worldPos.x-cellSizeHalf),(worldPos.z-cellSizeHalf),(worldPos.x+cellSizeHalf),(worldPos.z+cellSizeHalf)],
@@ -245,9 +253,9 @@ module.exports = function() {
 
             for(var u=0;u<results.length;u++) {
               var unitdata = results[u];
-              this.MakeUnitFromData(unitdata);
+              me.MakeUnitFromData(unitdata);
             }
-            this.world[zone][cellX][cellZ].hasLoadedUnits = true;
+            me.world[zone][cellX][cellZ].hasLoadedUnits = true;
 
           });
       })(zone, cellX, cellZ);
@@ -293,7 +301,7 @@ module.exports = function() {
         case UnitTypeEnum.TURRET_STRAIGHT:
         case UnitTypeEnum.TURRET_KILLABLE:
         case UnitTypeEnum.WANDERER:
-          unit = new NPC(data);
+          unit = new units.NPC(data);
           break;
         case UnitTypeEnum.MOVINGOBSTACLE:
 
@@ -507,6 +515,7 @@ module.exports = function() {
           });
         });
       }
+      var me = this;
 
       // Delete the things from the terrain in the deleteBuffer
       if ( !_.isUndefined(this.world[zone][cellX][cellZ].deleteBuffer) ) {
@@ -522,8 +531,8 @@ module.exports = function() {
               this.world[zone][cellX][cellZ].deleteBuffer =
                 _.without(this.world[zone][cellX][cellZ].deleteBuffer, deleteObj);
             }
-          });
-        });
+          }, me);
+        }, me);
       }
       // Query the entry
       var path = dataPath+"/"+zone+"/"+cellX+"/"+cellZ;
@@ -582,7 +591,7 @@ module.exports = function() {
     UpdateNearbyUnitsOtherUnitsLists: function(zone, cellX, cellZ) {
       for(var x=cellX-1;x<=cellX+1;x++){
         for(var z=cellZ-1;z<=cellZ+1;z++){
-          if ( this.CheckWorldStructure(zone, x, z) ) {
+          if ( this.checkWorldStructure(zone, x, z) ) {
             for(var u=0;u<this.world[zone][x][z].units.length;u++) {
               this.world[zone][x][z].units[u].UpdateOtherUnitsList();
             }

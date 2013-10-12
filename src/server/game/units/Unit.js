@@ -14,10 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var Class = require('../../../common/class');
+var _ = require('underscore');
+var Player = require('./units/Player');
 
-
+var THREE = require('../../../common/three');
 var Unit = Class.extend({
-  Init: function(data) {
+  init: function(data) {
     _.extend(this, data);
 
     this.active = true; // when things die or otherwise shut off this will disable AI and other processes
@@ -86,7 +89,7 @@ var Unit = Class.extend({
 
     this.standingOnUnitId = 0;
 
-    if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
+    if (worldHandler.checkWorldStructure(this.zone, this.cellX, this.cellZ)) {
       worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
     } else {
       // We are in a bad cell??? Find a place to spawn! Or DC
@@ -177,7 +180,7 @@ var Unit = Class.extend({
     this.otherUnits.push(unit);
 
     // Add the unit to ourselves clientside (only if WE are a player)
-    if ((this instanceof Player)) {
+    if (this instanceof Player) {
 
       var id = unit.id;
 
@@ -287,7 +290,7 @@ var Unit = Class.extend({
 
     for (var x = cx - 1; x <= cx + 1; x++) {
       for (var z = cz - 1; z <= cz + 1; z++) {
-        if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
+        if (worldHandler.checkWorldStructure(this.zone, x, z)) {
           _.each(worldHandler.world[this.zone][x][z].units, function(unit) {
             if (unit !== this) secondList.push(unit);
           }, this);
@@ -567,3 +570,4 @@ var Unit = Class.extend({
     return "zone " + this.zone + ", pos " + this.position.Round().ToString();
   }
 });
+module.exports = Unit;

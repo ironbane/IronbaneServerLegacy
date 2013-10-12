@@ -16,40 +16,24 @@
 */
 
 
-
+var Fighter = require('./Fighter');
 var NPC = Fighter.extend({
     Init: function(data) {
-
-
-
-
-
         this._super(data);
-
         // HACKY HACKY!!! See LootBag
-
         // Set to the default template values
         this.param = this.template.param;
         this.size = this.template.size;
         this.health = this.template.health;
         this.armor = this.template.armor;
         // END HACKY
-
-
         this.maxSpeed = 2.0;
         this.rotationSpeed = 10.0;
-
-
         this.SetWeaponsAndLoot();
-
-
         // A sub node position, used in the path finding
         this.targetNodePosition = this.position.clone();
-
         // Used for calculating new paths every few seconds
         this.calculateNewPathTimeout = 0.0;
-
-
     },
     Awake: function(){
       this._super();
@@ -173,3 +157,4 @@ var NPC = Fighter.extend({
         }
     }
 });
+module.exports = NPC;

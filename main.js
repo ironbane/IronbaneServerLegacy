@@ -94,23 +94,7 @@ module.exports = function() {
         './Game/AI/astar.js',
         './Game/item.js',
         './Game/SteeringBehaviour.js',
-        './Game/Unit.js',
-        './Game/MovingUnit.js',
-        './Game/Actor.js',
-        './Game/Fighter.js',
-        './Game/NPC.js',
-        './Game/Lootable.js',
-        './Game/Player.js',
-        './Game/Special/MovingObstacle.js',
-        './Game/Special/ToggleableObstacle.js',
-        './Game/Special/Train.js',
-        './Game/Special/Lever.js',
-        './Game/Special/TeleportEntrance.js',
-        './Game/Special/TeleportExit.js',
-        './Game/Special/Sign.js',
-        './Game/Special/Waypoint.js',
-        './Game/Special/HeartPiece.js',
-        './Game/Special/MusicPlayer.js',
+        
         './Server.js'
     ];
 
@@ -188,7 +172,7 @@ module.exports = function() {
         //console.log("chatHandler", chatHandler);
 
         // All set! Tell WorldHandler to load
-        global.worldHandler.LoadWorldLight();
+        global.worldHandler.loadWorldLight();
 
         // this replaces MainLoop, must go here since server hasn't been defined earlier...
         IronbaneGame.on('tick', function(elapsed) {

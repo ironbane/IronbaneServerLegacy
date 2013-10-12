@@ -237,6 +237,40 @@
         return item.basevalue || 0;
     };
 
+    // Generic cell functions
+// Cells are supposed to be numbered next to eachother
+IB.WorldToCellCoordinates= function(x, z, cellsize) {
+
+  if ( cellsize % 2 != 0 ) console.error("Cellsize not dividable by 2!");
+
+  var cellhalf = cellsize / 2;
+  //  5 / 20 = 0
+  // 20 / 20 = 1
+  x = Math.floor((x + cellhalf)/cellsize);
+  z = Math.floor((z + cellhalf)/cellsize);
+
+  return {
+    x: x,
+    z: z
+  };
+}
+
+IB.CellToWorldCoordinates =  function(x, z, cellsize) {
+
+  if ( cellsize % 2 != 0 ) console.error("Cellsize not dividable by 2!");
+
+  //var cellhalf = cellsize / 2;
+  // 0 * 20 - 10 = -10;
+  // 1 * 20 - 10 = 10;
+  x = (x * cellsize) ;
+  z = (z * cellsize) ;
+
+  return {
+    x: x,
+    z: z
+  };
+}
+
     if (typeof(module) === 'object' && module.exports === exports) {
         module.exports = IB;
     } else {

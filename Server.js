@@ -99,7 +99,7 @@ var Server = Class.extend({
         }
 
 
-        worldHandler.Tick(dTime);
+        worldHandler.tick(dTime);
 
 
 
