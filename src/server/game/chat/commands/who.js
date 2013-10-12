@@ -27,7 +27,13 @@ module.exports = function(items, units, worldHandler, chatHandler) {
             var room = params[0],
                 players = chatHandler.listPlayers(room);
 
-            chatHandler.announcePersonally(unit, players.join(', '), "#97FFFF");
+            if(players.length === 0) {
+                // if no one is in the room, it doesn't really exist
+                errorMessage = 'No one is in this room.';
+            } else {
+                // enhance?: get list of units instead, color names based on rank; display count; display room or "global";
+                chatHandler.announcePersonally(unit, players.join(', '), "#97FFFF");
+            }
 
             return {
                 errorMessage: errorMessage
