@@ -15,6 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var Unit = require('../Unit');
+var log = require('util').log;
+var SteeringBehaviour = require('../SteeringBehaviour');
 
 var THREE = require('../../../../common/three');
 
@@ -27,13 +29,13 @@ var MovingUnit = Unit.extend({
         this.targetPosition = new THREE.Vector3();
         this.steeringForce = new THREE.Vector3();
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         var acceleration = this.steeringForce.divideScalar(this.mass);
 
         this.velocity.add(acceleration.multiplyScalar(dTime));
 
-        this.velocity.Truncate(this.maxSpeed);
+        this.velocity.truncate(this.maxSpeed);
 
         this.position.add(this.velocity.clone().multiplyScalar(dTime));
 

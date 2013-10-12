@@ -1,7 +1,10 @@
 // commonjs wrapper for Shared.js replacement
+var _ = require('underscore');
 (function(exports) {
 
     var IB = {};
+
+IB.sequencedTimers = {};
 
     // STUFF FROM INIT
     IB.guestSpawnZone = 1;
@@ -237,6 +240,65 @@
         return item.basevalue || 0;
     };
 
+    IB.dateChunks = new Array(
+  new Array(60 * 60 * 24 * 365, 'year'),
+  new Array(60 * 60 * 24 * 30, 'month'),
+  new Array(60 * 60 * 24 * 7, 'week'),
+  new Array(60 * 60 * 24, 'day'),
+  new Array(60 * 60, 'hour'),
+  new Array(60, 'minute'),
+  new Array(1, 'second')
+  );
+
+
+IB.WasLucky = function(maxchance) {
+  return getRandomInt(1, maxchance) == 1;
+};
+
+IB.WasLucky100 = function(chance) {
+  return chance >= mt_rand(1, 100);
+};
+
+IB.timeSince = function(since) {
+  var count;
+  for (i = 0, j = dateChunks.length; i < j; i++) {
+    var seconds = dateChunks[i][0];
+    var name = dateChunks[i][1];
+    if ((count = Math.floor(since / seconds)) !== 0) {
+      break;
+    }
+  }
+  var print = (count == 1) ? '1 ' + name : count + " " + name + "s";
+  return print;
+};
+
+IB.ChooseSequenced = function(a) {
+  var uid = "";
+  for (var b in a) uid += b;
+  if ( _.isUndefined(sequencedTimers[uid]) ) sequencedTimers[uid] = 0;
+  var value = a[sequencedTimers[uid]];
+  sequencedTimers[uid]++;
+  if ( sequencedTimers[uid] >= a.length ) sequencedTimers[uid] = 0;
+  return value;
+};
+
+function mt_rand (min, max) {
+  // Returns a random number from Mersenne Twister
+  //
+  // version: 1109.2015
+  // discuss at: http://phpjs.org/functions/mt_rand
+  // +   original by: Onno Marsman
+  // *     example 1: mt_rand(1, 1);
+  // *     returns 1: 1
+  var argc = arguments.length;
+  if (argc === 0) {
+    min = 0;
+    max = 2147483647;
+  } else if (argc === 1) {
+    throw new Error('Warning: mt_rand() expects exactly 2 parameters, 1 given');
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
     // Generic cell functions
 // Cells are supposed to be numbered next to eachother
 IB.WorldToCellCoordinates= function(x, z, cellsize) {

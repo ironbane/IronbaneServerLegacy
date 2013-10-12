@@ -17,9 +17,10 @@
 
 var battleStatusTimeout = 10.0;
 var Actor = require('./Actor');
+var Item = require('../../item');
 var Fighter = Actor.extend({
     attackTimeout: 1,
-    Init: function(data) {
+    init: function(data) {
         this._super(data);
 
         this.sendRotationPacketY = true;
@@ -50,7 +51,7 @@ var Fighter = Actor.extend({
         this.chInvisibleByMonsters = false;
         this.ch999Damage = false;
 
-        this.UpdateAppearance(false);
+        this.updateAppearance(false);
 
         this.healthRegenTimeout = 0.0;
         this.healthRegenInterval = 1.0;
@@ -60,14 +61,14 @@ var Fighter = Actor.extend({
 
         this.lastBattleActionTimer = 0.0;
 
-        if(this.GetEquippedWeapon()) {
-          this.attackTimeout = this.GetEquippedWeapon().$template.delay;
+        if(this.getEquippedWeapon()) {
+          this.attackTimeout = this.getEquippedWeapon().$template.delay;
         }
     },
-    IsInBattle: function() {
+    isInBattle: function() {
         return this.lastBattleActionTimer > 0;
     },
-  ShootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
+  shootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
 
       aimError = !_.isUndefined(aimError) ? aimError : 0;
 
@@ -84,7 +85,7 @@ var Fighter = Actor.extend({
         sw:swingWeapon
       });
   },
-    AttemptAttack: function(victim) {
+   attemptAttack: function(victim) {
         // log("attempt attack");
         this.HandleMessage("attemptAttack", {});
         //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff" ) {
@@ -98,7 +99,7 @@ var Fighter = Actor.extend({
             this.ShootProjectile(victim.position, true, 0, this.template.aimerror);
         }
     },
-  Attack: function(victim, weapon) {
+  attack: function(victim, weapon) {
 
     this.lastBattleActionTimer = battleStatusTimeout;
 
@@ -183,7 +184,7 @@ var Fighter = Actor.extend({
     }
 
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
     if(this.attackTimeout > 0) {
       this.attackTimeout -= dTime;
     }
@@ -206,7 +207,7 @@ var Fighter = Actor.extend({
       if (this.lastBattleActionTimer <= 0) {
         if (this.healthRegenTimeout <= 0) {
           this.healthRegenTimeout = this.healthRegenInterval;
-          this.SetHealth(this.health + 1);
+          this.setHealth(this.health + 1);
         }
       }
 
@@ -217,7 +218,7 @@ var Fighter = Actor.extend({
       if (this.lastBattleActionTimer <= battleStatusTimeout - 3) {
         if (this.armorRegenTimeout <= 0) {
           this.armorRegenTimeout = this.armorRegenInterval;
-          this.SetArmor(this.armor + 1);
+          this.setArmor(this.armor + 1);
         }
       }
 
@@ -229,7 +230,7 @@ var Fighter = Actor.extend({
       this._super(dTime);
     }
   },
-  SetHealth: function(newHealth, noParticles) {
+  setHealth: function(newHealth, noParticles) {
     var oldHealth = this.health;
 
     noParticles = noParticles || false;
@@ -249,7 +250,7 @@ var Fighter = Actor.extend({
       this.EmitNearby("setStat", data, 0, true);
     }
   },
-  SetArmor: function(newArmor) {
+  setArmor: function(newArmor) {
     var oldArmor = this.armor;
 
     this.armor = newArmor;
@@ -265,7 +266,7 @@ var Fighter = Actor.extend({
         }, 0, true);
     }
   },
-    Die: function(killer) {
+    die: function(killer) {
         if (this.id < 0) {
             //debugger;
             this.HandleMessage("killed", {
@@ -308,7 +309,7 @@ var Fighter = Actor.extend({
             chatHandler.announceDied(this, killer);
         }
     },
-    Respawn: function() {
+    respawn: function() {
         this.SetHealth(this.healthMax, true);
         this.SetArmor(this.armorMax, true);
 
@@ -347,7 +348,7 @@ var Fighter = Actor.extend({
         }
     },
   // Returns true when the max health changed
-  CalculateMaxHealth: function(doEmit) {
+  calculateMaxHealth: function(doEmit) {
     var oldHealthMax = this.healthMax;
 
     doEmit = doEmit || false;
@@ -384,7 +385,7 @@ var Fighter = Actor.extend({
     }
   },
   // Returns true when the max armor changed
-  CalculateMaxArmor: function(doEmit) {
+  calculateMaxArmor: function(doEmit) {
 
 
     doEmit = doEmit || false;
@@ -422,7 +423,7 @@ var Fighter = Actor.extend({
       this.SetArmor(this.armorMax);
     }
   },
-    GiveItem: function(template, config) {
+    giveItem: function(template, config) {
         // todo: variable max inv?
         if (this.items.length >= 10) {
             // no free slots
@@ -474,7 +475,7 @@ var Fighter = Actor.extend({
 
         return true;
     },
-    UpdateAppearance: function(sendChanges) {
+    updateAppearance: function(sendChanges) {
         this.head = 0;
         this.body = 0;
         this.feet = 0;
@@ -508,7 +509,7 @@ var Fighter = Actor.extend({
             });
         }
     },
-    GetEquippedWeapon: function() {
+    getEquippedWeapon: function() {
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i];
 
@@ -557,7 +558,7 @@ var Fighter = Actor.extend({
         // purchase successful
         return true;
     },
-  InLineOfSight: function(unit, noHeadingCheck) {
+  inLineOfSight: function(unit, noHeadingCheck) {
     var unitToUs = unit.position.clone().sub(this.position);
 
     noHeadingCheck = noHeadingCheck || false;
@@ -579,7 +580,7 @@ var Fighter = Actor.extend({
     // console.log(unit.unitsInLineOfSight);
     return true;
   },
-  FindNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
+  findNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
     maxDistance = maxDistance || 0;
     onlyPlayers = onlyPlayers || false;
 

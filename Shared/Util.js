@@ -709,8 +709,8 @@ String.prototype.trim = function() {
     // The dummy class constructor
     function Class() {
       // All construction is actually done in the init method
-      if ( !initializing && this.Init )
-        this.Init.apply(this, arguments);
+      if ( !initializing && this.init )
+        this.init.apply(this, arguments);
     }
 
     // Populate our constructed prototype object
@@ -873,31 +873,9 @@ function VectorDistanceSq(a,b) {
 }
 
 
-function WasLucky(maxchance) {
-  return getRandomInt(1, maxchance) == 1;
-}
 
-function WasLucky100(chance) {
-  return chance >= mt_rand(1, 100);
-}
 
-function mt_rand (min, max) {
-  // Returns a random number from Mersenne Twister
-  //
-  // version: 1109.2015
-  // discuss at: http://phpjs.org/functions/mt_rand
-  // +   original by: Onno Marsman
-  // *     example 1: mt_rand(1, 1);
-  // *     returns 1: 1
-  var argc = arguments.length;
-  if (argc === 0) {
-    min = 0;
-    max = 2147483647;
-  } else if (argc === 1) {
-    throw new Error('Warning: mt_rand() expects exactly 2 parameters, 1 given');
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+
 
 var dateChunks = new Array(
 

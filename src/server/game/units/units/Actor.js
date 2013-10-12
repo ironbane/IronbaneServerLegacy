@@ -14,14 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var MovingUnit = require('./MovingUnit');
+var MovingUnit = require('./movingunit');
+var log = require('util').log;
 
 var Actor = MovingUnit.extend({
     init: function(data) {
         this._super(data);
         this.stateMachine = new StateMachine(this, new EmptyState(), new EmptyState());
     },
-    Awake: function() {
+    awake: function() {
         if (this.id < 0) {
             var identifier = this.template.name;
 
@@ -67,7 +68,7 @@ var Actor = MovingUnit.extend({
 
         this._super();
     },
-    BuildWaypoints: function() {
+    buildWaypoints: function() {
         // Calculate realistic routes where we can go to
         this.connectedNodeList = [];
 
@@ -104,24 +105,6 @@ var Actor = MovingUnit.extend({
 
                 if (!subNode) {
 
-                    // // ERROR!
-                    // // Not sure why, so send someone here and investigate
-
-                    // var msg = "Pathfinding node error! Please" +
-                    // " investigate the connection<br>between node <b>"+node.id +
-                    // "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
-                    // ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
-
-                    // chatHandler.announceRoom('mods', msg, "red");
-
-                    // log("ERROR: "+msg);
-
-                    // setTimeout(AnnounceOccurredError(msg, 15), 15000);
-
-                    // setTimeout(AnnounceOccurredError(msg, 60), 60000);
-
-
-                    // // debugger;
 
                     return;
                 }
@@ -135,12 +118,12 @@ var Actor = MovingUnit.extend({
 
         addEdgeNodes(this.connectedNodeList, this.zone, closestNode);
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         this.stateMachine.update(dTime);
 
         this._super(dTime);
     },
-    HandleMessage: function(message, data) {
+    handleMessage: function(message, data) {
         this.stateMachine.handleMessage(message, data);
     }
 });

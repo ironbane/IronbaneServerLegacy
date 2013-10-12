@@ -16,7 +16,7 @@
 */
 var Class = require('../../../common/class');
 var _ = require('underscore');
-var Player = require('./units/Player');
+//var Player = require('./units/Player');
 
 var THREE = require('../../../common/three');
 var Unit = Class.extend({
@@ -81,7 +81,7 @@ var Unit = Class.extend({
     this.sendRotationPacketY = false;
     this.sendRotationPacketZ = false;
 
-    this.UpdateCellPosition();
+    this.updateCellPosition();
 
     this.closestNode = null;
 
@@ -109,20 +109,20 @@ var Unit = Class.extend({
 
     (function(unit) {
       setTimeout(function() {
-        unit.UpdateNearbyUnitsOtherUnitsLists();
+        unit.updateNearbyUnitsOtherUnitsLists();
       }, 0);
     })(this);
 
 
 
   },
-  Awake: function() {
+  awake: function() {
     //log(this.id+" is awake!");
   },
-  TeleportToUnit: function(unit, noEmit) {
+  teleportToUnit: function(unit, noEmit) {
     this.Teleport(unit.zone, unit.position, noEmit);
   },
-  Teleport: function(zone, position, noEmit) {
+  teleport: function(zone, position, noEmit) {
 
 
     noEmit = noEmit || false;
@@ -163,10 +163,10 @@ var Unit = Class.extend({
       });
     }
   },
-  UpdateNearbyUnitsOtherUnitsLists: function() {
+  updateNearbyUnitsOtherUnitsLists: function() {
     worldHandler.UpdateNearbyUnitsOtherUnitsLists(this.zone, this.cellX, this.cellZ);
   },
-  UpdateCellPosition: function() {
+  updateCellPosition: function() {
 
     var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
@@ -175,86 +175,16 @@ var Unit = Class.extend({
     this.cellZ = cellPos.z;
 
   },
-  AddOtherUnit: function(unit) {
+  addOtherUnit: function(unit) {
     // Auto send AddUnit if we're a player
     this.otherUnits.push(unit);
 
     // Add the unit to ourselves clientside (only if WE are a player)
-    if (this instanceof Player) {
-
-      var id = unit.id;
-
-
-      var packet = {
-        id: id,
-        position: unit.position,
-        rotY: unit.rotation.y,
-        param: unit.param
-      };
-
-
-      if (unit instanceof Fighter) {
-
-        packet.health = unit.health;
-        packet.armor = unit.armor;
-        packet.healthMax = unit.healthMax;
-        packet.armorMax = unit.armorMax;
-
-        packet.size = unit.size;
-
-        packet.skin = unit.skin;
-        packet.eyes = unit.eyes;
-        packet.hair = unit.hair;
-        packet.head = unit.head;
-        packet.body = unit.body;
-        packet.feet = unit.feet;
-
-        if (unit.id > 0) {
-          // Add additional data to the packet
-          packet.name = unit.name;
-
-          var item = unit.GetEquippedWeapon();
-          if (item) {
-            packet.weapon = item.template;
-          }
-
-        } else {
-          if (unit.weapon && unit.displayweapon) {
-            packet.weapon = unit.weapon.id;
-          }
-        }
-      }
-
-      if (unit.id < 0) {
-        packet.template = unit.template.id;
-
-        if (unit.template.type === UnitTypeEnum.TRAIN ||
-          unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
-          unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
-          packet.rotX = unit.rotation.x;
-          packet.rotZ = unit.rotation.z;
-        }
-
-        if (unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
-          unit.data.on = unit.on;
-        }
-
-        if (unit.template.special) {
-          packet.metadata = unit.data;
-        }
-
-
-
-      }
-
-
-      this.socket.emit("addUnit", packet);
-
-    }
+    
 
 
   },
-  RemoveOtherUnit: function(unit) {
+  removeOtherUnit: function(unit) {
     // Auto send AddUnit if we're a player
 
     this.otherUnits = _.without(this.otherUnits, unit);
@@ -269,7 +199,7 @@ var Unit = Class.extend({
 
 
   },
-  UpdateOtherUnitsList: function() {
+  updateOtherUnitsList: function() {
 
     // If we are a player, only do so if we're ready to receive data
     if (this.id > 0 && !this.readyToReceiveUnits) return;
@@ -307,12 +237,12 @@ var Unit = Class.extend({
     for (var i = 0; i < secondList.length; i++) {
       if (firstList.indexOf(secondList[i]) == -1) {
         // Not found in the first list, so add it
-        this.AddOtherUnit(secondList[i]);
+        this.addOtherUnit(secondList[i]);
       }
     }
 
   },
-  FindNearestUnit: function(maxDistance) {
+  findNearestUnit: function(maxDistance) {
     maxDistance = maxDistance || 0;
     var cx = this.cellX;
     var cz = this.cellZ;
@@ -335,7 +265,7 @@ var Unit = Class.extend({
     }
     return nearestUnit;
   },
-  ChangeCell: function(newCellX, newCellZ) {
+  changeCell: function(newCellX, newCellZ) {
 
 
 
@@ -437,17 +367,17 @@ var Unit = Class.extend({
     }
 
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
 
   },
-  InRangeOfUnit: function(unit, range) {
+  inRangeOfUnit: function(unit, range) {
     return this.InRangeOfPosition(unit.position, range);
   },
-  InRangeOfPosition: function(position, range) {
+  inRangeOfPosition: function(position, range) {
     return position.clone().sub(this.position).lengthSq() < range * range;
   },
-  Remove: function() {
+  remove: function() {
 
     var zone = this.zone;
     var cx = this.cellX;
@@ -467,7 +397,7 @@ var Unit = Class.extend({
     }
 
   },
-  EmitNearby: function(event, data, maxDistance, allowSelf) {
+  emitNearby: function(event, data, maxDistance, allowSelf) {
 
     allowSelf = allowSelf || false;
     maxDistance = maxDistance || 0;
@@ -506,7 +436,7 @@ var Unit = Class.extend({
 
 
   },
-  CalculatePath: function(targetPosition) {
+  calculatePath: function(targetPosition) {
 
 
     var allNodes = this.connectedNodeList;
@@ -560,13 +490,13 @@ var Unit = Class.extend({
     }
 
   },
-  Say: function(text) {
+  say: function(text) {
     this.EmitNearby("say", {
       id: this.id,
       message: text
     }, 0, true);
   },
-  DebugLocationString: function() {
+  debugLocationString: function() {
     return "zone " + this.zone + ", pos " + this.position.Round().ToString();
   }
 });

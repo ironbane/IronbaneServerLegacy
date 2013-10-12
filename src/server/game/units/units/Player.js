@@ -20,7 +20,7 @@ var KickReason = {
 };
 var Fighter = require('./Fighter');
 var Player = Fighter.extend({
-  Init: function(data) {
+  init: function(data) {
 
     // Params for players are still unused
     data.param = 0;
@@ -40,7 +40,81 @@ var Player = Fighter.extend({
     this.lastChatTime = 0;
 
   },
-  Tick: function(dTime) {
+
+  addOtherUnit: function(unit) {
+   
+
+      var id = unit.id;
+
+
+      var packet = {
+        id: id,
+        position: unit.position,
+        rotY: unit.rotation.y,
+        param: unit.param
+      };
+
+
+      if (unit instanceof Fighter) {
+
+        packet.health = unit.health;
+        packet.armor = unit.armor;
+        packet.healthMax = unit.healthMax;
+        packet.armorMax = unit.armorMax;
+
+        packet.size = unit.size;
+
+        packet.skin = unit.skin;
+        packet.eyes = unit.eyes;
+        packet.hair = unit.hair;
+        packet.head = unit.head;
+        packet.body = unit.body;
+        packet.feet = unit.feet;
+
+        if (unit.id > 0) {
+          // Add additional data to the packet
+          packet.name = unit.name;
+
+          var item = unit.GetEquippedWeapon();
+          if (item) {
+            packet.weapon = item.template;
+          }
+
+        } else {
+          if (unit.weapon && unit.displayweapon) {
+            packet.weapon = unit.weapon.id;
+          }
+        }
+      }
+
+      if (unit.id < 0) {
+        packet.template = unit.template.id;
+
+        if (unit.template.type === UnitTypeEnum.TRAIN ||
+          unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
+          unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
+          packet.rotX = unit.rotation.x;
+          packet.rotZ = unit.rotation.z;
+        }
+
+        if (unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
+          unit.data.on = unit.on;
+        }
+
+        if (unit.template.special) {
+          packet.metadata = unit.data;
+        }
+
+
+
+      }
+
+      this._super(unit);
+      this.socket.emit("addUnit", packet);
+
+    
+  },
+  tick: function(dTime) {
 
     // console.log("this.zone: "+this.zone);
     // console.log("this.position: "+this.position.ToString());
@@ -72,7 +146,7 @@ var Player = Fighter.extend({
     this._super(dTime);
 
   },
-  Attack: function(victim, weapon) {
+  attack: function(victim, weapon) {
 
     // Players can only attack monsters and eachother (for now)
     if (victim.id < 0) {
@@ -86,7 +160,7 @@ var Player = Fighter.extend({
     this._super(victim, weapon);
 
   },
-  Delete: function() {
+  delete: function() {
 
 
     // Remove the character from the DB
@@ -100,23 +174,23 @@ var Player = Fighter.extend({
     mysql.query('DELETE FROM ib_items WHERE owner = ?', [this.id]);
 
   },
-  BigMessage: function(message) {
+  bigMessage: function(message) {
     this.socket.emit("bigMessage", {
       message: message
     });
   },
-  Cutscene: function(id) {
+  cutscene: function(id) {
     this.socket.emit("cutscene", id);
   },
-  LightWarn: function() {
+  lightWarn: function() {
     var message = this.name + ': Your behaviour is not tolerated. Stop it.';
     chatHandler.Announce('' + message + '', "yellow");
   },
-  SeriousWarn: function() {
+  seriousWarn: function() {
     var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
     chatHandler.Announce('' + message + '', "red");
   },
-    Kick: function(reason) {
+    kick: function(reason) {
         var me = this,
             message;
 
@@ -135,7 +209,7 @@ var Player = Fighter.extend({
             me.socket.disconnect();
         }, 1000);
     },
-  Ban: function(hours, reason) {
+  ban: function(hours, reason) {
     // Immunity
     if (this.editor) {
       chatHandler.announce(this.name + ' has immunity.', "red");
@@ -172,7 +246,7 @@ var Player = Fighter.extend({
       me.socket.disconnect();
     }, 1000);
   },
-    Save: function() {
+    save: function() {
         // No updating for guests
         // Update MYSQL and set the character data
         mysql.query('UPDATE ib_characters SET ' +
@@ -214,9 +288,9 @@ var Player = Fighter.extend({
             });
         })(this);
     },
-  LeaveGame: function() {
+  leaveGame: function() {
 
-    this.Save();
+    this.save();
 
     chatHandler.announceLoginStatus(this, 'leave');
 

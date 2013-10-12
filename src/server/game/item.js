@@ -16,13 +16,15 @@
 */
 
 // instance of an item template
+var Class = require('../../common/class');
+var _ = require('underscore');
 var Item = Class.extend({
     equipped: 0,
     slot: 0,
     attr1: 0,
     data: {},
     value: 0,
-    Init: function(template, config) {
+    init: function(template, config) {
         if(!template) {
             throw "must init using a template!";
         }
@@ -62,3 +64,4 @@ var Item = Class.extend({
         return this.$template.basevalue;
     }
 });
+module.exports = Item;

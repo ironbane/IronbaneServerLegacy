@@ -17,6 +17,7 @@
 
 // load all possible states here (instead of dynamic)
 var units = {};
+var _  = require('underscore');
 var log = require('util').log;
 units.Actor = require('./actor');
 units.Fighter = require('./fighter');
@@ -25,15 +26,15 @@ units.MovingUnit = require('./movingunit');
 units.NPC = require('./npc');
 units.Player = require('./player');
 units.HeartPiece = require('./special/heartpiece');
-units.lever = require('./special/lever');
+units.Lever = require('./special/lever');
 units.MovingObstacle = require('./special/movingobstacle');
 units.MusicPlayer = require('./special/musicplayer');
-units.sign = require('./special/sign');
+units.Sign = require('./special/sign');
 units.TeleportEntrance = require('./special/teleportentrance');
 units.TeleportExit = require('./special/teleportexit');
-units.ToggableObstacle = require('./special/toggleableobstacle');
+units.ToggleableObstacle = require('./special/toggleableobstacle');
 units.Train = require('./special/train');
 units.Waypoint = require('./special/Waypoint');
 
-log(units);
+log(_.keys(units));
 module.exports = units;

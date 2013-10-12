@@ -43,6 +43,12 @@
 
             return this;
         },
+        truncate: function(n) {
+        if ( this.length() > n ) {
+            return this.normalize().multiplyScalar(n);
+          }
+          return this;
+        },
         setComponent: function(index, value) {
             switch (index) {
                 case 0:

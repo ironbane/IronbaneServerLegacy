@@ -14,10 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
+var _  = require('underscore');
+module.exports = function(mysql) {
 var Server = Class.extend({
-    Init: function() {
+    init: function() {
 
 
         this.npcIDCount = -1;
@@ -26,19 +26,19 @@ var Server = Class.extend({
         mysql.query('SELECT MAX(id) as id FROM ib_units',
             function (err, result) {
                 if ( result.length === 0 ) {
-                    server.npcIDCount = 0;
+                    this.npcIDCount = 0;
                 }
                 else {
-                    server.npcIDCount = result[0].id;
+                    this.npcIDCount = result[0].id;
                 }
             });
         mysql.query('SELECT MAX(id) as id FROM ib_items ORDER BY id DESC',
             function (err, result) {
                 if ( result.length == 0 ) {
-                    server.itemIDCount = 0;
+                    this.itemIDCount = 0;
                 }
                 else {
-                    server.itemIDCount = result[0].id;
+                    this.itemIDCount = result[0].id;
                 }
             });
 
@@ -117,7 +117,7 @@ var Server = Class.extend({
 
                             //if ( units[u].id > 0 ) continue;
 
-                            units[u].Tick(dTime);
+                            units[u].tick(dTime);
 
                         }
 
@@ -140,7 +140,7 @@ var Server = Class.extend({
                         for(var u=0;u<units.length;u++) {
 
 
-                            if ( !(units[u] instanceof Player) ) continue;
+                            if ( units[u].id < 0 ) continue;
 
                             var snapshot = [];
 
@@ -226,5 +226,5 @@ var Server = Class.extend({
 
     }
 });
-
-var server = new Server();
+return Server;
+}

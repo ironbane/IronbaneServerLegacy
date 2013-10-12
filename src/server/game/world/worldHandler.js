@@ -292,7 +292,6 @@ var _ = require('underscore');
 
 
       var unit = null;
-
       switch(data.template.type) {
         case UnitTypeEnum.NPC:
         case UnitTypeEnum.MONSTER:
@@ -312,7 +311,7 @@ var _ = require('underscore');
             data.rotz = data.data.rotZ;
           }
 
-          unit = new MovingObstacle(data);
+          unit = new units.MovingObstacle(data);
           break;
         case UnitTypeEnum.TOGGLEABLEOBSTACLE:
 
@@ -323,7 +322,7 @@ var _ = require('underscore');
             data.rotz = data.data.rotZ;
           }
 
-          unit = new ToggleableObstacle(data);
+          unit = new units.ToggleableObstacle(data);
           break;
         case UnitTypeEnum.TRAIN:
 
@@ -339,16 +338,16 @@ var _ = require('underscore');
             return;
           }
 
-          unit = new Train(data);
+          unit = new unitsTrain(data);
           break;
         case UnitTypeEnum.LEVER:
-          unit = new Lever(data);
+          unit = new units.Lever(data);
           break;
         case UnitTypeEnum.TELEPORTENTRANCE:
-          unit = new TeleportEntrance(data);
+          unit = new units.TeleportEntrance(data);
           break;
         case UnitTypeEnum.TELEPORTEXIT:
-          unit = new TeleportExit(data);
+          unit = new units.TeleportExit(data);
           break;
         case UnitTypeEnum.MUSICPLAYER:
           unit = new MusicPlayer(data);
@@ -362,7 +361,7 @@ var _ = require('underscore');
             data.rotz = data.data.rotZ;
           }
 
-          unit = new Sign(data);
+          unit = new units.Sign(data);
           break;
         case UnitTypeEnum.WAYPOINT:
           unit = new Waypoint(data);
@@ -376,10 +375,10 @@ var _ = require('underscore');
             data.rotz = data.data.rotZ;
           }
 
-          unit = new Lootable(data, true);
+          unit = new units.Lootable(data, true);
           break;
         case UnitTypeEnum.HEARTPIECE:
-          unit = new HeartPiece(data);
+          unit = new units.HeartPiece(data);
           break;
         default:
           unit = new Unit(data);
@@ -593,7 +592,7 @@ var _ = require('underscore');
         for(var z=cellZ-1;z<=cellZ+1;z++){
           if ( this.checkWorldStructure(zone, x, z) ) {
             for(var u=0;u<this.world[zone][x][z].units.length;u++) {
-              this.world[zone][x][z].units[u].UpdateOtherUnitsList();
+              this.world[zone][x][z].units[u].updateOtherUnitsList();
             }
           }
         }

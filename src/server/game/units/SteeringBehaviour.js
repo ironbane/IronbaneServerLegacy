@@ -21,8 +21,7 @@ var Deceleration = {
     FAST:1
 };
 
-var Class = 
-
+var Class = require('../../../common/class');
 var SteeringBehaviour = Class.extend({
     Init: function(unit) {
         this.unit = unit;
@@ -136,3 +135,4 @@ var SteeringBehaviour = Class.extend({
 		return Arrive(midPoint, Deceleration.FAST);
 	}
 });
+module.exports = SteeringBehaviour;

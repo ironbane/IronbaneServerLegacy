@@ -92,10 +92,7 @@ module.exports = function() {
         './Engine/SocketHandler.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
-        './Game/item.js',
-        './Game/SteeringBehaviour.js',
         
-        './Server.js'
     ];
 
     // Include scripts from the assets
@@ -173,7 +170,8 @@ module.exports = function() {
 
         // All set! Tell WorldHandler to load
         global.worldHandler.loadWorldLight();
-
+        var s = require('./Server')(mysql);
+        global.server = new s();
         // this replaces MainLoop, must go here since server hasn't been defined earlier...
         IronbaneGame.on('tick', function(elapsed) {
             // eventually we wouldn't be accessing the global var here...
