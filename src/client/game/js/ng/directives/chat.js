@@ -43,9 +43,8 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
         diedspecial: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by {{ data.cause }}.',
         leave: '<div><span class="name {{ data.user.rank }}">{{ data.user.name }}</span> has left the game.</div>',
         say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
-        "announce": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
-        "announce:personal": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
-        "announce:mods": '<div class="message" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
+        "say:targetted": '<div><span class="target">[{{ data.target }}]</span> <span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
+        "announce": '<div class="message announce {{ data.target }}" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
         "default": '<div class="message">{{ data.message | mouthwash }}</div>'
     };
 
@@ -81,6 +80,18 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
                 if(scope.data.online.length === 0) {
                     scope.data.online.push({name: 'None', rank: 'fool'});
                 }
+            }
+
+            // rooms & PM
+            if(scope.data.type.search('say:') >= 0) {
+                scope.type = 'say:targetted';
+                scope.data.target = scope.data.type.split(':')[1];
+            }
+
+            // announcements all go to the same one
+            if(scope.data.type.search('announce') >= 0) {
+                scope.type = 'announce';
+                scope.data.target = scope.data.type.split(':')[1];
             }
 
             el.html(getTemplate(scope.type));

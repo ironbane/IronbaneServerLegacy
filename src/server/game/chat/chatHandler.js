@@ -223,6 +223,8 @@ module.exports = function(items, units, worldHandler) {
             var rooms = this.io.sockets.manager.rooms,
                 names = _.keys(rooms);
 
+            names = _.without(names, '');
+
             names = _.map(names, function(name) {
                 return name.substr(1); // remove '/' prefix as it's not needed by us
             });
