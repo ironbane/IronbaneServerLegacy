@@ -58,7 +58,7 @@ module.exports = function() {
     var crypto = require('crypto');
     var path = require('path');
 
-    var util = require('./Engine/util.js')
+    var util = require('./Engine/util.js');
 
     var fsi = require('./External/fsi.js');
 
@@ -79,22 +79,9 @@ module.exports = function() {
         //insecureAuth:false
     });
 
-    // load constants (was Shared.js)
-    var IB = require('./src/common/constants');
-    // inject into global until rest is modular
-    _.extend(global, IB);
-
-    // load AI as a module
-    var AI = require('./src/server/game/ai');
-    // temp pass them on to global for access below
-    global.StateMachine = AI.StateMachine;
-    global.State = AI.State;
-    _.extend(global, AI.States);
-
     // These are all to be converted to modules
     var includes = [
         './Engine/Vector3.js',
-        './Init.js',
         './Shared/seedrandom.js',
         './Shared/Buffs.js',
         './Shared/Util.js',
@@ -104,8 +91,6 @@ module.exports = function() {
         './Engine/Switch.js',
         './Engine/SocketHandler.js',
         './Engine/WorldHandler.js',
-        './Engine/DataHandler.js',
-        './Engine/ChatHandler.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
         './Game/item.js',
@@ -177,11 +162,30 @@ module.exports = function() {
         io = httpServer.server.io;
         ioApp = httpServer.server;
 
+        // load constants (was Shared.js)
+        var IB = require('./src/common/constants');
+        // inject into global until rest is modular
+        _.extend(global, IB);
 
+        // Load DataHandler global for now (holds memory DB of item and unit templates)
+        global.dataHandler = require('./src/server/game/dataHandler')(mysql);
+
+        // load AI as a module
+        var AI = require('./src/server/game/ai');
+        // temp pass them on to global for access below
+        global.StateMachine = AI.StateMachine;
+        global.State = AI.State;
+        _.extend(global, AI.States);
+
+        // READ REST OF OLD GLOBAL APP HERE
         for (var f = 0; f < includes.length; f++) {
             log("Loading: " + includes[f]);
             eval(fs.readFileSync(includes[f]) + '');
         }
+
+        // Load Chat module - after worldHandler, there is a dep
+        global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
+        console.log("chatHandler", chatHandler);
 
         // All set! Tell WorldHandler to load
         worldHandler.LoadWorldLight();
@@ -210,7 +214,7 @@ module.exports = function() {
         // We can only prevent this by upgrading to a real dedicated server, which we will do
         // when we have more people. Currently IB runs on a VPS.
         setTimeout(function() {
-            chatHandler.Announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
+            global.chatHandler.announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
             setTimeout(function() {
                 process.exit();
             }, 60000);
@@ -235,8 +239,8 @@ module.exports = function() {
             if (results.length) {
                 shuttingDown = true;
 
-                chatHandler.Announce("&lt;Server&gt; New update available!", "red");
-                chatHandler.Announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
+                global.chatHandler.announce("&lt;Server&gt; New update available!", "red");
+                global.chatHandler.announce("&lt;Server&gt; Auto-restarting in 10 seconds...", "red");
 
                 // Disconnect all clients first
                 io.sockets.emit("disconnect");

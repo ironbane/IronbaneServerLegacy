@@ -51,7 +51,7 @@ var Server = Class.extend({
     },
     AutoBackup: function() {
       log("Creating daily backup...");
-      //chatHandler.Announce("Performing auto-backup...", "blue");
+      //chatHandler.announce("Performing auto-backup...", "blue");
       worldHandler.DoFullBackup();
       setTimeout(function(){server.AutoBackup()}, 3600 * 24 * 1000);
     },
@@ -93,7 +93,7 @@ var Server = Class.extend({
 
                 ]);
 
-                chatHandler.Announce(msg);
+                chatHandler.announce(msg);
 
             }
         }

@@ -305,7 +305,7 @@ var Fighter = Actor.extend({
             // Remove their items
             this.items = [];
 
-            chatHandler.Died(this, killer);
+            chatHandler.announceDied(this, killer);
         }
     },
     Respawn: function() {

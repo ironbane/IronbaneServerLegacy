@@ -66,7 +66,7 @@ var Player = Fighter.extend({
 
         this.respawnTimer = 10.0;
 
-        chatHandler.DiedSpecial(this, "lava");
+        chatHandler.announceDiedSpecial(this, "lava");
     }
 
     this._super(dTime);
@@ -116,29 +116,29 @@ var Player = Fighter.extend({
     var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
     chatHandler.Announce('' + message + '', "red");
   },
-  Kick: function(reason) {
-    // Immunity
-    if (this.editor) {
-      chatHandler.Announce(this.name + ' has immunity.', "yellow");
-      return;
-    }
+    Kick: function(reason) {
+        var me = this,
+            message;
 
-    var reason = reason ? "Reason: " + reason : "No reason given";
+        // Immunity
+        if (me.editor) {
+            chatHandler.announce(me.name + ' has immunity.', "yellow");
+            return;
+        }
 
-    var me = this;
+        reason = reason ? "Reason: " + reason : "No reason given";
 
-    var message = this.name + ' has been kicked. (' + reason + ')';
-    chatHandler.Announce(message, "yellow");
+        message = me.name + ' has been kicked. (' + reason + ')';
+        chatHandler.announce(message, "yellow");
 
-    setTimeout(function() {
-      me.socket.disconnect();
-    }, 1000);
-
-  },
+        setTimeout(function() {
+            me.socket.disconnect();
+        }, 1000);
+    },
   Ban: function(hours, reason) {
     // Immunity
     if (this.editor) {
-      chatHandler.Announce(this.name + ' has immunity.', "red");
+      chatHandler.announce(this.name + ' has immunity.', "red");
       return;
     }
 
@@ -154,7 +154,7 @@ var Player = Fighter.extend({
     var how = hours ? "permanently banned" : "banned for " + hours + " hours";
 
     var message = this.name + ' has been ' + how + '. (' + reason + ')';
-    chatHandler.Announce(message, "red");
+    chatHandler.announce(message, "red");
 
     mysql.query('INSERT INTO ib_bans SET ?', {
       ip: me.socket.ip,
@@ -218,7 +218,7 @@ var Player = Fighter.extend({
 
     this.Save();
 
-    chatHandler.LeaveGame(this);
+    chatHandler.announceLoginStatus(this, 'leave');
 
     var cx = this.cellX;
     var cz = this.cellZ;

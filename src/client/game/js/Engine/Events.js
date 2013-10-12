@@ -46,25 +46,39 @@ $('#chatInput').blur(function(){
   }
   hasChatFocus = false;
 });
-$('#chatInput').keypress(function(e)
-{
-  if ( !socketHandler.inGame ) return;
 
-  code= (e.keyCode ? e.keyCode : e.which);
-  if (code == 13) {
-    var clientmsg = $('#chatInput').val();
-    lastUsedChat[lastUsedChatCounter++] = clientmsg;
-    lastUsedChatSelectCounter = lastUsedChatCounter;
+$('#chatInput').keypress(function(e) {
+    if ( !socketHandler.inGame ) {
+        return;
+    }
 
-    socketHandler.socket.emit('chatMessage', {
-      message: clientmsg
-    });
+    code = (e.keyCode ? e.keyCode : e.which);
+    if (code === 13) {
+        var clientmsg = $('#chatInput').val(),
+            finalmsg;
 
-    $('#chatInput').attr('value', '');
-    $('#chatInput').blur();
-    $('#chatInputBox').hide();
-  }
+        lastUsedChat[lastUsedChatCounter++] = clientmsg;
+        lastUsedChatSelectCounter = lastUsedChatCounter;
+
+        // default chat "command" is /say to the global
+        // supports both / & @ as commands
+        if(clientmsg[0] === '/' || clientmsg[0] === '@') {
+            // continue as normal!
+            finalmsg = clientmsg;
+        } else {
+            finalmsg = '/say ' + clientmsg;
+        }
+
+        socketHandler.socket.emit('chatMessage', {
+            message: finalmsg
+        });
+
+        $('#chatInput').attr('value', '');
+        $('#chatInput').blur();
+        $('#chatInputBox').hide();
+    }
 });
+
 $('#chatInput').keydown(function(e)
 {
   if ( !socketHandler.inGame ) return;
