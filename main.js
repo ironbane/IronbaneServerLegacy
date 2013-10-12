@@ -58,7 +58,7 @@ module.exports = function() {
     var crypto = require('crypto');
     var path = require('path');
 
-    var util = require('./Engine/util.js');
+    var util = require('./src/server/game/util.js');
 
     var fsi = require('./External/fsi.js');
 
@@ -81,15 +81,9 @@ module.exports = function() {
 
     // These are all to be converted to modules
     var includes = [
-        './Engine/Vector3.js',
         './Shared/seedrandom.js',
         './Shared/Buffs.js',
-        './Shared/Util.js',
-        './Shared/NodeHandler.js',
-        './Engine/ConsoleCommand.js',
-        './Engine/ConsoleHandler.js',
-        './Engine/Switch.js',
-        './Engine/SocketHandler.js',
+        //'./Shared/Util.js',
         './Game/AI/graph.js',
         './Game/AI/astar.js',
         
@@ -170,8 +164,8 @@ module.exports = function() {
 
         // All set! Tell WorldHandler to load
         global.worldHandler.loadWorldLight();
-        var s = require('./Server')(mysql);
-        global.server = new s();
+        var server = require('./Server')(mysql);
+        global.server = new server();
         // this replaces MainLoop, must go here since server hasn't been defined earlier...
         IronbaneGame.on('tick', function(elapsed) {
             // eventually we wouldn't be accessing the global var here...
@@ -185,7 +179,7 @@ module.exports = function() {
 
         setInterval(function autoSave() {
             log("Auto-saving all players...");
-            worldHandler.LoopUnits(function(unit) {
+            worldHandler.loopUnits(function(unit) {
                 if (unit instanceof Player) {
                     unit.Save();
                 }

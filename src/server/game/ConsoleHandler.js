@@ -14,9 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+var Class = require('../../common/class');
+module.exports = function(){
 var ConsoleHandler = Class.extend({
-  Init: function() {
+  init: function() {
     this.AccessLevel = {
       GUEST : 0,
       PLAYER : 1,
@@ -329,4 +330,5 @@ var ConsoleHandler = Class.extend({
   }
 });
 
-var consoleHandler = new ConsoleHandler();
+return ConsoleHandler();
+};

@@ -15,6 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var _  = require('underscore');
+var Class = require('./src/common/class');
 module.exports = function(mysql) {
 var Server = Class.extend({
     init: function() {

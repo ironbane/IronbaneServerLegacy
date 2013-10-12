@@ -20,7 +20,7 @@ module.exports = function(mysql) {
   var units = require('../units/units');
 
 var _ = require('underscore');
-    var util = require('../../../../Engine/util.js');
+    var util = require('../util.js');
     var dataPath = clientDir + 'data';
     var fs = require('fs');
   var dataPathPersistent = assetDir + 'data';
