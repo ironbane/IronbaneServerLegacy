@@ -17,6 +17,7 @@
 module.exports = function(items, units, worldHandler) {
     var Class = require('../../../common/class'),
         sanitize = require('validator').sanitize,
+        _ = require('underscore'),
         log = require('util').log;
 
     var ChatHandler = Class.extend({
@@ -65,6 +66,7 @@ module.exports = function(items, units, worldHandler) {
             // commands starting with @ are assumed to be of type SAY as that is normal "chat" type behavior
             if(commandOpener === '@') {
                 command = 'say';
+                target = realparams.shift();
             } else {
                 command = realparams.shift();
                 // for the case of say, if we use /say, then if we want to target a room use : , like: /say:zone_1 hey what's up or /say:"leeroy jenkins" don't attack!
@@ -92,8 +94,11 @@ module.exports = function(items, units, worldHandler) {
                 errorMessage = "That command does not exist!";
             }
 
-            if (errorMessage) {
+            if (errorMessage && errorMessage.length > 0) {
                 feedback += "<br>" + errorMessage;
+            } else {
+                // let's only show feedback if there is an error
+                showFeedback = false;
             }
 
             if (showFeedback) {
@@ -121,7 +126,11 @@ module.exports = function(items, units, worldHandler) {
                 message: message
             };
 
-            this.io.sockets.emit("chatMessage", messageData);
+            if(room) {
+                this.io.sockets.in(room).emit('chatMessage', messageData);
+            } else {
+                this.io.sockets.emit("chatMessage", messageData);
+            }
         },
         announce: function(message, color) {
             log("[Announce] " + message);
@@ -210,14 +219,26 @@ module.exports = function(items, units, worldHandler) {
 
             this.io.sockets.emit("chatMessage", messageData);
         },
-        listRooms: function(unit) {
-            var rooms = this.io.sockets.manager.rooms;
-            log('listRooms: ' + rooms);
+        listRooms: function() {
+            var rooms = this.io.sockets.manager.rooms,
+                names = _.keys(rooms);
 
-            this.announcePersonally(unit, Object.keys(rooms).join(', '), "blue");
+            names = _.map(names, function(name) {
+                return name.substr(1); // remove '/' prefix as it's not needed by us
+            });
+
+            return names;
+        },
+        listPlayers: function(room) {
+            // list users in room
+            var clients = this.io.sockets.clients(room);
+            var names = _.map(clients, function(client) {
+                return client.unit.name;
+            });
+
+            return names;
         }
     });
 
     return ChatHandler;
-
 };

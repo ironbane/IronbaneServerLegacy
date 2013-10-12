@@ -17,5 +17,5 @@
 
 module.exports = function(io, items, units, worldHandler) {
     var ChatHandler = require('./chatHandler')(items, units, worldHandler);
-    return new ChatHandler(io); // for the global reference, later lives only within here?
+    return new ChatHandler(io);
 };

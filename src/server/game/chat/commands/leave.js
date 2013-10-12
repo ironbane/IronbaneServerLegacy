@@ -21,20 +21,32 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
-    var _ = require('underscore');
-
     return {
         requiresEditor: false,
-        name: 'rooms',
         action: function(unit, target, params, errorMessage) {
-            var rooms = chatHandler.listRooms();
+            var room = params[0],
+                success = false;
 
-            // filter list of character names
-            var players = chatHandler.listPlayers();
-            rooms = _.difference(rooms, players);
+            // for now hard coded room rules
+            if (unit.editor) {
+                // editors can leave whatever they want
+                unit.socket.leave(room);
+                success = true;
+            } else if (room === unit.name) {
+                errorMessage = "Can't leave your PM room.";
+            } else if (room === 'guests' && unit.isGuest) {
+                errorMessage = "You are a guest, can't leave the guests room.";
+            } else if (room === 'zone_' + unit.zone) {
+                errorMessage = "Can't leave the zone you are in.";
+            } else {
+                unit.socket.leave(room);
+                success = true;
+            }
 
-            // todo: if not editor, filter out editor rooms?
-            chatHandler.announcePersonally(unit, rooms.join(', '), '#97FFFF');
+            // todo: instead provide feedback to return object?
+            if(success) {
+                chatHandler.announcePersonally(unit, "Left: " + room, "pink");
+            }
 
             return {
                 errorMessage: errorMessage

@@ -3,17 +3,25 @@
 
     var IB = {};
 
+    // STUFF FROM INIT
+    IB.guestSpawnZone = 1;
+    IB.guestSpawnPosition = {x: 10, y: 0, z: 0};
+    IB.tutorialSpawnZone = 3;
+    IB.tutorialSpawnPosition = {x: 42, y: 57, z: 59};
+    IB.normalSpawnZone = 1;
+    IB.normalSpawnPosition = {x: 3, y: 20, z: -4};
+    IB.playerSpawnTimeout = 5.0;
+    IB.NPCSpawnTimeout = 10.0;
+    // END INIT
+
     IB.cellSize = 96 + 16;
     IB.cellSizeHalf = IB.cellSize / 2;
     IB.cellLoadRange = 1;
 
-
     IB.unitAcceleration = 20;
-
 
     IB.dayTime = 60 * 15;
     // IB.dayTime = 90;
-
 
     IB.worldScale = 2;
 

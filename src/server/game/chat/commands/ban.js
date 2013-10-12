@@ -21,20 +21,17 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
-    var _ = require('underscore');
-
     return {
-        requiresEditor: false,
-        name: 'rooms',
+        requiresEditor: true,
         action: function(unit, target, params, errorMessage) {
-            var rooms = chatHandler.listRooms();
+            var name = params[0],
+                hours = params[1],
+                reason = params[2],
+                player = worldHandler.FindPlayerByName(name);
 
-            // filter list of character names
-            var players = chatHandler.listPlayers();
-            rooms = _.difference(rooms, players);
-
-            // todo: if not editor, filter out editor rooms?
-            chatHandler.announcePersonally(unit, rooms.join(', '), '#97FFFF');
+            if (player) {
+                player.Ban(hours, reason);
+            }
 
             return {
                 errorMessage: errorMessage

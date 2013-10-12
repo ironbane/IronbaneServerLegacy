@@ -15,14 +15,23 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var guestSpawnZone = 1;
-var guestSpawnPosition = new THREE.Vector3(10, 0, 0);
+// chat command API
+// items - item templates (from datahandler)
+// units - unit templates (from datahandler)
+// worldHandler - worldHandler reference
+// chatHandler - reference to general chat utils
+module.exports = function(items, units, worldHandler, chatHandler) {
+    return {
+        requiresEditor: false,
+        action: function(unit, target, params, errorMessage) {
+            var room = params[0],
+                players = chatHandler.listPlayers(room);
 
+            chatHandler.announcePersonally(unit, players.join(', '), "#97FFFF");
 
-var tutorialSpawnZone = 3;
-var tutorialSpawnPosition = new THREE.Vector3(42, 57, 59);
-var normalSpawnZone = 1;
-var normalSpawnPosition = new THREE.Vector3(3, 20, -4);
-
-var playerSpawnTimeout = 5.0;
-var NPCSpawnTimeout = 10.0;
+            return {
+                errorMessage: errorMessage
+            };
+        }
+    };
+};

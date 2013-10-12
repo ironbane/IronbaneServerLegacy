@@ -21,11 +21,14 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
+    var constants = require('../../../../common/constants');
+
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-            unit.Teleport(normalSpawnZone, normalSpawnPosition);
+            unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
             chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
+
             return {
                 errorMessage: errorMessage
             };

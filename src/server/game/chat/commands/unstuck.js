@@ -21,20 +21,18 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
-    var _ = require('underscore');
+    var constants = require('../../../../common/constants');
 
     return {
-        requiresEditor: false,
-        name: 'rooms',
+        requiresEditor: true,
         action: function(unit, target, params, errorMessage) {
-            var rooms = chatHandler.listRooms();
-
-            // filter list of character names
-            var players = chatHandler.listPlayers();
-            rooms = _.difference(rooms, players);
-
-            // todo: if not editor, filter out editor rooms?
-            chatHandler.announcePersonally(unit, rooms.join(', '), '#97FFFF');
+            var unfortunate = worldHandler.FindPlayerByName(params[0]);
+            if (unfortunate) {
+                unfortunate.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
+                chatHandler.announcePersonally(unfortunate, "You were teleported back to town.", "lightgreen");
+            } else {
+                chatHandler.announcePersonally(unit, "Playername " + params[0] + " not found", "red");
+            }
 
             return {
                 errorMessage: errorMessage

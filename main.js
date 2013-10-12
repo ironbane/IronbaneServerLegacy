@@ -82,7 +82,6 @@ module.exports = function() {
     // These are all to be converted to modules
     var includes = [
         './Engine/Vector3.js',
-        './Init.js',
         './Shared/seedrandom.js',
         './Shared/Buffs.js',
         './Shared/Util.js',
