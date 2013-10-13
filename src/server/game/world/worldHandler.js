@@ -16,7 +16,7 @@
 */
 
 module.exports = function(mysql) {
-  var Class = require('../../../common/class');
+  var Class = require('resig-class');
   var units = require('../units/units');
 
 var _ = require('underscore');

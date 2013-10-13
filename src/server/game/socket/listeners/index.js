@@ -1,8 +1,8 @@
 var listeners = {};
 
-var backToMainListener = require('./backToMainListener');
+var backToMainListener = require('./backToMainListener')();
 listeners.backToMainListener = new backToMainListener();
-chatMessageListener = require('./chatMessageListener');
+chatMessageListener = require('./chatMessageListener')();
 listeners.chatMessageListener = new chatMessageListener();
 console.log(listeners);
 console.log(listeners.backToMainListener);

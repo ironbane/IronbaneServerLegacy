@@ -1,4 +1,6 @@
 module.exports = function(){
+    var Class = require('resig-class');
+    var _ = require('underscore');
 
 var ChatMessageListener = Class.extend({
     init: function(){
@@ -31,7 +33,6 @@ var ChatMessageListener = Class.extend({
                 }
                 socket.unit.lastChatTime = (new Date()).getTime();
 
-                log(socket.unit.name + ': ' + data.message);
                 chatHandler.processInput(socket.unit, data.message);
             }
             });

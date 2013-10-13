@@ -492,7 +492,7 @@ var Unit = Class.extend({
 
   },
   say: function(text) {
-    this.EmitNearby("say", {
+    this.emitNearby("say", {
       id: this.id,
       message: text
     }, 0, true);

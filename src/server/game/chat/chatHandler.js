@@ -114,7 +114,7 @@ module.exports = function(items, units, worldHandler) {
 
             // only echo this if to global?
             if(!room) {
-                unit.Say(message);
+                unit.say(message);
             }
 
             var messageData = {
