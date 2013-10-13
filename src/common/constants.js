@@ -1,6 +1,4 @@
 // commonjs wrapper for Shared.js replacement
-var _ = require('underscore');
-var THREE = require('./three');
 (function(exports) {
 
     var IB = {};
@@ -278,12 +276,12 @@ IB.ConvertVector3 = function(vec) {
 }
 
 IB.CheckData = function(obj, names) {
-  if ( _.isUndefined(obj) ) return false;
+  if ( obj === undefined ) return false;
   if ( !obj ) return false;
 
   //for(var n in names) {
   for(var n=0;n<names.length;n++){
-    if ( _.isUndefined(obj[names[n]]) ) return false;
+    if ( obj[names[n]] === undefined ) return false;
   }
   return true;
 };
@@ -304,7 +302,7 @@ IB.timeSince = function(since) {
 IB.ChooseSequenced = function(a) {
   var uid = "";
   for (var b in a) uid += b;
-  if ( _.isUndefined(sequencedTimers[uid]) ) sequencedTimers[uid] = 0;
+  if ( sequencedTimers[uid] === undefined ) sequencedTimers[uid] = 0;
   var value = a[sequencedTimers[uid]];
   sequencedTimers[uid]++;
   if ( sequencedTimers[uid] >= a.length ) sequencedTimers[uid] = 0;

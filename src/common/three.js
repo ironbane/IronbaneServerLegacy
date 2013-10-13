@@ -436,12 +436,31 @@
 
   return this;
 },
+
 Perp : function() {
   return this.cross(new THREE.Vector3(0, 1, 0));
 },
         equals: function(v) {
             return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z));
         },
+        toRadians : function(n) {
+  this.x = this.x.ToRadians();
+  this.y = this.y.ToRadians();
+  this.z = this.z.ToRadians();
+
+  return this;
+},
+inRangeOf : function(vector, range) {
+    return vector.clone().sub(this).lengthSq() < range*range;
+},
+
+toDegrees : function(n) {
+  this.x = this.x.ToDegrees();
+  this.y = this.y.ToDegrees();
+  this.z = this.z.ToDegrees();
+
+  return this;
+},
         fromArray: function(array) {
             this.x = array[0];
             this.y = array[1];

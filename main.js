@@ -147,7 +147,7 @@ module.exports = function() {
         global.worldHandler = require('./src/server/game/world')(mysql);
         var ch = require('./src/server/game/consoleHandler')();
         global.consoleHandler = new ch();
-        var sh = require('./src/server/game/socketHandler')(mysql, io);
+        var sh = require('./src/server/game/socket/socketHandler')(mysql, io);
         global.socketHandler = new sh();
         global.mysql = mysql;
 

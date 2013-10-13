@@ -16,19 +16,21 @@
 */
 module.exports = function(mysql, io){
 var characterIDCount = 1;
-var Class = require('../../common/class');
+var Class = require('../../../common/class');
 var log = require('util').log;
 var _ = require('underscore');
-var Player = require('./units/units/Player');
-log(Player);
+var Player = require('../units/units/Player');
+var THREE = require('../../../common/three');
 var SocketHandler = Class.extend({
     bans: [],
     onlinePlayers: [],
+    listeners: {},
     init: function() {
         var me = this;
         log("starting socketHandler");
         this.UpdateBans();
-
+        this.listeners = require('./listeners');
+        log(_.keys(this.listeners));
         // temp until service implemented
         function loadCharItems(chardata, callback) {
             chardata.items = [];
@@ -275,6 +277,7 @@ var SocketHandler = Class.extend({
                 }
             }
         });
+        
 
         io.sockets.on("connection", function (socket) {
             socket.ip = socket.handshake.address.address;
@@ -282,57 +285,13 @@ var SocketHandler = Class.extend({
             socket.unit = null;
 
             socket.on("backToMainMenu", function(data, reply) {
-                if (!_.isFunction(reply)) {
-                    log('backToMainMenu no callback defined!');
-                    return;
-                }
-                if (socket.unit) {
-                    if (socket.unit.health <= 0) {
-                        reply({
-                            errmsg: "Please wait until you respawn!"
-                        });
-                        return;
-                    }
-                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
-                        return p.id === socket.unit.id;
-                    }));
-                    socket.unit.LeaveGame();
-                    reply("OK");
-
-                    log(socket.unit.name + " is back at the Main Menu.");
-                }
-
-                socket.unit = null;
+                me.listeners.backToMainListener.trigger({socket: socket, data: data});
             });
 
             // chatMessage is the user input processor
             socket.on("chatMessage", function(data) {
-                if (!socket.unit) {
-                    return;
-                }
-
-                if (!_.isString(data.message)) {
-                    chatHandler.announceRoom('__nick__', "Warning: Hacked client in " +
-                        "[chatMessage]<br>User " + socket.unit.name + "", "red");
-                    return;
-                }
-
-                // should trunc + add ellipses?
-                data.message = data.message.substr(0, 100);
-
-                // No empty messages
-                if (!data.message || data.message.length <= 0) {
-                    return;
-                }
-
-                if (!socket.unit.editor && socket.unit.lastChatTime > (new Date()).getTime() - 2000) {
-                    chatHandler.announcePersonally(socket.unit, "Please don't spam the server.", "yellow");
-                    return;
-                }
-                socket.unit.lastChatTime = (new Date()).getTime();
-
-                log(socket.unit.name + ': ' + data.message);
-                chatHandler.processInput(socket.unit, data.message);
+                me.listeners.chatMessageListener.trigger({socket: socket, data: data});
+                
             });
 
             socket.on("doJump", function (data) {
@@ -1858,7 +1817,7 @@ var SocketHandler = Class.extend({
                     }
 
 
-                    var p = ConvertVector3(data.p);
+                    var p = THREE.ConvertVector3(data.p);
 
                     var radians = socket.unit.rotation.y + (Math.PI/2);
 

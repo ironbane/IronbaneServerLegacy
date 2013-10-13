@@ -85,7 +85,7 @@ module.exports = function(grunt) {
                     // Shared between client and server
                     "Shared/Util.js",
                     "Shared/Shared.js",
-                    "Shared/NodeHandler.js",
+                    //"Shared/NodeHandler.js",
                     "Shared/seedrandom.js",
                     "Shared/Buffs.js",
 
