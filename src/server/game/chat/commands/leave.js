@@ -28,8 +28,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
                 success = false;
 
             // for now hard coded room rules
-            if (unit.editor) {
-                // editors can leave whatever they want
+            if (chatHandler.listRoomsPlayer(unit).indexOf(room) < 0) {
+                errorMessage = "You are not in a room called: " + room;
+            } else if (unit.editor) {
+                // editors can leave whatever they want (that they are in)
                 unit.socket.leave(room);
                 success = true;
             } else if (room === unit.name) {
