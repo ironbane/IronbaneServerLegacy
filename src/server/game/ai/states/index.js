@@ -23,7 +23,6 @@ States.NPCGlobalState = require('./npcGlobalState');
 States.Turret = require('./turret');
 States.TurretStraight = require('./turretStraight');
 States.ChaseEnemy = require('./chaseEnemy');
-States.ExploreAndLookForEnemies = require('./hunt');
 States.FleeEnemy = require('./fleeEnemy');
 States.Patrol = require('./patrol');
 States.Wander = require('./wander');
