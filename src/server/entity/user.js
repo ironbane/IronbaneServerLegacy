@@ -1,5 +1,5 @@
 // user.js - backend user entity / service
-var Class = require('../../common/class'),
+var Class = require('resig-class');
     config = require('../../../nconf'),
     log = require('util').log;
 

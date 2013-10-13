@@ -3,7 +3,7 @@ var events = require('events'),
     sys = require('sys'),
     log = console.log,
     _ = require('underscore'),
-    Class = require('../../common/class');
+ Class = require('resig-class');
 
 // enhance default class
 sys.inherits(Class, events.EventEmitter);

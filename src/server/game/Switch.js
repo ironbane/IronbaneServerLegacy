@@ -16,6 +16,8 @@
 */
 
 
+var Class = require('resig-class');
+var _ = require('underscore');
 var Switch = Class.extend({
 	Init: function(id, output1, output2, output3, output4) {
 

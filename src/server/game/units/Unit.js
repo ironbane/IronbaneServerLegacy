@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var Class = require('../../../common/class');
+var Class = require('resig-class');
 var _ = require('underscore');
 
 var THREE = require('../../../common/three');
@@ -416,7 +416,6 @@ var Unit = Class.extend({
           var units = worldHandler.world[zone][x][z].units;
 
           for (var u = 0; u < units.length; u++) {
-            log(_.keys(Player));
             if (!(units[u] instanceof Player)) continue;
 
             // Don't send to ourselves...?

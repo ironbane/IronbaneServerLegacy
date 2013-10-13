@@ -14,8 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var Class = require('../../../common/class');
 
+var Class = require('resig-class');
 var StateMachine = Class.extend({
     init: function(owner, currentState, globalState) {
         this.owner = owner;

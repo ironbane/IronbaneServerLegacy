@@ -16,7 +16,7 @@
 */
 
 // instance of an item template
-var Class = require('../../common/class');
+var Class = require('resig-class');
 var _ = require('underscore');
 var Item = Class.extend({
     equipped: 0,

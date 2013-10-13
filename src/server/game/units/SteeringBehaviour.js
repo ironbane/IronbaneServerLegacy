@@ -21,7 +21,7 @@ var Deceleration = {
     FAST:1
 };
 
-var Class = require('../../../common/class');
+var Class = require('resig-class');
 var SteeringBehaviour = Class.extend({
     Init: function(unit) {
         this.unit = unit;

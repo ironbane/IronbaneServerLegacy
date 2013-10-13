@@ -1,5 +1,5 @@
 // menu.js
-var Class = require('../../common/class');
+var Class = require('resig-class');
 
 module.exports = function(db) {
     var Q = require('q'),

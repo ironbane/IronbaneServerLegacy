@@ -15,7 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 module.exports = function(items, units, worldHandler) {
-    var Class = require('../../../common/class'),
+    
+var Class = require('resig-class'),
         sanitize = require('validator').sanitize,
         _ = require('underscore'),
         log = require('util').log;
