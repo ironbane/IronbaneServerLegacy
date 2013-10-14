@@ -72,7 +72,7 @@ var _ = require('underscore');
 // Everything runs on one database, since the db is not hurt that bad by performance
 // We cut the middle man and only use mysql occasionally to save/load data
 // Start MySQL - has to be here for global access below...
-var mysql = require('./src/server/mysql');
+var mysql = require('./src/server/db');
 
 // create game server, do it first so that the other 2 "servers" can query it
 var IronbaneGame;

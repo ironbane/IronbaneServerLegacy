@@ -16,7 +16,7 @@
 */
 
 var _ = require('underscore'),
-    db = require(APP_ROOT_PATH + '/src/server/mysql');
+    db = require(APP_ROOT_PATH + '/src/server/db');
 
 var future = {
     items: {},
