@@ -338,7 +338,7 @@ var _ = require('underscore');
             return;
           }
 
-          unit = new unitsTrain(data);
+          unit = new units.Train(data);
           break;
         case UnitTypeEnum.LEVER:
           unit = new units.Lever(data);
@@ -364,7 +364,7 @@ var _ = require('underscore');
           unit = new units.Sign(data);
           break;
         case UnitTypeEnum.WAYPOINT:
-          unit = new Waypoint(data);
+          unit = new units.Waypoint(data);
           break;
         case UnitTypeEnum.LOOTABLE:
 

@@ -232,6 +232,19 @@ var Class = require('resig-class'),
 
             return names;
         },
+        // list the rooms that a specific player is a member of
+        listRoomsPlayer: function(unit) {
+            var rooms = this.io.sockets.manager.roomClients[unit.socket.id],
+                names = _.keys(rooms);
+
+            names = _.without(names, '');
+
+            names = _.map(names, function(name) {
+                return name.substr(1); // remove '/' prefix as it's not needed by us
+            });
+
+            return names;
+        },
         listPlayers: function(room) {
             // list users in room
             var clients = this.io.sockets.clients(room);

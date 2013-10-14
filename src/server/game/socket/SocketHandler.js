@@ -1692,7 +1692,7 @@ var SocketHandler = Class.extend({
                 });
 
                 if ( !existingNode ) {
-                    var newNodeID = worldHandler.GetWaypointID(zone);
+                    var newNodeID = worldHandler.getWaypointID(zone);
 
                     nodeHandler.AddNode(zone, newNodeID, position);
 
