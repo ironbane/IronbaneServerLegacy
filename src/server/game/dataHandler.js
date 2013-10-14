@@ -15,35 +15,34 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var _ = require('underscore');
+var _ = require('underscore'),
+    db = require(APP_ROOT_PATH + '/src/server/db');
 
-module.exports = function(db) {
-    var future = {
-        items: {},
-        units: {}
-    };
-
-    db.query('SELECT * FROM ib_item_templates',
-        function(err, results, fields) {
-            if (err) {
-                throw err;
-            }
-
-            _.each(results, function(item) {
-                future.items[item.id] = item;
-            });
-        });
-
-    db.query('SELECT * FROM ib_unit_templates',
-        function(err, results, fields) {
-            if (err) {
-                throw err;
-            }
-
-            _.each(results, function(unit) {
-                future.units[unit.id] = unit;
-            });
-        });
-
-    return future;
+var future = {
+    items: {},
+    units: {}
 };
+
+db.query('SELECT * FROM ib_item_templates',
+    function(err, results, fields) {
+        if (err) {
+            throw err;
+        }
+
+        _.each(results, function(item) {
+            future.items[item.id] = item;
+        });
+    });
+
+db.query('SELECT * FROM ib_unit_templates',
+    function(err, results, fields) {
+        if (err) {
+            throw err;
+        }
+
+        _.each(results, function(unit) {
+            future.units[unit.id] = unit;
+        });
+    });
+
+module.exports = future;

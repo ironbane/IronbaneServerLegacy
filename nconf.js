@@ -8,7 +8,7 @@ var nconf = require('nconf');
 //
 nconf.argv()
     .env()
-    .file({ file: './config.json' });
+    .file({ file: __dirname + '/config.json' });
 
 // if not provided use these values
 nconf.defaults({
