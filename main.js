@@ -21,7 +21,7 @@ var path = require('path'),
     log = require('util').log;
 
 // track root path of this file, so no matter where the game is launched from we have the base for require
-global.APP_ROOT_PATH = path.dirname(module.filename);
+global.APP_ROOT_PATH = __dirname;
 
 var isProduction = config.get('isProduction');
 var cryptSalt = config.get('cryptSalt');
@@ -168,7 +168,7 @@ function start(scripts) {
     _.extend(global, IB);
 
     // Load DataHandler global for now (holds memory DB of item and unit templates)
-    global.dataHandler = require('./src/server/game/dataHandler')(mysql);
+    global.dataHandler = require('./src/server/game/dataHandler');
 
     // load AI as a module
     var AI = require('./src/server/game/ai');
