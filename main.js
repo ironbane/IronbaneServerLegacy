@@ -148,6 +148,37 @@ function keepAlive() {
     return;
 }
 
+var LoadActorScripts = function() {
+    var scriptPath = assetDir + 'scripts',
+        fs = require('q-io/fs'),
+        path = require('path'),
+        actorScripts = {};
+
+    return fs.listTree(scriptPath, function(file) {
+        return path.extname(file) === '.js';
+    }).then(function(files) {
+        console.log('loading actor scripts...' + files.length);
+        _.each(files, function(file) {
+            console.log("loading... " + path.basename(file));
+
+            try {
+                var script = require(file);
+                // script should be an object to add
+                _.each(_.keys(script), function(key) {
+                    global.actorScripts[key] = script[key];
+                });
+            }catch(e) {
+                console.error("error loading script!!" + e);
+            }
+        });
+
+        return actorScripts;
+    }, function(err) {
+        console.log('error loading asset scripts! ', err);
+        return {};
+    });
+};
+
 function start(scripts) {
     // create game server, do it first so that the other 2 "servers" can query it
     IronbaneGame = require('./src/server/game');
@@ -182,6 +213,14 @@ function start(scripts) {
         log("Loading: " + includes[f]);
         eval(fs.readFileSync(includes[f]) + '');
     }
+
+    // temp hack
+    global.worldHandler = worldHandler;
+
+    global.actorScripts = {};
+    LoadActorScripts().then(function(scripts) {
+        _.extend(global.actorScripts, scripts);
+    });
 
     // Load Chat module - after worldHandler, there is a dep
     global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
@@ -256,28 +295,8 @@ var includes = [
     '/Server.js'
 ];
 
-// Include scripts from the assets
-var scriptPath = assetDir + 'scripts';
-
-var actorScripts = {};
-util.walk(scriptPath, function(err, results) {
-    if (err) {
-        throw err;
-    }
-
-    includes = _.map(includes, function(include) {
-        return APP_ROOT_PATH + include;
-    });
-
-    _.each(results, function(result) {
-        //console.log(result);
-        if (path.extname(result) === ".js") {
-            includes = includes.concat([
-                result
-            ]);
-        }
-
-    });
-
-    start(includes);
+includes = _.map(includes, function(include) {
+    return APP_ROOT_PATH + include;
 });
+
+start(includes);
