@@ -109,10 +109,10 @@ program
 program
       .command('start')
       .description('Start the game!')
-      .action(function(){
+      .action(function() {
             console.log('starting the server...');
             // todo: validate config?
-            require('./main.js')();
+            var main = require(__dirname + '/main.js');
       });
 
 program
