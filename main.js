@@ -162,7 +162,7 @@ var LoadActorScripts = function() {
             console.log("loading... " + path.basename(file));
 
             try {
-                var script = require(file);
+                var script = require("./"+file);
                 // script should be an object to add
                 _.each(_.keys(script), function(key) {
                     global.actorScripts[key] = script[key];
