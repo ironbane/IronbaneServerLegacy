@@ -76,6 +76,7 @@ var MonsterState = State.extend({
         unit.stateMachine.changeState(new ChaseEnemy(sorted[0].attacker));
     },
     handleMessage: function(unit, message, data) {
+
         switch (message) {
             case "attacked":
                 var threat = _.find(this.threatTable, function(e) {
@@ -98,6 +99,11 @@ var MonsterState = State.extend({
                 break;
             case "stopChase":
             case "respawned":
+                // If we can't move, don't try
+                if (!this.waypointList.length) {
+                    return;
+                }
+
                 // We lost the enemy or gave  up
 
                 // Go back to wandering
