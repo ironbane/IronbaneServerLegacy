@@ -14,15 +14,22 @@
         You should have received a copy of the GNU General Public License
         along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+module.exports = function(io){
 var characterIDCount = 1;
+var Class = require('../../../common/class')
+var mysql = require(APP_ROOT_PATH + '/src/server/db');
+var log = require('util').log;
+var _ = require('underscore');
+var Player = require('')
 
 var SocketHandler = Class.extend({
     bans: [],
     onlinePlayers: [],
-    Init: function() {
+    init: function() {
         var me = this;
-
+this.listeners = require('./listeners')(this);
+log(_.keys(this.listeners));
+            
         this.UpdateBans();
 
         // temp until service implemented
@@ -277,29 +284,10 @@ var SocketHandler = Class.extend({
 
             socket.unit = null;
 
-            socket.on("backToMainMenu", function(data, reply) {
-                if (!_.isFunction(reply)) {
-                    log('backToMainMenu no callback defined!');
-                    return;
-                }
-                if (socket.unit) {
-                    if (socket.unit.health <= 0) {
-                        reply({
-                            errmsg: "Please wait until you respawn!"
-                        });
-                        return;
-                    }
-                    socketHandler.onlinePlayers = _.without(socketHandler.onlinePlayers, _.find(socketHandler.onlinePlayers, function(p) {
-                        return p.id === socket.unit.id;
-                    }));
-                    socket.unit.LeaveGame();
-                    reply("OK");
-
-                    log(socket.unit.name + " is back at the Main Menu.");
-                }
-
-                socket.unit = null;
-            });
+            socket.on("backToMainMenu", function(data, reply){
+                this.listeners["backToMainMenu"].action(data, reply, socket);
+        });
+           
 
             // chatMessage is the user input processor
             socket.on("chatMessage", function(data) {
@@ -568,6 +556,7 @@ var SocketHandler = Class.extend({
                         break;
                 }
             });
+
 
             socket.on("dropItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
@@ -1934,4 +1923,5 @@ var SocketHandler = Class.extend({
     }
 });
 
-var socketHandler = new SocketHandler();
+return SocketHandler;
+}

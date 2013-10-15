@@ -200,6 +200,7 @@ function start(scripts) {
 
     // Load DataHandler global for now (holds memory DB of item and unit templates)
     global.dataHandler = require('./src/server/game/dataHandler');
+    global.SocketHandler = require('./src/server/game/socket')(io);
 
     // load AI as a module
     var AI = require('./src/server/game/ai');
@@ -269,7 +270,7 @@ var includes = [
     '/Engine/ConsoleCommand.js',
     '/Engine/ConsoleHandler.js',
     '/Engine/Switch.js',
-    '/Engine/SocketHandler.js',
+   // '/Engine/SocketHandler.js',
     '/Engine/WorldHandler.js',
     '/Game/AI/graph.js',
     '/Game/AI/astar.js',
