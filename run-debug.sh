@@ -1,2 +1,2 @@
 #!/bin/bash
-node debug ironbane.js start
+node --debug-brk ironbane.js start
