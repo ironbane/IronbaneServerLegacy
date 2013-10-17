@@ -81,6 +81,18 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
+    Post.like = function(postId, userId){
+        var deferred = Q.defer();
+
+        db.query("insert into forum_posts_likes set ?", {from_user : userId, to_post:postId}, function(err, results){
+            if(err){
+                return deferred.reject(err);
+            }
+            deferred.resolve();
+        });
+        return deferred.promise;
+    }
+
     Post.get = function(postId) {
         var deferred = Q.defer();
 

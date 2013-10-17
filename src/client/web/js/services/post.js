@@ -4,6 +4,18 @@ angular.module('IronbaneApp')
         angular.copy(json || {}, this);
     };
 
+    Post.like = function(postId){
+        var promise = $http.post('/api/forum/likepost', {postId: postId})
+        .then(function(response){
+            $log.log("success saving like", response.data);
+            return response.data;
+        }, function(error){
+            $log.error("error saving like", error);
+            return $q.reject(error);
+        });
+        return promise;
+    };
+
     Post.prototype.$save = function(params) {
         var url = '/api/forum/' + params.boardId + '/topics',
             self = this;

@@ -20,6 +20,9 @@
                         
                      <span class="signature">{{post.user.sig}}</span>
                      </article>
+                     <likebutton post="post.id" like="likePost(post.id)"/>
+                     <span ng-repeat="like in post.likes">{{like}}</span>
+                     
                      <br class="clear">
                 </li>
             </ul>

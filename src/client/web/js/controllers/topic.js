@@ -20,6 +20,28 @@ angular.module('IronbaneApp')
         //$scope.posts.push(post);
     });
 
+    $scope.likePost = function(post){
+        $log.log("like");
+        $log.log(post);
+        Post.like(post)
+        .then(function(success){
+            $log.log("topic liked");
+            angular.forEach($scope.posts, function(_post){
+                $log.log($scope.posts);
+                
+                if(_post.id === post){
+                    if(_post.likes===null){
+                        _post.likes = [];
+                    }
+                    $log.log(_post);
+                    _post.likes.push($scope.$root.currentUser.name);
+                }
+            });
+        }, function(error){
+            $log.log("whoops," + error);
+        });
+    };
+
     $scope.lock = function(){
 
     	Topic.lock($scope.topic.id)

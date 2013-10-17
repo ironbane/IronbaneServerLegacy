@@ -117,8 +117,10 @@ module.exports = function(db) {
         log("getting view for " + topicId + " with minimumtime "  + minimumtime);
 
         var postsQ = ' (select count(id) from forum_posts where user = us.id) as postcount, ';
-        db.query('SELECT ' + postsQ + 'fp.content, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
+        var likesQ = ' (select name from forum_posts_likes  INNER JOIN bcs_users on bcs_users.id = forum_posts_likes.from_user where to_post = fp.id) as likes, ';
+        db.query('SELECT ' + postsQ + likesQ + 'fp.content, fp.id, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
             if (err) {
+                log(err);
                 deferred.reject(err);
                 return;
             }
