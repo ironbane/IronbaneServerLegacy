@@ -17,6 +17,7 @@ module.exports = function(db) {
             this.admin = parameters.admin;
             this.editor = parameters.editor;
             this.moderator = parameters.moderator;
+            log(parameters);
         },
 
         $adminResetPassword: function(){
