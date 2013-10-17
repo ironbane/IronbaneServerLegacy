@@ -16,12 +16,11 @@
 */
 module.exports = function(io){
 var characterIDCount = 1;
-var Class = require('../../../common/class')
+var Class = require('../../../common/class');
 var mysql = require(APP_ROOT_PATH + '/src/server/db');
 var log = require('util').log;
 var _ = require('underscore');
-var Player = require('')
-
+var Player = global.Player;
 var SocketHandler = Class.extend({
     bans: [],
     onlinePlayers: [],
@@ -138,11 +137,11 @@ log(_.keys(this.listeners));
                     id: unit.id,
                     name: unit.name
                 },
-                online: socketHandler.onlinePlayers
+                online: me.onlinePlayers
             });
 
             // add us to the online player list
-            socketHandler.onlinePlayers.push({
+            me.onlinePlayers.push({
                 id: unit.id,
                 name: unit.name,
                 rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
@@ -285,39 +284,15 @@ log(_.keys(this.listeners));
             socket.unit = null;
 
             socket.on("backToMainMenu", function(data, reply){
-                this.listeners["backToMainMenu"].action(data, reply, socket);
-        });
+                me.listeners["backToMainMenu"].action(data, reply, socket);
+            });
            
 
             // chatMessage is the user input processor
             socket.on("chatMessage", function(data) {
-                if (!socket.unit) {
-                    return;
-                }
-
-                if (!_.isString(data.message)) {
-                    chatHandler.announceRoom('__nick__', "Warning: Hacked client in " +
-                        "[chatMessage]<br>User " + socket.unit.name + "", "red");
-                    return;
-                }
-
-                // should trunc + add ellipses?
-                data.message = data.message.substr(0, 100);
-
-                // No empty messages
-                if (!data.message || data.message.length <= 0) {
-                    return;
-                }
-
-                if (!socket.unit.editor && socket.unit.lastChatTime > (new Date()).getTime() - 2000) {
-                    chatHandler.announcePersonally(socket.unit, "Please don't spam the server.", "yellow");
-                    return;
-                }
-                socket.unit.lastChatTime = (new Date()).getTime();
-
-                log(socket.unit.name + ': ' + data.message);
-                chatHandler.processInput(socket.unit, data.message);
+                me.listeners["chatMessage"].action(data, socket);
             });
+                
 
             socket.on("doJump", function (data) {
                 if (!socket.unit) {
@@ -330,31 +305,10 @@ log(_.keys(this.listeners));
             });
 
             socket.on("readyToReceiveUnits", function (bool) {
-
-                if ( !socket.unit ) return;
-
-                if ( !_.isBoolean(bool) ) return;
-
-                if ( socket.unit ) {
-                    socket.unit.readyToReceiveUnits = bool;
-                    socket.unit.UpdateOtherUnitsList();
-
-                    if ( bool ) {
-                        // Check for new players
-                        var currentTime = parseInt((new Date()).getTime()/1000.0, 10);
-
-                        if ( socket.unit.zone === 1
-                            && currentTime < socket.unit.creationtime + 1000
-                            && !socket.unit.hasSeenStartCutscene ) {
-                            socket.unit.hasSeenStartCutscene = true;
-
-                            //socket.unit.Cutscene("FindIronbane");
-                        }
-                    }
-
-                }
-
+                me.listeners["readyToReceiveUnits"].action(bool, socket);
             });
+
+                
 
             socket.on("addProjectile", function (data, reply) {
 
@@ -1339,7 +1293,7 @@ log(_.keys(this.listeners));
 
                 var reason = data.reason ? data.reason : "";
 
-                switch (parseInt(data.action)) {
+                switch (parseInt(data.action, 10)) {
                     case UserManagementTypeEnum.LIGHTWARN:
                         foundUnit.LightWarn();
                         break;
@@ -1924,4 +1878,4 @@ log(_.keys(this.listeners));
 });
 
 return SocketHandler;
-}
+};

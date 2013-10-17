@@ -22,7 +22,7 @@ var fs = require('q-io/fs'),
 module.exports = function(socketlistener) {
 
     var listeners = {};
-    console.log("loading socket listeners")
+    console.log("loading socket listeners");
 
     // dynamically load all commands
     fs.list(__dirname).then(function(files) {

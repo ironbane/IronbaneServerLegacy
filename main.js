@@ -198,7 +198,14 @@ function start(scripts) {
     // inject into global until rest is modular
     _.extend(global, IB);
 
-    // Load DataHandler global for now (holds memory DB of item and unit templates)
+  
+    // READ REST OF OLD GLOBAL APP HERE
+    for (var f = 0; f < includes.length; f++) {
+        log("Loading: " + includes[f]);
+        eval(fs.readFileSync(includes[f]) + '');
+    }
+global.Player = Player;
+      // Load DataHandler global for now (holds memory DB of item and unit templates)
     global.dataHandler = require('./src/server/game/dataHandler');
     global.SocketHandler = require('./src/server/game/socket')(io);
 
@@ -209,11 +216,6 @@ function start(scripts) {
     global.State = AI.State;
     _.extend(global, AI.States);
 
-    // READ REST OF OLD GLOBAL APP HERE
-    for (var f = 0; f < includes.length; f++) {
-        log("Loading: " + includes[f]);
-        eval(fs.readFileSync(includes[f]) + '');
-    }
 
     // temp hack
     global.worldHandler = worldHandler;
