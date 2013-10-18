@@ -819,7 +819,7 @@ var WorldHandler = Class.extend({
             }
         });
 
-        return waypointIDCount;
+        return waypointIDCount+1;
   }
 });
 
