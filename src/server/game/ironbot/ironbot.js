@@ -25,8 +25,7 @@ var unidecode = require('unidecode');
 var dictionaries = {};
 
 // Load the badwords dictionary
-var badwords = require('./lib/badwords.js');
-dictionaries.badwords = badwords.getDictionary();
+dictionaries.badwords = require('./lib/badwords.js');
 
 function detectBadwords(message, dictionaries) {
 	var wordHit = 0;
@@ -48,7 +47,6 @@ function filterBadwords(unit, message, dictionaries) {
 	_.each(dictionaries.badwords, function(rxp, key) {
 		// Test each word for a match
 		if(message.match(rxp)) {
-			message = message.replace(rxp, ' **** ');
 			wordHits.push(key);
 		}
 	});
