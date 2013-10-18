@@ -16,7 +16,7 @@
 */
 
 // Create and populate the dictionary dictonary
-dictionary = {};
+var dictionary = {};
 
 /* anus, arse, asshole, arsehole. */dictionary.anus = /\b(a+(\W|\d|_)*n+(\W|\d|_)*u+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*r+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*r+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\.|\-|\*|_|\^|\+|\~|\`|\=|\,|\&|\@)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b/i;
 /* ass */dictionary.ass = /((c|d|e|f|g|h|i|j|k|n|o|q|s|t|u|v|w|x|y|z)+(\W|\d|_)*a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*z+(\W|\d|_)*z+(\W|\d|_)*)\b|(a+(\W|\d|_)*([\$]|5)+(\W|\d|_)*([\$]|5)+(\W|\d|_)*\w*)|(a+(\W|\d|_)*([\$]|5)+(\W|\d|_)*([\$]|5)+(\W|\d|_)*)/i;
