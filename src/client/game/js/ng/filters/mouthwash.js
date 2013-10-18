@@ -1,359 +1,131 @@
 IronbaneApp
 .filter('mouthwash', [function() {
-    var badWords = [
-        {"anus":"butt"},
-        {"arse":"butt"},
-        {"arsehole":"butt"},
-        {"ass":"butt"},
-        {"ass-hat":"idiot"},
-        {"ass-jabber":"homosexual"},
-        {"ass-pirate":"homosexual"},
-        {"assbag":"idiot"},
-        {"assbandit":"homosexual"},
-        {"assbanger":"homosexual"},
-        {"assbite":"idiot"},
-        {"assclown":"butt"},
-        {"asscock":"idiot"},
-        {"asscracker":"butt"},
-        {"asses":"butts"},
-        {"assface":"butt"},
-        {"assfuck":"rear-loving"},
-        {"assfucker":"homosexual"},
-        {"assgoblin":"homosexual"},
-        {"asshat":"butt"},
-        {"asshead":"idiot"},
-        {"asshole":"jerk"},
-        {"asshopper":"homosexual"},
-        {"assjacker":"homosexual"},
-        {"asslick":"idiot"},
-        {"asslicker":"Buttlicker"},
-        {"assmonkey":"idiot"},
-        {"assmunch":"idiot"},
-        {"assmuncher":"butt"},
-        {"assnigger":"Racial Slur"},
-        {"asspirate":"homosexual"},
-        {"assshit":"idiot"},
-        {"assshole":"butt"},
-        {"asssucker":"idiot"},
-        {"asswad":"butt"},
-        {"asswipe":"butt"},
-        {"axwound":"female genitalia"},
-        {"bampot":"idiot"},
-        {"bastard":"illegitimate child"},
-        {"beaner":"Mexican"},
-        {"bitch":"female dog"},
-        {"bitchass":"idiot"},
-        {"bitches":"female dogs"},
-        {"bitchtits":"homosexual"},
-        {"bitchy":"mean"},
-        {"blow job":"sexual act"},
-        {"blowjob":"sexual act"},
-        {"bollocks":"male genitalia"},
-        {"bollox":"male genitalia"},
-        {"boner":"erection"},
-        {"brotherfucker":"homosexual"},
-        {"bullshit":"poop"},
-        {"bumblefuck":"homosexual"},
-        {"butt plug":"cork"},
-        {"butt-pirate":"homosexual"},
-        {"buttfucka":"homosexual"},
-        {"buttfucker":"homosexual"},
-        {"camel toe":"female genitalia"},
-        {"carpetmuncher":"homosexual"},
-        {"chesticle":"Breast"},
-        {"chinc":"Chinese"},
-        {"chink":"asian"},
-        {"choad":"male genitalia"},
-        {"chode":"small penis"},
-        {"clit":"female genitals"},
-        {"clitface":"idiot"},
-        {"clitfuck":"sexual act"},
-        {"clusterfuck":"mess up"},
-        {"cock":"penis"},
-        {"cockass":"Jerk"},
-        {"cockbite":"idiot"},
-        {"cockburger":"idiot"},
-        {"cockface":"idiot"},
-        {"cockfucker":"idiot"},
-        {"cockhead":"idiot"},
-        {"cockjockey":"homosexual"},
-        {"cockknoker":"homosexual"},
-        {"cockmaster":"homosexual"},
-        {"cockmongler":"homosexual"},
-        {"cockmongruel":"homosexual"},
-        {"cockmonkey":"idiot"},
-        {"cockmuncher":"homosexual"},
-        {"cocknose":"idiot"},
-        {"cocknugget":"idiot"},
-        {"cockshit":"idiot"},
-        {"cocksmith":"homosexual"},
-        {"cocksmoke":"homosexual"},
-        {"cocksmoker":"homosexual"},
-        {"cocksniffer":"homosexual"},
-        {"cocksucker":"homosexual"},
-        {"cockwaffle":"idiot"},
-        {"coochie":"female genitalia"},
-        {"coochy":"female genitalia"},
-        {"coon":"African American"},
-        {"cooter":"vagina"},
-        {"cracker":"Caucasian"},
-        {"cum":"semen"},
-        {"cumbubble":"idiot"},
-        {"cumdumpster":"prostitute"},
-        {"cumguzzler":"homosexual"},
-        {"cumjockey":"homosexual"},
-        {"cumslut":"dirty girl"},
-        {"cumtart":"idiot"},
-        {"cunnie":"female genitalia"},
-        {"cunnilingus":"sexual act"},
-        {"cunt":"vagina"},
-        {"cuntass":"idiot"},
-        {"cuntface":"idiot"},
-        {"cunthole":"female genitalia"},
-        {"cuntlicker":"homosexual"},
-        {"cuntrag":"idiot"},
-        {"cuntslut":"idiot"},
-        {"dago":"Italian"},
-        {"damn":"darn"},
-        {"deggo":"Italian"},
-        {"dick":"penis"},
-        {"dick-sneeze":"orgasm"},
-        {"dickbag":"idiot"},
-        {"dickbeaters":"Hands"},
-        {"dickface":"idiot"},
-        {"dickfuck":"idiot"},
-        {"dickfucker":"homosexual"},
-        {"dickhead":"phallace face"},
-        {"dickhole":"male genitalia"},
-        {"dickjuice":"semen"},
-        {"dickmilk":"sperm"},
-        {"dickmonger":"homosexual"},
-        {"dicks":"penises"},
-        {"dickslap":"sexual act"},
-        {"dicksucker":"homosexual"},
-        {"dicksucking":"sexual act"},
-        {"dicktickler":"homosexual"},
-        {"dickwad":"idiot"},
-        {"dickweasel":"idiot"},
-        {"dickweed":"idiot"},
-        {"dickwod":"idiot"},
-        {"dike":"homosexual"},
-        {"dildo":"sexual toy"},
-        {"dipshit":"idiot"},
-        {"doochbag":"idiot"},
-        {"dookie":"poop"},
-        {"douche":"female hygene product"},
-        {"douche-fag":"idiot"},
-        {"douchebag":"female hygene accessory"},
-        {"douchewaffle":"homosexual"},
-        {"dumass":"idiot"},
-        {"dumb ass":"idiot"},
-        {"dumbass":"idiot"},
-        {"dumbfuck":"idiot"},
-        {"dumbshit":"idiot"},
-        {"dumshit":"idiot"},
-        {"dyke":"homosexual"},
-        {"fag":"homosexual"},
-        {"fagbag":"homosexual"},
-        {"fagfucker":"homosexual"},
-        {"faggit":"homosexual"},
-        {"faggot":"homosexual"},
-        {"faggotcock":"homosexual"},
-        {"fagtard":"homosexual idiot"},
-        {"fatass":"a fat person"},
-        {"fellatio":"sexual act"},
-        {"feltch":"sexual act"},
-        {"flamer":"homosexual"},
-        {"fuck":"fornicate"},
-        {"fuckass":"idiot"},
-        {"fuckbag":"idiot"},
-        {"fuckboy":"idiot"},
-        {"fuckbrain":"idiot"},
-        {"fuckbutt":"butt"},
-        {"fuckbutter":"Sexual fluids"},
-        {"fucked":"had intercourse"},
-        {"fucker":"fornicator"},
-        {"fuckersucker":"idiot"},
-        {"fuckface":"idiot"},
-        {"fuckhead":"butt"},
-        {"fuckhole":"jerk"},
-        {"fuckin":"sexual act"},
-        {"fucking":"freaking"},
-        {"fucknut":"idiot"},
-        {"fucknutt":"idiot"},
-        {"fuckoff":"go away"},
-        {"fucks":"sexual act"},
-        {"fuckstick":"male genitalia"},
-        {"fucktard":"Moron"},
-        {"fucktart":"idiot"},
-        {"fuckup":"idiot"},
-        {"fuckwad":"idiot"},
-        {"fuckwit":"dummy"},
-        {"fuckwitt":"idiot"},
-        {"fudgepacker":"homosexual"},
-        {"gay":"homosexual"},
-        {"gayass":"butt"},
-        {"gaybob":"homosexual"},
-        {"gaydo":"homosexual"},
-        {"gayfuck":"homosexual"},
-        {"gayfuckist":"homosexual"},
-        {"gaylord":"homosexual"},
-        {"gaytard":"homosexual"},
-        {"gaywad":"homosexual"},
-        {"goddamn":"goshdarn"},
-        {"goddamnit":"goshdarnit"},
-        {"gooch":"female genitalia"},
-        {"gook":"Chinese"},
-        {"gringo":"foreigner"},
-        {"guido":"italian"},
-        {"handjob":"sexual act"},
-        {"hard on":"erection"},
-        {"heeb":"Jewish Person"},
-        {"ho":"woman"},
-        {"hoe":"Woman"},
-        {"homo":"homosexual"},
-        {"homodumbshit":"idiot"},
-        {"honkey":"white person"},
-        {"humping":"sexual act"},
-        {"jackass":"idiot"},
-        {"jagoff":"idiot"},
-        {"jerk off":"masturbate"},
-        {"jerkass":"idiot"},
-        {"jigaboo":"African American"},
-        {"jizz":"Semen"},
-        {"jungle bunny":"african american"},
-        {"junglebunny":"african american"},
-        {"kike":"Jewish Person"},
-        {"kooch":"female genitalia"},
-        {"kootch":"female genitalia"},
-        {"kraut":"german"},
-        {"kunt":"female genitalia"},
-        {"kyke":"Jewish person"},
-        {"lameass":"loser"},
-        {"lardass":"overweight individual"},
-        {"lesbian":"homosexual"},
-        {"lesbo":"homosexual"},
-        {"lezzie":"homosexual"},
-        {"mcfagget":"homosexual"},
-        {"minge":"female genitalia"},
-        {"mothafucka":"Jerk"},
-        {"mothafuckin\'":"mother loving"},
-        {"motherfucker":"mother lover"},
-        {"motherfucking":"fornicating with mother"},
-        {"muff":"female genitalia"},
-        {"muffdiver":"homosexual"},
-        {"munging":"sexual act"},
-        {"nigro":"african american"},
-        {"negro":"african american"},
-        {"nigaboo":"African American"},
-        {"nigga":"african american"},
-        {"nigger":"african american"},
-        {"niggers":"African Americans"},
-        {"niglet":"african american child"},
-        {"nut sack":"male genitalia"},
-        {"nutsack":"male genitalia"},
-        {"paki":"pakistanien"},
-        {"panooch":"femail genitalia"},
-        {"pecker":"Penis"},
-        {"peckerhead":"idiot"},
-        {"penis":"male genitalia"},
-        {"penisbanger":"homosexual"},
-        {"penisfucker":"homosexual"},
-        {"penispuffer":"homosexual"},
-        {"piss":"urinate"},
-        {"pissed":"urinated"},
-        {"pissed off":"angry"},
-        {"pissflaps":"female genitalia"},
-        {"polesmoker":"homosexual"},
-        {"pollock":"polish person"},
-        {"poon":"female genitals"},
-        {"poonani":"female genitalia"},
-        {"poonany":"vagina"},
-        {"poontang":"female genitalia"},
-        {"porch monkey":"african american"},
-        {"porchmonkey":"African American"},
-        {"prick":"penis"},
-        {"punanny":"female genitalia"},
-        {"punta":"female dog"},
-        {"pussies":"Female Genitalias"},
-        {"pussy":"female reproductive organ"},
-        {"pussylicking":"sexual act"},
-        {"puto":"idiot"},
-        {"queef":"vaginal fart."},
-        {"queer":"homosexual"},
-        {"queerbait":"homosexual"},
-        {"queerhole":"homosexual"},
-        {"renob":"erection"},
-        {"rimjob":"dirty sexual act"},
-        {"ruski":"Russian"},
-        {"sand nigger":"middle eastern"},
-        {"sandnigger":"middle eastern"},
-        {"schlong":"male genitalia"},
-        {"scrote":"male genitalia"},
-        {"shit":"poop"},
-        {"shitass":"idiot"},
-        {"shitbag":"idiot"},
-        {"shitbagger":"idiot"},
-        {"shitbrains":"idiot"},
-        {"shitbreath":"Bad Breath"},
-        {"shitcanned":"Fired"},
-        {"shitcunt":"idiot"},
-        {"shitdick":"idiot"},
-        {"shitface":"pooface"},
-        {"shitfaced":"Drunk"},
-        {"shithead":"jerk"},
-        {"shithole":"idiot"},
-        {"shithouse":"bathroom"},
-        {"shitspitter":"butt"},
-        {"shitstain":"poop"},
-        {"shitter":"defecator"},
-        {"shittiest":"worst"},
-        {"shitting":"pooping"},
-        {"shitty":"bad"},
-        {"shiz":"poop"},
-        {"shiznit":"poop"},
-        {"skank":"dirty girl"},
-        {"skeet":"semen"},
-        {"skullfuck":"sexual act"},
-        {"slut":"sexually popular woman"},
-        {"slutbag":"sexually popular woman"},
-        {"smeg":"poop"},
-        {"snatch":"female genitalia"},
-        {"spic":"mexican"},
-        {"spick":"mexican american"},
-        {"splooge":"ejaculate"},
-        {"spook":"White person"},
-        {"suckass":"idiot"},
-        {"tard":"mentally challenged"},
-        {"testicle":"male genitalia"},
-        {"thundercunt":"idiot"},
-        {"tit":"breast"},
-        {"titfuck":"sexual act"},
-        {"tits":"breasts"},
-        {"tittyfuck":"sexual act"},
-        {"twat":"female genitals"},
-        {"twatlips":"idiot"},
-        {"twats":"vaginas"},
-        {"vagina":"female genitalia"},
-        {"wank":"sexual act"},
-        {"wankjob":"sexual act"},
-        {"wetback":"Mexican"},
-        {"whore":"hussy"},
-        {"whorebag":"idiot"},
-        {"whoreface":"idiot"}
-    ];
 
-    return function(input) {
+	// Create and populate the dictionary dictonary
+	var dictionary = {};
+
+	/* anus, arse, asshole, arsehole. */dictionary.anus = /\b(a+(\W|\d|_)*n+(\W|\d|_)*u+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*r+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*r+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b|\b(a+(\.|\-|\*|_|\^|\+|\~|\`|\=|\,|\&|\@)*h+(\W|\d|_)*(0|o)+(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*)\b/i;
+	/* ass */dictionary.ass = /((c|d|e|f|g|h|i|j|k|n|o|q|s|t|u|v|w|x|y|z)+(\W|\d|_)*a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)\b|\b(a+(\W|\d|_)*z+(\W|\d|_)*z+(\W|\d|_)*)\b|(a+(\W|\d|_)*([\$]|5)+(\W|\d|_)*([\$]|5)+(\W|\d|_)*\w*)|(a+(\W|\d|_)*([\$]|5)+(\W|\d|_)*([\$]|5)+(\W|\d|_)*)/i;
+	/* axwound */dictionary.axwound = /\b((a|@)+(\W|\d|_)*(x|k)+(e|s|z|5|)+(\W|\d|_)*(w)+(\W|\d|_)*(o|0|a|@)+(\W|\d|_)*(un)+(\W|\d|_)*(d|t))/i;
+	/* bampot */dictionary.bampot = /\b(((\w)|())+(\W|\d|_)*(b)+(\W|\d|_)*(a|@)+(\W|\d|_)*(mp)+(\W|\d|_)*(o|0)+(\W|\d|_)*(t))/i;
+	/* bareback */dictionary.bareback = /\b(b+(\W|\d|_)*a+(\W|\d|_)*r+(\W|\d|_)*(3|e)+(\W|\d|_)*b+(\W|\d|_)*a+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*)/i;
+	/* beaner */dictionary.beaner = /\b(((\w)|())+(\W|\d|_)*(b)+(\W|\d|_)*(e|3)+(\W|\d|_)*(a|@|e)+(\W|\d|_)*(n)+(\W|\d|_)*(e|3)+(\W|\d|_)*(r))/i;
+	/* bitch */dictionary.bitch = /\b(b+(\W|\d|_)*i+(\W|\d|_)*a*(\W|\d|_)*(7|t)+(\W|\d|_)*(c|k)+(\W|\d|_)*h+(\W|\d|_)*)/i;
+	/* blowjob, fellatio, handjob */dictionary.blowjob = /\b(b+(\W|\d|_)*(1|l)+(\W|\d|_)*(0|o)+(\W|\d|_)*w+(\W|\d|_)*j+(\W|\d|_)*(0|o)+(\W|\d|_)*b+(\W|\d|_)*)|\b(b+(\W|\d|_)*j+(\W|\d|_)*)\b|\b(b+(\W|\d|_)*j+(\W|\d|_)*(0|o)+(\W|\d|_)*b+(\W|\d|_)*)|(f+(\W|\d|_)*(3|e)+(\W|\d|_)*(1|l)*(\W|\d|_)*(1|l)+(\W|\d|_)*a+(\W|\d|_)*(7|t)+(\W|\d|_)*(1|i)+(\W|\d|_)*(0|o)+(\W|\d|_)*)|(h+(\W|\d|_)*a+(\W|\d|_)*n+(\W|\d|_)*d+(\W|\d|_)*j+(\W|\d|_)*(0|o)+(\W|\d|_)*b+(\W|\d|_)*)/i;
+	/* bollocks, bollox */dictionary.bollocks = /\b(((\w)|())+(\W|\d|_)*(b)+(\W|\d|_)*(o|0)+(\W|\d|_)*(l|1|i)+(\W|\d|_)*(l|1|i|)+(\W|\d|_)*(o|0)+(\W|\d|_)*(x|ks|cks))/i;
+	/* boner */dictionary.boner = /\b(b+(\W|\d|_)*(0|o)+(\W|\d|_)*n+(\W|\d|_)*(3|e)+(\W|\d|_)*r+(\W|\d|_)*s*(\W|\d|_)*)\b/i;
+	/* butt, buttplug, butt-pirate */dictionary.butt = /\b((?!butter)((\w)|())+(\W|\d|_)*(b)+(\W|\d|_)*(u)+(\W|\d|_)*(t)(t|)+([^er]))/i;
+	/* camel toe */dictionary.cameltoe = /\b((c|k)+(\W|\d|_)*a+(\W|\d|_)*m+(\W|\d|_)*(3|e)+(\W|\d|_)*(1|l)+(\W|\d|_)*(7|t)+(\W|\d|_)*(0|o)+(\W|\d|_)*(3|e)+(\W|\d|_)*)/i;
+	/* carpetmuncher */dictionary.carpetmuncher = /\b(((\w)|())+(\W|\d|_)*(c)+(\W|\d|_)*(a|@)+(\W|\d|_)*(rp)+(\W|\d|_)*(e|3)+(\W|\d|_)*(d|t)+(\W|\d|_)*(m)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(c)+(\W|\d|_)*(h)+(\W|\d|_)*(\W|\d|_)*(e|3)+(\W|\d|_)*(r))/i;
+	/* chesticle */dictionary.chesticle = /\b(((\w)|())+(\W|\d|_)*(c)+(\W|\d|_)*(h)+(\W|\d|_)*(e|3)+(\W|\d|_)*(s|z|5)+(\W|\d|_)*(t)+(\W|\d|_)*(i|l|1|!)+(\W|\d|_)*(c|k)+(\W|\d|_)*(i|l|1|!)+(\W|\d|_)*(e|3))/i;
+	/* chinc, chink */dictionary.chinc = /\b(((\w)|())+(\W|\d|_)*(c)+(\W|\d|_)*(h)+(\W|\d|_)*(i|l|1)+(\W|\d|_)*(n)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k|))/i;
+	/* choad, chode */dictionary.choad = /\b(((\w)|())+(\W|\d|_)*(c)+(\W|\d|_)*(h)+(\W|\d|_)*(o|0)+(\W|\d|_)*(a|@|d|t)+(\W|\d|_)*(t|d|e|3))/i;
+	/* clit, cunt */dictionary.cunt = /\b(((\w)|())+(\W|\d|_)*(c)+(\W|\d|_)*(l|1|!|u)+(\W|\d|_)*(i|1|!|n)+(\W|\d|_)*(t|d))/i;
+	/* cock, cawk, kock */dictionary.cock = /((c|k)+(\W|\d|_)*(0|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*)\b|((c|k)+(\W|\d|_)*a+(\W|\d|_)*w+(\W|\d|_)*(c|k)+(\W|\d|_)*)/i;
+	/* coochie, coochy */dictionary.coochie = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*(o|0)+(\W|\d|_)*(o|0|)+(c)+(\W|\d|_)*(h)+(\W|\d|_)*(1|i|!|y)+(\W|\d|_)*(e|3|))/i;
+	/* coon */dictionary.coon = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*((o|0){2,4})+(\W|\d|_)*(n))/i;
+	/* cooter */dictionary.cooter = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*((o|0){2})+(\W|\d|_)*(t)+(\W|\d|_)*(e|3)+(\W|\d|_)*(r))/i;
+	/* cracker */dictionary.cracker = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*(r)+(\W|\d|_)*(a|@)+(\W|\d|_)*((c|k){2})+(\W|\d|_)*(e|3)+(\W|\d|_)*(r))/i;
+	/* cum */dictionary.cum = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*(u)+(\W|\d|_)*(m))/i;
+	/* dick, dike, hardon, dildo */dictionary.dick = /\b(d+(\W|\d|_)*(1|i)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*)|\b(d+(\W|\d|_)*(1|i)+(\W|\d|_)*k+(\W|\d|_)*(3|e)+(\W|\d|_)*)|\b(d+(\W|\d|_)*(1|i)+(\W|\d|_)*(1|l)+(\W|\d|_)*(1|l)*(\W|\d|_)*d+(\W|\d|_)*(0|o)+(\W|\d|_)*)|\b(d+(\W|\d|_)*y+(\W|\d|_)*(c|k)+(\W|\d|_)*(3|e)+(\W|\d|_)*)|\b(h+(\W|\d|_)*a+(\W|\d|_)*r+(\W|\d|_)*d+(\W|\d|_)*(0|o)+(\W|\d|_)*n+(\W|\d|_)*)\b|\b((c|k)+(\W|\d|_)*u+(\W|\d|_)*m+(\W|\d|_)*m+(\W|\d|_)*i+(\W|\d|_)*n+(\W|\d|_)*g+(\W|\d|_)*)\b/i;
+	/* cunnie, cunnilingus */dictionary.cunnie = /\b(((\w)|())+(\W|\d|_)*(c|k)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(n|)+(\W|\d|_)*(i|l|1!)+(\W|\d|_)*(l|1|!|e|3))/i;
+	/* dago, deggo */dictionary.dago = /\b(((\w)|())+(\W|\d|_)*(d)+(\W|\d|_)*(a|@|e|3)+(\W|\d|_)*(g)+(\W|\d|_)*(g|)+(\W|\d|_)*(o|0))/i;
+	/* damn */dictionary.damn = /\b(d+(\W|\d|_)*a+(\W|\d|_)*m+(\W|\d|_)*n+(\W|\d|_)*\w*)|\b(d+(\W|\d|_)*m+(\W|\d|_)*n+(\W|\d|_)*\w*)|\b(d+(\W|\d|_)*m+(\W|\d|_)*n+(\W|\d|_)*)\b/i;
+	/* dildo */dictionary.dildo = /\b(((\w)|())+(\W|\d|_)*(d)+(\W|\d|_)*((i|1|!){2})+(\W|\d|_)*(d)+(\W|\d|_)*(o|0))/i;
+	/* doochbag, doochbag */dictionary.doochbag = /\b(((\w)|())+(\W|\d|_)*(d)+(\W|\d|_)*(o|0)+(\W|\d|_)*(o|0|u)+(\W|\d|_)*(c)+(\W|\d|_)*(h)+(\W|\d|_)*(e|3|)+(\W|\d|_)*(b)+(\W|\d|_)*(a|@)+(\W|\d|_)*(g))/i;
+	/* dookie */dictionary.dookie = /\b(((\w)|())+(\W|\d|_)*(d)+(\W|\d|_)*(o|0)+(\W|\d|_)*(o|0)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|)+(\W|\d|_)*(i|1|y)+(\W|\d|_)*(e|3|))/i;
+	/* doosh, dooch, douche */dictionary.doosh = /\b(((\w)|())+(\W|\d|_)*(d)+(\W|\d|_)*(o|0)+(\W|\d|_)*(o|0|u)+(\W|\d|_)*(s|c|5)+(\W|\d|_)*(h))/i;
+	/* dyke */dictionary.dyke = /\b(((\w)|())+(d)+(\W|\d|_)*(y)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|)+(\W|\d|_)*(e|3))/i;
+	/* ejaculate */dictionary.ejaculate = /\b((3|e)+(\W|\d|_)*j+(\W|\d|_)*a+(\W|\d|_)*(c|k)+(\W|\d|_)*u+(\W|\d|_)*(1|l)+(\W|\d|_)*a+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|e)+(\W|\d|_)*)/i;
+	/* fag */dictionary.fag = /(f+(\W|\d|_)*a+(\W|\d|_)*g+(\W|\d|_)*)|(f+(\W|\d|_)*a+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*)|\b(f+(\W|\d|_)*(3|e)+(\W|\d|_)*g+(\W|\d|_)*)/i;
+	/* feltch */dictionary.feltch = /\b(((\w)|())+(\W|\d|_)*(f)+(\W|\d|_)*(e|3)+(\W|\d|_)*(l)+(\W|\d|_)*(t)+(\W|\d|_)*(c)+(\W|\d|_)*(h))/i;
+	/* flamer */dictionary.flamer = /\b(f+(\W|\d|_)*(1|l)+(\W|\d|_)*a+(\W|\d|_)*m+(\W|\d|_)*(3|e)+(\W|\d|_)*r+(\W|\d|_)*)\b/i;
+	/* fock */dictionary.fock = /\b(f+(\W|\d|_)*(0|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*)\b|\b(f+(\W|\d|_)*(0|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*\w*)/i;
+	/* foreskin */dictionary.foreskin = /\b(f+(\W|\d|_)*(0|o)+(\W|\d|_)*r+(\W|\d|_)*(3|e)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(c|k)+(\W|\d|_)*(1|i)+(\W|\d|_)*n+(\W|\d|_)*)\b/i;
+	/* fuck */dictionary.fuck = /\b((?!fax)((\w)|())+(\W|\d|_)*(f|v)+(\W|\d|_)*(v|u|a|o)+(\W|\d|_)*(c|k|x)+(\W|\d|_)*(k|c|))/i;
+	/* fudgepacker */dictionary.fudgepacker = /\b(((\w)|())+(\W|\d|_)*(f)+(\W|\d|_)*(u)+(\W|\d|_)*(d)+(\W|\d|_)*(g)+(\W|\d|_)*(e|3)+(\W|\d|_)*(p)+(\W|\d|_)*(a|@)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|)+(\W|\d|_)*(e|3)+(r))/i;
+	/* gay, lez, lesbian */dictionary.gay = /(g+(\W|\d|_)*a+(\W|\d|_)*y+(\W|\d|_)*)|\b(g+(\W|\d|_)*(3|e)+(\W|\d|_)*y+(\W|\d|_)*)|\b(g+(\W|\d|_)*h+(\W|\d|_)*(3|e|a)+(\W|\d|_)*y+(\W|\d|_)*)|\b((1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*z+(\W|\d|_)*)|\b((1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*b+(\W|\d|_)*)|\b(g+(\W|\d|_)*(3|e)+(\W|\d|_)*h+(\W|\d|_)*y+(\W|\d|_)*)/i;
+	/* god damn */dictionary.goddamn = /\b(g+(\W|\d|_)*(0|o)+(\W|\d|_)*d+(\W|\d|_)*d+(\W|\d|_)*a+(\W|\d|_)*(m|n)+(\W|\d|_)*\w*)/i;
+	/* gooch, gook */dictionary.gooch = /\b(((\w)|())+(\W|\d|_)*(g)+(\W|\d|_)*((o|0){2})(c)+(\W|\d|_)*(h))/i;
+	/* gringo, guido */dictionary.gringo = /\b(((\w)|())+(\W|\d|_)*(g)+(\W|\d|_)*(r)+(\W|\d|_)*(i|1)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9)+(\W|\d|_)*(o|0))/i;
+	/* heeb */dictionary.heeb = /\b(((\w)|())+(\W|\d|_)*(h)+(\W|\d|_)*((e|3){2})+(\W|\d|_)*(b))/i;
+	/* ho, hoe */dictionary.ho = /\b(((\w)|())+(\W|\d|_)*(h)+(\W|\d|_)*(o|0)+(\W|\d|_)*(e|3|))\b/i;
+	/* homo */dictionary.homo = /\b(((\w)|())+h+(\W|\d|_)*(o|0)+(\W|\d|_)*m+(\W|\d|_)*(o|0)+(\W|\d)*)/i;
+	/* honkey */dictionary.honkey = /\b(((\w)|())+(\W|\d|_)*(h)+(\W|\d|_)*(o|0)+(\W|\d|_)*(n)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|)+(\W|\d|_)*(e|3|i|1)+(\W|\d|_)*(y|e|3))/i;
+	/* horney, horny */dictionary.horney = /\b(h+(\W|\d|_)*(0|o)+(\W|\d|_)*r+(\W|\d|_)*n+(\W|\d|_)*(3|e)*(\W|\d|_)*(ie|y)+(\W|\d|_)*)\b/i;
+	/* humping */dictionary.humping = /\b(((\w)|())+(\W|\d|_)*(h)+(\W|\d|_)*(u)+(\W|\d|_)*(m)+(\W|\d|_)*(p)+(\W|\d|_)*(i|1)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9))\b/i;
+	/* jackoff, jerkoff, jizz, jiss */dictionary.jackoff = /\b(j+(\W|\d|_)*a+(\W|\d|_)*(c|k)+(\W|\d|_)*(0|o)+(\W|\d|_)*f+(\W|\d|_)*f+(\W|\d|_)*)\b|\b(j+(\W|\d|_)*(3|a|e)+(\W|\d|_)*r+(\W|\d|_)*(c|k)+(\W|\d|_)*(0|o)+(\W|\d|_)*f+(\W|\d|_)*f+(\W|\d|_)*)|\b(j+(\W|\d|_)*(1|i)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*\w*)/i;
+	/* jagoff */dictionary.jagoff = /\b(((\w)|())+(\W|\d|_)*(j)+(\W|\d|_)*(a|@)+(\W|\d|_)*(g|9)+(\W|\d|_)*(o|0)+(\W|\d|_)*(f)+(\W|\d|_)*(f|))\b/i;
+	/* jigaboo */dictionary.jigaboo = /\b(((\w)|())+(\W|\d|_)*(j)+(\W|\d|_)*(i|1)+(\W|\d|_)*(g|9)+(\W|\d|_)*(a|@)+(\W|\d|_)*(b|6)+(\W|\d|_)*((o|0){2}))\b/i;
+	/* jungle bunny, junglebunny */dictionary.junglebunny = /\b(((\w)|())+(\W|\d|_)*(j)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9)+(\W|\d|_)*(l|1)+(\W|\d|_)*(e|3)+(\W|\d|_)*(b)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(n|)+(\W|\d|_)*(y|i|1)+(\W|\d|_)*(e|3|))\b/i;
+	/* kike */dictionary.kike = /\b(((\w)|())+(\W|\d|_)*(k)+(\W|\d|_)*(i|1)+(\W|\d|_)*(k)+(\W|\d|_)*(e|3))\b/i;
+	/* kooch */dictionary.kooch = /\b((c|k)+(\W|\d|_)*(0|o)+(\W|\d|_)*(0|o)+(\W|\d|_)*t*(\W|\d|_)*(c|k)+(\W|\d|_)*h+(\W|\d|_)*)\b/i;
+	/* kraut */dictionary.kraut = /\b(((\w)|())+(\W|\d|_)*(k)+(\W|\d|_)*(r)+(\W|\d|_)*(a|@)+(\W|\d|_)*(u)+(\W|\d|_)*(d|t))\b/i;
+	/* kyke */dictionary.kyke = /\b(((\w)|())+(\W|\d|_)*(k)+(\W|\d|_)*(y)+(\W|\d|_)*(k)+(\W|\d|_)*(e|3))\b/i;
+	/* masturbate, wank */dictionary.masturbate = /\b(m+(\W|\d|_)*a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(7|t)+(\W|\d|_)*u+(\W|\d|_)*r+(\W|\d|_)*b+(\W|\d|_)*a+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|e)+(\W|\d|_)*)|\b(m+(\W|\d|_)*a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|e)*(\W|\d|_)*r+(\W|\d|_)*b(\W|\d|_)*a+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|e)+(\W|\d|_)*)|\b(w+(\W|\d|_)*a+(\W|\d|_)*n+(\W|\d|_)*(c|k)+(\W|\d|_)*)/i;
+	/* milf */dictionary.milf = /b(m+(\W|\d|_)*(1|i)+(\W|\d|_)*(1|l)+(\W|\d|_)*f+(\W|\d|_)*)/i;
+	/* minge */dictionary.minge = /\b(((\w)|())+(\W|\d|_)*(m)+(\W|\d|_)*(i|1)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9)+(\W|\d|_)*(e|3))\b/i;
+	/* mofo */dictionary.mofo = /\b(m+(\W|\d|_)*(0|o)+(\W|\d|_)*f+(\W|\d|_)*(0|o)+(\W|\d|_)*)/i;
+	/* muff, muffdiver */dictionary.muff = /\b((?!muffin)((\w)|())+(\W|\d|_)*(m)+(\W|\d|_)*(u)+(\W|\d|_)*((f){2}))/i;
+	/* munging */dictionary.munging = /\b(((\w)|())+(\W|\d|_)*(m)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9)+(\W|\d|_)*(i|1)+(\W|\d|_)*(n)+(\W|\d|_)*(g|9))\b/i;
+	/* nigger */dictionary.nigger = /\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*g+(\W|\d|_)*)|\b(n+(\W|\d|_)*(3|e)+(\W|\d|_)*g+(\W|\d|_)*g+(\W|\d|_)*)|\b(n+(\W|\d|_)*g+(\W|\d|_)*r+(\W|\d|_)*)\b|\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*r+(\W|\d|_)*)|\b(n+(\W|\d|_)*(3|e)+(\W|\d|_)*g+(\W|\d|_)*r+(\W|\d|_)*)|\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*(3|e)+(\W|\d|_)*r+(\W|\d|_)*)\b|\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*a+(\W|\d|_)*)|\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*(1|l)+(\W|\d|_)*)|\b(n+(\W|\d|_)*(1|i)+(\W|\d|_)*g+(\W|\d|_)*u+(\W|\d|_)*r+(\W|\d|_)*)/i;
+	/* nutsack */dictionary.nutsack = /\b(n+(\W|\d|_)*u+(\W|\d|_)*(7|t)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*a+(\W|\d|_)*(c|k)+(\W|\d|_)*)/i;
+	/* orgasm, orgy */dictionary.orgasm = /\b((0|o)+(\W|\d|_)*r+(\W|\d|_)*g+(\W|\d|_)*a+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(i|u|o|a)*(\W|\d|_)*m+(\W|\d|_)*)|\b((0|o)+(\W|\d|_)*r+(\W|\d|_)*g+(\W|\d|_)*y+(\W|\d|_)*)/i;
+	/* paki */dictionary.paki = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(a|@)+(\W|\d|_)*(k)+(\W|\d|_)*(i|1))\b/i;
+	/* panooch */dictionary.panooch = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(a|@)+(\W|\d|_)*(n)+(\W|\d|_)*((o|0){2})+(\W|\d|_)*(c|g)+(\W|\d|_)*(h|))\b/i;
+	/* pecker */dictionary.pecker = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(e|3)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k|)+(\W|\d|_)*(e|3)+(\W|\d|_)*(r))/i;
+	/* penis */dictionary.penis = /\b(p+(\W|\d|_)*(e|i)+(\W|\d|_)*n+(\W|\d|_)*(i|u|a|1)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*)/i;
+	/* phuck */dictionary.phuck = /\b(p+(\W|\d|_)*h+(\W|\d|_)*u+(\W|\d|_)*(c|k)*(\W|\d|_)*(c|k|v|x)+(\W|\d|_)*)/i;
+	/* piss, pissed, pissed off, pissflaps */dictionary.piss = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(i|1)+(\W|\d|_)*((s|5){2}))/i;
+	/* polesmoker */dictionary.polesmoker = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(o|0)+(\W|\d|_)*(l|1)+(\W|\d|_)*(e|3)+(\W|\d|_)*(s|5)+(\W|\d|_)*(m)+(\W|\d|_)*(o|0)+(\W|\d|_)*(k)+(\W|\d|_)*(e|3)+(\W|\d|_)*(r))\b/i;
+	/* pollock */dictionary.pollock = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(o|0)+(\W|\d|_)*(l|1)+(\W|\d|_)*(l|1|)+(\W|\d|_)*(o|0)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|))\b/i;
+	/* poon, poonani, poonany, poontang */dictionary.poon = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*((o|0){2})+(\W|\d|_)*(n))/i;
+	/* porch monkey, porchmonkey */dictionary.porchmonkey = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(o|0)+(\W|\d|_)*(r)+(\W|\d|_)*(g|c)+(\W|\d|_)*(h|)+(\W|\d|_)*(e|3|)+(\W|\d|_)*(m)+(\W|\d|_)*(o|0)+(\W|\d|_)*(n)+(\W|\d|_)*(k)+(\W|\d|_)*(e|i|)+(\W|\d|_)*(y|e|))\b/i;
+	/* porn, pron, pr0n */dictionary.porn = /\b(p+(\W|\d|_)*(0|o)+(\W|\d|_)*r+(\W|\d|_)*n+(\W|\d|_)*(0|o)*(\W|\d|_)*(5|s|z)*(\W|\d|_)*)\b|\b(p+(\W|\d|_)*r+(\W|\d|_)*(0|o)+(\W|\d|_)*n+(\W|\d|_)*(0|o)*(\W|\d|_)*(5|s|z)*(\W|\d|_)*)\b/i;
+	/* poz */dictionary.poz = /\b(p+(\W|\d|_)*(0|o)+(\W|\d|_)*z+(\W|\d|_)*)/i;
+	/* prick */dictionary.prick = /\b(p+(\W|\d|_)*r+(\W|\d|_)*(1|i)+(\W|\d|_)*(\W|\d|_)*(c|k)+(\W|\d|_)*)\b/i;
+	/* punanny, punta */dictionary.punanny = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(t|)+(\W|\d|_)*(a|2))/i;
+	/* pussy */dictionary.pussy = /\b(p+(\W|\d|_)*u+(\W|\d|_)*(5|s|z)*(\W|\d|_)*(5|s|z)+(\W|\d|_)*(y|ie|ies)+(\W|\d|_)*)/i;
+	/* puto, puta */dictionary.puta = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(u)+(\W|\d|_)*(t)+(\W|\d|_)*(a|@|o|0))/i;
+	/* queer, queef */dictionary.queer = /\b(q+(\W|\d|_)*(w|u|i|e)+(\W|\d|_)*(r|f)+(\W|\d|_)*)/i;
+	/* rectum */dictionary.rectum = /\b(r+(\W|\d|_)*w*(\W|\d|_)*(3|e)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)*(\W|\d|_)*(7|t)+(\W|\d|_)*(0|o|u)*(\W|\d|_)*m+(\W|\d|_)*s*(\W|\d|_)*)/i;
+	/* renob */dictionary.renob = /\b(((\w)|())+(\W|\d|_)*(r)+(\W|\d|_)*(e|3)+(\W|\d|_)*(n)+(\W|\d|_)*(o|0)+(\W|\d|_)*(b))\b/i;
+	/* retard */dictionary.retard = /\b(r+(\W|\d|_)*(3|e|i)+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|a|u|e)+(\W|\d|_)*r+(\W|\d|_)*d+(\W|\d|_)*(ed|s)*(\W|\d|_)*)\b/i;
+	/* rimjob, scrotum */dictionary.scrotum = /\b(r+(\W|\d|_)*(1|i)+(\W|\d|_)*m+(\W|\d|_)*j+(\W|\d|_)*(0|o)+(\W|\d|_)*b+(\W|\d|_)*)|\b((5|s|z)+(\W|\d|_)*(c|k)+(\W|\d|_)*r+(\W|\d|_)*(0|o|u)+(\W|\d|_)*(7|t)+(\W|\d|_)*(3|e|u)+(\W|\d|_)*(m|)+(\W|\d|_)*)/i;
+	/* ruski */dictionary.ruski = /\b(((\w)|())+(\W|\d|_)*(r)+(\W|\d|_)*(u)+(\W|\d|_)*(s|5)+(\W|\d|_)*(k)+(\W|\d|_)*(y|i|1)+(\W|\d|_)*(e|3|))\b/i;
+	/* schlong */dictionary.schlong = /\b((5|s|z)+(\W|\d|_)*c*(\W|\d|_)*h+(\W|\d|_)*(1|l)+(\W|\d|_)*(0|o)+(\W|\d|_)*n+(\W|\d|_)*g+(\W|\d|_)*)/i;
+	/* screw */dictionary.screw = /\b((5|s|z)+(\W|\d|_)*(c|k)+(\W|\d|_)*r+(\W|\d|_)*(3|e)+(\W|\d|_)*w+(\W|\d|_)*\w*)/i;
+	/* semen */dictionary.semen = /\b((5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*m+(\W|\d|_)*(3|e|a)+(\W|\d|_)*n+(\W|\d|_)*)\b/i;
+	/* sex */dictionary.sex = /\b((5|s|z)+(\W|\d|_)*(3|e)+(\W|\d|_)*x+(\W|\d|_)*)/i;
+	/* shart */dictionary.shart = /\b((5|s|z)+(\W|\d|_)*h+(\W|\d|_)*a+(\W|\d|_)*r+(\W|\d|_)*(7|t)+(\W|\d|_)*)/i;
+	/* shit */dictionary.shit = /\b((5|s|z)+(\W|\d|_)*h+(y|i|1)+(\W|\d|_)*(7|t)+(\W|\d|_)*)/i;
+	/* shiz, shiznit, shizzle, etc */dictionary.shiz = /\b(((\w)|())+(\W|\d|_)*(s|5|z)+(\W|\d|_)*(h)+(\W|\d|_)*(i|1|!)+(\W|\d|_)*(s|5|z))/i;
+	/* skank */dictionary.skank = /\b(((\w)|())+(\W|\d|_)*(s)+(\W|\d|_)*(k|c)+(\W|\d|_)*(a|@)+(\W|\d|_)*(n)+(\W|\d|_)*(k))\b/i;
+	/* skank, slut */dictionary.slut = /\b((5|s|z)+(\W|\d|_)*(c|k)+(\W|\d|_)*a+(\W|\d|_)*n+(\W|\d|_)*(c|k)+(\W|\d|_)*)|\b((5|s|z)+(\W|\d|_)*(1|l)+(\W|\d|_)*u+(\W|\d|_)*(7|t)+(\W|\d|_)*)/i;
+	/* skeet, skat */dictionary.skeet = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(k|c)+(\W|\d|_)*(((e|3){2})|(a|@))+(\W|\d|_)*(d|t))\b/i;
+	/* smeg */dictionary.smeg = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(m)+(\W|\d|_)*(e|3)+(\W|\d|_)*(g|9))\b/i;
+	/* snatch */dictionary.snatch = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(n)+(\W|\d|_)*(a|@)+(\W|\d|_)*(t)+(\W|\d|_)*(c|g|9)+(\W|\d|_)*(h|))\b/i;
+	/* spic, spick */dictionary.spic = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(p)+(\W|\d|_)*(i|1|!)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|))\b/i;
+	/* splooge */dictionary.splooge = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(p)+(\W|\d|_)*(l|1|!)+(\W|\d|_)*((0|o){2})+(\W|\d|_)*(g|9)+(\W|\d|_)*(e|3))\b/i;
+	/* spook */dictionary.spook = /\b(((\w)|())+(\W|\d|_)*(s|5)+(\W|\d|_)*(p)+(\W|\d|_)*((o|0){2})+(\W|\d|_)*(k))\b/i;
+	/* stfu, gtfo  */dictionary.stfu = /\b((5|s|z)+(\W|\d|_)*(7|t)+(\W|\d|_)*f+(\W|\d|_)*u+(\W|\d|_)*)|\b(g+(\W|\d|_)*(7|t)+(\W|\d|_)*f+(\W|\d|_)*(0|o)+(\W|\d|_)*)/i;
+	/* testical, testicle */dictionary.testicle = /\b((7|t)+(\W|\d|_)*(3|e)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(7|t)+(\W|\d|_)*(a|i)+(\W|\d|_)*(c|k)+(\W|\d|_)*(3|a|e)*(\W|\d|_)*(1|l)+(\W|\d|_)*(3|e)*(\W|\d|_)*)/i;
+	/* tit but no other words */dictionary.tit = /\b((7|t)+(1|i)+(7|t)+)\b|\b((7|t)+(1|i)+(7|t)+(5|s|z)+)\b|\b((7|t)+(1|i)+(7|t)+y+)\b/i;
+	/* turd, terd, tard */dictionary.tard = /\b(((\w)|())+(\W|\d|_)*(t)+(\W|\d|_)*(u|e|a|@|3)+(\W|\d|_)*(r)+(\W|\d|_)*(d|t))/i;
+	/* twad */dictionary.tard = /\b(((\w)|())+(\W|\d|_)*(t|7)+(\W|\d|_)*(w)+(\W|\d|_)*(a|@)+(\W|\d|_)*(t|7))/i;
+	/* vagina */dictionary.vagina = /\b(v+(\W|\d|_)*a+(\W|\d|_)*(g|j)+(\W|\d|_)*)\b|\b(v+(\W|\d|_)*a+(\W|\d|_)*(g|j)+(\W|\d|_)*a*(\W|\d|_)*(1|i)+(\W|\d|_)*n+(\W|\d|_)*a+(\W|\d|_)*s*(\W|\d|_)*)\b/i;
+	/* wetback */dictionary.wetback = /\b(((\w)|())+(\W|\d|_)*(w)+(\W|\d|_)*(e|3)+(\W|\d|_)*(t|d)+(\W|\d|_)*(b)+(\W|\d|_)*(a|@)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|))\b/i;
+	/* whore */dictionary.whore = /\b(((\w)|())+(\W|\d|_)*(w|)+(\W|\d|_)*(h)+(\W|\d|_)*(o|0)+(\W|\d|_)*(a|)+(\W|\d|_)*(r)+(\W|\d|_)*(e|3))/i;
+
+   return function(input) {
         if (!input) {
             return;
         }
 
         var clean = " " + input + " ";
 
-        angular.forEach(badWords, function(word) {
-            angular.forEach(word, function(value, key) {
-                clean = clean.replace(" " + key + " ", " " + value + " ");
-            });
+        angular.forEach(dictionary, function(word) {
+                clean = clean.replace(word, " *** ");
         });
 
         return clean;
