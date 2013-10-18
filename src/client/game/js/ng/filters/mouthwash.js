@@ -349,13 +349,14 @@ IronbaneApp
         }
 
         var clean = " " + input + " ";
-
+/*
+	// Disbled for time being, later this whole script becomes unessecary
         angular.forEach(badWords, function(word) {
             angular.forEach(word, function(value, key) {
                 clean = clean.replace(" " + key + " ", " " + value + " ");
             });
         });
-
+*/
         return clean;
     };
 }]);

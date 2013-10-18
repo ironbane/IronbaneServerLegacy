@@ -132,6 +132,17 @@ module.exports = function(db) {
         }
     });
 
+    function checkBadName(name) {
+        var deferred = Q.defer();
+        var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
+        if(ironbot.detectBadwords(name)) {
+            deferred.reject('Choose a better name.');
+	} else {
+            deferred.resolve();
+        }
+        return deferred.promise;
+    }
+
     function checkDuplicateName(name) {
         var deferred = Q.defer();
 
@@ -190,7 +201,7 @@ module.exports = function(db) {
             };
 
         // validation (todo: skin, hair, eyes, max characters)
-        Q.all([checkValidName(createObj.name), checkDuplicateName(createObj.name)])
+        Q.all([checkValidName(createObj.name), checkDuplicateName(createObj.name), checkBadName(createObj.name)])
             .then(function() {
                 // all validations passed
                 db.query('insert into ib_characters set ?', createObj, function(err, result) {
