@@ -112,6 +112,11 @@ module.exports = function(items, units, worldHandler) {
                 message = sanitize(message).entityEncode();
             }
 
+            // Send message through ironbot
+            var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
+            message = ironbot.filterBadwords(unit, message);
+
+
             // only echo this if to global?
             if(!room) {
                 unit.Say(message);
