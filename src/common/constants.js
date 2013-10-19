@@ -25,6 +25,7 @@
 
     IB.worldScale = 2;
 
+    // these template ids are super fragile between environments
     IB.lootBagTemplate = 2;
     IB.movingObstacleTemplate = 4;
     IB.toggleableObstacleTemplate = 5;
@@ -37,6 +38,7 @@
     IB.musicPlayerTemplate = 71;
     IB.waypointTemplate = 95;
     IB.trainTemplate = 96;
+    IB.triggerTemplate = 109;
 
     IB.UnitTypeEnum = {
         PLAYER: 0,
@@ -55,6 +57,7 @@
         HEARTPIECE: 13,
         MUSICPLAYER: 14,
         WAYPOINT: 15,
+        TRIGGER: 16,
 
         // NPC's
         MONSTER: 20,

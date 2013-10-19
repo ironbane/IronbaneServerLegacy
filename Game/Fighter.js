@@ -183,72 +183,74 @@ var Fighter = Actor.extend({
     }
 
   },
-  Tick: function(dTime) {
-    if(this.attackTimeout > 0) {
-      this.attackTimeout -= dTime;
-    }
-
-    if (this.lastBattleActionTimer > 0) {
-      this.lastBattleActionTimer -= dTime;
-    }
-
-    if (this.health <= 0) {
-      if (this.respawnTimer > 0.0) {
-        this.respawnTimer -= dTime;
-      } else {
-        this.Respawn();
-      }
-    } else {
-      if (this.healthRegenTimeout > 0) {
-        this.healthRegenTimeout -= dTime;
-      }
-
-      if (this.lastBattleActionTimer <= 0) {
-        if (this.healthRegenTimeout <= 0) {
-          this.healthRegenTimeout = this.healthRegenInterval;
-          this.SetHealth(this.health + 1);
+    Tick: function(dTime) {
+        if(this.attackTimeout > 0) {
+            this.attackTimeout -= dTime;
         }
-      }
 
-      // Three seconds without being hit will recharge our armor
-      if (this.armorRegenTimeout > 0) {
-        this.armorRegenTimeout -= dTime;
-      }
-      if (this.lastBattleActionTimer <= battleStatusTimeout - 3) {
-        if (this.armorRegenTimeout <= 0) {
-          this.armorRegenTimeout = this.armorRegenInterval;
-          this.SetArmor(this.armor + 1);
+        if (this.lastBattleActionTimer > 0) {
+            this.lastBattleActionTimer -= dTime;
         }
-      }
 
-      // No additional ticking needed for players (physics are done on the client)
-      if (this.id > 0) {
-        return;
-      }
+        if (this.health <= 0) {
+            if (this.respawnTimer > 0.0) {
+                this.respawnTimer -= dTime;
+            } else {
+                this.Respawn();
+            }
+        } else {
+            if (this.healthRegenTimeout > 0) {
+                this.healthRegenTimeout -= dTime;
+            }
 
-      this._super(dTime);
-    }
-  },
-  SetHealth: function(newHealth, noParticles) {
-    var oldHealth = this.health;
+            // only monsters can regen health
+            if (this.lastBattleActionTimer <= 0 && this.id < 0) {
+                if (this.healthRegenTimeout <= 0) {
+                    this.healthRegenTimeout = this.healthRegenInterval;
+                    this.SetHealth(this.health + 1);
+                }
+            }
 
-    noParticles = noParticles || false;
+            // Three seconds without being hit will recharge our armor
+            if (this.armorRegenTimeout > 0) {
+                this.armorRegenTimeout -= dTime;
+            }
+            if (this.lastBattleActionTimer <= battleStatusTimeout - 3) {
+                if (this.armorRegenTimeout <= 0) {
+                    this.armorRegenTimeout = this.armorRegenInterval;
+                    this.SetArmor(this.armor + 1);
+                }
+            }
 
-    this.health = newHealth;
+            // No additional ticking needed for players (physics are done on the client)
+            if (this.id > 0) {
+                return;
+            }
 
-    this.health = Math.min(this.healthMax, this.health);
+            this._super(dTime);
+        }
+    },
+    SetHealth: function(newHealth, noParticles) {
+        var oldHealth = this.health;
+        noParticles = noParticles || false;
 
+        this.health = newHealth;
+        this.health = Math.min(this.healthMax, this.health);
 
-    if ( oldHealth != this.health ) {
-      var data ={
-        id:this.id,
-        s:"h",
-        h:this.health
-        };
-        if ( noParticles ) data.np = true;
-      this.EmitNearby("setStat", data, 0, true);
-    }
-  },
+        if ( oldHealth !== this.health ) {
+            var data = {
+                id: this.id,
+                s: "h",
+                h: this.health
+            };
+
+            if (noParticles) {
+              data.np = true;
+            }
+
+            this.EmitNearby("setStat", data, 0, true);
+        }
+    },
   SetArmor: function(newArmor) {
     var oldArmor = this.armor;
 
