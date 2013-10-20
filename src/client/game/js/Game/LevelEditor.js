@@ -309,7 +309,14 @@ var EditorGUI = function() {
 
   this.npcID = 0;
 
-  this.npcTemplate = 1;
+  this.npcTemplate = (function(){
+      var first = null;
+      _.each(unitTemplates, function(val, key){
+        if ( !first ) first = key;
+      });
+      return first;
+    })();
+
   this.npcParam = 0;
 
 
