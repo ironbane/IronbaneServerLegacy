@@ -297,7 +297,7 @@ var Projectile = Unit.extend({
         if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
             var mat = textureHandler.GetTexture( 'images/projectiles/arrow_single.png', false, {transparent:true, doubleSided:true});
 
-
+            console.log("making arrow");
             var mesh;
 
             var planeGeo = new THREE.PlaneGeometry(1,1, 1, 1);
@@ -627,7 +627,8 @@ var Projectile = Unit.extend({
         }
     },
     Impact: function(hasHitTerrain) {
-
+        console.log("impact: " + hasHitTerrain);
+        console.log(this);
         if ( this.impactDone ) return;
 
         if ( this.velocity.lengthSq() < 0.25 ) this.impactDone = true;

@@ -242,6 +242,7 @@ var Unit = PhysicsObject.extend({
     }
   },
   FullDestroy: function() {
+    console.log("destroying " +this);
     ironbane.unitList = _.without(ironbane.unitList, this);
     this.Destroy();
   },
@@ -418,11 +419,13 @@ var Unit = PhysicsObject.extend({
         // Only for the player to reduce performance
         // NPC's use waypoints and other players should do their own local collision detection
         // Will make cheaters easier to spot
-        if ( (this instanceof Player) || (this instanceof Projectile) ) {
+        if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
           var tVel = this.velocity.clone();
           tVel.y = 0;
           tVel.normalize();
-
+          if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
+            console.log("casting for arrow1");
+          }
           var ray = new THREE.Raycaster( this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), tVel);
 
 
@@ -456,90 +459,96 @@ var Unit = PhysicsObject.extend({
           this.terrainAngle = 0;
 
           // Again, increase by performance for other units by reducing raycasts
-          var rayList = (this instanceof Player) ? this.rayOffsetList : this.rayOffsetList;
+          /*var rayList = (this instanceof Player) ? this.rayOffsetList : this.rayOffsetList;*/
+          var rayList = this.rayOffsetList;
 
-          for ( var ro=0;ro<rayList.length;ro++ ) {
+          if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
+         if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
+            console.log("casting for arrow2");
+          }
+            for ( var ro=0;ro<rayList.length;ro++ ) {
 
-            var rayCastPos = this.position.clone().add(rayList[ro]);
+              var rayCastPos = this.position.clone().add(rayList[ro]);
 
-            var ray = new THREE.Raycaster( rayCastPos, new THREE.Vector3(0, -1, 0));
-            var normal = new THREE.Vector3();
-            var point = new THREE.Vector3();
-            var distance = 0;
-            var succesfulRays = 0;
-            var struckUnit = null;
+              var ray = new THREE.Raycaster( rayCastPos, new THREE.Vector3(0, -1, 0));
+              var normal = new THREE.Vector3();
+              var point = new THREE.Vector3();
+              var distance = 0;
+              var succesfulRays = 0;
+              var struckUnit = null;
 
-            var distanceCheck = 0.5;
-
-
-            var intersects = terrainHandler.RayTest(ray, {
-              testMeshesNearPosition:this.position,
-              reverseRaySortOrder:true,
-              unitReference: this,
-              unitRayName: "colground"
-            });
-
-            for(var i=0;i<intersects.length;i++){
-              normal = intersects[i].face.normal;
-              point = intersects[i].point;
-              distance = intersects[i].distance;
-
-              struckUnit = intersects[i].object.unit;
+              var distanceCheck = 0.5;
 
 
-              raycastNormal = normal;
-              raycastGroundPosition = point;
+              var intersects = terrainHandler.RayTest(ray, {
+                testMeshesNearPosition:this.position,
+                reverseRaySortOrder:true,
+                unitReference: this,
+                unitRayName: "colground"
+              });
+
+              for(var i=0;i<intersects.length;i++){
+                normal = intersects[i].face.normal;
+                point = intersects[i].point;
+                distance = intersects[i].distance;
+
+                struckUnit = intersects[i].object.unit;
 
 
-               if ( (this instanceof Player || this instanceof Projectile) ) {
-                 if ( struckUnit instanceof DynamicMesh ) {
+                raycastNormal = normal;
+                raycastGroundPosition = point;
 
-                     this.unitStandingOn = struckUnit;
 
+                 if ( (this instanceof Player || this instanceof Projectile) ) {
+                   if ( struckUnit instanceof DynamicMesh ) {
+
+                       this.unitStandingOn = struckUnit;
+
+                   }
                  }
-               }
 
-              distance = distance.Round(2);
+                distance = distance.Round(2);
 
-              if ( distance <= distanceCheck && this.restrictToGround ) {
+                if ( distance <= distanceCheck && this.restrictToGround ) {
 
-                var distanceInside = distanceCheck-distance;
+                  var distanceInside = distanceCheck-distance;
 
-                var normalCopy = raycastNormal.clone();
+                  var normalCopy = raycastNormal.clone();
 
-                var vec = new THREE.Vector3(0, 1, 0);
+                  var vec = new THREE.Vector3(0, 1, 0);
 
-                this.terrainAngle = Math.acos(raycastNormal.dot(vec)).ToDegrees();
+                  this.terrainAngle = Math.acos(raycastNormal.dot(vec)).ToDegrees();
 
-                // Prevent false values from players being stuck
-                if ( this.terrainAngle > 89 || this.terrainAngle < 0 ) this.terrainAngle = 0;
+                  // Prevent false values from players being stuck
+                  if ( this.terrainAngle > 89 || this.terrainAngle < 0 ) this.terrainAngle = 0;
 
-                if ( showEditor && levelEditor.editorGUI.chClimb ) this.terrainAngle = 0;
+                  if ( showEditor && levelEditor.editorGUI.chClimb ) this.terrainAngle = 0;
 
-                if ( this.terrainAngle < 45 ) {
-                  normalCopy.set(0,1,0);
+                  if ( this.terrainAngle < 45 ) {
+                    normalCopy.set(0,1,0);
+                  }
+
+                  var dvec = normalCopy.clone().multiplyScalar(distanceInside);
+
+                  if ( this.unitStandingOn ) {
+                    var rotationMatrix = new THREE.Matrix4();
+                    rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
+                    dvec.applyMatrix4(rotationMatrix);
+                  }
+
+                  this.object3D.position.add(dvec);
+
+                  if ( !(this instanceof Projectile) ) {
+                    this.velocity.sub(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
+                  }
+
+                  if ( (this instanceof Projectile) && this.type.parabolic ) {
+                    this.velocity.set(0,0,0);
+                    this.Impact(true);
+                  }
+
+                  this.isTouchingGround = true;
                 }
-
-                var dvec = normalCopy.clone().multiplyScalar(distanceInside);
-
-                if ( this.unitStandingOn ) {
-                  var rotationMatrix = new THREE.Matrix4();
-                  rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
-                  dvec.applyMatrix4(rotationMatrix);
-                }
-
-                this.object3D.position.add(dvec);
-
-                if ( !(this instanceof Projectile) ) {
-                  this.velocity.sub(normalCopy.multiplyScalar(normalCopy.dot(this.velocity)));
-                }
-
-                if ( (this instanceof Projectile) && this.type.parabolic ) {
-                  this.velocity.set(0,0,0);
-                  this.Impact(true);
-                }
-
-                this.isTouchingGround = true;
               }
             }
           }
@@ -583,7 +592,10 @@ var Unit = PhysicsObject.extend({
 
         // Collide against meshes to the top
         // Only for the player
-        if ( (this instanceof Player) || (this instanceof Projectile) ) {
+        if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
+           if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
+            console.log("casting for arrow3");
+          }
           ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
           var intersects = terrainHandler.RayTest(ray, {
