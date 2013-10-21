@@ -291,7 +291,7 @@ var includes = [
     '/Game/Special/TeleportExit.js',
     '/Game/Special/Sign.js',
     '/Game/Special/Waypoint.js',
-    '/Game/Special/Trigger.js',
+    '/Game/Special/trigger.js',
     '/Game/Special/HeartPiece.js',
     '/Game/Special/MusicPlayer.js',
     '/Server.js'
