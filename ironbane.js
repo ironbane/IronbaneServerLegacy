@@ -22,6 +22,10 @@ var setupWizard = function() {
                 type: 'string',
                 "default": config.get('buildTarget')
             },
+            game_host: {
+                type: 'string',
+                "default": config.get('game_host')
+            },
             server_port: {
                 type: 'number',
                 "default": config.get('server_port')
