@@ -242,7 +242,6 @@ var Unit = PhysicsObject.extend({
     }
   },
   FullDestroy: function() {
-    console.log("destroying " +this);
     ironbane.unitList = _.without(ironbane.unitList, this);
     this.Destroy();
   },
@@ -423,9 +422,7 @@ var Unit = PhysicsObject.extend({
           var tVel = this.velocity.clone();
           tVel.y = 0;
           tVel.normalize();
-          if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
-            console.log("casting for arrow1");
-          }
+
           var ray = new THREE.Raycaster( this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), tVel);
 
 
@@ -462,10 +459,7 @@ var Unit = PhysicsObject.extend({
           /*var rayList = (this instanceof Player) ? this.rayOffsetList : this.rayOffsetList;*/
           var rayList = this.rayOffsetList;
 
-          if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
-         if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
-            console.log("casting for arrow2");
-          }
+          if ( !(this instanceof Projectile && this.impactDone) ) {
             for ( var ro=0;ro<rayList.length;ro++ ) {
 
               var rayCastPos = this.position.clone().add(rayList[ro]);
@@ -593,9 +587,6 @@ var Unit = PhysicsObject.extend({
         // Collide against meshes to the top
         // Only for the player
         if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
-           if(this instanceof Projectile && this.type.meshType === ProjectileMeshTypeEnum.ARROW) {
-            console.log("casting for arrow3");
-          }
           ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
           var intersects = terrainHandler.RayTest(ray, {
