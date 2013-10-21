@@ -114,7 +114,7 @@ module.exports = function(items, units, worldHandler) {
             }
 
             // Void if message is empty
-            if(message == '') return;
+            if( !message ) return;
 
             // Send message through ironbot
             message = ironbot.filterBadwords(unit, message);
