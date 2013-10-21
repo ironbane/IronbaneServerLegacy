@@ -162,7 +162,8 @@ var LoadActorScripts = function() {
             console.log("loading... " + path.basename(file));
 
             try {
-                var script = require(path.relative("./", file)); // does this fix both nix & windows?
+                var script = require("."+path.sep+file); // does this fix both nix & windows?
+
                 // script should be an object to add
                 _.each(_.keys(script), function(key) {
                     global.actorScripts[key] = script[key];
@@ -290,7 +291,6 @@ var includes = [
     '/Game/Special/TeleportExit.js',
     '/Game/Special/Sign.js',
     '/Game/Special/Waypoint.js',
-    '/Game/Special/trigger.js',
     '/Game/Special/HeartPiece.js',
     '/Game/Special/MusicPlayer.js',
     '/Server.js'
