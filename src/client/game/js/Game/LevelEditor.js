@@ -229,11 +229,28 @@ var EditorGUI = function() {
   }
 
   this.epwAdd = function() {
-    socketHandler.socket.emit('addNPC', {
-      position: ironbane.player.position,
-      template: waypointTemplate
-    });
-  }
+      socketHandler.socket.emit('addNPC', {
+          position: ironbane.player.position,
+          template: waypointTemplate
+      });
+  };
+
+  this.epTriggerName = 'trigger';
+  this.epTriggerScript = '';
+  this.epTriggerRange = 5;
+  this.epTriggerInterval = 3;
+  this.epTriggerAdd = function() {
+      socketHandler.socket.emit('addNPC', {
+          position: ironbane.player.position,
+          template: triggerTemplate,
+          data: {
+              name: levelEditor.editorGUI.epTriggerName,
+              script: levelEditor.editorGUI.epTriggerScript,
+              range: levelEditor.editorGUI.epTriggerRange,
+              triggerInterval: levelEditor.editorGUI.epTriggerInterval
+          }
+      });
+  };
 
   this.eplmMesh = firstOfObject(ModelEnum);
   this.eplmLootItems = "";
@@ -754,6 +771,13 @@ var LevelEditor = Class.extend({
 
     var fWaypoints = fEntityPlacer.addFolder('Waypoints');
     guiControls['epwAdd'] = fWaypoints.add(this.editorGUI, 'epwAdd');
+
+    var fTriggers = fEntityPlacer.addFolder('Triggers');
+    guiControls['epTriggerName'] = fTriggers.add(this.editorGUI, 'epTriggerName');
+    guiControls['epTriggerScript'] = fTriggers.add(this.editorGUI, 'epTriggerScript');
+    guiControls['epTriggerRange'] = fTriggers.add(this.editorGUI, 'epTriggerRange');
+    guiControls['epTriggerInterval'] = fTriggers.add(this.editorGUI, 'epTriggerInterval');
+    guiControls['epTriggerAdd'] = fTriggers.add(this.editorGUI, 'epTriggerAdd');
 
     var fTrains = fEntityPlacer.addFolder('Trains');
     guiControls['eptrMesh'] = fTrains.add(this.editorGUI, 'eptrMesh', ModelEnum);

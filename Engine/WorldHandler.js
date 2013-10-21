@@ -446,6 +446,11 @@ var WorldHandler = Class.extend({
       case UnitTypeEnum.WAYPOINT:
         unit = new Waypoint(data);
         break;
+
+      case UnitTypeEnum.TRIGGER:
+          unit = new Trigger(data);
+          break;
+
       case UnitTypeEnum.LOOTABLE:
 
         if ( data.data ) {

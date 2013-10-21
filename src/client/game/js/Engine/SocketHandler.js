@@ -237,6 +237,16 @@ var SocketHandler = Class.extend({
 
                     unit = new Waypoint(ConvertVector3(data.position), data.id);
                     break;
+
+                case UnitTypeEnum.TRIGGER:
+                    // also dont show on prod... todo: when editor open instead?
+                    if(isProduction) {
+                        return;
+                    }
+
+                    unit = new Trigger(ConvertVector3(data.position), data.id);
+                    break;
+
                 case UnitTypeEnum.LOOTABLE:
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
