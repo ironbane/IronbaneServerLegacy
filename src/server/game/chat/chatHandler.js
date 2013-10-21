@@ -18,7 +18,8 @@ module.exports = function(items, units, worldHandler) {
     var Class = require('../../../common/class'),
         sanitize = require('validator').sanitize,
         _ = require('underscore'),
-        log = require('util').log;
+        log = require('util').log,
+        ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
 
     var ChatHandler = Class.extend({
         init: function(io) {
@@ -112,10 +113,11 @@ module.exports = function(items, units, worldHandler) {
                 message = sanitize(message).entityEncode();
             }
 
-            // Send message through ironbot
-            var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
-            message = ironbot.filterBadwords(unit, message);
+            // Void if message is empty
+            if(message == '') return;
 
+            // Send message through ironbot
+            message = ironbot.filterBadwords(unit, message);
 
             // only echo this if to global?
             if(!room) {
