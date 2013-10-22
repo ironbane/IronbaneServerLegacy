@@ -83,13 +83,13 @@ IronbaneApp.directive('chatWindow', ['$log', function($log) {
             }
 
             // rooms & PM
-            if(scope.data.type.search('say:') >= 0) {
+            if(scope.data.type && scope.data.type.search('say:') >= 0) {
                 scope.type = 'say:targetted';
                 scope.data.target = scope.data.type.split(':')[1];
             }
 
             // announcements all go to the same one
-            if(scope.data.type.search('announce') >= 0) {
+            if(scope.data.type && scope.data.type.search('announce') >= 0) {
                 scope.type = 'announce';
                 scope.data.target = scope.data.type.split(':')[1];
             }
