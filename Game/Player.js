@@ -108,14 +108,14 @@ var Player = Fighter.extend({
   Cutscene: function(id) {
     this.socket.emit("cutscene", id);
   },
-  LightWarn: function() {
-    var message = this.name + ': Your behaviour is not tolerated. Stop it.';
-    chatHandler.Announce('' + message + '', "yellow");
-  },
-  SeriousWarn: function() {
-    var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
-    chatHandler.Announce('' + message + '', "red");
-  },
+    LightWarn: function() {
+        var message = this.name + ': Your behaviour is not tolerated. Stop it.';
+        chatHandler.announce('' + message + '', "yellow");
+    },
+    SeriousWarn: function() {
+        var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
+        chatHandler.announce('' + message + '', "red");
+    },
     Kick: function(reason) {
         var me = this,
             message;
