@@ -97,6 +97,8 @@ module.exports = function(items, units, worldHandler) {
 
             if (errorMessage && errorMessage.length > 0) {
                 feedback += "<br>" + errorMessage;
+            } else if(commandOpener === '@') {
+                feedback = target + '>> ' + message;
             } else {
                 // let's only show feedback if there is an error
                 showFeedback = false;
@@ -255,10 +257,10 @@ module.exports = function(items, units, worldHandler) {
             // list users in room
             var clients = this.io.sockets.clients(room);
             var names = _.map(clients, function(client) {
-                return client.unit.name;
+                return client.unit ? client.unit.name : null;
             });
 
-            return names;
+            return _.without(names, null);
         }
     });
 
