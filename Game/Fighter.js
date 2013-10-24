@@ -478,8 +478,8 @@ var Fighter = Actor.extend({
     },
     UpdateAppearance: function(sendChanges) {
         var self = this;
-        // maybe we are NPC!
-        if(!self.id > 0) {
+
+        if(self.id > 0) {
             this.head = 0;
             this.body = 0;
             this.feet = 0;
