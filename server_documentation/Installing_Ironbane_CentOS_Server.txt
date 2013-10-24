@@ -1,0 +1,89 @@
+============================================
+== Get the server ready and updated first ==
+============================================
+
+Install CentOS 6.4 with all default options. Or choose a CentOS 6 preinstall from your provider. 
+
+Login to the server as root
+
+( Get minimal packages for installing )
+yum install wget vim
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+( Download nodejs-ansi because its broken in EPEL )
+wget http://kojipkgs.fedoraproject.org//packages/nodejs-ansi/0.1.2/7.el6.1/noarch/nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
+
+( Install npm, and node )
+yum --enablerepo="epel" install npm ./nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
+
+( Now use npm and n to install the latest stable version of node )
+npm cache clean -f
+npm install -g n ( If your system already has vim this can give an error )
+n stable
+
+npm -g install forever
+
+( Install mysql and gm )
+yum install mysql-server git GraphicsMagick
+
+( Set mysql password )
+mysqladmin -u root password 'YOUR_MYSQL_ROOT_PASSWORD’
+
+( Start mysql and make it permanent )
+service mysqld start
+chkconfig mysqld on
+
+( Openup port 80 in firewall chain. Add other ports if we might need them )
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+service iptables save
+service iptables restart
+
+===================================
+== Download and install Ironbane ==
+===================================
+
+( Download inonbane in /opt folder )
+cd /opt/
+git clone https://github.com/ironbane/IronbaneServer.git Ironbane
+cd Ironbane/
+git clone https://github.com/ironbane/IronbaneAssets.git IronbaneAssets
+
+( create dabase for ironbane )
+mysql -u root -p
+	CREATE DATABASE ironbane; ( Or another name if you prefer this )
+
+( Install ironbane )
+cd /opt/Ironbane
+npm install
+npm install -g grunt-cli
+( Make sure to enter the external IP you want to use for the game as gamehost value or a domain name that points to this server. Also change to port 80 so all users can enter your ip without :portnumber )
+node ironbane.js init 
+
+( run grunt to deploy the game )
+grunt
+
+===========================
+== Change admin password ==
+===========================
+
+( Now we need to set a new admin password thats encrypted with our new cryptSalt )
+
+node ironbane.js adminpass
+
+====================================
+== Make Ironbane run as a service ==
+====================================
+
+( Copy the ironbane.conf from the server_documentation to init)
+( If you didnt make any changes to paths during this installation you dont need to edit ironbane.conf)
+( Ironbane will automatically start on runlevels 2345 )
+cp server_documentation/ironbane.conf /etc/init
+chmod +x /etc/init/ironbane.conf
+
+( Start the ironbane service )
+initctl start ironbane
+
+( And you are good to go. ironbane as a service now go with your browser to the just installed server )
+
+

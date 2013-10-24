@@ -90,6 +90,39 @@ var setupWizard = function() {
     return result;
 };
 
+var adminPass = function() {
+    var prompt = require('prompt');
+
+    prompt.message = "Ironbane!".green;
+
+    var password = {
+        properties: {
+            password: {
+                type: 'string',
+                "default": ""
+            }
+        }
+    };
+    console.log('Please provide a password for the admin user.');
+
+    prompt.start();
+
+    var pGet = q.denodeify(prompt.get);
+
+    var steps = [function(res) {
+        return pGet(password).then(function(results) {
+            return _.extend(res, results);
+        });
+    }];
+
+    var finalResult = {};
+    var result = q.resolve(finalResult);
+    steps.forEach(function (f) {
+        result = result.then(f);
+    });
+    return result;
+};
+
 program.version('Ironbane MMO v' + pkg.version + ' alpha');
 
 program
@@ -107,6 +140,34 @@ program
                 .done();
 
             // TODO: do DB installation as well (run mysql child process to insert script?)
+        });
+    });
+
+program
+    .command('adminpass')
+    .description('Change the admin password via prompting.')
+    .action(function() {
+        adminPass().then(function(responses) {
+		var db = require('mysql').createConnection({
+			host: config.get('mysql_host'),
+			user: config.get('mysql_user'),
+			password: config.get('mysql_password'),
+			database: config.get('mysql_database')
+		}),
+		user = {},
+		crypto = require('crypto'),
+                pHash = crypto.createHash('md5'),
+                cryptSalt = config.get('cryptSalt');
+
+                pHash.update(cryptSalt + responses.password);
+                user.pass = pHash.digest('hex');
+
+		// update admin password in the database
+		var query = db.query("UPDATE bcs_users set ? where `name` = ?;", [user,'admin'], function(err) {
+			if(err) console.log('SQL error during password change: ' + JSON.stringify(err));
+		});
+		db.end();
+		console.log('Admin password saved.');
         });
     });
 
