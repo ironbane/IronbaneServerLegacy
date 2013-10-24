@@ -76,7 +76,7 @@ var Server = Class.extend({
                 var msg = ChooseSequenced([
 
                     "Welcome to Ironbane! Server uptime: "+timeSince(((new Date()).getTime()/1000.0)-(this.startTime/1000.0))+"<br>"+
-                    "Note that Ironbane is still in an early Alpha stage.<br>Please report all bugs in the forum!",
+                    "Note that Ironbane is still in an early Alpha stage.<br>Please report all bugs in the forum! Use enter to chat.",
 
                     "Are you a programmer? An artist? A 3D modeler?<br>"+
                     "Would you like to work on an exciting project with a cool team?<br>"+
