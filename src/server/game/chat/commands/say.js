@@ -24,8 +24,13 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
+            var rooms = chatHandler.listRooms();
 
-            chatHandler.say(unit, params.join(' '), target);
+            if(rooms.indexOf(target) < 0) {
+                errorMessage = "No such user or room.";
+            } else {
+                chatHandler.say(unit, params.join(' '), target);
+            }
 
             return {
                 errorMessage: errorMessage

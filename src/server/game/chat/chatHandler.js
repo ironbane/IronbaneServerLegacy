@@ -87,6 +87,7 @@ module.exports = function(items, units, worldHandler) {
             var feedback = "(" + unit.name + ") " + message + "";
             var errorMessage = "";
             var showFeedback = true;
+            var color = "#01ff46";
 
             if (this.commands[command] && ((!this.commands[command].requiresEditor && !unit.editor) || unit.editor)) {
                 var result = this.commands[command].action(unit, target, realparams, errorMessage);
@@ -97,15 +98,17 @@ module.exports = function(items, units, worldHandler) {
 
             if (errorMessage && errorMessage.length > 0) {
                 feedback += "<br>" + errorMessage;
+                color = "#FF0000";
             } else if(commandOpener === '@') {
-                feedback = target + '>> ' + message;
+                feedback = '@' + target + ' >> ' + message;
+                color = "#FFF";
             } else {
                 // let's only show feedback if there is an error
                 showFeedback = false;
             }
 
             if (showFeedback) {
-                this.announcePersonally(unit, feedback, errorMessage ? "red" : "#01ff46");
+                this.announcePersonally(unit, feedback, color);
             }
         },
         say: function(unit, message, room) {

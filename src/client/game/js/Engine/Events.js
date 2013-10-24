@@ -29,22 +29,26 @@ var msg = '';
 
 $('#chatInput').attr('value', msg);
 
-$('#chatInput').focus(function(){
+$('#chatInput').focus(function() {
+    if (!socketHandler.inGame) {
+        return;
+    }
 
-  if ( !socketHandler.inGame ) return;
-
-  if ( $('#chatInput').attr('value') == msg ) {
-    $('#chatInput').attr('value', '');
-  }
-  hasChatFocus = true;
+    if ($('#chatInput').attr('value') === msg) {
+        $('#chatInput').attr('value', '');
+    }
+    hasChatFocus = true;
 });
-$('#chatInput').blur(function(){
-  if ( !socketHandler.inGame ) return;
 
-  if ( $('#chatInput').attr('value') === '' ) {
-    $('#chatInput').attr('value', msg);
-  }
-  hasChatFocus = false;
+$('#chatInput').blur(function() {
+    if (!socketHandler.inGame) {
+        return;
+    }
+
+    if ($('#chatInput').attr('value') === '') {
+        $('#chatInput').attr('value', msg);
+    }
+    hasChatFocus = false;
 });
 
 $('#chatInput').keypress(function(e) {
@@ -57,21 +61,24 @@ $('#chatInput').keypress(function(e) {
         var clientmsg = $('#chatInput').val(),
             finalmsg;
 
-        lastUsedChat[lastUsedChatCounter++] = clientmsg;
-        lastUsedChatSelectCounter = lastUsedChatCounter;
+        // prevent blank messages
+        if(clientmsg.trim() !== '') {
+            lastUsedChat[lastUsedChatCounter++] = clientmsg;
+            lastUsedChatSelectCounter = lastUsedChatCounter;
 
-        // default chat "command" is /say to the global
-        // supports both / & @ as commands
-        if(clientmsg[0] === '/' || clientmsg[0] === '@') {
-            // continue as normal!
-            finalmsg = clientmsg;
-        } else {
-            finalmsg = '/say ' + clientmsg;
+            // default chat "command" is /say to the global
+            // supports both / & @ as commands
+            if(clientmsg[0] === '/' || clientmsg[0] === '@') {
+                // continue as normal!
+                finalmsg = clientmsg;
+            } else {
+                finalmsg = '/say ' + clientmsg;
+            }
+
+            socketHandler.socket.emit('chatMessage', {
+                message: finalmsg
+            });
         }
-
-        socketHandler.socket.emit('chatMessage', {
-            message: finalmsg
-        });
 
         $('#chatInput').attr('value', '');
         $('#chatInput').blur();
@@ -154,47 +161,7 @@ $(document).keydown(function(event){
 
   keyTracker[event.keyCode] = true;
 
-  if ( event.keyCode == 13 ) {
-    setTimeout(function(){
-      $('#chatLine').focus();
-      hasChatFocus = true;
-    }, 100);
-    return;
-  }
 
-
-  if ( ironbane.player ) {
-    if ( event.keyCode == 49 ) {
-      ironbane.player.UseItem(0);
-    }
-    if ( event.keyCode == 50 ) {
-      ironbane.player.UseItem(1);
-    }
-    if ( event.keyCode == 51 ) {
-      ironbane.player.UseItem(2);
-    }
-    if ( event.keyCode == 52 ) {
-      ironbane.player.UseItem(3);
-    }
-    if ( event.keyCode == 53 ) {
-      ironbane.player.UseItem(4);
-    }
-    if ( event.keyCode == 54 ) {
-      ironbane.player.UseItem(5);
-    }
-    if ( event.keyCode == 55 ) {
-      ironbane.player.UseItem(6);
-    }
-    if ( event.keyCode == 56 ) {
-      ironbane.player.UseItem(7);
-    }
-    if ( event.keyCode == 57 ) {
-      ironbane.player.UseItem(8);
-    }
-    if ( event.keyCode == 48 ) {
-      ironbane.player.UseItem(9);
-    }
-  }
 
 
   if ( event.keyCode === 27 ) {
