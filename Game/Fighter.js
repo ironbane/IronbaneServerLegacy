@@ -477,37 +477,41 @@ var Fighter = Actor.extend({
         return true;
     },
     UpdateAppearance: function(sendChanges) {
-        this.head = 0;
-        this.body = 0;
-        this.feet = 0;
+        var self = this;
+        // maybe we are NPC!
+        if(!self.id > 0) {
+            this.head = 0;
+            this.body = 0;
+            this.feet = 0;
 
-        for (var i = 0; i < this.items.length; i++) {
-            var item = this.items[i];
+            for (var i = 0; i < this.items.length; i++) {
+                var item = this.items[i];
 
-            if (item.equipped) {
-                if (item.getType() === "armor") {
-                    switch (item.getSubType()) {
-                      case "head":
-                          this.head = item.getImage();
-                          break;
-                      case "body":
-                          this.body = item.getImage();
-                          break;
-                      case "feet":
-                          this.feet = item.getImage();
-                          break;
+                if (item.equipped) {
+                    if (item.getType() === "armor") {
+                        switch (item.getSubType()) {
+                          case "head":
+                              this.head = item.getImage();
+                              break;
+                          case "body":
+                              this.body = item.getImage();
+                              break;
+                          case "feet":
+                              this.feet = item.getImage();
+                              break;
+                        }
                     }
                 }
             }
-        }
 
-        if (sendChanges) {
-            this.EmitNearby("updateClothes", {
-                id: this.id,
-                head: this.head,
-                body: this.body,
-                feet: this.feet
-            });
+            if (sendChanges) {
+                this.EmitNearby("updateClothes", {
+                    id: this.id,
+                    head: this.head,
+                    body: this.body,
+                    feet: this.feet
+                });
+            }
         }
     },
     GetEquippedWeapon: function() {
