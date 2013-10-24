@@ -46,6 +46,8 @@ Your root folder should now contain an IronbaneAssets folder.
 
 * Run ```ironbane start``` from the root directory.
 
+* Run ```ironbane adminpass``` from the root directory to set a new admin password.
+
 * Open ```http://localhost:8080/``` to try out your installation.
 
-* Login using username and password ```admin```.
+* Login using username ```admin``` and your password.
