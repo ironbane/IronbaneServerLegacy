@@ -122,8 +122,40 @@ module.exports = function(items, units, worldHandler) {
             if( !message ) return;
 
             // Send message through ironbot
-            message = ironbot.filterBadwords(unit, message);
+            var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
+	    var filterMessage = ironbot.filterBadwords(unit, message);
+	    message = filterMessage.message;
+	    if(filterMessage.status !== "clean") {
+		switch(filterMessage.status) {
+			case 'lightwarn':
+				// Send lightwarn
+				player = worldHandler.FindPlayerByName(unit.name);
+				if (player) {
+					player.LightWarn();
+				}
+			break;
 
+			case 'warn':
+				// Send serius warn
+				player = worldHandler.FindPlayerByName(unit.name);
+				if (player) {
+					player.SeriousWarn();
+				}
+			break;
+
+			case 'kick':
+				// Send kick
+				player = worldHandler.FindPlayerByName(unit.name);
+				if (player) {
+					player.Kick('Untolerated behaviour');
+				}
+			break;
+
+			default:
+				// Nothing
+			break;
+		}            	
+	    }
             // only echo this if to global?
             if(!room) {
                 unit.Say(message);
