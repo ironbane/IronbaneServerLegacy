@@ -36,7 +36,7 @@ Your root folder should now contain an IronbaneAssets folder.
 
 * Run ```npm install``` from the root directory
 
-* Run ```ironbane init``` at the prompt **OR** Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
+* Run ```node ironbane.js init``` at the prompt **OR** Create a ```config.json``` file setting values for the properties you need. Refer to ```nconf.js``` for the defaults.
 
 * Run ```npm install -g grunt-cli``` to install Grunt
 
@@ -44,9 +44,9 @@ Your root folder should now contain an IronbaneAssets folder.
 
 * Run grunt ```grunt```
 
-* Run ```ironbane start``` from the root directory.
+* Run ```node ironbane.js start``` from the root directory.
 
-* Run ```ironbane adminpass``` from the root directory to set a new admin password.
+* Run ```node ironbane.js adminpass``` from the root directory to set a new admin password.
 
 * Open ```http://localhost:8080/``` to try out your installation.
 
