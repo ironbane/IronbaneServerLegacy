@@ -146,7 +146,7 @@ module.exports = function(db) {
     function checkDuplicateName(name) {
         var deferred = Q.defer();
 
-        db.query('select count(*) as count from ib_characters where name=?', [name], function(err, result) {
+        db.query('select count(*) as count from ib_characters where LOWER(name)=?', [name.toLowerCase()], function(err, result) {
             if(err) {
                 log('create char error checking for duplicate name: ' + err);
             }
