@@ -44,9 +44,9 @@ Your root folder should now contain an IronbaneAssets folder.
 
 * Run grunt ```grunt```
 
-* Run ```node ironbane.js start``` from the root directory.
-
 * Run ```node ironbane.js adminpass``` from the root directory to set a new admin password.
+
+* Run ```node ironbane.js start``` from the root directory.
 
 * Open ```http://localhost:8080/``` to try out your installation.
 
