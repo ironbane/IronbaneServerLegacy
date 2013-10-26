@@ -94,6 +94,9 @@ var SocketHandler = Class.extend({
             socket.join('zone_' + unit.zone);
             // cell and/or "nearby" type channels? (to localize chat bubbles)
 
+            // Join a global channel, for now until we have more players
+            socket.join('global');
+
             // Update us, and all players that are nearby
             var cx = unit.cellX;
             var cz = unit.cellZ;

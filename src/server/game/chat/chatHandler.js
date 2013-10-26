@@ -82,6 +82,10 @@ module.exports = function(items, units, worldHandler) {
                         target = realparams.shift();
                     }
                 }
+                else {
+                    // Default target is global
+                    target = "global";
+                }
             }
 
             var feedback = "(" + unit.name + ") " + message + "";
@@ -154,7 +158,7 @@ module.exports = function(items, units, worldHandler) {
 			default:
 				// Nothing
 			break;
-		}            	
+		}
 	    }
             // only echo this if to global?
             if(!room) {
