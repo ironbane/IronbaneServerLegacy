@@ -82,10 +82,6 @@ module.exports = function(items, units, worldHandler) {
                         target = realparams.shift();
                     }
                 }
-                else {
-                    // Default target is global
-                    target = "global";
-                }
             }
 
             var feedback = "(" + unit.name + ") " + message + "";

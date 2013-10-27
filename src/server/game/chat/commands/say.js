@@ -21,15 +21,26 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
+    var _ = require('underscore');
+
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-            var rooms = chatHandler.listRooms();
+            var rooms = chatHandler.listRooms(),
+                match;
 
-            if(rooms.indexOf(target) < 0) {
+            // if we're attempting to match a user or room
+            if(_.isString(target)) {
+                // check for case insensitive way
+                match = _.find(rooms, function(room) {
+                    return room.toLowerCase() === target.toLowerCase();
+                });
+            }
+
+            if(target && !match) {
                 errorMessage = "No such user or room.";
             } else {
-                chatHandler.say(unit, params.join(' '), target);
+                chatHandler.say(unit, params.join(' '), match); // OK to pass null for match here, that's "global"
             }
 
             return {
