@@ -44,7 +44,7 @@ module.exports = function(items, units, worldHandler) {
             var params = message.split(/(".*?")/),
                 realparams = [];
 
-            if(params.length === 1) {
+            if (params.length === 1) {
                 // there are no quoted params, so just do space delim
                 realparams = message.split(' ');
             } else {
@@ -65,16 +65,16 @@ module.exports = function(items, units, worldHandler) {
             }
 
             // commands starting with @ are assumed to be of type SAY as that is normal "chat" type behavior
-            if(commandOpener === '@') {
+            if (commandOpener === '@') {
                 command = 'say';
                 target = realparams.shift();
             } else {
                 command = realparams.shift();
                 // for the case of say, if we use /say, then if we want to target a room use : , like: /say:zone_1 hey what's up or /say:"leeroy jenkins" don't attack!
-                if(command.indexOf(':') >= 0) {
+                if (command.indexOf(':') >= 0) {
                     var cmdparts = command.split(':');
                     command = cmdparts[0];
-                    if(cmdparts[1] !== '') {
+                    if (cmdparts[1] !== '') {
                         // non quoted string target
                         target = cmdparts[1];
                     } else {
@@ -99,7 +99,7 @@ module.exports = function(items, units, worldHandler) {
             if (errorMessage && errorMessage.length > 0) {
                 feedback += "<br>" + errorMessage;
                 color = "#FF0000";
-            } else if(commandOpener === '@') {
+            } else if (commandOpener === '@') {
                 feedback = '@' + target + ' >> ' + message;
                 color = "#FFF";
             } else {
@@ -119,45 +119,47 @@ module.exports = function(items, units, worldHandler) {
             }
 
             // Void if message is empty
-            if( !message ) return;
+            if (!message) {
+                return;
+            }
 
             // Send message through ironbot
             var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
-	    var filterMessage = ironbot.filterBadwords(unit, message);
-	    message = filterMessage.message;
-	    if(filterMessage.status !== "clean") {
-		switch(filterMessage.status) {
-			case 'lightwarn':
-				// Send lightwarn
-				player = worldHandler.FindPlayerByName(unit.name);
-				if (player) {
-					player.LightWarn();
-				}
-			break;
+            var filterMessage = ironbot.filterBadwords(unit, message);
+            message = filterMessage.message;
+            if (filterMessage.status !== "clean") {
+                switch (filterMessage.status) {
+                    case 'lightwarn':
+                        // Send lightwarn
+                        player = worldHandler.FindPlayerByName(unit.name);
+                        if (player) {
+                            player.LightWarn();
+                        }
+                        break;
 
-			case 'warn':
-				// Send serius warn
-				player = worldHandler.FindPlayerByName(unit.name);
-				if (player) {
-					player.SeriousWarn();
-				}
-			break;
+                    case 'warn':
+                        // Send serius warn
+                        player = worldHandler.FindPlayerByName(unit.name);
+                        if (player) {
+                            player.SeriousWarn();
+                        }
+                        break;
 
-			case 'kick':
-				// Send kick
-				player = worldHandler.FindPlayerByName(unit.name);
-				if (player) {
-					player.Kick('Untolerated behaviour');
-				}
-			break;
+                    case 'kick':
+                        // Send kick
+                        player = worldHandler.FindPlayerByName(unit.name);
+                        if (player) {
+                            player.Kick('Untolerated behaviour');
+                        }
+                        break;
 
-			default:
-				// Nothing
-			break;
-		}
-	    }
+                    default:
+                        // Nothing
+                        break;
+                }
+            }
             // only echo this if to global?
-            if(!room) {
+            if (!room) {
                 unit.Say(message);
             }
 
@@ -170,8 +172,8 @@ module.exports = function(items, units, worldHandler) {
                 message: message
             };
 
-            if(room) {
-                this.io.sockets.in(room).emit('chatMessage', messageData);
+            if (room) {
+                this.io.sockets. in (room).emit('chatMessage', messageData);
             } else {
                 this.io.sockets.emit("chatMessage", messageData);
             }

@@ -26,6 +26,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
+            if(!_.isString(params[0])) {
+                return {errorMessage: 'join target required.'};
+            }
+
             var room = params[0].toLowerCase(),
                 success = false,
                 rooms = chatHandler.listRooms(),
