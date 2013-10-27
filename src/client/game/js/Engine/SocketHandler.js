@@ -441,28 +441,23 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('respawn', function(data) {
-
             var unit = FindUnit(data.id);
 
             if (unit) {
-
                 unit.health = data['h'];
                 unit.object3D.position.copy(ConvertVector3(data['p']));
 
                 if (unit === ironbane.player) {
-
                     terrainHandler.transitionState = transitionStateEnum.START;
 
                     $('#gameFrame').animate({
                         opacity: 0.00
                     }, 1000, function() {
-
                         terrainHandler.transitionState = transitionStateEnum.MIDDLE;
 
                         setTimeout(function() {
                             ironbane.showingGame = false;
                         }, 100);
-
 
                         socketHandler.readyToReceiveUnits = false;
                         ironbane.player.UpdateWeapon(0);
@@ -474,25 +469,17 @@ var SocketHandler = Class.extend({
                         hudHandler.ShowHUD();
                         hudHandler.MakeHealthBar(true);
 
-
                         hudHandler.ReloadInventory();
-
-
                     });
-
-
-
                 }
 
                 unit.canMove = true;
                 unit.dead = false;
 
                 unit.Respawn();
-
             }
-
-
         });
+
         //        this.socket.on('doSwing', function (data) {
         //            //if ( !socketHandler.loggedIn ) return;
         //

@@ -23,7 +23,9 @@ var Fighter = Actor.extend({
         this._super(data);
 
         this.sendRotationPacketY = true;
-        this.respawnTimer = 0.0;
+
+        // default for players is 10, mobs are variable, default 30
+        this._respawnTime = this.respawnTimer = this.id > 0 ? 10 : (this.respawntime || 30);
 
         // NPC's don't really have an items array, but nevertheless...
         if (this.items === undefined) {
@@ -34,11 +36,10 @@ var Fighter = Actor.extend({
         // Initially, their values come from MySQL and are afterwards updated within the server without updating MySQL
         // The template values are used for Maximum values, and should never be changed
 
-        if ( this.id < 0 ) {
+        if (this.id < 0) {
             this.healthMax = this.template.health;
             this.armorMax = this.template.armor;
-        }
-        else {
+        } else {
             this.CalculateMaxHealth();
             this.CalculateMaxArmor();
         }
@@ -60,30 +61,30 @@ var Fighter = Actor.extend({
 
         this.lastBattleActionTimer = 0.0;
 
-        if(this.GetEquippedWeapon()) {
-          this.attackTimeout = this.GetEquippedWeapon().$template.delay;
+        if (this.GetEquippedWeapon()) {
+            this.attackTimeout = this.GetEquippedWeapon().$template.delay;
         }
     },
     IsInBattle: function() {
         return this.lastBattleActionTimer > 0;
     },
-  ShootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
+    ShootProjectile: function(targetPosition, swingWeapon, weaponID, aimError) {
 
-      aimError = !_.isUndefined(aimError) ? aimError : 0;
+        aimError = !_.isUndefined(aimError) ? aimError : 0;
 
-      var offset = new THREE.Vector3();
+        var offset = new THREE.Vector3();
 
-      swingWeapon = !_.isUndefined(swingWeapon) ? swingWeapon : true;
-      weaponID = weaponID || this.weapon.id;
+        swingWeapon = !_.isUndefined(swingWeapon) ? swingWeapon : true;
+        weaponID = weaponID || this.weapon.id;
 
-      this.EmitNearby("addProjectile", {
-        s:this.position.clone().Round(2),
-        t:targetPosition.clone().add(offset).Round(2),
-        o:this.id,
-        w:weaponID,
-        sw:swingWeapon
-      });
-  },
+        this.EmitNearby("addProjectile", {
+            s: this.position.clone().Round(2),
+            t: targetPosition.clone().add(offset).Round(2),
+            o: this.id,
+            w: weaponID,
+            sw: swingWeapon
+        });
+    },
     AttemptAttack: function(victim) {
         // log("attempt attack");
         this.HandleMessage("attemptAttack", {});
@@ -98,93 +99,73 @@ var Fighter = Actor.extend({
             this.ShootProjectile(victim.position, true, 0, this.template.aimerror);
         }
     },
-  Attack: function(victim, weapon) {
+    Attack: function(victim, weapon) {
+        this.lastBattleActionTimer = battleStatusTimeout;
+        // Do damage
+        //        if ( this.id > 0 ) {
+        //            var template = dataHandler.items[weapon.template];
+        //
+        //        }
+        var damage = this.ch999Damage ? 999 : weapon.attr1;
 
-    this.lastBattleActionTimer = battleStatusTimeout;
+        if (!victim.chGodMode) {
+            if (victim.id > 0 && damage < 0) {
+                victim.health += Math.abs(damage);
+                victim.health = Math.min(victim.healthMax, victim.health);
 
+                this.HandleMessage("healTarget", {
+                    damage: damage
+                });
+                victim.HandleMessage("healed", {
+                    attacker: this,
+                    damage: damage
+                });
+            } else {
+                // 22/12/12 No more PvP... :(
+                if (this.id > 0 && victim.id > 0) {
+                    return;
+                }
+                damage = Math.abs(damage);
+                var remaining = damage - victim.armor;
+                victim.armor -= damage;
 
+                if (remaining > 0) {
+                    victim.health -= remaining;
+                }
 
+                victim.health = Math.max(victim.health, 0);
+                victim.armor = Math.max(victim.armor, 0);
 
-    // Do damage
-    //        if ( this.id > 0 ) {
-    //            var template = dataHandler.items[weapon.template];
-    //
-    //        }
-
-    var damage = this.ch999Damage ? 999 : weapon.attr1;
-
-    if ( !victim.chGodMode ) {
-
-      if(victim.id > 0 &&  damage < 0) {
-        victim.health += Math.abs(damage);
-
-        victim.health = Math.min(victim.healthMax, victim.health);
-
-
-        this.HandleMessage("healTarget", {damage:damage});
-        victim.HandleMessage("healed", {attacker:this, damage:damage});
-      }
-
-      else{
-
-        // 22/12/12 No more PvP... :(
-        if ( this.id > 0 && victim.id > 0 ) return;
-        damage = Math.abs(damage);
-      var remaining = damage - victim.armor;
-        victim.armor -= damage;
-
-        if ( remaining > 0 ) {
-          victim.health -= remaining;
+                this.HandleMessage("hurtTarget", {
+                    damage: damage
+                });
+                victim.HandleMessage("attacked", {
+                    attacker: this,
+                    damage: damage
+                });
+            }
         }
 
-        victim.health = Math.max(victim.health, 0);
-        victim.armor = Math.max(victim.armor, 0);
+        victim.EmitNearby("getMeleeHit", {
+            victim: victim.id,
+            attacker: this.id,
+            h: victim.health,
+            a: victim.armor
+        }, 0, victim.id > 0); // Only send to ourselves when we are a player (id > 0)
 
-        this.HandleMessage("hurtTarget", {damage:damage});
-        victim.HandleMessage("attacked", {attacker:this, damage:damage});
-      }
-    }
+        // Only update the timer if we were attacked, not healed
+        if (damage > 0) {
+            victim.lastBattleActionTimer = battleStatusTimeout;
+        }
 
-    victim.EmitNearby("getMeleeHit", {
-      victim:victim.id,
-      attacker:this.id,
-      h:victim.health,
-      a:victim.armor
-    }, 0, victim.id > 0); // Only send to ourselves when we are a player (id > 0)
-
-
-    // Only update the timer if we were attacked, not healed
-    if ( damage > 0 ) {
-      victim.lastBattleActionTimer = battleStatusTimeout;
-    }
-
-    if ( victim.health <= 0 && victim.respawnTimer <= 0) {
-      //victim.health = 20;
-      victim.health = 0;
-
-      // Reset NPC velocities, as they would otherwise keep going and change cells
-      if ( victim.id < 0 ) {
-        victim.velocity.set(0,0,0);
-      }
-
-      victim.Die(this);
-      victim.respawnTimer = victim.id > 0 ? 10.0 : 30.0;
-
-
-      // 22/12/12 Permadeath, no more respawning for players
-      // if ( victim.id > 0 )  {
-
-      //   victim.Delete();
-
-
-
-      // }
-
-    }
-
-  },
+        // move to apply damage type method?
+        if (victim.health <= 0) {
+            victim.health = 0;
+            victim.Die(this);
+        }
+    },
     Tick: function(dTime) {
-        if(this.attackTimeout > 0) {
+        if (this.attackTimeout > 0) {
             this.attackTimeout -= dTime;
         }
 
@@ -237,7 +218,7 @@ var Fighter = Actor.extend({
         this.health = newHealth;
         this.health = Math.min(this.healthMax, this.health);
 
-        if ( oldHealth !== this.health ) {
+        if (oldHealth !== this.health) {
             var data = {
                 id: this.id,
                 s: "h",
@@ -245,45 +226,50 @@ var Fighter = Actor.extend({
             };
 
             if (noParticles) {
-              data.np = true;
+                data.np = true;
             }
 
             this.EmitNearby("setStat", data, 0, true);
         }
     },
-  SetArmor: function(newArmor) {
-    var oldArmor = this.armor;
+    SetArmor: function(newArmor) {
+        var oldArmor = this.armor;
 
-    this.armor = newArmor;
+        this.armor = newArmor;
 
-    this.armor = Math.min(this.armorMax, this.armor);
+        this.armor = Math.min(this.armorMax, this.armor);
 
 
-    if ( oldArmor != this.armor ) {
-      this.EmitNearby("setStat", {
-        id:this.id,
-        s:"a",
-        a:this.armor
-        }, 0, true);
-    }
-  },
+        if (oldArmor !== this.armor) {
+            this.EmitNearby("setStat", {
+                id: this.id,
+                s: "a",
+                a: this.armor
+            }, 0, true);
+        }
+    },
     Die: function(killer) {
-        if (this.id < 0) {
+        var self = this;
+
+        // the dead don't move!
+        self.velocity.set(0, 0, 0);
+
+        if (self.id < 0) {
             //debugger;
-            this.HandleMessage("killed", {
+            self.HandleMessage("killed", {
                 killer: killer
             });
 
-            if (this.loot.length > 0) {
+            if (self.loot.length > 0) {
                 var angle = getRandomFloat(0, 1) * Math.PI * 2;
 
                 //log("spawning lootbag...");
                 var bag = new Lootable({
                     id: server.GetAValidNPCID(),
-                    x: this.position.x + Math.cos(angle),
-                    y: this.position.y,
-                    z: this.position.z + Math.sin(angle),
-                    zone: this.zone,
+                    x: self.position.x + Math.cos(angle),
+                    y: self.position.y,
+                    z: self.position.z + Math.sin(angle),
+                    zone: self.zone,
 
                     // Hacky: refers to lootBag ID
                     template: dataHandler.units[lootBagTemplate],
@@ -291,8 +277,8 @@ var Fighter = Actor.extend({
                     roty: 0
                 }, false);
 
-                for (var i = 0; i < this.loot.length; i++) {
-                    var item = this.loot[i];
+                for (var i = 0; i < self.loot.length; i++) {
+                    var item = self.loot[i];
 
                     item.owner = bag.id;
                     // Add the item to the lootbag
@@ -305,125 +291,132 @@ var Fighter = Actor.extend({
             }
         } else {
             // Remove their items
-            this.items = [];
+            self.items = [];
 
-            chatHandler.announceDied(this, killer);
+            chatHandler.announceDied(self, killer);
         }
     },
     Respawn: function() {
-        this.SetHealth(this.healthMax, true);
-        this.SetArmor(this.armorMax, true);
+        var self = this;
 
-        if (this.id > 0) {
-            //      this.position = new THREE.Vector3(0, 0, 0);
-            //      this.zone = 1;
+        // reset the respawn timer now
+        self.respawnTimer = self._respawnTime;
+
+        console.log('respawning: ', self.id, ' ', self.name, ' :: ', self._respawnTime, ' >> ', self.respawntime);
+
+        self.SetHealth(self.healthMax, true);
+        self.SetArmor(self.armorMax, true);
+
+        if (self.id > 0) {
+            //      self.position = new THREE.Vector3(0, 0, 0);
+            //      self.zone = 1;
             //debugger;
 
             // People who die in the tutorial need to do it again
-            if (this.zone === tutorialSpawnZone) {
-                this.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+            if (self.zone === tutorialSpawnZone) {
+                self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
             } else {
-                this.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                self.Teleport(normalSpawnZone, normalSpawnPosition, true);
             }
         } else {
-            if (this instanceof NPC) {
-                this.SetWeaponsAndLoot();
+            if (self instanceof NPC) {
+                self.SetWeaponsAndLoot();
             }
-            this.position = this.startPosition.clone();
-            this.targetNodePosition = this.position.clone();
-            this.HandleMessage("respawned", {});
+            self.position = self.startPosition.clone();
+            self.targetNodePosition = self.position.clone();
+            self.HandleMessage("respawned", {});
         }
 
-        // log("Respawned "+this.id);
+        // log("Respawned "+self.id);
 
         // Send the client that it's okay to revert back
-        this.EmitNearby("respawn", {
-            id: this.id,
-            p: this.position.clone().Round(2),
-            z: this.zone,
-            h: this.health
+        self.EmitNearby("respawn", {
+            id: self.id,
+            p: self.position.clone().Round(2),
+            z: self.zone,
+            h: self.health
         }, 0, true);
 
-        if (this.id < 0) {
-            this.velocity.set(0, 0, 0);
+        if (self.id < 0) {
+            self.velocity.set(0, 0, 0);
         }
     },
-  // Returns true when the max health changed
-  CalculateMaxHealth: function(doEmit) {
-    var oldHealthMax = this.healthMax;
+    // Returns true when the max health changed
+    CalculateMaxHealth: function(doEmit) {
+        var oldHealthMax = this.healthMax;
 
-    doEmit = doEmit || false;
+        doEmit = doEmit || false;
 
-    //        var healthMax = 20;
+        //        var healthMax = 20;
 
-    //        for(var i in socketHandler.playerData.items) {
-    //            var item = socketHandler.playerData.items[i];
-    //
-    //            var template = items[item.template];
-    //
-    //            if ( item.equipped ) {
-    //
-    //                if ( template.type == "armor" ) {
-    //
-    //                    healthMax += item.attr1;
-    //
-    //                }
-    //            }
-    //        }
+        //        for(var i in socketHandler.playerData.items) {
+        //            var item = socketHandler.playerData.items[i];
+        //
+        //            var template = items[item.template];
+        //
+        //            if ( item.equipped ) {
+        //
+        //                if ( template.type == "armor" ) {
+        //
+        //                    healthMax += item.attr1;
+        //
+        //                }
+        //            }
+        //        }
 
-    this.healthMax = 20;
+        this.healthMax = 20;
 
-    if ( doEmit && this.healthMax != oldHealthMax ) {
-      this.EmitNearby("setStat", {
-        id:this.id,
-        s:"hm",
-        hm:this.healthMax
-        }, 0, true);
-    }
-
-    if ( this.health > this.healthMax ) {
-      this.SetHealth(this.healthMax);
-    }
-  },
-  // Returns true when the max armor changed
-  CalculateMaxArmor: function(doEmit) {
-
-
-    doEmit = doEmit || false;
-
-    var oldArmorMax = this.armorMax;
-
-    var armorMax = 0;
-
-    for(var i=0;i<this.items.length;i++) {
-      var item = this.items[i];
-
-      var template = dataHandler.items[item.template];
-
-      if ( item.equipped ) {
-
-        if ( template.type == "armor" ) {
-
-          armorMax += item.attr1;
-
+        if (doEmit && this.healthMax !== oldHealthMax) {
+            this.EmitNearby("setStat", {
+                id: this.id,
+                s: "hm",
+                hm: this.healthMax
+            }, 0, true);
         }
-      }
-    }
 
-    this.armorMax = armorMax;
+        if (this.health > this.healthMax) {
+            this.SetHealth(this.healthMax);
+        }
+    },
+    // Returns true when the max armor changed
+    CalculateMaxArmor: function(doEmit) {
 
-    if ( doEmit && this.armorMax != oldArmorMax ) {
-      this.EmitNearby("setStat", {
-        id:this.id,
-        s:"am",
-        am:this.armorMax
-        }, 0, true);
-    }
 
-    if ( this.armor > this.armorMax ) {
-      this.SetArmor(this.armorMax);
-    }
-  },
+        doEmit = doEmit || false;
+
+        var oldArmorMax = this.armorMax;
+
+        var armorMax = 0;
+
+        for (var i = 0; i < this.items.length; i++) {
+            var item = this.items[i];
+
+            var template = dataHandler.items[item.template];
+
+            if (item.equipped) {
+
+                if (template.type === "armor") {
+
+                    armorMax += item.attr1;
+
+                }
+            }
+        }
+
+        this.armorMax = armorMax;
+
+        if (doEmit && this.armorMax !== oldArmorMax) {
+            this.EmitNearby("setStat", {
+                id: this.id,
+                s: "am",
+                am: this.armorMax
+            }, 0, true);
+        }
+
+        if (this.armor > this.armorMax) {
+            this.SetArmor(this.armorMax);
+        }
+    },
     GiveItem: function(template, config) {
         // todo: variable max inv?
         if (this.items.length >= 10) {
@@ -451,24 +444,30 @@ var Fighter = Actor.extend({
     },
     addCoins: function(amount) {
         // attempt to auto stack coins
-        if(amount <= 0) {
+        if (amount <= 0) {
             return false;
         }
 
-        var bags = _.where(this.items, {type: 'cash'});
-        if(bags.length > 0) {
+        var bags = _.where(this.items, {
+            type: 'cash'
+        });
+        if (bags.length > 0) {
             // for now just add to the first bag,
             // todo: bag limits?
             bags[0].value += amount;
         } else {
             // need to add one if the slot is available
-            var template = _.where(dataHandler.items, {type: 'cash'})[0];
-            if(!template) {
+            var template = _.where(dataHandler.items, {
+                type: 'cash'
+            })[0];
+            if (!template) {
                 log('server has no cash items!!!');
                 return false;
             }
 
-            if(!this.GiveItem(template, {value: amount})) {
+            if (!this.GiveItem(template, {
+                value: amount
+            })) {
                 // no room in inventory for coins!
                 return false;
             }
@@ -479,7 +478,7 @@ var Fighter = Actor.extend({
     UpdateAppearance: function(sendChanges) {
         var self = this;
 
-        if(self.id > 0) {
+        if (self.id > 0) {
             this.head = 0;
             this.body = 0;
             this.feet = 0;
@@ -490,15 +489,15 @@ var Fighter = Actor.extend({
                 if (item.equipped) {
                     if (item.getType() === "armor") {
                         switch (item.getSubType()) {
-                          case "head":
-                              this.head = item.getImage();
-                              break;
-                          case "body":
-                              this.body = item.getImage();
-                              break;
-                          case "feet":
-                              this.feet = item.getImage();
-                              break;
+                            case "head":
+                                this.head = item.getImage();
+                                break;
+                            case "body":
+                                this.body = item.getImage();
+                                break;
+                            case "feet":
+                                this.feet = item.getImage();
+                                break;
                         }
                     }
                 }
@@ -535,21 +534,23 @@ var Fighter = Actor.extend({
     },
     purchase: function(item) {
         // if player has multiple money bags need to remove them until finished
-        var bags = _.where(this.items, {type: 'cash'}),
+        var bags = _.where(this.items, {
+            type: 'cash'
+        }),
             bagIndex = 0,
             available = this.getTotalCoins(),
             remaining = item.price;
 
-        if(!remaining || remaining <= 0) {
+        if (!remaining || remaining <= 0) {
             return false; // invalid price! (fallback to value or basevalue?)
         }
 
-        if(available < remaining) {
+        if (available < remaining) {
             return false; // can't afford
         }
 
-        while(remaining > 0) {
-            if(bags[bagIndex].value - remaining < 0) {
+        while (remaining > 0) {
+            if (bags[bagIndex].value - remaining < 0) {
                 remaining -= bags[bagIndex].value;
                 this.items = _.without(this.items, bags[bagIndex]);
             } else {
@@ -563,97 +564,96 @@ var Fighter = Actor.extend({
         // purchase successful
         return true;
     },
-  InLineOfSight: function(unit, noHeadingCheck) {
-    var unitToUs = unit.position.clone().sub(this.position);
+    InLineOfSight: function(unit, noHeadingCheck) {
+        var unitToUs = unit.position.clone().sub(this.position);
 
-    noHeadingCheck = noHeadingCheck || false;
+        noHeadingCheck = noHeadingCheck || false;
 
-    if ( !noHeadingCheck && this.heading.dot(unitToUs.normalize()) <= 0 ) {
-      // log("not in the FOV!");
-      return false;
-    }
-
-    if ( unit.id > 0 ) {
-      // Check the LOS array
-      if ( !_.contains(unit.unitsInLineOfSight, this.id) ) {
-        // log("not found in los list!");
-        return false;
-      }
-    }
-
-    // log("in LOS! LOS:");
-    // console.log(unit.unitsInLineOfSight);
-    return true;
-  },
-  FindNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
-    maxDistance = maxDistance || 0;
-    onlyPlayers = onlyPlayers || false;
-
-    var cx = this.cellX;
-    var cz = this.cellZ;
-
-    //log("FindNearestTarget, maxDistance "+maxDistance+", onlyPlayers "+(onlyPlayers?"true":"false")+"");
-
-    for(var x=cx-1;x<=cx+1;x++){
-      for(var z=cz-1;z<=cz+1;z++){
-        if ( worldHandler.CheckWorldStructure(this.zone, x, z) ) {
-          for(var u=0;u<worldHandler.world[this.zone][x][z].units.length;u++) {
-            var unit = worldHandler.world[this.zone][x][z].units[u];
-
-            if ( unit == this ) {
-              continue;
-            }
-
-            if ( unit instanceof Fighter ) {
-
-              //debugger;
-
-              if ( unit.health <= 0 ) {
-                //log("unit.health <= 0");
-                continue;
-              }
-
-              if ( unit.chInvisibleByMonsters ) {
-                //log("unit.chInvisibleByMonsters");
-                continue;
-              }
-
-              if ( onlyPlayers && unit.id < 0 ) {
-                //log("onlyPlayers && unit.id < 0");
-                continue;
-              }
-
-              if ( !onlyPlayers && unit.id < 0 && unit.template.friendly === this.template.friendly ) {
-                // Don't attack our own kind!
-                continue;
-              }
-
-              // Check if we are looking at the target
-              if ( !this.InLineOfSight(unit, noHeadingCheck) ) {
-                //log("not in line of sight!");
-                continue;
-              }
-
-
-            }
-            else {
-              continue;
-            }
-
-            if ( maxDistance > 0 && !this.InRangeOfUnit(unit, maxDistance) ) {
-              //log("too far away!");
-              continue;
-            }
-
-            //if ( maxDistance > 0 && !unit.InRangeOfPosition(this.startPosition, maxDistance) ) continue;
-
-
-            return unit;
-
-          }
+        if (!noHeadingCheck && this.heading.dot(unitToUs.normalize()) <= 0) {
+            // log("not in the FOV!");
+            return false;
         }
-      }
+
+        if (unit.id > 0) {
+            // Check the LOS array
+            if (!_.contains(unit.unitsInLineOfSight, this.id)) {
+                // log("not found in los list!");
+                return false;
+            }
+        }
+
+        // log("in LOS! LOS:");
+        // console.log(unit.unitsInLineOfSight);
+        return true;
+    },
+    FindNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
+        maxDistance = maxDistance || 0;
+        onlyPlayers = onlyPlayers || false;
+
+        var cx = this.cellX;
+        var cz = this.cellZ;
+
+        //log("FindNearestTarget, maxDistance "+maxDistance+", onlyPlayers "+(onlyPlayers?"true":"false")+"");
+
+        for (var x = cx - 1; x <= cx + 1; x++) {
+            for (var z = cz - 1; z <= cz + 1; z++) {
+                if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
+                    for (var u = 0; u < worldHandler.world[this.zone][x][z].units.length; u++) {
+                        var unit = worldHandler.world[this.zone][x][z].units[u];
+
+                        if (unit === this) {
+                            continue;
+                        }
+
+                        if (unit instanceof Fighter) {
+
+                            //debugger;
+
+                            if (unit.health <= 0) {
+                                //log("unit.health <= 0");
+                                continue;
+                            }
+
+                            if (unit.chInvisibleByMonsters) {
+                                //log("unit.chInvisibleByMonsters");
+                                continue;
+                            }
+
+                            if (onlyPlayers && unit.id < 0) {
+                                //log("onlyPlayers && unit.id < 0");
+                                continue;
+                            }
+
+                            if (!onlyPlayers && unit.id < 0 && unit.template.friendly === this.template.friendly) {
+                                // Don't attack our own kind!
+                                continue;
+                            }
+
+                            // Check if we are looking at the target
+                            if (!this.InLineOfSight(unit, noHeadingCheck)) {
+                                //log("not in line of sight!");
+                                continue;
+                            }
+
+
+                        } else {
+                            continue;
+                        }
+
+                        if (maxDistance > 0 && !this.InRangeOfUnit(unit, maxDistance)) {
+                            //log("too far away!");
+                            continue;
+                        }
+
+                        //if ( maxDistance > 0 && !unit.InRangeOfPosition(this.startPosition, maxDistance) ) continue;
+
+
+                        return unit;
+
+                    }
+                }
+            }
+        }
+        return null;
     }
-    return null;
-  }
 });

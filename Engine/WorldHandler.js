@@ -369,6 +369,9 @@ var WorldHandler = Class.extend({
 
     data.displayweapon = data.template.displayweapon;
 
+    // utilize custom respawns from db
+    data.respawntime = data.template.respawntime;
+
 
     var unit = null;
 
