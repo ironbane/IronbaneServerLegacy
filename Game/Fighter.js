@@ -737,6 +737,9 @@ var Fighter = Actor.extend({
         return true;
     },
     InLineOfSight: function(unit, noHeadingCheck) {
+        // Experimental: test if its better if the monsters always see the player
+        return true;
+
         var unitToUs = unit.position.clone().sub(this.position);
 
         noHeadingCheck = noHeadingCheck || false;
@@ -744,14 +747,6 @@ var Fighter = Actor.extend({
         if (!noHeadingCheck && this.heading.dot(unitToUs.normalize()) <= 0) {
             // log("not in the FOV!");
             return false;
-        }
-
-        if (unit.isPlayer()) {
-            // Check the LOS array
-            if (!_.contains(unit.unitsInLineOfSight, this.id)) {
-                // log("not found in los list!");
-                return false;
-            }
         }
 
         // log("in LOS! LOS:");

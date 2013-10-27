@@ -110,7 +110,6 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/SoundHandler.js",
                     "<%= gameScriptPath %>/Engine/TextureHandler.js",
                     "<%= gameScriptPath %>/Engine/MeshHandler.js",
-                    "<%= gameScriptPath %>/Engine/PathFinder.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
                     "<%= gameScriptPath %>/Game/Hud.js",
                     "<%= gameScriptPath %>/Game/PhysicsObject.js",
@@ -315,10 +314,22 @@ module.exports = function(grunt) {
         },
         // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
-             src: ['<%= cfg.get("assetDir") %>**/*.obj']
+             src: ['<%= cfg.get("assetDir") %>images/**/*.obj']
         },
-        levelutil: {
-             src: ['<%= cfg.get("assetDir") %>**/objects.json']
+        builddetailmeshes: {
+             // src: ['<%= cfg.get("assetDir") %>**/objects.json']
+             options: {
+                assetDir: ['<%= cfg.get("assetDir") %>'],
+                host: '<%= cfg.get("mysql_host") %>',
+                user: '<%= cfg.get("mysql_user") %>',
+                password: '<%= cfg.get("mysql_password") %>',
+                database: '<%= cfg.get("mysql_database") %>'
+             },
+             src: ['<%= cfg.get("assetDir") %>data/*']
+        },
+        buildnavnodes: {
+             // src: ['<%= cfg.get("assetDir") %>images/**/*.nav.js']
+             src: ['<%= cfg.get("assetDir") %>images/**/3.nav.js']
         },
         dbutil: {
             options: {
@@ -375,6 +386,8 @@ module.exports = function(grunt) {
     grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
     grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
     grunt.registerTask('full', ['dbupgrade', 'game', 'website', 'assets']);
+    grunt.registerTask('detailmeshes', ['builddetailmeshes', 'three_obj']);
+    grunt.registerTask('navnodes', ['three_obj', 'buildnavnodes']);
 
     // when ready do both
     grunt.registerTask('default', ['full']);

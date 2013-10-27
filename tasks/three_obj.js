@@ -18,14 +18,14 @@ module.exports = function(grunt) {
 
             var s = fs.ReadStream(file);
             s.on('data', function(d) {
-              md5sum.update(d);
+                md5sum.update(d);
             });
             s.on('end', function() {
-              var d = md5sum.digest('hex');
-              deferred.resolve({
-                file:file,
-                md5:d
-              });
+                var d = md5sum.digest('hex');
+                deferred.resolve({
+                    file: file,
+                    md5: d
+                });
             });
             return deferred.promise;
         };
@@ -33,12 +33,12 @@ module.exports = function(grunt) {
         var checkIfJsFileIsUpToDate = function(result) {
             var deferred = Q.defer();
 
-            var jsfile = path.dirname(result.file)+"/"+
-                path.basename(result.file, ".obj")+".js";
+            var jsfile = path.dirname(result.file) + "/" +
+                path.basename(result.file, ".obj") + ".js";
 
             var basename = path.basename(result.file);
 
-            if ( !fs.existsSync(jsfile) ) {
+            if (!fs.existsSync(jsfile)) {
                 deferred.resolve("bla");
             }
             else {
@@ -48,8 +48,8 @@ module.exports = function(grunt) {
                     }
                     data = JSON.parse(data);
 
-                    if ( data.metadata ) {
-                        if ( !data.metadata.md5 || data.metadata.md5 !== result.md5 ) {
+                    if (data.metadata) {
+                        if (!data.metadata.md5 || data.metadata.md5 !== result.md5) {
                             //console.log(basename+" is not up-to-date.");
                             // This file is not up-to-date
                             deferred.resolve(result.md5);
@@ -69,17 +69,17 @@ module.exports = function(grunt) {
         var compileObj = function(file, md5) {
             var deferred = Q.defer();
 
-            var cmd = "python "+
-                path.dirname(file)+"/convert_obj_three.py"+
-                " -i "+path.dirname(file)+"/"+path.basename(file)+
-                " -o "+path.dirname(file)+"/"+path.basename(file, ".obj")+".js"+
+            var cmd = "python " +
+                path.dirname(file) + "/convert_obj_three.py" +
+                " -i " + path.dirname(file) + "/" + path.basename(file) +
+                " -o " + path.dirname(file) + "/" + path.basename(file, ".obj") + ".js" +
                 "";
 
             shell.exec(cmd, function(code, output) {
-              // console.log('Exit code:', code);
-              // console.log('Program output:', output);
-                var jsfile = path.dirname(file)+"/"+
-                    path.basename(file, ".obj")+".js";
+                // console.log('Exit code:', code);
+                // console.log('Program output:', output);
+                var jsfile = path.dirname(file) + "/" +
+                    path.basename(file, ".obj") + ".js";
 
                 // Read the file and clean it up
                 fs.readFile(jsfile, function read(err, data) {
@@ -89,17 +89,29 @@ module.exports = function(grunt) {
                     data = JSON.parse(data);
 
 
+                    var potentialZoneNumber = parseInt(path.basename(file, ".obj"), 10);
 
-                    if ( !_.isNaN(parseInt(path.basename(file, ".obj"), 10)) ) {
-                      // For terrain, set a scale factor of x300
-                      // which is 0.003333 for the converter
-                      data.scale = 0.003333;
+                    if (!_.isNaN(potentialZoneNumber) &&
+                        file.indexOf(".full") === -1 && file.indexOf(".nav") === -1) {
+                        // For terrain, set a scale factor of x300
+                        // which is 0.003333 for the converter
+                        // But not for detail and navigation meshes, as they are already scaled
+
+                        var scaleHack = true;
+
+                        if (potentialZoneNumber === 50) {
+                            scaleHack = false;
+                        }
+
+                        if (scaleHack) {
+                            data.scale = 0.003333;
+                        }
                     }
 
 
                     data.metadata.md5 = md5;
 
-                    if ( data.materials ) {
+                    if (data.materials) {
                         var badFields = [
                             "DbgColor",
                             "DbgIndex",
@@ -136,6 +148,8 @@ module.exports = function(grunt) {
         var modelsUpToDate = 0;
         var modelsToBeUpdated = 0;
 
+        console.log("Checking for updated 3D models that require conversion");
+
         task.filesSrc.forEach(function(file) {
 
             // Check if a .js exists
@@ -152,7 +166,7 @@ module.exports = function(grunt) {
                         return checkIfJsFileIsUpToDate(result);
                     })
                     .then(function(md5) {
-                        if ( md5 ) {
+                        if (md5) {
                             modelsToBeUpdated++;
                             return compileObj(file, md5);
                         }
@@ -166,7 +180,7 @@ module.exports = function(grunt) {
         });
 
         promises.reduce(Q.when, Q()).then(function() {
-            grunt.log.writeln(modelsUpToDate+" models up-to-date, "+modelsToBeUpdated+" updated.");
+            grunt.log.writeln(modelsUpToDate + " models up-to-date, " + modelsToBeUpdated + " updated.");
             grunt.log.writeln("All done!");
             taskDone(true);
         });

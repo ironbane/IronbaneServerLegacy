@@ -33,7 +33,6 @@ if (!isProduction && config.get('use_nodetime')) {
 
 var clientDir = config.get('buildTarget') + 'game/';
 var assetDir = config.get('assetDir');
-var persistentWorldChanges = config.get('persistentWorldChanges');
 
 if (!cryptSalt) {
     var warn = function() {
@@ -68,6 +67,8 @@ var check = require('validator').check,
     sanitize = require('validator').sanitize;
 
 var _ = require('underscore');
+
+var THREE = require('./src/client/game/lib/three/three.js');
 
 // Everything runs on one database, since the db is not hurt that bad by performance
 // We cut the middle man and only use mysql occasionally to save/load data
@@ -270,18 +271,14 @@ function start(scripts) {
 
 // These are all to be converted to modules
 var includes = [
-    '/Engine/Vector3.js',
     '/Shared/seedrandom.js',
     '/Shared/Buffs.js',
     '/Shared/Util.js',
-    '/Shared/NodeHandler.js',
     '/Engine/ConsoleCommand.js',
     '/Engine/ConsoleHandler.js',
     '/Engine/Switch.js',
     '/Engine/SocketHandler.js',
     '/Engine/WorldHandler.js',
-    '/Game/AI/graph.js',
-    '/Game/AI/astar.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',
     '/Game/MovingUnit.js',

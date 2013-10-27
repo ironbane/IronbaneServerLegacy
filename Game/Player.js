@@ -36,9 +36,6 @@ var Player = Fighter.extend({
     this._super(data);
 
 
-    this.unitsInLineOfSight = [];
-
-
     // Prevent spammers
     this.lastChatTime = 0;
 

@@ -20,12 +20,17 @@ var Unit = Class.extend({
   Init: function(data) {
     _.extend(this, data);
 
-    this.active = true; // when things die or otherwise shut off this will disable AI and other processes
+    // When things die or otherwise shut off this will disable AI and other processes
+    this.active = this.id > 0 ? true : false;
+
+
+    // Whether the unit has a custom script attached
+    this.isScripted = false;
 
     // Physics...
     //
 
-    this.mass = 0.1;
+    this.mass = 0.5;
 
     // Server-side velocity, is not sent to the client
     this.velocity = new THREE.Vector3();
@@ -86,33 +91,25 @@ var Unit = Class.extend({
 
     this.standingOnUnitId = 0;
 
-    if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-      worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
-    } else {
-      // We are in a bad cell??? Find a place to spawn! Or DC
-      log("Bad cell found for " + this.id);
 
-      if (this.id > 0 && this.editor) {
-        log("...but I'm generating one because he's an editor.");
-        worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
-        worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
-      }
-    }
 
     this.startPosition = this.position.clone();
     this.startRotation = this.rotation.clone();
 
 
-    (function(unit) {
-      setTimeout(function() {
-        unit.UpdateNearbyUnitsOtherUnitsLists();
-      }, 0);
-    })(this);
+    var me = this;
 
+    setTimeout(function() {
+      me.UpdateNearbyUnitsOtherUnitsLists();
+      worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
+    }, 0);
+
+
+    this.navigationMeshGroup = null;
 
 
   },
-  isPlayer: function(){
+  isPlayer: function() {
     return this instanceof Player;
   },
   isA: function(type) {
@@ -121,6 +118,9 @@ var Unit = Class.extend({
   },
   Awake: function() {
     //log(this.id+" is awake!");
+    // For fast searching, we need to precompute what group of nodes
+    // from the navigation mesh we are going to search in
+    this.navigationMeshGroup = pathFinder.getGroup(this.zone, this.position);
   },
   TeleportToUnit: function(unit, noEmit) {
     this.Teleport(unit.zone, unit.position, noEmit);
@@ -145,14 +145,15 @@ var Unit = Class.extend({
     this.UpdateCellPosition();
 
     if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-      worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
-    } else {
+      worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
+    }
+    else {
       log("[Teleport] Cell does not exist for unit #" +
         this.id + " (" + this.cellX + ", " + this.cellZ + ")");
       if (this.isPlayer() > 0 && this.editor) {
         log("[Teleport] Generating cell because he's an editor.");
         worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
-        worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
+        worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
       }
     }
 
@@ -219,7 +220,8 @@ var Unit = Class.extend({
             packet.weapon = item.template;
           }
 
-        } else {
+        }
+        else {
           if (unit.weapon && unit.displayweapon) {
             packet.weapon = unit.weapon.id;
           }
@@ -325,30 +327,30 @@ var Unit = Class.extend({
     }
     return nearestUnit;
   },
-    findNearestSpawnPoint: function() {
-        var unit = this,
-            spawn = null,
-            spawns = worldHandler.findUnitsByName('player_spawn_point', unit.zone);
+  findNearestSpawnPoint: function() {
+    var unit = this,
+      spawn = null,
+      spawns = worldHandler.findUnitsByName('player_spawn_point', unit.zone);
 
-        if(spawns.length === 0) {
-            return spawn;
-        }
+    if (spawns.length === 0) {
+      return spawn;
+    }
 
-        if(spawns.length === 1) {
-            spawn = spawns[0];
-        }
+    if (spawns.length === 1) {
+      spawn = spawns[0];
+    }
 
-        var distance = Number.MAX_VALUE;
-        _.each(spawns, function(point) {
-            var d = DistanceBetweenPoints(unit.position.x, unit.position.z, point.position.x, point.position.z);
-            if(d < distance) {
-                spawn = point;
-                distance = d;
-            }
-        });
+    var distance = Number.MAX_VALUE;
+    _.each(spawns, function(point) {
+      var d = DistanceBetweenPoints(unit.position.x, unit.position.z, point.position.x, point.position.z);
+      if (d < distance) {
+        spawn = point;
+        distance = d;
+      }
+    });
 
-        return spawn;
-    },
+    return spawn;
+  },
   ChangeCell: function(newCellX, newCellZ) {
     // Make sure we generate adjacent cells if they don't exist
     var cx = this.cellX;
@@ -366,25 +368,29 @@ var Unit = Class.extend({
       // First, remove us from our world cell and add ourselves to the right cell
       // Remove the unit from the world cells
       if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
-        var units = worldHandler.world[zone][cx][cz].units;
-        var removeUnit = _.find(units, function(unit) {
-          return unit.id == this.id;
-        }, this);
-        worldHandler.world[zone][cx][cz].units = _.without(units, removeUnit);
+        // var units = worldHandler.world[zone][cx][cz].units;
+        // var removeUnit = _.find(units, function(unit) {
+        //   return unit.id == this.id;
+        // }, this);
+        // worldHandler.world[zone][cx][cz].units = _.without(units, removeUnit);
+        worldHandler.removeUnitFromCell(this, cx, cz);
       }
 
 
       // Add to the new cell
       // What if the cell doesn't exist? Don't add?
       if (worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) {
-        worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
-      } else {
+        // worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
+        worldHandler.addUnitToCell(this, newCellX, newCellZ);
+      }
+      else {
         log("[ChangeCell] Cell does not exist for unit #" +
           this.id + " (" + cellPos.x + ", " + cellPos.z + ")");
         if (this.isPlayer() && this.editor) {
           log("[ChangeCell] Generating cell because he's an editor.");
           worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
-          worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
+          // worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
+          worldHandler.addUnitToCell(this, newCellX, newCellZ);
         }
       }
 
@@ -463,8 +469,7 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-
-    worldHandler.world[zone][cx][cz].units = _.without(worldHandler.world[zone][cx][cz].units, this);
+    worldHandler.removeUnitFromCell(this, this.cellX, this.cellZ);
 
     for (var x = cx - 1; x <= cx + 1; x++) {
       for (var z = cz - 1; z <= cz + 1; z++) {
@@ -516,56 +521,32 @@ var Unit = Class.extend({
   },
   CalculatePath: function(targetPosition) {
 
+    if (this.navigationMeshGroup) {
+      var paths = pathFinder.findPath(this.position,
+        targetPosition,
+        this.zone,
+        this.navigationMeshGroup);
 
-    var allNodes = this.connectedNodeList;
-
-    var closestNode = null;
-    var distance = Math.pow(50, 2);
-
-    _.each(allNodes, function(node) {
-      var measuredDistance = DistanceSq(node.pos, this.position);
-      if (measuredDistance < distance) {
-        closestNode = node;
-        distance = measuredDistance;
+      if ( paths ) {
+        while (paths[0] && paths[0].distanceToSquared(this.targetNodePosition) < 0.5) {
+          paths.shift();
+        }
       }
-    }, this);
 
-    // Store the closest node
-    this.closestNode = closestNode;
-
-
-
-    var farthestNode = null;
-    distance = Math.pow(50, 2);
-    //for(var x=0;x<allNodes.length;x++){
-
-    _.each(allNodes, function(node) {
-      var measuredDistance = DistanceSq(node.pos, targetPosition);
-      if (measuredDistance < distance) {
-        farthestNode = node;
-        distance = measuredDistance;
+      if (paths && paths[0]) {
+        this.targetNodePosition.copy(paths[0]);
       }
-    }, this);
-
-    // If we can't find any node, just go straight to the target
-    if (!closestNode || !farthestNode) {
-      //this.targetNodePosition = targetPosition.clone();
-      return;
+      else {
+        // No match found, just go straight for the target
+        this.targetNodePosition.copy(this.position);
+      }
+    }
+    else {
+      // With no navigation data, just go to the target
+      this.targetNodePosition.copy(this.position);
     }
 
-    var paths = astar.search(allNodes, closestNode, farthestNode);
 
-
-    // If the path is empty, go straight for the target
-    if (paths.length === 0) {
-      //this.targetNodePosition = targetPosition.clone();
-      // log("[CalculatePath] No path found, going straight for the target! new targetNodePosition: "+this.targetNodePosition.ToString());
-    } else {
-      // Go for the first node in the list
-      this.targetNodePosition = ConvertVector3(paths[0].pos);
-      // log("[CalculatePath] Path found, going for the first in the list! new targetNodePosition: "+this.targetNodePosition.ToString());
-      // log("[CalculatePath] First node ID: "+paths[0].id);
-    }
 
   },
   Say: function(text) {

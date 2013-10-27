@@ -19,9 +19,10 @@ var State = require('../state'),
     THREE = require('../../../../common/three'),
     VectorDistance = THREE.VectorDistance;
 
+var pathFinder = require(APP_ROOT_PATH+ '/src/server/game/pathFinder.js');
+
 var Wander = State.extend({
-    init: function(waypoints, options) {
-        this.waypoints = waypoints;
+    init: function(options) {
         this.targetPosition = new THREE.Vector3();
         this.options = options || {};
         this.options.minWaitTime = this.options.minWaitTime === undefined ? 1 : this.options.minWaitTime;
@@ -39,19 +40,21 @@ var Wander = State.extend({
         if (VectorDistance(unit.position, this.targetPosition) < 1.0 && !this.hasReachedWaypoint) {
             this.hasReachedWaypoint = true;
             // Get a random waypoint nearby and travel to it
-            if (unit.connectedNodeList.length === 0) {
-                // log("[Wander] Error: No nodes found!");
-            } else {
-                var me = this;
-                var newPoint = _.sample(me.waypoints);
 
-                setTimeout(function() {
-                    me.targetPosition = newPoint;
-                    me.hasReachedWaypoint = false;
-                }, _.sample(_.range(this.options.minWaitTime, this.options.maxWaitTime)) * 1000);
+            var me = this;
+            var newPoint = pathFinder.getRandomNode(unit.zone,
+                unit.navigationMeshGroup,
+                unit.startPosition,
+                unit.template.spawnguardradius);
+
+            setTimeout(function() {
+                me.targetPosition = newPoint;
+                // console.log("[Wander] Traveling to ", newPoint);
+                me.hasReachedWaypoint = false;
+            }, _.sample(_.range(this.options.minWaitTime, this.options.maxWaitTime)) * 1000);
 
                 // log("[Wander] Traveling to node "+randomNode.id+"...");
-            }
+
         }
 
         //unit.steeringForce = unit.steeringBehaviour.Wander();

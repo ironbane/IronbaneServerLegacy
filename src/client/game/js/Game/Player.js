@@ -93,7 +93,6 @@ var Player = Fighter.extend({
 
         this.lookAtPosition = new THREE.Vector3();
 
-        this.pathFinder = IB.PathFinder();
     },
     getTotalCoins: function() {
         //console.log('getTotalCoins', socketHandler.playerData.items);
@@ -266,10 +265,10 @@ var Player = Fighter.extend({
     tick: function(dTime) {
         var player = this;
 
-        
-        this.pathFinder.tick(dTime);
+
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
         debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+
 
         // Check for loot bags, chests, and vendors nearby
         var found = player.checkForLoot();
@@ -707,45 +706,10 @@ var Player = Fighter.extend({
 
         // Don't send heavy packets
 
-        // Make a list of all NPC's in line of sight
-        var npcLOS = [];
-
-        var ourpos = ironbane.player.position.clone().add(new THREE.Vector3(0, 0.5, 0));
-
-        // Do a raycast for each NPC
-        for (var u = 0; u < ironbane.unitList.length; u++) {
-            var unit = ironbane.unitList[u];
-
-            if (unit instanceof Fighter && unit.inRangeOfUnit(ironbane.player, 30) && !(unit.isPlayer())) {
-
-
-
-                var dir = unit.position.clone().add(new THREE.Vector3(0, 0.5, 0)).sub(ourpos);
-                // With a small offset to account for NPCs stuck in walls
-                var distance = dir.length() - 0.5;
-                var ray = new THREE.Raycaster(ourpos, dir.normalize(), 0, distance);
-
-
-                var intersects = terrainHandler.rayTest(ray, {
-                    testMeshesNearPosition: unit.position,
-                    extraRange: distance,
-                    unitReference: this,
-                    unitRayName: "los"
-                });
-
-                if (intersects.length === 0) {
-                    // In line of sight!
-                    npcLOS.push(unit.id);
-                }
-
-            }
-        }
 
         var data = {
             p: this.object3D.position.clone().Round(2),
-            r: this.targetRotation.y.Round(2),
-            //s: this.speed.Round(2),
-            los: npcLOS
+            r: this.targetRotation.y.Round(2)
         };
 
         if (this.unitStandingOn) data.u = this.unitStandingOn.id;

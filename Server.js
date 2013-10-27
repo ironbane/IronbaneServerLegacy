@@ -38,6 +38,7 @@ var Server = Class.extend({
 
         this.lastBackupTime = this.startTime;
 
+
     },
     AutoBackup: function() {
       log("Creating daily backup...");
@@ -88,7 +89,7 @@ var Server = Class.extend({
         worldHandler.Tick(dTime);
 
 
-
+        // console.log("Tick");
 
         for(var z in worldHandler.world) {
             for(var cx in worldHandler.world[z]) {
@@ -100,10 +101,11 @@ var Server = Class.extend({
 
                         for(var u=0;u<units.length;u++) {
 
-
                             //if ( units[u].id > 0 ) continue;
 
-                            units[u].Tick(dTime);
+                            if ( units[u].active ) {
+                                units[u].Tick(dTime);
+                            }
 
                         }
 

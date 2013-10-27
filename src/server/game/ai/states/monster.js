@@ -23,13 +23,13 @@ var State = require('../state'),
     ChaseEnemy = require('./chaseEnemy');
 
 var outsideSpawnGuardRadius = function(unit) {
-    return unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius;
+    return unit.template.spawnguardradius > 0 && unit.startPosition.distanceToSquared(unit.position) > Math.pow(unit.template.spawnguardradius, 2);
 };
 
 var MonsterState = State.extend({
     init: function() {
         this.wanderRange = 10;
-        this.chaseSpeed = 5;
+        this.chaseSpeed = 4;
         this.walkSpeed = 2;
         this.threatTable = [];
         this.wanderConfig = {
@@ -41,20 +41,8 @@ var MonsterState = State.extend({
         var me = this;
 
         unit.maxSpeed = me.walkSpeed;
-        me.waypointList = [];
-        _.each(unit.connectedNodeList, function(node) {
-            var pos = ConvertVector3(node.pos);
-            if (unit.InRangeOfPosition(pos, me.wanderRange)) {
-                me.waypointList.push(pos);
-            }
-        });
 
-        // If we can't move, don't try
-        if (!me.waypointList.length) {
-            return;
-        }
-
-        unit.stateMachine.changeState(new Wander(me.waypointList, me.wanderConfig));
+        unit.stateMachine.changeState(new Wander(me.wanderConfig));
     },
     execute: function(unit, dTime) {
         if (!(unit.stateMachine.currentState instanceof ChaseEnemy)) {
@@ -99,15 +87,11 @@ var MonsterState = State.extend({
                 break;
             case "stopChase":
             case "respawned":
-                // If we can't move, don't try
-                if (!this.waypointList.length) {
-                    return;
-                }
 
                 // We lost the enemy or gave  up
 
                 // Go back to wandering
-                unit.stateMachine.changeState(new Wander(this.waypointList, this.wanderConfig));
+                unit.stateMachine.changeState(new Wander(this.wanderConfig));
                 unit.maxSpeed = this.walkSpeed;
                 this.threatTable = [];
                 break;

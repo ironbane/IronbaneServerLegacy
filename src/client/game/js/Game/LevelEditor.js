@@ -25,13 +25,6 @@ var ObjectPlacerModeEnum = {
 };
 
 
-var PathPlacerModeEnum = {
-  NODES : 0,
-  EDGES : 1,
-  DELETE : 2
-};
-
-
 var EditorGUI = function() {
 
   this.globalEnable = !_.isUndefined(localStorage.globalEnable) ? (localStorage.globalEnable === 'true') : false;
@@ -308,14 +301,6 @@ var EditorGUI = function() {
   // NPC editor mode
   this.neDeleteMode = false;
 
-
-  // Path placer
-  this.ppShowWaypoints = false;
-
-  this.ppAutoScanMode = false;
-  this.ppAutoDeleteMode = false;
-  this.ppUseSmallNodes = false;
-  this.ppMaxElevationDiff = 1.0;
 
   // Model placer
   this.enableModelPlacer = false;
@@ -732,10 +717,8 @@ var LevelEditor = Class.extend({
     var fModelPlacer = this.editorGUI.gui.addFolder('Model Placer');
     var fModelPainter = this.editorGUI.gui.addFolder('Model Painter');
     var fNPCEditor = this.editorGUI.gui.addFolder('NPC Editor');
+    
     var fEntityPlacer = this.editorGUI.gui.addFolder('Entity Placer');
-
-    var fPathPlacer = this.editorGUI.gui.addFolder('Path Placer');
-
 
     var fTeleport = this.editorGUI.gui.addFolder('Teleport');
 
@@ -744,12 +727,6 @@ var LevelEditor = Class.extend({
 
     var fPlayerManagement = this.editorGUI.gui.addFolder('Player Management');
 
-
-    guiControls['ppShowWaypoints'] = fPathPlacer.add(this.editorGUI, 'ppShowWaypoints');
-    guiControls['ppAutoScanMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoScanMode');
-    guiControls['ppAutoDeleteMode'] = fPathPlacer.add(this.editorGUI, 'ppAutoDeleteMode');
-    guiControls['ppUseSmallNodes'] = fPathPlacer.add(this.editorGUI, 'ppUseSmallNodes');
-    guiControls['ppMaxElevationDiff'] = fPathPlacer.add(this.editorGUI, 'ppMaxElevationDiff');
 
 
     guiControls['enableModelPlacer'] = fModelPlacer.add(this.editorGUI, 'enableModelPlacer');
@@ -1062,35 +1039,6 @@ var LevelEditor = Class.extend({
 
     guiControls['selectModel'].onFinishChange(function(value) {
       checkPreviewMesh();
-    });
-
-
-    guiControls['ppShowWaypoints'].onFinishChange(function(value) {
-      for(var c in terrainHandler.cells) terrainHandler.cells[c].ReloadWaypointsOnly();
-    });
-
-    guiControls['ppAutoScanMode'].onFinishChange(function(value) {
-      if ( value ) {
-
-        _.each([
-          'Entering Autoscan mode...',
-          'Simply walk around to add navigation points.',
-          'For narrow areas, use the Small Nodes setting.',
-        ], function(msg) {
-          hudHandler.AddChatMessage(msg);
-        });
-      }
-    });
-
-    guiControls['ppAutoDeleteMode'].onFinishChange(function(value) {
-      if ( value ) {
-        _.each([
-          'Entering Autodelete mode...',
-          'Simply walk around to delete navigation points that are near the player.',
-        ], function(msg) {
-          hudHandler.AddChatMessage(msg);
-        });
-      }
     });
 
     //$('#tileSelectBox').css('width', (frameWidth-20)+'px');

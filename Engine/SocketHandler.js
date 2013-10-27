@@ -2063,130 +2063,6 @@ var SocketHandler = Class.extend({
                 reply(true);
             });
 
-            socket.on("ppAddNode", function (position, reply) {
-
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                if (!_.isFunction(reply)) {
-                    log('ppAddNode no callback defined!');
-                    return;
-                }
-
-                position = ConvertVector3(position).Round(2);
-
-                var zone = socket.unit.zone;
-
-                // Check if there is a node at this position
-                var existingNode = null;
-                _.each(worldHandler.world[zone], function(cx) {
-                    _.each(cx, function(cz) {
-                        if ( cz.graph === undefined ) return;
-                        if ( cz.graph.nodes === undefined ) return;
-                        _.each(cz.graph.nodes, function(node) {
-                            if ( VectorDistanceSq(ConvertVector3(node.pos), position) < 1 ) {
-                                existingNode = node;
-                            }
-                        });
-                    });
-                });
-
-                if ( !existingNode ) {
-                    var newNodeID = worldHandler.getWaypointID(zone);
-
-                    nodeHandler.AddNode(zone, newNodeID, position);
-
-                    var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                    worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-
-                    socket.unit.EmitNearby("ppAddNode", {
-                        id: newNodeID,
-                        pos: position
-                    }, 0, true);
-
-                    reply({
-                        newNodeID:newNodeID
-                    });
-                }
-                else {
-                    socket.unit.EmitNearby("ppAddNode", {
-                        id: existingNode.id,
-                        pos: position
-                    }, 0, true);
-
-                    reply({
-                        newNodeID:existingNode.id
-                    });
-                }
-            });
-
-            socket.on("ppAddEdge", function (data, reply) {
-
-                // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                if (!_.isFunction(reply)) {
-                    log('ppAddEdge no callback defined!');
-                    return;
-                }
-
-                if ( !CheckData(data, ["from","to","twoway"]) ) {
-                    reply({
-                        errmsg:"Corrupt AddEdge data"
-                    });
-                    return;
-                }
-
-                var zone = socket.unit.zone;
-
-                nodeHandler.AddEdge(zone, data.from, data.to, data.twoway);
-
-                var position = nodeHandler.GetNodePosition(zone, data.from);
-
-                var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-
-                socket.unit.EmitNearby("ppAddEdge", data, 0, true);
-
-            });
-
-
-            socket.on("ppDeleteNode", function (data, reply) {
-
-                // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
-
-                if (!_.isFunction(reply)) {
-                    log('ppDeleteNode no callback defined!');
-                    return;
-                }
-
-                if ( !CheckData(data, ["id"]) ) {
-                    reply({
-                        errmsg:"Corrupt node data"
-                    });
-                    return;
-                }
-
-                var zone = socket.unit.zone;
-
-                // Check if the node is there
-                var nodeInfo = nodeHandler.GetNodeArrayIndex(zone, data.id);
-                if ( !nodeInfo ) return;
-
-
-                var position = nodeHandler.GetNodePosition(zone, data.id);
-
-                nodeHandler.DeleteNode(zone, data.id);
-
-
-
-
-                var cellPos = WorldToCellCoordinates(position.x, position.z, cellSize);
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-
-
-                socket.unit.EmitNearby("ppDeleteNode", data, 0, true);
-            });
             socket.on("disconnect", function (data) {
                 if (socket.unit) {
                     log(socket.unit.name + " disconnected.");
@@ -2201,20 +2077,13 @@ var SocketHandler = Class.extend({
 
                 if ( socket.unit ) {
 
-                    if ( !CheckData(data, ["p","r","los"]) ) {
+                    if ( !CheckData(data, ["p","r"]) ) {
                         return;
                     }
 
                     if ( !CheckVector(data.p) ) return;
 
                     if ( !_.isNumber(data.r) ) return;
-
-                    if ( !_.isArray(data.los) ) return;
-
-                    for(var x=0;x<data.los.length;x++) {
-                        if ( !_.isNumber(data.los[x]) ) return;
-                    }
-
 
                     var p = ConvertVector3(data.p);
 
@@ -2224,21 +2093,6 @@ var SocketHandler = Class.extend({
                     socket.unit.heading.y = 0;
                     socket.unit.heading.z = Math.cos(radians);
                     socket.unit.heading.normalize();
-
-                    if ( !_.isArray(data.los) ) {
-                        socket.unit.Kick(KickReason.CHEAT);
-                        return;
-                    }
-
-                    for(var u=0;u<data.los.length;u++) {
-                        var n = data.los[u];
-                        if ( !_.isNumber(n) || n >= 0 ) {
-                            socket.unit.Kick(KickReason.CHEAT);
-                            return;
-                        }
-                    }
-
-                    socket.unit.unitsInLineOfSight = data.los;
 
                     socket.unit.side = socket.unit.heading.clone().Perp();
 

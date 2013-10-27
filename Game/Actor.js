@@ -29,8 +29,6 @@ var Actor = MovingUnit.extend({
                 identifier = this.data.scriptName;
             }
 
-            this.BuildWaypoints();
-
             // Load the real state
             var currentState = null;
             switch (this.template.type) {
@@ -60,79 +58,12 @@ var Actor = MovingUnit.extend({
 
             // Check if we have a global state defined
             if (!_.isUndefined(actorScripts[identifier])) {
+                this.isScripted = true;
                 this.stateMachine.setGlobalState(new actorScripts[identifier]());
             }
         }
 
         this._super();
-    },
-    BuildWaypoints: function() {
-        // Calculate realistic routes where we can go to
-        this.connectedNodeList = [];
-
-        // First, find a "home" node from where we'll build our list
-        var closestNode = null;
-        var distance = Math.pow(50, 2);
-        var allNodes = worldHandler.allNodes[this.zone];
-
-        _.each(allNodes, function(node) {
-            var measuredDistance = DistanceSq(node.pos, this.position);
-
-            if (measuredDistance < distance) {
-                closestNode = node;
-                distance = measuredDistance;
-            }
-        }, this);
-
-        if (!closestNode) {
-            log("Warning: no nodes found for NPC " + this.id + " in zone " + this.zone + "!");
-            return;
-        }
-
-        // We got the closest node
-        // Now build a path with all nodes that link to it
-        var me = this;
-
-        function AnnounceOccurredError(msg, amount) {
-            chatHandler.announceRoom('mods', msg + "<br><i>Warning: this error happened " + amount + " seconds ago.</i>", "red");
-        }
-
-        function addEdgeNodes(list, zone, node) {
-            for (var x = 0; x < node.edges.length; x++) {
-                var subNode = worldHandler.allNodes[zone][node.edges[x]];
-
-                if (!subNode) {
-
-                    // // ERROR!
-                    // // Not sure why, so send someone here and investigate
-
-                    // var msg = "Pathfinding node error! Please" +
-                    // " investigate the connection<br>between node <b>"+node.id +
-                    // "</b> and node <b>"+node.edges[x]+"</b>!<br>Location: " +
-                    // ConvertVector3(node.pos).ToString() + " in zone "+me.zone;
-
-                    // chatHandler.announceRoom('mods', msg, "red");
-
-                    // log("ERROR: "+msg);
-
-                    // setTimeout(AnnounceOccurredError(msg, 15), 15000);
-
-                    // setTimeout(AnnounceOccurredError(msg, 60), 60000);
-
-
-                    // // debugger;
-
-                    return;
-                }
-
-                if (!_.contains(list, subNode)) {
-                    list.push(subNode);
-                    addEdgeNodes(list, zone, subNode);
-                }
-            }
-        }
-
-        addEdgeNodes(this.connectedNodeList, this.zone, closestNode);
     },
     Tick: function(dTime) {
         this.stateMachine.update(dTime);

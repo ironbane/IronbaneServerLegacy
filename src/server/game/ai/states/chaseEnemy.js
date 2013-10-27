@@ -32,7 +32,7 @@ var isInvalidPlayer = function(unit) {
 };
 
 var outsideSpawnGuardRadius = function(unit) {
-    return unit.template.spawnguardradius > 0 && VectorDistance(unit.startPosition, unit.position) > unit.template.spawnguardradius;
+    return unit.template.spawnguardradius > 0 && unit.startPosition.distanceToSquared(unit.position) > Math.pow(unit.template.spawnguardradius, 2);
 };
 
 var ChaseEnemy = State.extend({

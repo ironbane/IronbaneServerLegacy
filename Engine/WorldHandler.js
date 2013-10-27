@@ -15,24 +15,29 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var dataPath = assetDir + 'data';
 
-var dataPath = clientDir + 'data';
-var dataPathPersistent = assetDir + 'data';
+var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
+pathFinder.setPath(dataPath);
 
 var WorldHandler = Class.extend({
     Init: function() {
         // World structure
         // [zone][cx][cz]
         this.world = {};
-        this.allNodes = {};
+
         this.switches = {};
         this.awake = false;
         this.hasLoadedWorld = false;
+
+
+
     },
     Awake: function() {
-        var self = this;
 
-        self.BuildZoneWaypoints();
+        this.LoadNavigationNodes();
+
+        var self = this;
 
         // All units ready! Awaken!
         self.LoopUnits(function(u) {
@@ -42,54 +47,9 @@ var WorldHandler = Class.extend({
         log("World has awaken!");
         self.awake = true;
 
-        //self.LoadSwitches();
-    },
-    BuildZoneWaypoints: function() {
-        var self = this;
-        // Load all waypoints!
-        var count = 0;
-        for (var z in self.world) {
-            var subcount = 0;
-            // Every zone has their own set of nodes
-            self.allNodes[z] = {};
-            for (var cx in self.world[z]) {
-                for (var cz in self.world[z][cx]) {
-                    if (self.world[z][cx][cz] === undefined) {
-                        continue;
-                    }
-                    if (self.world[z][cx][cz].graph === undefined) {
-                        continue;
-                    }
-                    if (self.world[z][cx][cz].graph.nodes === undefined) {
-                        continue;
-                    }
-
-                    //self.allNodes = self.world[self.zone][cx][cz]['graph']['nodes'].concat(self.allNodes);
-                    var len = self.world[z][cx][cz].graph.nodes.length;
-                    for (var x = 0; x < len; x++) {
-                        var node = self.world[z][cx][cz].graph.nodes[x];
-                        //console.log(node);
-                        //console.log(self.world[z].allNodes);
-                        //self.world[z].allNodes.node['id'] = node;
-                        self.allNodes[z][node.id] = node;
-                        count++;
-                        subcount++;
-                    }
-                }
-            }
-
-            log("Loaded " + subcount + " waypoints for zone " + z + "");
-        }
-
-        self.LoopUnits(function(u) {
-            if (u instanceof Actor) {
-                u.BuildWaypoints();
-            }
-        });
-
-        log("Loaded " + count + " waypoints in total");
     },
     Tick: function(dTime) {
+
         if (!this.hasLoadedWorld) {
             return;
         }
@@ -107,6 +67,99 @@ var WorldHandler = Class.extend({
                 this.Awake();
             }
         }
+    },
+    addUnitToCell: function(unit, newCellX, newCellZ) {
+
+        var x = newCellX;
+        var z = newCellZ;
+
+        if (worldHandler.CheckWorldStructure(unit.zone, x, z)) {
+            worldHandler.world[unit.zone][x][z].units.push(unit);
+        }
+        else {
+            // We are in a bad cell??? Find a place to spawn! Or DC
+            log("Bad cell found for " + unit.id);
+
+            if (unit.id > 0 && unit.editor) {
+                log("...but I'm generating one because he's an editor.");
+                worldHandler.GenerateCell(unit.zone, x, z);
+                worldHandler.world[unit.zone][x][z].units.push(unit);
+            }
+        }
+
+        if ( unit.id > 0 ) {
+            // Active all NPC's that are nearby
+            this.LoopUnitsNear(unit.zone, newCellX, newCellZ, function(unit) {
+                if ( unit.id < 0 ) {
+                    unit.active = true;
+                }
+            });
+        }
+
+
+    },
+    removeUnitFromCell: function(unit, oldCellX, oldCellZ) {
+
+        var x = oldCellX;
+        var z = oldCellZ;
+
+        worldHandler.world[unit.zone][x][z].units = _.without(worldHandler.world[unit.zone][x][z].units, unit);
+
+        var me = this;
+
+        if ( unit.id > 0 ) {
+            // Active all NPC's that are nearby
+            var allCells = [];
+            var activeCells = [];
+            this.LoopCells(function(cell) {
+                allCells.push(cell);
+                if ( cell.units ) {
+                    var foundUnit = _.find(cell.units, function(unit) {
+                        return unit.id > 0;
+                    });
+                    if ( foundUnit !== undefined ) {
+                        // Add all nearby cells
+                        me.LoopCellsNear(foundUnit.zone, foundUnit.cellX, foundUnit.cellZ, function(cell) {
+                            activeCells.push(cell);
+                        });
+                    }
+                }
+            });
+
+            var cellsToBeDisabled = _.difference(allCells, activeCells);
+
+            _.each(cellsToBeDisabled, function(cell) {
+                if ( cell.units ) {
+                    _.each(cell.units, function(unit) {
+                        if ( unit.id < 0 ) {
+                            unit.active = false;
+                        }
+                    });
+                }
+            });
+        }
+
+
+    },
+    buildCellsArray: function() {
+        // TODO actually use these for ticking
+        var me = this;
+        me.allCells = [];
+        this.LoopCells(function(cell) {
+            me.allCells.push(cell);
+        });
+    },
+    LoadNavigationNodes: function() {
+
+        console.log("Loading navigation nodes...");
+
+        _.each(this.world, function(z, i) {
+            pathFinder.loadZone(i);
+        });
+
+
+        pathFinder.test();
+
     },
     SaveWorld: function() {
         this.LoopCellsWithIndex(function(z, cx, cz) {
@@ -195,27 +248,11 @@ var WorldHandler = Class.extend({
                     continue;
                 }
 
-
-                self.BuildWorldStructure(zone, cx, cz);
-
-                // Load navigation graph, even in a light world because we need it
-                if (file === "graph.json") {
-                    try {
-                        var path = dataPath + "/" + zone + "/" + cx + "/" + cz;
-                        var stats = fs.lstatSync(path + "/graph.json");
-
-                        if (stats.isFile()) {
-                            self.world[zone][cx][cz].graph = JSON.parse(fs.readFileSync(path + "/graph.json", 'utf8'));
-                        }
-                    } catch (e) {
-                        throw e;
-                    }
-                }
-
-
                 if (file !== "objects.json") {
                     continue;
                 }
+
+                self.BuildWorldStructure(zone, cx, cz);
 
                 self.world[zone][cx][cz].objects = [];
                 self.world[zone][cx][cz].units = [];
@@ -234,7 +271,12 @@ var WorldHandler = Class.extend({
                 log("Loaded " + z + " cells in zone " + v);
             });
 
+
+            // For more performant ticking
+            self.buildCellsArray();
+
             self.hasLoadedWorld = true;
+
         });
     },
     // all of these loop methods are like forEach
@@ -247,14 +289,14 @@ var WorldHandler = Class.extend({
             }
         });
     },
-    LoopUnitsNear: function(zone, cellX, cellZ, fn) {
+    LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
         this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
             if (!_.isUndefined(cell.units)) {
                 _.each(cell.units, function(unit) {
                     fn(unit);
                 });
             }
-        });
+        }, offset);
     },
     LoopCells: function(fn) {
         _.each(this.world, function(zone) {
@@ -265,11 +307,14 @@ var WorldHandler = Class.extend({
             });
         });
     },
-    LoopCellsNear: function(zone, cellX, cellZ, fn) {
+    LoopCellsNear: function(zone, cellX, cellZ, fn, offset) {
+
+        offset = offset || 1;
+
         var self = this;
 
-        for (var x = cellX - 1; x <= cellX + 1; x++) {
-            for (var z = cellZ - 1; z <= cellZ + 1; z++) {
+        for (var x = cellX - offset; x <= cellX + offset; x++) {
+            for (var z = cellZ - offset; z <= cellZ + offset; z++) {
                 if (self.CheckWorldStructure(zone, x, z)) {
                     fn(self.world[zone][x][z]);
                 }
@@ -312,6 +357,7 @@ var WorldHandler = Class.extend({
     LoadUnits: function(zone, cellX, cellZ) {
         var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize),
             self = this;
+
 
         mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?', [zone, (worldPos.x - cellSizeHalf), (worldPos.z - cellSizeHalf), (worldPos.x + cellSizeHalf), (worldPos.z + cellSizeHalf)],
             function(err, results) {
@@ -401,7 +447,8 @@ var WorldHandler = Class.extend({
                     data.rotx = data.data.rotX;
                     data.roty = data.data.rotY;
                     data.rotz = data.data.rotZ;
-                } else if (!data || !data.scriptName) {
+                }
+                else if (!data || !data.scriptName) {
                     // Can't live without a script!
                     log("Warning: no script found for Train " + data.id);
                     return;
@@ -474,12 +521,13 @@ var WorldHandler = Class.extend({
     },
     LoadCell: function(zone, cellX, cellZ) {
         // Query the entry
-        var path = (persistentWorldChanges ? dataPathPersistent : dataPath) + "/" + zone + "/" + cellX + "/" + cellZ;
+        var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
 
         fsi.mkdirSync(path, 0777, true, function(err) {
             if (err) {
                 log("Error:" + err);
-            } else {
+            }
+            else {
                 log('Directory created');
             }
         });
@@ -492,18 +540,8 @@ var WorldHandler = Class.extend({
                 if (stats.isFile()) {
                     this.world[zone][cellX][cellZ].objects = JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
                 }
-            } catch (e) {
-                throw e;
             }
-
-            // Load navigation graph
-            try {
-                stats = fs.lstatSync(path + "/graph.json");
-
-                if (stats.isFile()) {
-                    this.world[zone][cellX][cellZ].graph = JSON.parse(fs.readFileSync(path + "/graph.json", 'utf8'));
-                }
-            } catch (e) {
+            catch (e) {
                 throw e;
             }
         }
@@ -516,7 +554,6 @@ var WorldHandler = Class.extend({
 
         this.world[zone][cellX][cellZ].units = [];
         this.world[zone][cellX][cellZ].objects = [];
-        this.world[zone][cellX][cellZ].graph = {};
 
         log("Generated cell (" + cellX + "," + cellZ + ")");
 
@@ -530,7 +567,6 @@ var WorldHandler = Class.extend({
 
         // Instead of saving instantly, we load the cell, overwrite it with the terrain we have, and save it! And empty terrain!
         var buffer_objects = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].objects));
-        var buffer_graph = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].graph));
         var buffer_units = this.world[zone][cellX][cellZ].units;
 
         this.LoadCell(zone, cellX, cellZ);
@@ -540,7 +576,6 @@ var WorldHandler = Class.extend({
             buffer_objects = [];
         }
 
-        this.world[zone][cellX][cellZ].graph = buffer_graph;
         this.world[zone][cellX][cellZ].units = buffer_units;
 
         for (var o = 0; o < buffer_objects.length; o++) {
@@ -556,7 +591,8 @@ var WorldHandler = Class.extend({
                     if (pos.x === loopObj.x && pos.y === loopObj.y && pos.z === loopObj.z) {
                         if (_.isEmpty(obj.metadata)) {
                             delete loopObj.metadata;
-                        } else {
+                        }
+                        else {
 
                             if (_.isUndefined(loopObj.metadata)) {
                                 loopObj.metadata = {};
@@ -585,51 +621,18 @@ var WorldHandler = Class.extend({
 
         // Query the entry
         var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
-        var pathPersistent = dataPathPersistent + "/" + zone + "/" + cellX + "/" + cellZ;
 
         fsi.mkdirSync(path, 0777, true, function(err) {
             if (err) {
                 log("Error:" + err);
-            } else {
+            }
+            else {
                 log('Directory created');
             }
         });
 
-        // Same for persistent data
-        if (persistentWorldChanges) {
-            fsi.mkdirSync(pathPersistent, 0777, true, function(err) {
-                if (err) {
-                    log("Error:" + err);
-                } else {
-                    log('Directory created');
-                }
-            });
-        }
-
         var str = JSON.stringify(this.world[zone][cellX][cellZ].objects, null, 4);
         fs.writeFileSync(path + "/objects.json", str);
-
-        if (persistentWorldChanges) {
-            fs.writeFileSync(pathPersistent + "/objects.json", str);
-        }
-
-        // Clean up the nodes first
-        astar.cleanUp(this.world[zone][cellX][cellZ].graph);
-
-        // Rebuild the zone waypoints
-        if (this.buildZoneWaypointsTimer) {
-            clearTimeout(this.buildZoneWaypointsTimer);
-        }
-        this.buildZoneWaypointsTimer = setTimeout(function() {
-            self.BuildZoneWaypoints();
-        }, 5000);
-
-        str = JSON.stringify(this.world[zone][cellX][cellZ].graph, null, 4);
-        fs.writeFileSync(path + "/graph.json", str);
-
-        if (persistentWorldChanges) {
-            fs.writeFileSync(pathPersistent + "/graph.json", str);
-        }
 
         log("Saved cell (" + cellX + "," + cellZ + ") in zone " + zone + "");
 
@@ -688,7 +691,8 @@ var WorldHandler = Class.extend({
                     }
                 }
             }
-        } else {
+        }
+        else {
             for (z in self.world) {
                 for (cx in self.world[z]) {
                     for (cz in self.world[z][cx]) {
@@ -742,7 +746,8 @@ var WorldHandler = Class.extend({
                     }
                 }
             }
-        } else {
+        }
+        else {
             for (z in self.world) {
                 for (cx in self.world[z]) {
                     for (cz in self.world[z][cx]) {
@@ -789,25 +794,25 @@ var WorldHandler = Class.extend({
 
 
 
-    for(var z in worldHandler.world) {
-      for(var cx in worldHandler.world[z]) {
-        for(var cz in worldHandler.world[z][cx]) {
+        for (var z in worldHandler.world) {
+            for (var cx in worldHandler.world[z]) {
+                for (var cz in worldHandler.world[z][cx]) {
 
-          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+                    if (!_.isUndefined(worldHandler.world[z][cx][cz].units)) {
 
-            var units = worldHandler.world[z][cx][cz].units;
+                        var units = worldHandler.world[z][cx][cz].units;
 
-            for(var u in units) {
+                        for (var u in units) {
 
-              if (units[u].isPlayer()){
+                            if (units[u].isPlayer()) {
 
-              if ( units[u].name === name ) return units[u];
+                                if (units[u].name === name) return units[u];
+                            }
+                        }
+                    }
+                }
             }
-            }
-          }
         }
-    }
-}
         return null;
     },
     FindUnitNear: function(id, nearUnit) {
@@ -852,26 +857,6 @@ var WorldHandler = Class.extend({
             }
         }
         return false;
-    },
-    getWaypointID: function(zone) {
-        if (_.isUndefined(this.world[zone])) {
-            return -1;
-        }
-
-        // Todo: cache properly
-        var waypointIDCount = 0;
-
-        this.LoopCells(function(cell) {
-            if (!_.isUndefined(cell.graph)) {
-                if (!_.isUndefined(cell.graph.nodes)) {
-                    for (var n = 0; n < cell.graph.nodes.length; n++) {
-                        waypointIDCount = Math.max(waypointIDCount, cell.graph.nodes[n].id);
-                    }
-                }
-            }
-        });
-
-        return waypointIDCount + 1;
     }
 });
 

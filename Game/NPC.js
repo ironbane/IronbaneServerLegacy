@@ -147,19 +147,19 @@ var NPC = Fighter.extend({
         deceleration = deceleration || Deceleration.FAST;
 
 
-        //log("TravelToPosition dist:");
-        //console.log(distance);
+        // log("TravelToPosition dist:");
+        // console.log(distance);
         var targetPositionDistance = DistanceSq(this.position, targetPosition);
-
-        // if ( distance < 1 || this.calculateNewPathTimeout <= 0) {
-        if ( distance < 0.5 ) {
+        // debugger;
+        if ( distance < 0.5 || this.calculateNewPathTimeout <= 0) {
+        // if ( distance < 0.5 ) {
             this.calculateNewPathTimeout = 2.0;
 
             if ( targetPositionDistance > 1 ) {
-                //log("[TravelToPosition] Calculating new path to "+targetPosition.ToString());
+                // console.log("[TravelToPosition] Calculating new path to ", targetPosition);
                 this.CalculatePath(targetPosition);
 
-                //log("[TravelToPosition] Node Path: "+this.targetNodePosition.ToString());
+                // console.log("[TravelToPosition] Node Path: ", this.targetNodePosition);
             }
         }
 
