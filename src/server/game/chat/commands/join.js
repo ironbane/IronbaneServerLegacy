@@ -21,16 +21,25 @@
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
+    var _ = require('underscore');
+
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-            var room = params[0],
-                success = false;
+            var room = params[0].toLowerCase(),
+                success = false,
+                rooms = chatHandler.listRooms(),
+                exists = _.find(rooms, function(r) {
+                    return r.toLowerCase() === room;
+                });
+
+            //console.log('joining room: ', exists);
 
             // for now hard coded room rules
-            if (unit.editor) {
-                // editors can join whatever they want
-                unit.socket.join(room);
+            if (unit.editor || !exists) { // TODO: swear filter on room names?
+                console.log('editor or non exists room', exists);
+                // editors can join whatever they want or if the room doesn't already exist
+                unit.socket.join(exists || room);
                 success = true;
             } else if (room === 'mods' || room === 'editors' || room === 'admins' || room === '__nick__') {
                 errorMessage = "Insufficient privledges.";
@@ -38,10 +47,11 @@ module.exports = function(items, units, worldHandler, chatHandler) {
                 errorMessage = "Only for guests!";
             } else if (room.indexOf('zone') >= 0 && (parseInt(room.split('zone')[1], 10) !== unit.zone)) {
                 errorMessage = "Cannot join a zone you are not in.";
-            } else if (chatHandler.listPlayers('').indexOf(room) >= 0 && unit.name !== room) {
+            } else if (chatHandler.listPlayers().indexOf(exists) >= 0 && unit.name !== exists) {
                 errorMessage = "Not allowed to join another players private message room.";
             } else {
-                unit.socket.join(room);
+                console.log('existing room join: ', room, exists);
+                unit.socket.join(exists);
                 success = true;
             }
 

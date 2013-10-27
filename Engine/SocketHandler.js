@@ -89,7 +89,20 @@ var SocketHandler = Class.extend({
                 socket.join('__nick__');
             }
             // join a channel in your own name for private messaging
+            // user will take priority over other rooms created prior to their login
+            var userRoom = _.find(chatHandler.listRooms(), function(room) {
+                return room.toLowerCase() === unit.name.toLowerCase();
+            });
+            if(userRoom) {
+                _.each(io.sockets.clients(userRoom), function(client) {
+                    if(client.unit) {
+                        chatHandler.announcePersonally(client.unit, "Booted from another user's PM room: " + userRoom);
+                    }
+                    client.leave(userRoom);
+                });
+            }
             socket.join(unit.name);
+
             // join a zone based channel (todo: join/leave on changing zones)
             socket.join('zone_' + unit.zone);
             // cell and/or "nearby" type channels? (to localize chat bubbles)
