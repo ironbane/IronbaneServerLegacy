@@ -144,8 +144,8 @@
     IB.zoneTypeConfig[IB.ZoneTypeEnum.HAUNTEDMANSION] = {
         "enableFluid": true,
         "fluidLevel": 0.5,
-        "fluidTexture": 102,
-        "fluidTextureGlow": 101,
+        "fluidTexture": 1650,
+        "fluidTextureGlow": 1651,
         "fluidType": "water",
         "enableClouds": false,
         "cloudDensity": 0.0,
