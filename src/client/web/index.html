@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="IronbaneApp">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Ironbane! {{ subTitle }}</title>
 
     <!-- we need to base at other than root -->
     <base href="@@root/" />
 
-    <link rel="stylesheet" type="text/css" href="/css/ironbane.css">
+    <link rel="stylesheet" href="/css/ironbane.css" />
 
-    <link rel="stylesheet" type="text/css" href="/lib/markitup/skins/markitup/style.css" />
-<link rel="stylesheet" type="text/css" href="/lib/markitup/sets/bbcode/style.css" />
+    <link rel="stylesheet" href="/lib/markitup/skins/markitup/style.css" />
+    <link rel="stylesheet" href="/lib/markitup/sets/bbcode/style.css" />
+    <script src="/lib/jquery-2.0.3.min.js"></script>
+   <script src="/lib/angular-1.1.4/angular.min.js"></script>
+<script src="/lib/angular-ui/ui-utils.js"></script>
 
-    <script src="/lib/jquery-2.0.0.min.js"></script>
-    <script src="/lib/angular-1.1.4/angular.min.js"></script>
-    <script src="/lib/angular-ui/ui-utils.js"></script>
 
-
-<script type="text/javascript" src="/lib/markitup/jquery.markitup.js"></script>
-<script type="text/javascript" src="/lib/markitup/sets/bbcode/set.js"></script>
+<script src="/lib/markitup/jquery.markitup.js"></script>
+<script src="/lib/markitup/sets/bbcode/set.js"></script>
 
 
     
@@ -52,7 +51,6 @@
                         <li><a href="/article/faq">FAQ</a></li>
                         <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
                         <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
-                        <li ng-show="currentUser.$hasRole('ADMIN')"><a href="/admin">memory</a></li>
                     </ul>
                 </div>
 
