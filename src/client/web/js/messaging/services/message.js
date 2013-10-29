@@ -20,6 +20,15 @@ angular.module('IronbaneApp')
         });
     };
 
+    Message.delete = function(messageIds){
+        return $http.post('/api/messages/delete', messageIds)
+        .then(function(results){
+        $log.log("ALL OK!");
+       }, function(err){
+        $log.log("WHOOPS");
+       });
+    };
+
     Message.send = function(message){
        return $http.post('/api/message', message)
        .then(function(results){

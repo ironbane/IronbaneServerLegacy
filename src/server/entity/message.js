@@ -27,6 +27,16 @@ module.exports = function(db) {
         }
     });
 
+    Message.delete = function(messageIds){
+        var deferred = Q.defer();
+        log(messageIds);
+        db.query("SELECT * from bcs_messages where id in ?" , messageIds, function(results){
+            log(JSON.stringify(results));
+            return deferred.resolve();
+        });
+        return deferred.promise;
+    };
+
     Message.create = function(message){
         var deferred = Q.defer();
         var toUserQ = "(SELECT id as to_user from bcs_users where name = '" + message.to_user + "' ) ";

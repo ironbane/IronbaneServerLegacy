@@ -22,6 +22,17 @@ module.exports = function(app, db) {
         });
     });
 
+    app.post('/api/messages/delete', function(req, res){
+        log(req.body);
+        Message.delete(req.body).then(function(messages) {
+            // send back the completed details
+            res.send(messages);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
+
     app.get('/api/messages/', function(req, res){
         Message.getAll(req.user.id).then(function(messages) {
             // send back the completed details

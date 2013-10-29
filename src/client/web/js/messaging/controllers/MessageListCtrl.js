@@ -24,8 +24,14 @@ angular.module('IronbaneApp')
 			  }, true);
 
             $scope.deletePost = function(){
-            	
-                $scope.message = "deletePost";        
+                $log.log("deleting");
+            	var selectedPosts = [];
+                angular.forEach($scope.messages, function(message){
+                    if(message.checked){
+                        selectedPosts.push(message.id);
+                    }
+                });
+                Message.delete(selectedPosts);        
             };                    
         }
     ]);
