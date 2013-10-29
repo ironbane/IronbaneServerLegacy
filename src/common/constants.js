@@ -152,7 +152,6 @@
         "skyboxShader": "dungeon",
         "lightSystem": IB.LightSystemEnum.DUNGEON,
         "music": ["music/dissonantwaltz"]
-        
     };
     
         IB.LootBagTypeEnum = {
