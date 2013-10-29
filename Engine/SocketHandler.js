@@ -643,7 +643,9 @@ var SocketHandler = Class.extend({
 
                     // Hacky: refers to lootBag ID
                     template: dataHandler.units[lootBagTemplate],
-
+                    data: {
+                        droppedBy: player.id
+                    },
                     roty: 0
                 }, false);
 
