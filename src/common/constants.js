@@ -72,7 +72,8 @@
         WORLD: 1,
         DUNGEON: 2,
         TUTORIAL: 3,
-        CASTLE: 4
+        CASTLE: 4,
+        HAUNTEDMANSION: 5,
     };
 
     IB.LightSystemEnum = {
