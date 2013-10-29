@@ -139,8 +139,23 @@
         "lightSystem": IB.LightSystemEnum.DUNGEON,
         "music": ["music/castle"]
     };
-
-    IB.LootBagTypeEnum = {
+    
+    IB.zoneTypeConfig[IB.ZoneTypeEnum.HAUNTEDMANSION] = {
+        "enableFluid": true,
+        "fluidLevel": 0.5,
+        "fluidTexture": 102,
+        "fluidTextureGlow": 101,
+        "fluidType": "water",
+        "enableClouds": false,
+        "cloudDensity": 0.0,
+        "cloudLevel": 0,
+        "skyboxShader": "dungeon",
+        "lightSystem": IB.LightSystemEnum.DUNGEON,
+        "music": ["music/dissonantwaltz"]
+        
+    };
+    
+        IB.LootBagTypeEnum = {
         COMMON: 0,
         UNCOMMON: 1,
         EPIC: 2,
