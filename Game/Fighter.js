@@ -524,6 +524,41 @@ var Fighter = Actor.extend({
 
         return null;
     },
+    // test if has item in inventory
+    hasItem: function(query) {
+        var found;
+
+        if(_.isString(query)) {
+            // check by name
+            found = _.find(this.items, function(item) {
+                return item.$template.name === query;
+            });
+        } else {
+            // assume ID
+            found = _.find(this.items, function(item) {
+                return item.template === query;
+            });
+        }
+
+        return !!found;
+    },
+    hasItemEquipped: function(query) {
+        var found;
+
+        if(_.isString(query)) {
+            // check by name
+            found = _.find(this.items, function(item) {
+                return item.$template.name === query;
+            });
+        } else {
+            // assume ID
+            found = _.find(this.items, function(item) {
+                return item.template === query;
+            });
+        }
+
+        return found && found.equipped;
+    },
     getTotalCoins: function() {
         // sum value of cash items in inventory
         return _.reduce(_.pluck(_.where(this.items, {

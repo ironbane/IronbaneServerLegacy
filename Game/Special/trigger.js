@@ -48,10 +48,14 @@ var Trigger = Unit.extend({
                 // still in range, maybe get a pulse
                 if(trigger.triggerTimeout <= 0) {
                     trigger.onTick(unit);
-                    trigger.triggerTimeout = trigger.triggerInterval;
                 }
             }
         });
+
+        // dont reset tick trigger timer until whole loop done
+        if(trigger.triggerTimeout <= 0) {
+            trigger.triggerTimeout = trigger.triggerInterval;
+        }
 
         // clear guests of quitters outside the first loop
         trigger.guests = _.difference(trigger.guests, quitters);
@@ -79,7 +83,7 @@ var Trigger = Unit.extend({
         if(actorScripts.hasOwnProperty(trigger.data.script) && _.isFunction(actorScripts[trigger.data.script].onEnter)) {
             actorScripts[trigger.data.script].onEnter.call(trigger, unit);
         } else {
-            console.warn("Script (enter) not loaded for trigger! " + trigger.data.script);
+            //console.warn("Script (enter) not loaded for trigger! " + trigger.data.script);
         }
     },
     onExit: function(unit) {
@@ -95,7 +99,7 @@ var Trigger = Unit.extend({
         if(actorScripts.hasOwnProperty(trigger.data.script) && _.isFunction(actorScripts[trigger.data.script].onExit)) {
             actorScripts[trigger.data.script].onExit.call(trigger, unit);
         } else {
-            console.warn("Script (exit) not loaded for trigger! " + trigger.data.script);
+            //console.warn("Script (exit) not loaded for trigger! " + trigger.data.script);
         }
     },
     onTick: function(unit) {
@@ -111,7 +115,7 @@ var Trigger = Unit.extend({
         if(actorScripts.hasOwnProperty(trigger.data.script) && _.isFunction(actorScripts[trigger.data.script].onTick)) {
             actorScripts[trigger.data.script].onTick.call(trigger, unit);
         } else {
-            console.warn("Script (tick) not loaded for trigger! " + trigger.data.script);
+            //console.warn("Script (tick) not loaded for trigger! " + trigger.data.script);
         }
     }
 });
