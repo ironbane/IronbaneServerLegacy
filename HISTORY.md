@@ -1,5 +1,66 @@
 # History
 
+# 0.4.2 - 28/10/2013
+##Chat
+
+- Improved swearing filter
+= Added a channel system. Usage: /join [room] and /leave [room]
+- Added private messaging: Usage: @[user] [message]
+
+##Game
+
+- Improved world terrain
+
+##Bug fixes
+
+- Fixed lag when having a lot of projectiles on the screen
+- Fixed some NPC's being naked
+- You can no longer chat empty messages
+- You can no longer register the same username
+
+# 0.4 - 06/10/2013 
+##Chat
+
+- The swearfilter now also works on the chat bubbles
+- Added /stuck command
+
+#Game
+
+- Added zeppelins
+- Added civilians
+- Added a lot of new models
+- Added basic aggro system
+- Improved and more detailed zones
+- Improved pathfinding for NPC's
+- Turrets now have an appearance
+- Improved lighting and atmosphere
+- You can now aim directly on NPC's (before you had to aim at the ground they were standing on)
+
+##Interface
+
+- Creating a new character now randomizes the appearance
+
+##Bug fixes
+
+- Fixed IB not working on Firefox and Linux
+- Holding the jump key now correctly makes the player jump repeatedly
+- Falling through the world is now less likely to happen
+- Fixed "ghost mode"
+- Arrows and bows now play the correct sounds
+- Fixed buggy jumping in water
+- Fixed turrets sometimes not shooting at players
+- Fixed player names in chat having wrong colors
+- Server now auto-restarts every 24 hours to prevent file-reading errors
+- Fixed buttons in the main menu causing layout issues
+- Character customization buttons now work more properly
+- You can no longer get stuck in objects
+- Fixed main menu view being different after already having played
+- Standing on moving objects is now less buggy
+
+##For developers
+
+- We've updated the README on GitHub for the latest details concerning installation.
+
 ## 0.1.6
 
 - Fixed sprites showing black
