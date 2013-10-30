@@ -62,6 +62,11 @@ var SoundHandler = Class.extend({
             volume: 0.5,
             loops: 1
         },
+           {
+            file: "music/dissonantwaltz.mp3",
+            volume: 0.5,
+            loops: 1
+        },
 
         "ui/click.mp3",
         "ui/blip.mp3",
