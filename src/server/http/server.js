@@ -86,7 +86,9 @@ var Server = Class.extend({
             app.use(express.favicon(config.get('buildTarget') + "game/favicon.ico")); // todo: move to common
             app.use(express.compress());
             app.use(express.cookieParser());
-            app.use(express.bodyParser({uploadDir:'./uploads'}));
+            //app.use(express.bodyParser({uploadDir:'./uploads'}));
+            app.use(express.json());
+            app.use(express.urlencoded());
             app.use(express.methodOverride());
             app.use(express.session({
                 secret: config.get('session_secret'),
