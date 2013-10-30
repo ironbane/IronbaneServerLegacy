@@ -25,7 +25,7 @@ module.exports = function(items, units, worldHandler, chatHandler) {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
 
-            var message = "MOVE (W,A,S,D)<br>STRAFE (Q,E)<br>Walk slower, turn faster (shift)<br>Attack (right mouse click)<br>CHAT (enter)<br>If you get stuck (/stuck in chatbox)";
+            var message = "MOVE (W,A,S,D)<br>STRAFE (Q,E)<br>Walk slower, turn faster (shift)<br>Attack (left mouse click)<br>CHAT (enter)<br>If you get stuck (/stuck in chatbox)";
             chatHandler.announcePersonally(unit, message, "yellow");
 
             return {
