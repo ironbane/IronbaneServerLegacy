@@ -61,6 +61,36 @@
 
 - We've updated the README on GitHub for the latest details concerning installation.
 
+# 0.3 - 20/08/2013
+##Chat
+
+- Added a basic swearing filter.
+
+## Game
+
+- The first tutorial chest now has a tutorial graphic explaining what to do. 
+- Player movement now has more friction. 
+- NPC's now attack from a slightly closer range.
+
+## Interface
+
+- Added (funny) loading messages. Feel free to post new ones if you feel creative.
+- Trying to login with a false username or password now clears the password field. 
+- Due to an unfinished new authentification system, logging in or registering a new account needs to refresh the page. This is temporary and we will address this issue shortly.
+
+## Bug fixes
+
+- NPC's no longer stop respawning after a while. 
+- Water splash and jump sounds no longer play repeatedly. 
+- Items no longer randomly disappear from the inventory bar when moving them around. 
+- Monster weapons no longer play the wrong sounds 
+- Arrows that hit the ground no longer repeatedly play the impact sound in an annoying way. 
+- Changed the arrow symbols on the character selection screen to resolve a weird spacing issue on mac. 
+- Lava no longer looks dark at night. 
+- Water and lava no longer have a weird stretch texture sometimes. 
+- Trees and other large objects now have shadows again. 
+- NPC's in the distance no longer rapidly bounce up and down.
+
 ## 0.1.6
 
 - Fixed sprites showing black
