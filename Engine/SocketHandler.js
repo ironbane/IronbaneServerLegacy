@@ -823,6 +823,18 @@ var SocketHandler = Class.extend({
                     delete item.price;
                 }
 
+
+                // HACK HACK HACK for halloween 1/11/2013
+                // Quick fix to teleport people out of the mansion when they loot from the chest
+                // in the treasure room
+                if ( bag.id === -2112 ) {
+                    var exit = worldHandler.FindUnit(-2085);
+                    if(exit) {
+                        player.TeleportToUnit(exit);
+                    }
+                }
+
+
                 reply({
                     items: player.items,
                     loot: bag.loot
