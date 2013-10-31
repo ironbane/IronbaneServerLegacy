@@ -290,8 +290,10 @@ var Fighter = Actor.extend({
                 }
             }
         } else {
-            // Remove their items
-            self.items = [];
+            // clear all items except those special ones
+            self.items = _.filter(self.items, function(item) {
+                return item.data && item.data.permanent === true;
+            });
 
             chatHandler.announceDied(self, killer);
         }
@@ -311,6 +313,12 @@ var Fighter = Actor.extend({
             //      self.position = new THREE.Vector3(0, 0, 0);
             //      self.zone = 1;
             //debugger;
+
+            // need a better "reset"
+            self.UpdateAppearance(true);
+            self.socket.emit('updateInventory', {
+                items: self.items
+            });
 
             // People who die in the tutorial need to do it again
             if (self.zone === tutorialSpawnZone) {
