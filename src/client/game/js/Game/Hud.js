@@ -586,6 +586,7 @@ var HUDHandler = Class.extend({
         switch (template.type) {
             case 'weapon':
                 itemInfo += infoRow((item.attr1 > 0 ? 'Damage' : 'Heals'), this.GetStatContent(Math.abs(item.attr1), "misc/heart", 0, false, true));
+                itemInfo += infoRow('Attackspeed', template.delay + " seconds");
                 break;
             case 'armor':
                 itemInfo += infoRow('Armor', this.GetStatContent(item.attr1, "misc/armor", 0, false, true));
