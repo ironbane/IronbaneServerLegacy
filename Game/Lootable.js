@@ -84,7 +84,7 @@ var Lootable = Unit.extend({
 
                 if (templateId) {
                     if (_.isUndefined(dataHandler.items[templateId])) {
-                        log("Warning! item " + templateId + " not found for Lootable " + this.id + "!");
+                        log("Warning! item template" + templateId + " not found for Lootable " + this.id + "!");
                         continue;
                     }
 
