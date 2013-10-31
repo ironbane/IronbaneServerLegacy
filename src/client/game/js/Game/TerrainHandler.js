@@ -461,8 +461,8 @@ var TerrainHandler = Class.extend({
 
         break;
       case terrainHandlerStatusEnum.LOADED:
-        for(x=cp.x-2;x<=cp.x+2;x+=1){
-          for(z=cp.z-2;z<=cp.z+2;z+=1){
+        for(var x=cp.x-2;x<=cp.x+2;x+=1){
+          for(var z=cp.z-2;z<=cp.z+2;z+=1){
             var coords = CellToWorldCoordinates(x, z, cellSize);
             var tempVec = new THREE.Vector3(coords.x, p.y,
                coords.z);
