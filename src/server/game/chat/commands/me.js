@@ -24,10 +24,14 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-                var color = '#999999',
+            var color = '#999999',
 		ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot'),
 		filterMessage = ironbot.filterBadwords(unit, params.join(" ")),
             	message = '<b>* ' + unit.name + " " + filterMessage.message + ' *</b>';
+
+	    if(filterMessage.message === "") return {
+                errorMessage: errorMessage
+            }
 
             if(target) {
                 chatHandler.announceRoom(target, message, color);
