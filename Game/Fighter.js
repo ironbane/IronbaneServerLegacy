@@ -524,8 +524,61 @@ var Fighter = Actor.extend({
 
         return null;
     },
+    // swap one item in inventory for another
+    // item: name or id
+    // replacement: name or id
+    // replacementConfig: additional data to pass to replacement (customize)
+    replaceItem: function(item, replacement, replacementConfig) {
+        var self = this;
+
+        var original = self.getItem(item);
+        if(!original) {
+            // we don't have the item to swap out
+            return false;
+        } else {
+            var template = _.find(dataHandler.items, function(itemT) {
+                return itemT.name === replacement || itemT.id === replacement;
+            });
+            if(!template) {
+                // can't find template to replace item with!
+                return false;
+            }
+            var config = {
+                slot: original.slot,
+                owner: self.id
+            };
+            if(_.isObject(replacementConfig)) {
+                _.extend(config, replacementConfig);
+            }
+            var replaced = new Item(template, config);
+            self.items.push(replaced);
+            self.items = _.without(self.items, original);
+
+            if(original.equipped) {
+                // todo: get this logic cleaner somehow
+                if(original.getType() === 'armor') {
+                    self.UpdateAppearance(true);
+                    self.CalculateMaxHealth(true);
+                    self.CalculateMaxArmor(true);
+                } else {
+                    self.EmitNearby("updateWeapon", {
+                        id: self.id,
+                        // should weapon really be template id?
+                        weapon: item.equipped ? item.template : 0
+                    });
+                }
+            }
+
+            // let the client know
+            self.socket.emit('updateInventory', {
+                items: self.items
+            });
+
+            return true;
+        }
+    },
     // test if has item in inventory
-    hasItem: function(query) {
+    getItem: function(query) {
         var found;
 
         if(_.isString(query)) {
@@ -540,7 +593,7 @@ var Fighter = Actor.extend({
             });
         }
 
-        return !!found;
+        return found;
     },
     hasItemEquipped: function(query) {
         var found;

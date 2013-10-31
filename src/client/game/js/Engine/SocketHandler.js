@@ -430,6 +430,13 @@ var SocketHandler = Class.extend({
 
         });
 
+        // replace player inv with server inv
+        this.socket.on('updateInventory', function(data) {
+            // TODO: if changes are made to equipped items do we need additional events?
+            socketHandler.playerData.items = data.items;
+            hudHandler.ReloadInventory();
+        });
+
         this.socket.on('lootFromBag', function(data) {
             // occurs when someone nearby loots from a bag
             // refresh the bag
