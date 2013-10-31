@@ -143,8 +143,8 @@ module.exports = function(app, db) {
         res.render('web' + req.path);
     };
     
-    app.get('/game', gameCallBack);
-    app.get('/game/*', gameCallBack); 
+    app.get('/game*', gameCallBack);
+   // app.get('/game/*', gameCallBack); 
 
     // templates for website
     app.get('/views/*', websiteCallback);
