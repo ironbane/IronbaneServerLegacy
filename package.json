@@ -26,7 +26,7 @@
     "socket.io": "~0.9.14",
     "mysql": "~2.0.0-alpha9",
     "wrench": "~1.5.1",
-    "express": "~3.4.0",
+    "express": "~3.4.4",
     "underscore": "~1.5.2",
     "bbcode": "~0.1.4",
     "passport": "~0.1.17",

@@ -114,7 +114,7 @@ module.exports = function(app, db) {
         res.render('game/templates/' + path.basename(req.path));
     });
 
-    app.get(['/game', '/game/*'], function(req, res) {
+    var gameCallBack = function(req, res) {
         gameModelPromise.then(function(stuff) {
             // add in all of the stuff that was from game.php
             res.locals = {
@@ -136,13 +136,22 @@ module.exports = function(app, db) {
         }, function(err) {
             res.send(500, err);
         });
-    });
+    };
+
+    var websiteCallback = function(req, res) {
+       log('requesting web template: ' + req.path);
+        res.render('web' + req.path);
+    };
+    
+    app.get('/game', gameCallBack);
+    app.get('/game/*', gameCallBack); 
 
     // templates for website
-    app.get(['/views/*', '/partials/*'], function(req, res) {
-        log('requesting web template: ' + req.path);
-        res.render('web' + req.path);
-    });
+    app.get('/views/*', websiteCallback);
+    app.get('/partials/*', websiteCallback);
+        
+
+    
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
