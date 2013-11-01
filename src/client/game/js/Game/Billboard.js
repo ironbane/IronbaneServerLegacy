@@ -14,10 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 var billboardSpritePath = 'images/billboards/';
 
@@ -36,56 +32,57 @@ var Billboard = Unit.extend({
         this.canSelectWithEditor = true;
 
     },
-    Add: function () {
+    Add: function() {
+        var texture = this.customPath ? 'images/' + this.param + '.png' : billboardSpritePath + '' + this.param + '.png';
+        this.texture = textureHandler.GetTexture(texture, true);
 
-        var texture = this.customPath ? 'images/'  + this.param+'.png' : billboardSpritePath + ''+this.param+'.png';
-        this.texture = textureHandler.GetTexture( texture, true);
-
-        this.TryToBuildMesh();;
-
+        this.TryToBuildMesh();
 
         this._super();
     },
     TryToBuildMesh: function() {
-        if ( this.texture.image.width === 0 ) {
-            (function(unit){setTimeout(function(){unit.TryToBuildMesh()}, 1000)})(this);
-        }
-        else {
+        if (this.texture.image.width === 0) {
+            (function(unit) {
+                setTimeout(function() {
+                    unit.TryToBuildMesh();
+                }, 1000);
+            })(this);
+        } else {
             this.BuildMesh();
         }
     },
     BuildMesh: function() {
-        var planeGeo = new THREE.PlaneGeometry(this.size * (this.texture.image.width/16), this.size * (this.texture.image.height/16), 1, 1);
+        var planeGeo = new THREE.PlaneGeometry(this.size * (this.texture.image.width / 16), this.size * (this.texture.image.height / 16), 1, 1);
 
-        this.meshHeight = (this.texture.image.height/16);
+        this.meshHeight = (this.texture.image.height / 16);
 
         var uniforms = {
-              uvScale: {
+            uvScale: {
                 type: 'v2',
                 value: new THREE.Vector2(1, 1)
-              },
-              size: {
+            },
+            size: {
                 type: 'v2',
                 value: new THREE.Vector2(1, 1)
-              },
-              hue: {
+            },
+            hue: {
                 type: 'v3',
                 value: new THREE.Vector3(1, 1, 1)
-              },
-              vSun: {
+            },
+            vSun: {
                 type: 'v3',
                 value: new THREE.Vector3(0, 1, 0)
-              },
-              texture1: {
+            },
+            texture1: {
                 type: 't',
                 value: this.texture
-              }
+            }
         };
 
         var shaderMaterial = new THREE.ShaderMaterial({
-            uniforms : uniforms,
-            vertexShader : $('#vertex').text(),
-            fragmentShader : $('#fragment').text(),
+            uniforms: uniforms,
+            vertexShader: $('#vertex').text(),
+            fragmentShader: $('#fragment').text(),
             //transparent : true,
             alphaTest: 0.5
         });
@@ -106,22 +103,17 @@ var Billboard = Unit.extend({
         this.startVertices = [];
 
         _.each(this.mesh.geometry.vertices, function(vertex) {
-          this.startVertices.push(vertex.clone());
+            this.startVertices.push(vertex.clone());
         }, this);
 
 
         ironbane.scene.add(this.mesh);
-
     },
     Tick: function(dTime) {
-
         this._super(dTime);
 
-        if ( this.mesh ) {
+        if (this.mesh) {
             this.mesh.LookFlatAt(ironbane.camera.position, true);
         }
     }
 });
-
-
-

@@ -32,5 +32,16 @@ var Trigger = Billboard.extend({
         this._super(position, 0, id, texture, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
+    },
+    Tick: function(dTime) {
+        if(this.mesh) {
+            if(le('globalEnable')) {
+                this.mesh.visible = true;
+            } else {
+                this.mesh.visible = false;
+            }
+        }
+
+        this._super(dTime);
     }
 });

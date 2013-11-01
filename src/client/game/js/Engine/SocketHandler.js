@@ -239,11 +239,6 @@ var SocketHandler = Class.extend({
                     break;
 
                 case UnitTypeEnum.TRIGGER:
-                    // also dont show on prod... todo: when editor open instead?
-                    if(isProduction) {
-                        return;
-                    }
-
                     unit = new Trigger(ConvertVector3(data.position), data.id);
                     break;
 
