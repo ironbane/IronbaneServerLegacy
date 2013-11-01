@@ -27,6 +27,7 @@ var dictionary = {};
 /* pee. */dictionary.pee = "I pee on the street";
 /* cuddle. */dictionary.cuddle = "I cuddle trees during weekends";
 /* lick. */dictionary.lick = "I can lick my toes :)";
+/* ironbot. */dictionary.ironbot = "Hello!"
 
 module.exports = dictionary;
 
