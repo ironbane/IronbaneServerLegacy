@@ -22,7 +22,7 @@
 var TeleportEntrance = Unit.extend({
     Init: function(position, id, metadata) {
 
-        if ( showEditor && levelEditor.editorGUI.opShowDebug ) {
+        if ( !isProduction ) {
             this.drawNameMesh = true;
             this.overrideName = Math.abs(id);
         }

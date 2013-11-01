@@ -18,7 +18,7 @@
 var Waypoint = Billboard.extend({
     Init: function(position, id) {
         var texture = "misc/waypoint";
-        this.drawNameMesh = true;
+        this.drawNameMesh = !isProduction;
         this._super(position, 0, id, texture, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
@@ -28,7 +28,7 @@ var Waypoint = Billboard.extend({
 var Trigger = Billboard.extend({
     Init: function(position, id) {
         var texture = "misc/trigger";
-        this.drawNameMesh = true;
+        this.drawNameMesh = !isProduction;
         this._super(position, 0, id, texture, true, -id);
         this.enableGravity = false;
         this.dynamic = true;

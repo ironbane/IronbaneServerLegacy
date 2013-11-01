@@ -270,16 +270,16 @@ var SocketHandler = Class.extend({
                 unit.appearance.feet = data['feet'];
 
                 if (template.type == UnitTypeEnum.TURRET) {
-                    if (!showEditor || !levelEditor.editorGUI.opShowDebug) {
-                        unit.appearance.hair = 0;
-                        unit.appearance.eyes = 0;
-                        unit.appearance.skin = 0;
-                        unit.appearance.body = 0;
-                        unit.appearance.head = 0;
-                        unit.appearance.feet = 0;
+                    // if (!showEditor || !levelEditor.editorGUI.opShowDebug) {
+                        // unit.appearance.hair = 0;
+                        // unit.appearance.eyes = 0;
+                        // unit.appearance.skin = 0;
+                        // unit.appearance.body = 0;
+                        // unit.appearance.head = 0;
+                        // unit.appearance.feet = 0;
 
                         unit.enableShadow = false;
-                    }
+                    // }
                 }
             }
 

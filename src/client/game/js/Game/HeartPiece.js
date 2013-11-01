@@ -20,20 +20,20 @@
 
 
 var HeartPiece = Billboard.extend({
-    Init: function(position, id) {	        
-                
-        
+    Init: function(position, id) {
+
+
         var texture = "misc/heartpiece";
 
-        if ( showEditor && levelEditor.editorGUI.opShowDebug ) {
+        if ( !isProduction ) {
             this.drawNameMesh = true;
             this.overrideName = Math.abs(id);
-        }        
+        }
 
         this._super(position, 0, id, texture, true);
-        
-                this.renderOffsetMultiplier = 1.0;      
-                
+
+                this.renderOffsetMultiplier = 1.0;
+
     },
     Add: function() {
         this._super();
@@ -44,14 +44,14 @@ var HeartPiece = Billboard.extend({
             unit.particleEmittersToMaintain.push(particleHandler.Add(ParticleTypeEnum.TELEPORTEXIT, {followUnit:unit}));
         }, 0);
         })(this);
-        
+
     },
     Tick: function(dTime) {
-      
-        this.renderOffset = new THREE.Vector3(0, 0.5 + (Math.cos((new Date()).getTime()/1000.0)*0.25), 0);        
 
-          
+        this.renderOffset = new THREE.Vector3(0, 0.5 + (Math.cos((new Date()).getTime()/1000.0)*0.25), 0);
+
+
         this._super(dTime);
-                
+
     }
 });

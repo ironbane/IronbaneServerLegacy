@@ -21,7 +21,7 @@
 var ToggleableObstacle = Train.extend({
     Init: function(position, rotation, id, param, metadata) {
 
-        if ( showEditor && levelEditor.editorGUI.opShowDebug ) {
+        if ( !isProduction ) {
             this.drawNameMesh = true;
             this.overrideName = Math.abs(id);
         }

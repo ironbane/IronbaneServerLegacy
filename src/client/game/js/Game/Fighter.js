@@ -42,7 +42,7 @@ var Fighter = Unit.extend({
     this.drawNameMesh = id > 0 && !(this instanceof Player) ? true : false;
 
 
-    if ( id < 0 && showEditor && levelEditor.editorGUI.opShowDebug ) {
+    if ( id < 0 && !isProduction ) {
         this.drawNameMesh = true;
         this.overrideName = Math.abs(id);
     }
