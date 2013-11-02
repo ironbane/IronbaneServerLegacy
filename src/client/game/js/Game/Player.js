@@ -38,7 +38,7 @@ var Player = Fighter.extend({
         ironbane.camera.position.copy(position.clone().add(new THREE.Vector3(0, 1, 0)));
         this.thirdPersonReference = this.originalThirdPersonReference.clone();
         this.targetSize = socketHandler.playerData.size;
-        this.sendDataTimeout = 0.0;
+        this.timers.sendDataTimeout = 0.0;
         this.canMove = true;
         this.canLoot = false;
         this.lootItems = [];
@@ -73,7 +73,7 @@ var Player = Fighter.extend({
             this.enableGravity = !levelEditor.editorGUI.chFlyMode;
         }
 
-        this.mouseRayCastCheckTimeout = 0.0;
+        this.timers.mouseRayCastCheckTimeout = 0.0;
 
         this.isLookingAround = false;
 
@@ -147,12 +147,14 @@ var Player = Fighter.extend({
   },
   Tick: function(dTime) {
 
-    this.sendDataTimeout -= dTime;
-
+    _.each(this.timers, function(value, key){
+      debug.SetWatch(key, value);
+    });
     this.pathFinder.tick(dTime);
+ debug.SetWatch("timercount from player.js: ", _.keys(this.timers).length);
+   
 
-
-    if ( this.mouseRayCastCheckTimeout > 0 ) this.mouseRayCastCheckTimeout -= dTime;
+    //if ( this.mouseRayCastCheckTimeout > 0 ) this.mouseRayCastCheckTimeout -= dTime;
 
 
 
@@ -172,6 +174,7 @@ var Player = Fighter.extend({
 
       if ( this.InRangeOfUnit(lootBag, (lootBag instanceof LootableMesh) ? 2.0 : 1.0) ) {
         found = lootBag;
+        return;
       }
     }
 
@@ -261,14 +264,6 @@ var Player = Fighter.extend({
 
 
     uc.multiplyScalar(0.5+(this.size*0.5));
-
-
-
-
-
-
-
-
 
     var tx = ((uc.x * Math.cos(rotrad)) - (uc.z * Math.sin(rotrad)));
     var tz = ((uc.x * Math.sin(rotrad)) + (uc.z * Math.cos(rotrad)));
@@ -515,7 +510,7 @@ var Player = Fighter.extend({
         if ( showEditor && levelEditor.editorGUI.chFlyMode ) {
           this.object3D.position.y += dTime * 5;
         }
-        else if ( this.lastJumpTimer <= 0 &&
+        else if ( this.timers.lastJumpTimer <= 0 &&
           (this.isTouchingGround ||
             (this.position.y < GetZoneConfig('fluidLevel')
               && this.position.y > GetZoneConfig('fluidLevel') - 0.5 ) ) ) {
@@ -523,7 +518,7 @@ var Player = Fighter.extend({
           if ( this.position.y < GetZoneConfig('fluidLevel') ) {
             //this.position.y = GetZoneConfig('fluidLevel');
 
-            this.lastJumpTimer = 1.0;
+            this.timers.lastJumpTimer = 1.0;
           }
 
           this.Jump();
@@ -615,12 +610,6 @@ var Player = Fighter.extend({
     }
 
     this.velocity.y = oldvy;
-
-
-
-
-
-
     //
     debug.SetWatch('player.speed', this.speed);
     debug.SetWatch('player.rotation', this.rotation.ToString());
@@ -631,26 +620,12 @@ var Player = Fighter.extend({
 
 
     if ( socketHandler.serverOnline ) {
-      if ( this.sendDataTimeout <= 0.0 ) {
-        this.sendDataTimeout = 0.25;
+      if ( this.timers.sendDataTimeout <= 0.0 ) {
+
+        this.timers.sendDataTimeout = 0.25;
         this.SendData();
       }
     }
-
-
-
-    //        if ( !_.isUndefined(ironbane.unitList[0]) ) {
-    //            var npc = ironbane.unitList[0];
-    //
-    //            this.position = npc.position;
-    //            this.rotation.y = npc.rotation.y;
-    //        }
-
-
-
-
-    // this.targetAimHelperTexture = "";
-
 
     // Move the reddish aim mesh
     if ( currentMouseToWorldData ) {
@@ -883,7 +858,7 @@ var Player = Fighter.extend({
   AttemptAttack: function(position) {
     var player = this;
 
-    if (player.attackTimeout > 0.0) {
+    if (player.timers.attackTimeout > 0.0) {
       return;
     }
 
@@ -934,7 +909,7 @@ var Player = Fighter.extend({
           }
 
           // either way wait to set delay until after reply
-          player.attackTimeout = newDelay;
+          player.timers.attackTimeout = newDelay;
         });
       }
     }

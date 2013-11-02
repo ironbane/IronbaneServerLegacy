@@ -26,9 +26,10 @@ var sizeScalingSpeed = 2;
 
 var Unit = PhysicsObject.extend({
   Init: function(position, rotation, id, name, param, size) {
-
     this._super(position);
 
+
+    this.timers = {};
     // Used for network units
     this.fakeVelocity = new THREE.Vector3();
 
@@ -84,8 +85,8 @@ var Unit = PhysicsObject.extend({
 
     this.visible = true;
 
-    this.waterSplashTimeout = 0.0;
-    this.waterSplashSoundTimeout = 0.0;
+    this.timers.waterSplashTimeout = 0.0;
+    this.timers.waterSplashSoundTimeout = 0.0;
 
     this.allowRaycastGround = true;
     this.restrictToGround = true;
@@ -295,7 +296,16 @@ var Unit = PhysicsObject.extend({
   },
   Tick: function(dTime) {
 
+    // When are we allowed to jump?
+    _.each(this.timers, function(value, timer) {
+      if(value>0){
+        
+        this.timers[timer] -= dTime;
+      }
+    }, this);
+    
 
+    //move this to Player.js
     if ( this instanceof Player &&
       (!ironbane.player.canMove ||
         terrainHandler.transitionState !== transitionStateEnum.END) ) return;
@@ -370,7 +380,7 @@ var Unit = PhysicsObject.extend({
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
-          if ( this.waterSplashSoundTimeout >= 0 ) this.waterSplashSoundTimeout -= dTime;
+          if ( this.timers.waterSplashSoundTimeout >= 0 ) this.timers.waterSplashSoundTimeout -= dTime;
           else {
             this.waterSplashSoundTimeout = 0.5;
             soundHandler.Play("splash", this.position);
@@ -380,7 +390,7 @@ var Unit = PhysicsObject.extend({
 
         }
         if ( GetZoneConfig("enableFluid") && this.position.y < GetZoneConfig('fluidLevel') ) {
-          if ( this.waterSplashTimeout >= 0 ) this.waterSplashTimeout -= dTime;
+          if ( this.timers.waterSplashTimeout >= 0 ) this.timers.waterSplashTimeout -= dTime;
           else {
             this.waterSplashTimeout = 0.1;
             particleHandler.Add(GetZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {

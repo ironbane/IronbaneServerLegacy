@@ -18,14 +18,10 @@
 
 var charactersSpritePath = 'images/characters/';
 var NPCSpritePath = 'images/npcs/';
-
-
 var rotation_speed = 2;
-
 var fighterAcceleration = 20;
 var fighterFriction = 3;
 var fighterMaxSpeed = 5;
-
 var attackSwingTime = 0.5;
 var walkSoundTime = 0.4;
 var meleeTime = 0.3;
@@ -64,26 +60,24 @@ var Fighter = Unit.extend({
     this.spriteStatus = this.SpriteStatusEnum.STAND;
     this.spriteForward = true;
 
-    this.walkSoundTimer = 0.0;
+    this.timers.walkSoundTimer = 0.0;
 
 
     this.spriteStep = 0;
-    this.walkSpriteTimer = 0.0;
+    this.timers.walkSpriteTimer = 0.0;
 
 
-    this.attackStateTimer = 0.0;
-    this.attackTimeout = 0.0;
+    this.timers.attackStateTimer = 0.0;
+    this.timers.attackTimeout = 0.0;
 
     this.targetFactor = 0;
 
-    this.meleeHitTimer = 0.0;
+    this.timers.meleeHitTimer = 0.0;
     this.meleeHitPosition = new THREE.Vector3();
 
-    this.meleeAttackTimer = 0.0;
+    this.timers.meleeAttackTimer = 0.0;
     this.meleeAttackPosition = new THREE.Vector3();
-
-
-    this.deathTimer = 0.0;
+    this.timers.deathTimer = 0.0;
     this.dead = false;
 
     this.health = health;
@@ -103,7 +97,7 @@ var Fighter = Unit.extend({
     // Used for size calculation
     this.meshHeight = 1.0;
 
-    this.lastJumpTimer = 0;
+    this.timers.lastJumpTimer = 0;
 
 
     this.spriteIndex = 0;
@@ -305,8 +299,7 @@ var Fighter = Unit.extend({
   Tick: function(dTime) {
 
 
-    // When are we allowed to jump?
-    if ( this.lastJumpTimer > 0 ) this.lastJumpTimer -= dTime;
+    
 
     // Update speed (used for walking animations
     if ( !(this instanceof Player) ) {
@@ -331,15 +324,6 @@ var Fighter = Unit.extend({
     }
 
 
-
-
-
-    if ( this.attackStateTimer > 0.0 ) this.attackStateTimer -= dTime;
-    if ( this.meleeHitTimer > 0.0 ) this.meleeHitTimer -= dTime;
-    if ( this.meleeAttackTimer > 0.0 ) this.meleeAttackTimer -= dTime;
-    if ( this.attackTimeout > 0.0 ) this.attackTimeout -= dTime;
-    if (this.walkSoundTimer > 0.0 ) this.walkSoundTimer -= dTime;
-
     //        debug.SetWatch('speed', this.speed);
     //        debug.SetWatch(this.id+': name', this.name);
     //debug.SetWatch(this.id+': speed', this.speed);
@@ -349,7 +333,7 @@ var Fighter = Unit.extend({
 
 
 
-    if ( this.meleeHitTimer <= 0 && this.meleeAttackTimer <= 0 ) {
+    if ( this.timers.meleeHitTimer <= 0 && this.timers.meleeAttackTimer <= 0 ) {
       // Reset position
       if ( !(this.renderOffset.lengthSq() < 0.0001) ) {
         this.renderOffset.set(0,0,0);
@@ -357,11 +341,11 @@ var Fighter = Unit.extend({
     }
     else {
 
-      if ( this.meleeHitTimer > 0 ) {
-        this.renderOffsetMultiplier = this.meleeHitTimer/meleeTime;
+      if ( this.timers.meleeHitTimer > 0 ) {
+        this.renderOffsetMultiplier = this.timers.meleeHitTimer/meleeTime;
       }
-      if ( this.meleeAttackTimer > 0 ) {
-        this.renderOffsetMultiplier = this.meleeAttackTimer/(meleeTime*1);
+      if ( this.timers.meleeAttackTimer > 0 ) {
+        this.renderOffsetMultiplier = this.timers.meleeAttackTimer/(meleeTime*1);
       }
 
 
@@ -383,15 +367,15 @@ var Fighter = Unit.extend({
 
       this.mesh.material.uniforms.hue.value.set(1,1,1);
 
-      if ( this.meleeHitTimer > 0 ) {
-        this.mesh.material.uniforms.hue.value.y -= (this.meleeHitTimer/meleeTime);
-        this.mesh.material.uniforms.hue.value.z -= (this.meleeHitTimer/meleeTime);
+      if ( this.timers.meleeHitTimer > 0 ) {
+        this.mesh.material.uniforms.hue.value.y -= (this.timers.meleeHitTimer/meleeTime);
+        this.mesh.material.uniforms.hue.value.z -= (this.timers.meleeHitTimer/meleeTime);
       }
 
-      if ( this.meleeAttackTimer > 0 ) {
+      if ( this.timers.meleeAttackTimer > 0 ) {
         //this.mesh.material.uniforms.hue.value.y -= (this.meleeAttackTimer/meleeTime)/2*2.0;
-        this.mesh.material.uniforms.hue.value.y -= (this.meleeAttackTimer/(meleeTime*1))*1.0;
-        this.mesh.material.uniforms.hue.value.z -= (this.meleeAttackTimer/(meleeTime*1))*2.0;
+        this.mesh.material.uniforms.hue.value.y -= (this.timers.meleeAttackTimer/(meleeTime*1))*1.0;
+        this.mesh.material.uniforms.hue.value.z -= (this.timers.meleeAttackTimer/(meleeTime*1))*2.0;
       }
 
       if ( terrainHandler.skybox ) this.mesh.material.uniforms.vSun.value.copy(terrainHandler.skybox.sunVector);
@@ -628,20 +612,8 @@ var Fighter = Unit.extend({
           break;
       }
 
-
-
-
-
-
-
       var roffset = this.renderOffset.clone().multiplyScalar(this.renderOffsetMultiplier);
       var renderPosition = this.position.clone().add(roffset);
-
-
-
-
-
-
       // For dynamic effect
 
 
@@ -665,8 +637,8 @@ var Fighter = Unit.extend({
 
 
       //this.weaponMesh.material.uniforms.hue.value.x = 1+(this.attackStateTimer/attackSwingTime);
-      this.weaponMesh.material.uniforms.hue.value.y = 1-(this.attackStateTimer/attackSwingTime);
-      this.weaponMesh.material.uniforms.hue.value.z = 1-(this.attackStateTimer/attackSwingTime);
+      this.weaponMesh.material.uniforms.hue.value.y = 1-(this.timers.attackStateTimer/attackSwingTime);
+      this.weaponMesh.material.uniforms.hue.value.z = 1-(this.timers.attackStateTimer/attackSwingTime);
 
       if ( terrainHandler.skybox ) this.weaponMesh.material.uniforms.vSun.value.copy(terrainHandler.skybox.sunVector);
 
@@ -685,7 +657,7 @@ var Fighter = Unit.extend({
       //if ( firstPerson ) direct = true;
 
 
-      var swingRotation = (this.attackStateTimer*2)/attackSwingTime;
+      var swingRotation = (this.timers.attackStateTimer*2)/attackSwingTime;
       if ( swingRotation > 1 ) swingRotation = 2 - swingRotation;
       if ( swingRotation <= 0 ) swingRotation = 0;
       //debug.SetWatch("swingRotation", swingRotation);
@@ -743,11 +715,11 @@ var Fighter = Unit.extend({
 
     if ( this.speed > 0.1 ) {
       this.spriteStatus = this.SpriteStatusEnum.WALK;
-      if(this.walkSoundTimer <= 0 ) {
+      if(this.timers.walkSoundTimer <= 0 ) {
         if(this instanceof Player) {
           //soundHandler.Play("Footsteps");
       }
-      this.walkSoundTimer = walkSoundTime;
+      this.timers.walkSoundTimer = walkSoundTime;
     }
     }
     else {
@@ -759,7 +731,7 @@ var Fighter = Unit.extend({
 
     //var oldSpriteIndex = this.spriteStep;
 
-    this.walkSpriteTimer += dTime / this.size;
+    this.timers.walkSpriteTimer += dTime / this.size;
 
     //        this.speed = 2.0;
     //        this.spriteStatus = this.SpriteStatusEnum.WALK;
@@ -775,8 +747,8 @@ var Fighter = Unit.extend({
 
       //debug.SetWatch('stepFactor', stepFactor);
 
-      if ( this.walkSpriteTimer > stepFactor ) {
-        this.walkSpriteTimer = 0.0;
+      if ( this.timers.walkSpriteTimer > stepFactor ) {
+        this.timers.walkSpriteTimer = 0.0;
         if ( this.spriteForward ) {
           this.spriteStep++;
           if ( this.spriteStep >= 2 ) this.spriteForward = false;
@@ -805,7 +777,7 @@ var Fighter = Unit.extend({
 
 
 
-    if ( this.attackStateTimer > 0 ) return;
+    if ( this.timers.attackStateTimer > 0 ) return;
 
     this.meleeHitPosition = null;
 
@@ -844,7 +816,7 @@ var Fighter = Unit.extend({
     //            this.meleeHitPosition.set(0, 0, 0);
     //        }
 
-    this.attackStateTimer = attackSwingTime;
+    this.timers.attackStateTimer = attackSwingTime;
 
   },
   Jump: function() {
@@ -856,7 +828,7 @@ var Fighter = Unit.extend({
       this.velocity.y = 2;
     }
 
-    this.lastJumpTimer += 0.5;
+    this.timers.lastJumpTimer += 0.5;
 
     this.restrictToGround = false;
 
@@ -882,7 +854,7 @@ var Fighter = Unit.extend({
 
     power = power || 0.3;
 
-    this.meleeAttackTimer = meleeTime * (0.5 + (power / 2)) * 1;
+    this.timers.meleeAttackTimer = meleeTime * (0.5 + (power / 2)) * 1;
 
     var force = this.position.clone().sub(position).normalize().multiplyScalar(-power);
 //    force.y  = power;
@@ -910,7 +882,7 @@ var Fighter = Unit.extend({
       //this.noPositionUpdateTimer = 0.1;
       //this.isTouchingGround = false;
 
-      this.meleeHitTimer = meleeTime * (0.5 + (power / 2));
+      this.timers.meleeHitTimer = meleeTime * (0.5 + (power / 2));
 
       var force = this.position.clone().sub(attacker.position).normalize().multiplyScalar(power);
       force.y  = power;
