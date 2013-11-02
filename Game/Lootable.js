@@ -23,7 +23,7 @@ var Lootable = Unit.extend({
         // HACKY HACKY!!! See NPC
         // Set to the default template values
         if (_.isUndefined(this.param)) {
-          this.param = this.template.param;
+            this.param = this.template.param;
         }
         // END HACKY
 
@@ -40,29 +40,12 @@ var Lootable = Unit.extend({
     },
     loadItems: function() {
         var self = this;
-        mysql.query('SELECT * FROM ib_items WHERE owner = ?', [self.id], function(err, results) {
-            if(err) {
-                throw 'error fetching items ' + err;
-            }
 
-            _.each(results, function(loot) {
-                // find a template
-                var template = dataHandler.items[loot.template];
-                if(template) {
-                    if (loot.data) {
-                        try {
-                            loot.data = JSON.parse(loot.data);
-                        } catch (e) {
-                            // some error parsing JSON, not valid JSON likely...
-                            console.log('error parsing JSON for item data', loot);
-                        }
-                    }
-                    // add new item, DB values take precendence over item's Init
-                    self.loot.push(new Item(template, loot));
-                } else {
-                    log('warning no template found for item: ' + loot.id);
-                }
-            });
+        return itemService.getAllByOwner(self.id).then(function(items) {
+            self.loot = items;
+        }, function(err) {
+            console.log('error getting items for lootable: ', self.id, ' >> ', err);
+            self.loot = [];
         });
     },
     Awake: function() {
@@ -88,7 +71,9 @@ var Lootable = Unit.extend({
                         continue;
                     }
 
-                    var item = new Item(dataHandler.items[templateId], {slot: l});
+                    var item = new Item(dataHandler.items[templateId], {
+                        slot: l
+                    });
                     this.loot.push(item);
                 }
             }

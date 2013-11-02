@@ -15,20 +15,29 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// instance of an item template
+var Class = require('../../common/class'),
+    _ = require('underscore');
+
+var ID = 0;
+
 var Item = Class.extend({
     equipped: 0,
     slot: 0,
     attr1: 0,
     data: {},
     value: 0,
-    Init: function(template, config) {
+    init: function(template, config) {
         if(!template) {
             throw "must init using a template!";
         }
 
-        // todo: deglobalization
-        this.id = server.GetAValidItemID();
+        // update any additional properties
+        if(config) {
+            _.extend(this, config);
+        }
+
+        // id is really only useful while the game is running, this id should *not* be persisted
+        this.id = ID++;
 
         // reference to the entire template object
         this.$template = template;
@@ -41,11 +50,6 @@ var Item = Class.extend({
         // copy for faster searching
         this.type = template.type;
         this.subtype = template.subtype;
-
-        // update any additional properties
-        if(config) {
-            _.extend(this, config);
-        }
     },
     // these getters setup so that the item instance could in the future have values
     // not on the template, but in the data JSON
@@ -62,3 +66,5 @@ var Item = Class.extend({
         return this.$template.basevalue;
     }
 });
+
+module.exports = Item;

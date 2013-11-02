@@ -16,7 +16,8 @@
 */
 var Class = require('../../common/class'),
     getName = require('../../common/namegen'),
-    log = require('util').log;
+    log = require('util').log,
+    ItemService = require('../services/item');
 
 // for now just sticking this here, todo: get from config or something
 var skinIdMaleStart = 1000;
@@ -233,12 +234,8 @@ module.exports = function(db) {
                 return;
             }
 
-            db.query('delete from ib_items where owner=?', [self.id], function(err, result) {
-                if(err) {
-                    log('error deleting character items: ' + err);
-                }
-
-                deferred.resolve('OK');
+            ItemService.deleteAllByOwner(self.id).then(function() {
+                deferred.resolve('success');
             });
         });
 

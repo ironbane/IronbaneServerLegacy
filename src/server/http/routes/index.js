@@ -45,7 +45,7 @@ module.exports = function(app, db) {
         var tasks = [],
             Zone = require('../../entity/zone')(db),
             UnitTemplate = require('../../entity/unitTemplate')(db),
-            ItemTemplate = require('../../entity/itemTemplate')(db),
+            ItemTemplateService = require('../../services/itemTemplate'),
             Mesh = require('../../entity/mesh')(db);
 
         tasks.push(Zone.getAll().then(function(zones) {
@@ -70,7 +70,7 @@ module.exports = function(app, db) {
             return templates;
         }, function(err) { return Q.reject(err); }));
 
-        tasks.push(ItemTemplate.getAll().then(function(templates) {
+        tasks.push(ItemTemplateService.getAll(true).then(function(templates) {
             // front end is expecting a map
             // there's prolly an underscore method for this
             _.each(templates, function(t) {
@@ -142,16 +142,16 @@ module.exports = function(app, db) {
        log('requesting web template: ' + req.path);
         res.render('web' + req.path);
     };
-    
+
     app.get('/game*', gameCallBack);
-   // app.get('/game/*', gameCallBack); 
+   // app.get('/game/*', gameCallBack);
 
     // templates for website
     app.get('/views/*', websiteCallback);
     app.get('/partials/*', websiteCallback);
-        
 
-    
+
+
 
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {

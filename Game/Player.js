@@ -97,8 +97,7 @@ var Player = Fighter.extend({
     this.items = [];
 
     // Delete the items
-    mysql.query('DELETE FROM ib_items WHERE owner = ?', [this.id]);
-
+    itemService.deleteAllByOwner(this.id);
   },
   BigMessage: function(message) {
     this.socket.emit("bigMessage", {
@@ -173,6 +172,8 @@ var Player = Fighter.extend({
     }, 1000);
   },
     Save: function() {
+        var unit = this;
+
         // No updating for guests
         // Update MYSQL and set the character data
         mysql.query('UPDATE ib_characters SET ' +
@@ -193,26 +194,18 @@ var Player = Fighter.extend({
         ]);
 
         // Save the items
-        (function(unit) {
-            mysql.query('DELETE FROM ib_items WHERE owner = ?', [unit.id], function(err, results, fields) {
-                for (var i = 0; i < unit.items.length; i++) {
-                    var item = unit.items[i];
+        itemService.deleteAllByOwner(unit.id).then(function() {
+            _.each(unit.items, function(item) {
+                // need to clear any _persistID that might have existed, since we just nuked them
+                delete item._persistID;
 
-                    // 20/9/12: Removed  server.GetAValidItemID() for id field as it causes duplication errors
-                    // Normally it doesn't matter which ID the items gets
-                    mysql.query('INSERT INTO ib_items (template, attr1, owner, equipped, slot, value, data) ' +
-                        'VALUES(?,?,?,?,?,?,?)', [
-                        item.template,
-                        item.attr1,
-                        unit.id,
-                        item.equipped,
-                        item.slot,
-                        item.value || 0,
-                        JSON.stringify(item.data)
-                    ]);
-                }
+                // just in case the owner isn't set properly (shouldn't happen)
+                item.owner = unit.id;
+
+                // todo: queue these promises up for this whole method, and do error handling
+                itemService.persist(item);
             });
-        })(this);
+        });
     },
   LeaveGame: function() {
 

@@ -28,35 +28,12 @@ var SocketHandler = Class.extend({
         // temp until service implemented
         function loadCharItems(chardata, callback) {
             chardata.items = [];
-            mysql.query('SELECT * FROM ib_items WHERE owner = ?', [chardata.id], function(err, results) {
-                if (err) {
-                    // todo: we should prolly output the log to a file somewhere to find these issues...
-                    log('error getting items for character ' + chardata.id + ': ' + err);
-                } else {
-                    results.forEach(function(item) {
-                        // if there is custom instance JSON data use it
-                        if (item.data) {
-                            try {
-                                item.data = JSON.parse(item.data);
-                            } catch (e) {
-                                // invalid json? prolly safe to ignore...
-                            }
-                        }
-
-                        var template = _.find(dataHandler.items, function(t) {
-                            return t.id === item.template;
-                        });
-
-                        if (template) {
-                            chardata.items.push(new Item(template, item));
-                        } else {
-                            log('could not find template for item result: ' + item.template);
-                        }
-                    });
-                }
-
-                // either way, fire the callback, no items won't be fatal, just messy
-                callback(); // since this is internal and temp, dont bother testing it
+            itemService.getAllByOwner(chardata.id).then(function(items) {
+                chardata.items = items;
+                callback();
+            }, function(err) {
+                log('error getting items for character: ' + chardata.id + ' >> ' + err);
+                callback();
             });
         }
 

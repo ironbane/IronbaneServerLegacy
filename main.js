@@ -199,6 +199,14 @@ function start(scripts) {
     // inject into global until rest is modular
     _.extend(global, IB);
 
+    // temporarily global services
+    global.itemTemplateService = require('./src/server/services/itemTemplate');
+    global.itemService = require('./src/server/services/item');
+
+    // temporarily global entities
+    global.ItemTemplate = require('./src/server/entity/itemTemplate');
+    global.Item = require('./src/server/entity/item');
+
     // Load DataHandler global for now (holds memory DB of item and unit templates)
     global.dataHandler = require('./src/server/game/dataHandler');
 
@@ -274,7 +282,6 @@ var includes = [
     '/Engine/WorldHandler.js',
     '/Game/AI/graph.js',
     '/Game/AI/astar.js',
-    '/Game/item.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',
     '/Game/MovingUnit.js',
