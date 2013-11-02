@@ -53,7 +53,7 @@ var Service = Class.extend({
     getAll: function(refresh) {
         var deferred = Q.defer();
 
-        if(!refresh) {
+        if(!refresh && _.keys(cache).length > 0) {
             deferred.resolve(_.map(cache, function(value) { return value; }));
         } else {
             db.query('SELECT * FROM ib_item_templates', function(err, results) {

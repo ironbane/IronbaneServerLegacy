@@ -16,23 +16,19 @@
 */
 
 var _ = require('underscore'),
-    db = require(APP_ROOT_PATH + '/src/server/db');
+    db = require(APP_ROOT_PATH + '/src/server/db'),
+    ItemTemplateService = require('../services/itemTemplate');
 
 var future = {
     items: {},
     units: {}
 };
 
-db.query('SELECT * FROM ib_item_templates',
-    function(err, results, fields) {
-        if (err) {
-            throw err;
-        }
-
-        _.each(results, function(item) {
-            future.items[item.id] = item;
-        });
+ItemTemplateService.getAll().then(function(templates) {
+    _.each(templates, function(t) {
+        future.items[t.id] = t;
     });
+});
 
 db.query('SELECT * FROM ib_unit_templates',
     function(err, results, fields) {

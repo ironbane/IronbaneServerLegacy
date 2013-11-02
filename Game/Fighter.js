@@ -388,28 +388,16 @@ var Fighter = Actor.extend({
     },
     // Returns true when the max armor changed
     CalculateMaxArmor: function(doEmit) {
-
-
         doEmit = doEmit || false;
 
         var oldArmorMax = this.armorMax;
-
         var armorMax = 0;
 
-        for (var i = 0; i < this.items.length; i++) {
-            var item = this.items[i];
-
-            var template = dataHandler.items[item.template];
-
-            if (item.equipped) {
-
-                if (template.type === "armor") {
-
-                    armorMax += item.attr1;
-
-                }
+        _.each(this.items, function(item) {
+            if(item.equipped && item.getType() === 'armor') {
+                armorMax += item.attr1;
             }
-        }
+        });
 
         this.armorMax = armorMax;
 
