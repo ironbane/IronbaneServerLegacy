@@ -83,7 +83,7 @@ var Mesh = Unit.extend({
     // Initialize events
     switch (this.meshData.name) {
       case "Dungeon Light Small":
-        this.flickerTime = 0.0;
+        this.timers.flickerTime = 0.0;
 
         var pointLight = new THREE.PointLight(0xdf724c, 1, 20);
         // var pointLight = new THREE.PointLight(0xff0000, 1, 10);
@@ -97,7 +97,7 @@ var Mesh = Unit.extend({
 
         break;
       case "Dungeon Light Big":
-        this.flickerTime = 0.0;
+        this.timers.flickerTime = 0.0;
 
         if ( !le("globalEnable") ) {
           useCollision = false;
@@ -110,7 +110,7 @@ var Mesh = Unit.extend({
         this.lightsToMaintain.push(pointLight);
         break;
       case "Dungeon Light Huge":
-        this.flickerTime = 0.0;
+        this.timers.flickerTime = 0.0;
 
         if ( !le("globalEnable") ) {
           useCollision = false;
@@ -371,11 +371,10 @@ var Mesh = Unit.extend({
       case "Dungeon Light Big":
       case "Dungeon Light Huge":
 
-        this.flickerTime -= dTime;
 
-        if ( this.flickerTime <= 0 ) {
+        if ( this.timers.flickerTime <= 0 ) {
           // this.lightsToMaintain[0].color.setRGB(1, getRandomFloat(0.5, 0.8), getRandomFloat(0.5, 0.8));
-          this.flickerTime = getRandomFloat(0.1, 0.2);
+          this.timers.flickerTime = getRandomFloat(0.1, 0.2);
           this.lightsToMaintain[0].intensity =
             this.lightsToMaintain[0].startIntensity + getRandomFloat(-0.1, 0.1);
         }
