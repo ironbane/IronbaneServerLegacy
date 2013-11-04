@@ -20,23 +20,36 @@
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-// Hell == zone 41
-
 module.exports = function(items, units, worldHandler, chatHandler) {
-    var constants = require('../../../../common/constants');
-
     return {
-        requiresEditor: false,
+        requiresEditor: true,
         action: function(unit, target, params, errorMessage) {
-	        var player = worldHandler.FindPlayerByName(unit.name);
-		if(player) {
-			if(player.zone === 41) {
-				chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
+		var name = params[0],
+			db = require("../../../db"),
+	                player = worldHandler.FindPlayerByName(name);
+
+            if (player) {
+		db.query("SELECT `name` FROM `ib_zones` WHERE `id` = ?;", player.zone, function(err, result) {
+			if (err) {
+				console.log('SQL error during whois: ' + JSON.stringify(err));
+				deferred.reject('SQL error');					}
+
+			if(result.length < 1) {
+				errorMessage = "Player not found";
+				chatHandler.announcePersonally(unit, errorMessage, "yellow");
 			} else {
-				unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
-				chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
+				if(result[0].name === null) {
+					errorMessage = "Player not found";
+					chatHandler.announcePersonally(unit, errorMessage, "yellow");
+				} else {
+					var message = player.name + " is now in " + result[0].name;
+					chatHandler.announcePersonally(unit, message, "yellow");
+				}
 			}
-		}
+		});
+		console.log(player.zone);
+            }
+
             return {
                 errorMessage: errorMessage
             };
