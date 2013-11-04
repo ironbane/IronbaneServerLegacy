@@ -40,6 +40,8 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 					if (err) {
 						console.log('SQL error during whois: ' + JSON.stringify(err));
 						deferred.reject('SQL error');
+					} else {
+						deferred.resolve(true);
 					}
 				});
 				return deferred.promise;
@@ -50,7 +52,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 				db.query("SELECT @userID := ib_characters.`user` FROM ib_characters WHERE ib_characters.`name` = @charName", function(err, result) {
 					if (err) {
 						console.log('SQL error during whois: ' + JSON.stringify(err));
-						deferred.reject('SQL error');					}
+						deferred.reject('SQL error');	
+					} else {
+						deferred.resolve(true);
+					}
 				});
 				return deferred.promise;
 			}
@@ -60,7 +65,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 				db.query("SELECT @characters := GROUP_CONCAT(ib_characters.`name`) FROM ib_characters WHERE ib_characters.`user` = @userID", function(err, result) {
 					if (err) {
 						console.log('SQL error during whois: ' + JSON.stringify(err));
-						deferred.reject('SQL error');					}
+						deferred.reject('SQL error');					
+					} else {
+						deferred.resolve(true);
+					}
 				});
 				return deferred.promise;
 			}
@@ -70,7 +78,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 				db.query("SELECT @userName := bcs_users.`name` AS `username`, NULL FROM bcs_users WHERE bcs_users.`id` = @userID", function(err, result) {
 					if (err) {
 						console.log('SQL error during whois: ' + JSON.stringify(err));
-						deferred.reject('SQL error');					}
+						deferred.reject('SQL error');					
+					} else {
+						deferred.resolve(true);
+					}
 				});
 				return deferred.promise;
 			}
@@ -80,19 +91,24 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 				db.query("SELECT @userID as `id`, @userName as `name`, @characters as `characters`", name, function(err, result) {
 					if (err) {
 						console.log('SQL error during whois: ' + JSON.stringify(err));
-						deferred.reject('SQL error');					}
-
-					if(result.length < 1) {
-						errorMessage = "Player not found";
-						chatHandler.announcePersonally(unit, errorMessage, "yellow");
+						deferred.reject('SQL error');					
 					} else {
-						if(result[0].id === null) {
+						if(result.length < 1) {
 							errorMessage = "Player not found";
 							chatHandler.announcePersonally(unit, errorMessage, "yellow");
 						} else {
-							var message = "forumname: " + result[0].name + "<br>" + "characters: " + result[0].characters;
-							chatHandler.announcePersonally(unit, message, "yellow");
+							if(result[0].id === null) {
+								errorMessage = "Player not found";
+								chatHandler.announcePersonally(unit, errorMessage, "yellow");
+							} else if(result[0].name === "" || result[0].name === "guest" ) {
+								var message = "Player is guest";
+								chatHandler.announcePersonally(unit, message, "yellow");
+							} else {
+								var message = "forumname: " + result[0].name + "<br>" + "characters: " + result[0].characters;
+								chatHandler.announcePersonally(unit, message, "yellow");
+							}
 						}
+						deferred.resolve(message);
 					}
 				});
 				return deferred.promise;

@@ -24,8 +24,7 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-
-            var message = "/join (Join/create a room)<br>/leave (Leave a room)<br>/rooms (List all rooms)<br>/who (Who is online)<br>/who roomname (Who is in this room)<br>/me (Say what you are doing)<br>";
+            var message = "/join (Join/create a room)<br>/leave (Leave a room)<br>/rooms (List all rooms)<br>/who (Who is online)<br>/who roomname (Who is in this room)<br>/me (Say what you are doing)<br>/zone playername (See where your buddies hangout)<br>";
             chatHandler.announcePersonally(unit, message, "yellow");
 
             return {
