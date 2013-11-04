@@ -20,35 +20,13 @@
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
+
 module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-		var name = params[0],
-			db = require("../../../db"),
-	                player = worldHandler.FindPlayerByName(name);
-
-            if (player) {
-		db.query("SELECT `name` FROM `ib_zones` WHERE `id` = ?;", player.zone, function(err, result) {
-			if (err) {
-				console.log('SQL error during whois: ' + JSON.stringify(err));
-			} else {
-				if(result.length < 1) {
-					errorMessage = "Player not found";
-					chatHandler.announcePersonally(unit, errorMessage, "yellow");
-				} else {
-					if(result[0].name === null) {
-						errorMessage = "Player not found";
-						chatHandler.announcePersonally(unit, errorMessage, "yellow");
-					} else {
-						var message = player.name + " is now in " + result[0].name;
-						chatHandler.announcePersonally(unit, message, "yellow");
-					}
-				}
-			}
-		});
-            }
-
+            var message = '/announce "message" (announce)<br>/warn player (warn)<br>/seriouswarn player (seriouswarn)<br>/kick player "reason" (kick from server)<br>/ban player hours "reason" (ban from server)<br>/unstuck player (unstuck, like /stuck)<br>/whois player (get player info)';
+            chatHandler.announcePersonally(unit, message, "yellow");
             return {
                 errorMessage: errorMessage
             };
