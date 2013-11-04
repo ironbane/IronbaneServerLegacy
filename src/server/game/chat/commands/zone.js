@@ -22,7 +22,7 @@
 // chatHandler - reference to general chat utils
 module.exports = function(items, units, worldHandler, chatHandler) {
     return {
-        requiresEditor: true,
+        requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
 		var name = params[0],
 			db = require("../../../db"),
