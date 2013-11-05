@@ -334,7 +334,7 @@ var Unit = Class.extend({
     findNearestSpawnPoint: function() {
         var unit = this,
             spawn = null,
-            spawns = worldHandler.findUnitsByName('player_spawn_point');
+            spawns = worldHandler.findUnitsByName('player_spawn_point', unit.zone);
 
         if(spawns.length === 0) {
             return spawn;
