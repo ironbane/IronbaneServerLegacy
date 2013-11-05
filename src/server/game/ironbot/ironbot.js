@@ -43,25 +43,42 @@ var resetTime = 60; // Time te reset counter
 // The number of badwords within resetTime before -> warn, seriuswarn, ban
 var warnCount = 5;
 
-
 // Load the badwords dictionary
 dictionaries.badwords = require('./lib/badwords.js');
 
 // Load the random message dictionary
 dictionaries.funnyRandom = require('./lib/funnyRandoms.js');
 
-function detectBadwords(message, dictionaries) {
+function detectWords(message, dictionary) {
 	var wordHit = 0;
-	_.each(dictionaries.badwords, function(rxp, key) {
+	_.each(dictionary, function(rxp, key) {
 		// Test each word for a match
 		if(message.match(rxp)) {
-			wordHit = 1;
+			wordHit = key;
 		}
 	});
 	return wordHit;
 }
 
+function detectNPChat(unit, message, dictionaries) {
+	var npc = detectWords(message, dictionaries.npc),
+	greet = detectWords(message, dictionaries.greet);
+	if(npc !== 0 && greet !== 0 ) {
+		return { name: npc }
+	} else {
+		return false;
+	}
+}
 
+function getNPCMessage(npc) {
+	// Load the greet dictionary
+	// Note that all NPC names also need a response dict
+	dictionaries.response = require('./lib/response_' + npc.name + '.js');
+	var keys = Object.keys(dictionaries.response);
+	message = dictionaries.response[keys[~~(Math.random()*(keys.length))]];
+	var returnMessage = '[' + npc.name + '] ' + message;
+	return returnMessage;
+}
 
 function addUnitToList(unit) { // Adds the unit to the list.
 	var nowTime = (new Date()).getTime() / 1000;
@@ -140,9 +157,28 @@ function filterBadwords(unit, message, dictionaries) {
 	}
 }
 
+// Function to detect is a player talks to or about an NPC
+exports.detectNPChat = function(unit, message) {
+	// Load the greet dictionary
+	dictionaries.greet = require('./lib/greet.js');
+
+	// Load the npc dictionary
+	dictionaries.npc = require('./lib/npc.js');
+
+	return detectNPChat(unit, message, dictionaries);
+}
+
+// Function to get a message for an npc
+exports.getNPCMessage = function(npc) {
+	return getNPCMessage(npc);
+}
+
+
+
+
 // Function to detect a bad word for use in charcter creation
 exports.detectBadwords = function(message) {
-	return detectBadwords(message, dictionaries);
+	return detectWords(message, dictionaries.badwords);
 }
 
 exports.filterBadwords = function(unit, message) {

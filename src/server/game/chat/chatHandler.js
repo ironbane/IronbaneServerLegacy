@@ -158,6 +158,7 @@ module.exports = function(items, units, worldHandler) {
                         break;
                 }
             }
+
             // only echo this if to global?
             if (!room) {
                 unit.Say(message);
@@ -177,6 +178,12 @@ module.exports = function(items, units, worldHandler) {
             } else {
                 this.io.sockets.emit("chatMessage", messageData);
             }
+
+	    // Get NPC response
+	    if((npc = ironbot.detectNPChat(unit, message)) !== false) {
+		this.announce(ironbot.getNPCMessage(npc), '#b8b8b8');
+	    }
+
         },
         announce: function(message, color) {
             log("[Announce] " + message);
