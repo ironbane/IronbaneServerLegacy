@@ -781,35 +781,9 @@ var WorldHandler = Class.extend({
     },
     // Only for players!!!!
     FindPlayerByName: function(name) {
-        for (var z in this.world) {
-            for (var cx in this.world[z]) {
-                for (var cz in this.world[z][cx]) {
-                    if (!_.isUndefined(this.world[z][cx][cz].units)) {
-                        var units = this.world[z][cx][cz].units;
-                        for (var u in units) {
-                            if (units[u].id < 0) {
-                                continue;
-                            }
+   
 
-    for(var z in worldHandler.world) {
-      for(var cx in worldHandler.world[z]) {
-        for(var cz in worldHandler.world[z][cx]) {
-
-          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
-
-            var units = worldHandler.world[z][cx][cz].units;
-
-            for(var u in units) {
-
-              if ( units[u].id < 0 ) continue;
-
-              if ( units[u].name === name ) return units[u];
-                            if (units[u].name === name) {
-                                return units[u];
-                            }
-                        }
-                    }
-                }
+   
     for(var z in worldHandler.world) {
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {
@@ -827,6 +801,8 @@ var WorldHandler = Class.extend({
             }
           }
         }
+    }
+}
         return null;
     },
     FindUnitNear: function(id, nearUnit) {
