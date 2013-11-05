@@ -735,12 +735,6 @@ var HUDHandler = Class.extend({
         var halfWidth = frameWidth * 0.5,
             halfHeight = frameHeight * 0.5;
 
-        $('#chatBox').css({
-            width: Math.floor(halfWidth) + 'px',
-            left: (Math.floor(halfWidth) - 5) + 'px',
-            top: '5px'
-        });
-
         $('#loginBox').css({
             left: (halfWidth - 300) + 'px',
             top: (halfHeight - 300) + 'px'
@@ -954,7 +948,6 @@ var HUDHandler = Class.extend({
         $("#statBar").hide();
         $('div[id^="li"]').hide();
         $('div[id^="ii"]').hide();
-        // $('#chatBox').hide();
     },
     ShowHUD: function() {
         $('#itemBar').show();
@@ -963,16 +956,17 @@ var HUDHandler = Class.extend({
         $("#statBar").show();
         $('div[id^="li"]').show();
         $('div[id^="ii"]').show();
-        // $('#chatBox').show();
     },
     HideMenuScreen: function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
-        $('#chatBox, #itemBar, #coinBar, #statBar').show();
+        $('#itemBar, #coinBar, #statBar').show();
+        $('#chatContent').trigger('show');
         soundHandler.FadeOut("music/maintheme", 5000);
     },
     ShowMenuScreen: function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
-        $('#chatBox, #itemBar, #lootBag, #coinBar, #statBar').hide();
+        $('#itemBar, #lootBag, #coinBar, #statBar').hide();
+        $('#chatContent').trigger('hide');
         soundHandler.FadeIn("music/maintheme", 5000);
     },
     GetLastCharacterPlayed: function() {

@@ -23,7 +23,7 @@ var keyTracker = {};
 // Use direct keycodes for keypress, keyTracker for true keydown holds
 $(document).keydown(function(event) {
 
-    if (hasChatFocus) {
+    if (window.hasChatFocus) {
         return;
     }
 
@@ -36,7 +36,7 @@ $(document).keydown(function(event) {
 
     // open chat with enter, /, or @
     if ((event.keyCode === 13 || event.keyCode === 191 || (event.shiftKey && event.keyCode === 50)) && socketHandler.inGame) {
-        $('#chatInputBox').show();
+        $('#chatInput').focus();
         setTimeout(function() {
             $('#chatInput').focus();
             if(event.keyCode === 191) {
@@ -45,7 +45,6 @@ $(document).keydown(function(event) {
             if(event.shiftKey && event.keyCode === 50) {
                 $('#chatInput').val('@');
             }
-            hasChatFocus = true;
         }, 100);
         return;
     }

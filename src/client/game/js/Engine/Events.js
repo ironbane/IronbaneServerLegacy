@@ -15,103 +15,6 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-// Variables
-var hasChatFocus = false;
-var lastUsedChat = [];
-var lastUsedChatCounter = 0;
-var lastUsedChatSelectCounter = 0;
-
-
-
-// Client input
-var msg = '';
-
-$('#chatInput').attr('value', msg);
-
-$('#chatInput').focus(function() {
-    if (!socketHandler.inGame) {
-        return;
-    }
-
-    if ($('#chatInput').attr('value') === msg) {
-        $('#chatInput').attr('value', '');
-    }
-    hasChatFocus = true;
-});
-
-$('#chatInput').blur(function() {
-    if (!socketHandler.inGame) {
-        return;
-    }
-
-    if ($('#chatInput').attr('value') === '') {
-        $('#chatInput').attr('value', msg);
-    }
-    hasChatFocus = false;
-});
-
-$('#chatInput').keypress(function(e) {
-    if ( !socketHandler.inGame ) {
-        return;
-    }
-
-    code = (e.keyCode ? e.keyCode : e.which);
-    if (code === 13) {
-        var clientmsg = $('#chatInput').val(),
-            finalmsg;
-
-        // prevent blank messages
-        if(clientmsg.trim() !== '') {
-            lastUsedChat[lastUsedChatCounter++] = clientmsg;
-            lastUsedChatSelectCounter = lastUsedChatCounter;
-
-            // default chat "command" is /say to the global
-            // supports both / & @ as commands
-            if(clientmsg[0] === '/' || clientmsg[0] === '@') {
-                // continue as normal!
-                finalmsg = clientmsg;
-            } else {
-                finalmsg = '/say ' + clientmsg;
-            }
-
-            socketHandler.socket.emit('chatMessage', {
-                message: finalmsg
-            });
-        }
-
-        $('#chatInput').attr('value', '');
-        $('#chatInput').blur();
-        $('#chatInputBox').hide();
-    }
-});
-
-$('#chatInput').keydown(function(e)
-{
-  if ( !socketHandler.inGame ) return;
-
-  code= (e.keyCode ? e.keyCode : e.which);
-  if ( code == 45 ) {
-    if ( player.target_unit ) {
-      $('#chatInput').attr('value',
-        $('#chatInput').attr('value') +
-        ' '+player.target_unit.id+' ');
-    }
-  }
-  if ( code == 38 ) {
-    if ( lastUsedChatSelectCounter > 0 ) lastUsedChatSelectCounter--;
-    $('#chatInput').attr('value',
-      lastUsedChat[lastUsedChatSelectCounter]);
-  }
-  if ( code == 40 ) {
-    if ( lastUsedChatSelectCounter < lastUsedChat.length - 1 )
-      lastUsedChatSelectCounter++;
-
-    $('#chatInput').attr('value',
-      lastUsedChat[lastUsedChatSelectCounter]);
-  }
-});
-
 // Disable right-click
 $(function() {
   $(this).bind('contextmenu', function(e) {
@@ -157,7 +60,7 @@ $(document).keydown(function(event){
 
   if ( !socketHandler.inGame ) return;
 
-  if ( hasChatFocus ) return;
+  if ( window.hasChatFocus ) {return;}
 
   keyTracker[event.keyCode] = true;
 
