@@ -27,6 +27,10 @@ var dictionary = {};
 /* pee. */dictionary.pee = "I pee on the street";
 /* cuddle. */dictionary.cuddle = "I cuddle trees during weekends";
 /* lick. */dictionary.lick = "I can lick my toes :)";
+/* bird. */dictionary.bird = "I am a bird." //tits, boobies, hooters, etc. are birds...
+/* dog */dictionary.dog = "My dog is a royal magesty."
+/* cat. */dictionary.cat = "I am a cat; I have nine lives."
+/* chicken */dictionary.chicken = "There is a man eating chicken in my house."
 
 module.exports = dictionary;
 
