@@ -112,6 +112,9 @@ var Unit = Class.extend({
 
 
   },
+  isPlayer: function(){
+    return this instanceof Player;
+  },
   Awake: function() {
     //log(this.id+" is awake!");
   },
@@ -142,7 +145,7 @@ var Unit = Class.extend({
     } else {
       log("[Teleport] Cell does not exist for unit #" +
         this.id + " (" + this.cellX + ", " + this.cellZ + ")");
-      if (this.id > 0 && this.editor) {
+      if (this.isPlayer() > 0 && this.editor) {
         log("[Teleport] Generating cell because he's an editor.");
         worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
         worldHandler.world[this.zone][this.cellX][this.cellZ].units.push(this);
@@ -152,7 +155,7 @@ var Unit = Class.extend({
     this.UpdateNearbyUnitsOtherUnitsLists();
 
 
-    if (this instanceof Player && !noEmit) {
+    if (this.isPlayer() && !noEmit) {
       this.socket.emit('teleport', {
         zone: zone,
         pos: position
@@ -176,7 +179,7 @@ var Unit = Class.extend({
     this.otherUnits.push(unit);
 
     // Add the unit to ourselves clientside (only if WE are a player)
-    if ((this instanceof Player)) {
+    if (this.isPlayer()) {
 
       var id = unit.id;
 
@@ -205,7 +208,7 @@ var Unit = Class.extend({
         packet.body = unit.body;
         packet.feet = unit.feet;
 
-        if (unit.id > 0) {
+        if (unit.isPlayer()) {
           // Add additional data to the packet
           packet.name = unit.name;
 
@@ -221,7 +224,7 @@ var Unit = Class.extend({
         }
       }
 
-      if (unit.id < 0) {
+      if (!(unit.isPlayer())) {
         packet.template = unit.template.id;
 
         if (unit.template.type === UnitTypeEnum.TRAIN ||
@@ -257,7 +260,7 @@ var Unit = Class.extend({
 
 
     // Add the unit to ourselves clientside (only if WE are a player)
-    if ((this instanceof Player)) {
+    if (this.isPlayer()) {
       this.socket.emit("removeUnit", {
         id: unit.id
       });
@@ -268,7 +271,7 @@ var Unit = Class.extend({
   UpdateOtherUnitsList: function() {
 
     // If we are a player, only do so if we're ready to receive data
-    if (this.id > 0 && !this.readyToReceiveUnits) return;
+    if (this.isPlayer() && !this.readyToReceiveUnits) return;
 
     // We have two lists
     // There is a list of units we currently have, and a list that we will have once we recalculate
@@ -390,7 +393,7 @@ var Unit = Class.extend({
       } else {
         log("[ChangeCell] Cell does not exist for unit #" +
           this.id + " (" + cellPos.x + ", " + cellPos.z + ")");
-        if (this.id > 0 && this.editor) {
+        if (this.isPlayer() && this.editor) {
           log("[ChangeCell] Generating cell because he's an editor.");
           worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
           worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);

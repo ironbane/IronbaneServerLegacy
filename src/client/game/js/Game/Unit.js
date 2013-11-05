@@ -77,9 +77,6 @@ var Unit = PhysicsObject.extend({
     this.terrainAngle = 0;
 
 
-    this.spriteStep = 0;
-    this.walkSpriteTimer = 0.0;
-
     this.renderOffset = new THREE.Vector3();
     this.renderOffsetMultiplier = 0.0;
 

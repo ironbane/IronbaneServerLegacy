@@ -75,7 +75,7 @@ var Player = Fighter.extend({
   Attack: function(victim, weapon) {
 
     // Players can only attack monsters and eachother (for now)
-    if (victim.id < 0) {
+    if (!(victim.isPlayer())) {
       if (victim.template.type !== UnitTypeEnum.MONSTER) return;
     } else {
 

@@ -14,6 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+
 var dataPath = clientDir + 'data';
 var dataPathPersistent = assetDir + 'data';
 
@@ -789,13 +791,41 @@ var WorldHandler = Class.extend({
                                 continue;
                             }
 
+    for(var z in worldHandler.world) {
+      for(var cx in worldHandler.world[z]) {
+        for(var cz in worldHandler.world[z][cx]) {
+
+          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+
+            var units = worldHandler.world[z][cx][cz].units;
+
+            for(var u in units) {
+
+              if ( units[u].id < 0 ) continue;
+
+              if ( units[u].name === name ) return units[u];
                             if (units[u].name === name) {
                                 return units[u];
                             }
                         }
                     }
                 }
+    for(var z in worldHandler.world) {
+      for(var cx in worldHandler.world[z]) {
+        for(var cz in worldHandler.world[z][cx]) {
+
+          if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+
+            var units = worldHandler.world[z][cx][cz].units;
+
+            for(var u in units) {
+
+              if (units[u].isPlayer()){
+
+              if ( units[u].name === name ) return units[u];
             }
+            }
+          }
         }
         return null;
     },

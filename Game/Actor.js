@@ -21,7 +21,7 @@ var Actor = MovingUnit.extend({
         this.stateMachine = new StateMachine(this, new EmptyState(), new EmptyState());
     },
     Awake: function() {
-        if (this.id < 0) {
+        if (!(this.isPlayer())) {
             var identifier = this.template.name;
 
             // Hack for trains...bad! We need to switch to a CES system
@@ -85,7 +85,7 @@ var Actor = MovingUnit.extend({
         }, this);
 
         if (!closestNode) {
-            log("Warning: no nodes found for NPC " + this.id + "!");
+            log("Warning: no nodes found for NPC " + this.id + " in zone " + this.zone + "!");
             return;
         }
 

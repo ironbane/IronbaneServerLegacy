@@ -817,7 +817,7 @@ var Player = Fighter.extend({
     for(var u=0;u<ironbane.unitList.length;u++) {
       var unit = ironbane.unitList[u];
 
-      if ( unit instanceof Fighter && unit.InRangeOfUnit(ironbane.player, 30) && unit.id < 0 ) {
+      if ( unit instanceof Fighter && unit.InRangeOfUnit(ironbane.player, 30) && !(unit.isPlayer()) ) {
 
 
 

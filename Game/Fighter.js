@@ -25,7 +25,14 @@ var Fighter = Actor.extend({
         this.sendRotationPacketY = true;
 
         // default for players is 10, mobs are variable, default 30
-        this._respawnTime = this.respawnTimer = this.id > 0 ? 10 : (this.respawntime || 30);
+         
+        if(this.isPlayer()){
+            this._respawnTime = this.respawnTimer = 10;
+        }
+        else{
+
+         this._respawnTime = this.respawnTimer =  (this.respawntime || 30);
+         }
 
         // NPC's don't really have an items array, but nevertheless...
         if (this.items === undefined) {
@@ -36,7 +43,7 @@ var Fighter = Actor.extend({
         // Initially, their values come from MySQL and are afterwards updated within the server without updating MySQL
         // The template values are used for Maximum values, and should never be changed
 
-        if (this.id < 0) {
+        if(!(this.isPlayer())){
             this.healthMax = this.template.health;
             this.armorMax = this.template.armor;
         } else {
@@ -109,7 +116,7 @@ var Fighter = Actor.extend({
         var damage = this.ch999Damage ? 999 : weapon.attr1;
 
         if (!victim.chGodMode) {
-            if (victim.id > 0 && damage < 0) {
+            if (victim.isPlayer() && damage < 0) {
                 victim.health += Math.abs(damage);
                 victim.health = Math.min(victim.healthMax, victim.health);
 
@@ -122,7 +129,7 @@ var Fighter = Actor.extend({
                 });
             } else {
                 // 22/12/12 No more PvP... :(
-                if (this.id > 0 && victim.id > 0) {
+                if (this.isPlayer() && victim.isPlayer()) {
                     return;
                 }
                 damage = Math.abs(damage);
@@ -204,7 +211,7 @@ var Fighter = Actor.extend({
             }
 
             // No additional ticking needed for players (physics are done on the client)
-            if (this.id > 0) {
+            if (this.isPlayer()) {
                 return;
             }
 
@@ -254,7 +261,7 @@ var Fighter = Actor.extend({
         // the dead don't move!
         self.velocity.set(0, 0, 0);
 
-        if (self.id < 0) {
+        if (!(self.isPlayer())) {
             //debugger;
             self.HandleMessage("killed", {
                 killer: killer
@@ -309,7 +316,7 @@ var Fighter = Actor.extend({
         self.SetHealth(self.healthMax, true);
         self.SetArmor(self.armorMax, true);
 
-        if (self.id > 0) {
+        if (self.isPlayer()) {
             //      self.position = new THREE.Vector3(0, 0, 0);
             //      self.zone = 1;
             //debugger;
@@ -351,7 +358,7 @@ var Fighter = Actor.extend({
             h: self.health
         }, 0, true);
 
-        if (self.id < 0) {
+        if (!(self.isPlayer())) {
             self.velocity.set(0, 0, 0);
         }
     },
@@ -664,7 +671,7 @@ var Fighter = Actor.extend({
             return false;
         }
 
-        if (unit.id > 0) {
+        if (unit.isPlayer()) {
             // Check the LOS array
             if (!_.contains(unit.unitsInLineOfSight, this.id)) {
                 // log("not found in los list!");
@@ -709,12 +716,12 @@ var Fighter = Actor.extend({
                                 continue;
                             }
 
-                            if (onlyPlayers && unit.id < 0) {
+                            if (onlyPlayers && !(unit.isPlayer())) {
                                 //log("onlyPlayers && unit.id < 0");
                                 continue;
                             }
 
-                            if (!onlyPlayers && unit.id < 0 && unit.template.friendly === this.template.friendly) {
+                            if (!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === this.template.friendly) {
                                 // Don't attack our own kind!
                                 continue;
                             }
@@ -740,7 +747,7 @@ var Fighter = Actor.extend({
 
                         return unit;
 
-                    }
+                     }
                 }
             }
         }
