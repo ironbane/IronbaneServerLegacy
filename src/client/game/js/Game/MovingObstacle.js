@@ -20,22 +20,13 @@
 
 var MovingObstacle = DynamicMesh.extend({
     Init: function(position, rotation, id, param, metadata) {
-
-
-
         this._super(position, rotation, id, param, metadata);
-
-
-
-
     },
     Tick: function(dTime) {
 
         if ( this.mesh ) {
 
             var time = (new Date()).getTime();
-
-
             switch (this.movementType) {
                 case MovingObstacleMovementTypeEnum.SineWaveX:
                     this.object3D.position.x = this.startPosition.x + (Math.sin((time/1000.0)*this.speedMultiplier)*this.distanceMultiplier);

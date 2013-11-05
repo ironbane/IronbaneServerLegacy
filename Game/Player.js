@@ -19,6 +19,9 @@ var KickReason = {
   CHEAT: "Cheating"
 };
 
+var MESSAGE_LIGHTWARNING = "Your behaviour is not tolerated. Stop it.";
+var MESSAGE_SERIOUSWARNING = "Continue like this and you will get banned.<br>You have been warned.";
+
 var Player = Fighter.extend({
   Init: function(data) {
 
@@ -108,11 +111,11 @@ var Player = Fighter.extend({
     this.socket.emit("cutscene", id);
   },
     LightWarn: function() {
-        var message = this.name + ': Your behaviour is not tolerated. Stop it.';
+        var message = this.name + ': ';
         chatHandler.announce('' + message + '', "yellow");
     },
     SeriousWarn: function() {
-        var message = this.name + ': Continue like this and you will get banned.<br>You have been warned.';
+        var message = this.name + ': ';
         chatHandler.announce('' + message + '', "red");
     },
     Kick: function(reason) {

@@ -15,11 +15,13 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var TEXTURE_WAYPOINT = "misc/waypoint";
+var TEXTURE_TRIGGER = "misc/trigger";
+
 var Waypoint = Billboard.extend({
     Init: function(position, id) {
-        var texture = "misc/waypoint";
         this.drawNameMesh = !isProduction;
-        this._super(position, 0, id, texture, true, -id);
+        this._super(position, 0, id, TEXTURE_WAYPOINT, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
     }
@@ -27,9 +29,8 @@ var Waypoint = Billboard.extend({
 
 var Trigger = Billboard.extend({
     Init: function(position, id) {
-        var texture = "misc/trigger";
         this.drawNameMesh = !isProduction;
-        this._super(position, 0, id, texture, true, -id);
+        this._super(position, 0, id, TEXTURE_TRIGGER, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
     },

@@ -27,8 +27,6 @@ var sizeScalingSpeed = 2;
 var Unit = PhysicsObject.extend({
   Init: function(position, rotation, id, name, param, size) {
     this._super(position);
-
-
     this.timers = {};
     // Used for network units
     this.fakeVelocity = new THREE.Vector3();
@@ -190,6 +188,9 @@ var Unit = PhysicsObject.extend({
 
     this.AddShadow();
   },
+  isPlayer: function(){
+    return this instanceof Player;
+  },
   renderNameMesh: function(name) {
 
       var unit = this,
@@ -325,7 +326,7 @@ var Unit = PhysicsObject.extend({
 
 
     if ( ironbane.player && this instanceof Fighter) {
-      if ( this instanceof Player ) {
+      if ( this.isPlayer() ) {
         this.unitStandingOn = null;
       }
       else {
@@ -346,7 +347,7 @@ var Unit = PhysicsObject.extend({
 
       // For all server-controlled units, simulate their actual position by walking to their targetPosition
       // instead of laggy teleports all the time
-      if ( !(this instanceof Player) && !(this instanceof Projectile) ) {
+      if ( !(this.isPlayer()) && !(this instanceof Projectile) ) {
 
         if ( !(le("mpTransformMode")
             && ironbane.newLevelEditor
@@ -396,7 +397,7 @@ var Unit = PhysicsObject.extend({
           }
         }
 
-        if ( !(this instanceof Fighter && this.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
+        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
           if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
             this.velocity.add(grav.clone().multiplyScalar(dTime));
           }
@@ -425,7 +426,7 @@ var Unit = PhysicsObject.extend({
         // Only for the player to reduce performance
         // NPC's use waypoints and other players should do their own local collision detection
         // Will make cheaters easier to spot
-        if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
+        if ( (this.isPlayer()) || (this instanceof Projectile && !this.impactDone) ) {
           var tVel = this.velocity.clone();
           tVel.y = 0;
           tVel.normalize();
@@ -491,7 +492,7 @@ var Unit = PhysicsObject.extend({
               for(var i=0;i<intersects.length;i++){
                 normal = intersects[i].face.normal;
                 point = intersects[i].point;
-                distance = intersects[i].distance;
+                distance = intersects[i].distance.Round(2);
 
                 struckUnit = intersects[i].object.unit;
 
@@ -500,7 +501,7 @@ var Unit = PhysicsObject.extend({
                 raycastGroundPosition = point;
 
 
-                 if ( (this instanceof Player || this instanceof Projectile) ) {
+                 if ( (this.isPlayer() || this instanceof Projectile) ) {
                    if ( struckUnit instanceof DynamicMesh ) {
 
                        this.unitStandingOn = struckUnit;
@@ -508,7 +509,6 @@ var Unit = PhysicsObject.extend({
                    }
                  }
 
-                distance = distance.Round(2);
 
                 if ( distance <= distanceCheck && this.restrictToGround ) {
 
@@ -593,7 +593,7 @@ var Unit = PhysicsObject.extend({
 
         // Collide against meshes to the top
         // Only for the player
-        if ( (this instanceof Player) || (this instanceof Projectile && !this.impactDone) ) {
+        if ( this.isPlayer() || (this instanceof Projectile && !this.impactDone) ) {
           ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
           var intersects = terrainHandler.RayTest(ray, {
@@ -620,33 +620,22 @@ var Unit = PhysicsObject.extend({
               moveVector.add(raycastNormal);
               moveVector.multiplyScalar(2);
             }
-
             this.velocity.add(moveVector);
-
           }
-
         }
-
-
-
       }
       else {
           this.allowRaycastGround = true;
       }
-
     }
-
-
     if ( raycastNormal ) {
       this.groundNormal = raycastNormal;
     }
-
-
     var offset = this.renderOffset.clone().multiplyScalar(this.renderOffsetMultiplier);
 
     // Additional offset for special units (hacky...)
 
-    if ( this.id < 0 && this.name == "Ghost" ) offset.y += 0.5;
+    if ( !(this.isPlayer()) && this.name == "Ghost" ) offset.y += 0.5;
 
 
     var renderPosition = this.position.clone().add(offset);
@@ -697,10 +686,6 @@ var Unit = PhysicsObject.extend({
 
     //this.mesh.position.y = renderPosition.y;
     }
-
-
-
-
   },
   InRangeOfUnit: function(unit, range) {
     return this.InRangeOfPosition(unit.position, range);

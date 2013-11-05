@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+var MAX_LOOTABLE_LIFETIME = 30;
 
 var Lootable = Unit.extend({
     lifeTime: 0,
@@ -84,7 +85,7 @@ var Lootable = Unit.extend({
 
         // Lootbags (<10) are removed while lootable meshes restock
         if (this.param < 10) {
-            if (this.lifeTime > 30) {
+            if (this.lifeTime > MAX_LOOTABLE_LIFETIME) {
                 this.Remove();
             }
         } else {

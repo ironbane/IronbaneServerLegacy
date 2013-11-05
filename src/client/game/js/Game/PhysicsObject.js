@@ -106,20 +106,15 @@ var PhysicsObject = Class.extend({
 
 
         this.oldPosition = this.object3D.position.clone();
-
-
-
             if ( this.unitStandingOn != this.lastUnitStandingOn ) {
                 // Perspective changed!
                 if ( this.lastUnitStandingOn ) {
                     // First remove the old reference
                     this.lastUnitStandingOn.object3D.remove(this.object3D);
                     ironbane.scene.add(this.object3D);
-
-
                     this.object3D.position.copy(this.position);
 
-                    if ( this instanceof Player ) {
+                    if ( this.isPlayer()) {
                         // Add the object's rotation to rotY
                         this.object3D.rotation.y += this.lastUnitStandingOn.object3D.rotation.y;
                     }
@@ -137,7 +132,7 @@ var PhysicsObject = Class.extend({
 
                     this.object3D.position.applyMatrix4(rotationMatrix);
 
-                    if ( this instanceof Player ) {
+                    if ( this.isPlayer() ) {
                         // Add the object's rotation to rotY
                         this.object3D.rotation.y -= this.unitStandingOn.object3D.rotation.y;
                     }
@@ -152,16 +147,6 @@ var PhysicsObject = Class.extend({
 
                 }
             }
-
-
-
-
-
-
-
-
-
-
         var acceleration = this.steeringForce.multiplyScalar(this.mass);
 
         this.velocity.add(acceleration.multiplyScalar(dTime));
@@ -178,10 +163,9 @@ var PhysicsObject = Class.extend({
         var vel = this.velocity.clone();
 
         if ( this.unitStandingOn ) {
-
-                    var rotationMatrix = new THREE.Matrix4();
-                    rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
-                    vel.applyMatrix4(rotationMatrix);
+            var rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.extractRotation(this.unitStandingOn.object3D.matrix).transpose();
+            vel.applyMatrix4(rotationMatrix);
         }
 
         this.object3D.position.add(vel.multiplyScalar(dTime));

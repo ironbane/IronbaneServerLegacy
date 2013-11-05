@@ -87,7 +87,8 @@ var ProjectileTypeEnum = {
         lifeTime: 8,
         parabolic: true,
         meshType: ProjectileMeshTypeEnum.ARROW,
-        impactSound: "arrowhit"
+        impactSound: "arrowhit",
+        texture: {FULL: 'images/projectiles/arrow_single.png', BACK: 'images/projectiles/arrow_back.png', HEAD:'images/projectiles/arrow_head.png'}
     },
     MELEE: {
         speed: 6,
@@ -105,7 +106,8 @@ var ProjectileTypeEnum = {
         lifeTime: 8,
         parabolic: true,
         meshType: ProjectileMeshTypeEnum.BONE,
-        rotationSpeed: new THREE.Vector3(10, 0, 0)
+        rotationSpeed: new THREE.Vector3(10, 0, 0),
+        texture: {FULL: 'images/projectiles/bone.png', BONEHEAD:  'images/projectiles/bonehead.png'} 
     }
 };
 
@@ -121,11 +123,11 @@ var Projectile = Unit.extend({
             this.weapon = ironbane.player.GetEquippedWeapon();
             this.weaponTemplate = items[this.weapon.template];
         }
-        else if ( this.owner.id < 0 ) {
+        else if (!(this.owner.isPlayer())) {
             this.weapon = items[weaponID];
             this.weaponTemplate = this.weapon;
         }
-        else if ( this.owner.id > 0 ) {
+        else if ( this.owner.isPlayer) {
             this.weapon = owner.weaponTemplate;
             this.weaponTemplate = this.weapon;
         }
@@ -156,7 +158,6 @@ var Projectile = Unit.extend({
 
 
         if ( type === ProjectileTypeEnum.MELEE ) {
-
             switch (this.weaponTemplate.subtype) {
                 case "sword":
                     this.type.lifeTime = 4;
@@ -170,13 +171,8 @@ var Projectile = Unit.extend({
                     this.type.lifeTime = 2;
                     this.type.speed = 10;
                     break;
-
             }
-
-
-
         }
-
 
         if ( this.type.parabolic ) {
             position.y += 0.5;
@@ -184,7 +180,6 @@ var Projectile = Unit.extend({
         else {
             targetPosition.y += 0.1;
         }
-
 
         this.particle = null;
 
@@ -196,14 +191,10 @@ var Projectile = Unit.extend({
             this.restrictToGround = false;
         }
 
-
-
         // Overwrite the default of '5'
         this.maxSpeed = 200;
 
-
         this.targetPosition = targetPosition;
-
 
         this.dynamic = true;
         this.enableGravity = false;
@@ -218,8 +209,6 @@ var Projectile = Unit.extend({
 
         this.impactDone = false;
 
-
-
         if ( this.type.parabolic ) {
             this.renderOffset.y -= 0.3;
             this.renderOffsetMultiplier = 1.0;
@@ -228,16 +217,12 @@ var Projectile = Unit.extend({
 
         var launchVelocity = this.targetPosition.clone().sub(this.position);
 
-
         var height = this.targetPosition.clone().sub(this.position).y;
-
 
         launchVelocity.normalize().multiplyScalar(this.type.speed);
 
         if ( this.type.parabolic ) {
-
             launchVelocity.y = 0;
-
             var angle = this.CalculateFiringAngle(targetPosition, false);
             this.heading = launchVelocity.clone().normalize();
             this.side = this.heading.clone().Perp();
@@ -257,36 +242,7 @@ var Projectile = Unit.extend({
         this.lifeTime = this.type.lifeTime;
     },
     Add: function () {
-
-        //console.warn(this.position.x);
-
-
-        // Get material
-
-
-
-
-
-//        this.TryToBuildMesh();
-
-
-
         this._super();
-//    },
-//    TryToBuildMesh: function() {
-//        if ( this.texture.image.width == 0 ) {
-//            (function(unit){
-//                setTimeout(function(){
-//                    unit.TryToBuildMesh()
-//                    }, 1000)
-//                })(this);
-//        }
-//        else {
-//            this.BuildMesh();
-//        }
-//    },
-//    BuildMesh: function() {
-
 
         this.mesh = new THREE.Object3D();
 
@@ -295,7 +251,7 @@ var Projectile = Unit.extend({
         this.mesh.add(this.meshChild);
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
-            var mat = textureHandler.GetTexture( 'images/projectiles/arrow_single.png', false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.GetTexture(ProjectileTypeEnum.ARROW.texture.FULL , false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -316,8 +272,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI/2;
             this.meshChild.add(mesh);
 
-            var texture = 'images/projectiles/arrowback.png';
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.ARROW.texture.BACK, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -326,8 +281,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var texture = 'images/projectiles/arrowhead.png';
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.ARROW.texture.HEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -339,7 +293,7 @@ var Projectile = Unit.extend({
         }
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.BONE ) {
-            var mat = textureHandler.GetTexture( 'images/projectiles/bone.png', false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.FULL, false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -361,8 +315,7 @@ var Projectile = Unit.extend({
             this.meshChild.add(mesh);
 
 
-            var texture = 'images/projectiles/bonehead.png';
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -371,7 +324,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( texture, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -390,14 +343,11 @@ var Projectile = Unit.extend({
 
             var mat = textureHandler.GetTexture(texture, false, {transparent:true, doubleSided:true});
 
-
-            var mesh;
-
             var planeGeo = new THREE.PlaneGeometry(1,1, 1, 1);
 
             this.meshHeight = 1;
 
-            mesh = new THREE.Mesh(planeGeo, mat);
+            var mesh = new THREE.Mesh(planeGeo, mat);
             mesh.rotation.x = Math.PI/4;
             mesh.rotation.y = Math.PI/2;
             this.meshChild.add(mesh);
@@ -425,13 +375,7 @@ var Projectile = Unit.extend({
 
     },
     Tick: function(dTime) {
-
-
-
         this.lifeTime -= dTime;
-
-
-
 
         //this.velocity = this.targetPosition.clone().sub(this.position).normalize().multiplyScalar(this.type.speed);
         //this.steeringForce = this.steeringBehaviour.Seek(this.targetPosition);
@@ -441,10 +385,8 @@ var Projectile = Unit.extend({
 
         var spriteIndex = this.GetDirectionSpriteIndex();
 
-
         if ( this.meshChild ) {
             if ( this.type.meshType == ProjectileMeshTypeEnum.MELEE ) {
-
                 if ( this.weaponTemplate.subtype === "axe" ) {
 //                    this.meshChild.rotation.y += dTime*10;
                      this.meshChild.rotation.x += dTime*15;
@@ -457,15 +399,12 @@ var Projectile = Unit.extend({
             groundV.y = 0;
             groundV.normalize();
 
-
-
             if ( this.isTouchingGround ) {
                 this.velocity.set(0,0,0);
 
                 if ( this.enableGravity ) {
                     //this.position.y += 1.0;
                     this.positionedShadowMesh = false;
-
                 }
 
                 this.enableGravity = false;
@@ -486,8 +425,8 @@ var Projectile = Unit.extend({
                             && u != ironbane.player
                             && unit.InRangeOfUnit(u, 1)
                             && u.health > 0
-                            && (u.id < 0 || (u.id > 0 && unit.weapon.attr1 <= 0))
-                            && (u.id > 0 || !u.template.friendly) ){
+                            && (u.id < 0 || (u.isPlayer() && unit.weapon.attr1 <= 0))
+                            && (u.isPlayer() || !u.template.friendly) ){
                             list.push(u.id);
                             unitList.push(u);
                         }
@@ -511,17 +450,13 @@ var Projectile = Unit.extend({
 //                        unit.unitStandingOn = unitList[0];
 
                         unit.Impact();
-
-
-
-
                     }
                     })(this);
 
                 }
             }
         }
-        else if ( this.owner.id < 0 ) {
+        else if (!(this.owner.isPlayer())) {
             if ( !this.damageDone ) {
                 if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
@@ -544,11 +479,6 @@ var Projectile = Unit.extend({
 
                         unit.damageDone = true;
 
-//                        unit.velocity.set(0,0,0)
-//                        unit.object3D.position.copy(ironbane.player.position);
-//                        unit.dynamic = false;
-//                        unit.unitStandingOn = ironbane.player;
-
                         unit.Impact();
                     }
                     })(this);
@@ -556,14 +486,12 @@ var Projectile = Unit.extend({
                 }
             }
         }
-        else if ( this.owner.id > 0 ) {
+        else if ( this.owner.isPlayer()) {
             if ( !this.damageDone ) {
                 if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
                     (function(unit){
                     var list = [];
-
-
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
                             && u != unit.owner
@@ -577,11 +505,6 @@ var Projectile = Unit.extend({
                     if ( list.length > 0 ) {
                         unit.damageDone = true;
 
-//                        unit.velocity.set(0,0,0)
-//                        unit.object3D.position.copy(u.position);
-//                        unit.dynamic = false;
-//                        unit.unitStandingOn = u;
-
                         unit.Impact();
 
                     }
@@ -594,12 +517,9 @@ var Projectile = Unit.extend({
 
         this.rotY = (Math.atan2(this.heading.z, this.heading.x));
         if ( this.rotY < 0 ) this.rotY += (Math.PI*2);
-        this.rotY = (Math.PI*2) - this.rotY ;
-
-
+        this.rotY = (Math.PI*2) - this.rotY;
 
         if ( this.lifeTime <= 0 ) {
-
             if ( this.particle ) {
                 this.particle.removeNextTick = true;
                 this.particle = null;
@@ -669,8 +589,6 @@ var Projectile = Unit.extend({
 
         var x = targetTransform.sub(myTransform).length();
 
-
-
         var v = this.type.speed;
         var g = -gravity.y;
 
@@ -684,7 +602,6 @@ var Projectile = Unit.extend({
             result = Math.PI*0.15;
         }
         else {
-
             sqrt = Math.sqrt(sqrt);
 
             // DirectFire chooses the low trajectory, otherwise high trajectory.

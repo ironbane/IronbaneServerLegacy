@@ -22,17 +22,11 @@
 
 var Lever = ToggleableObstacle.extend({
   Init: function(position, id, metadata) {
-
-
-
-
     this._super(position, new THREE.Euler(), id, 17, {
       'movementType':4,
       'rotY':0,
       'on':metadata.on
       });
-
-
   },
   BuildMesh: function(geometry, jsonMaterials) {
 

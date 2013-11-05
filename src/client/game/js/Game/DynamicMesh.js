@@ -20,13 +20,7 @@
 
 var DynamicMesh = Mesh.extend({
     Init: function(position, rotation, id, param, metadata) {
-
-
-
-
         this._super(position, rotation, id, param, metadata);
-
-
         this.dynamic = true;
 
 

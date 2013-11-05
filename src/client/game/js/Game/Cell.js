@@ -153,31 +153,24 @@ var Cell = Class.extend({
 
         if ( this.modelGeometry ) {
             this.modelGeometry.dispose();
-
             this.totalMaterials = [];
         }
 
         if ( this.models ) {
             // TODO Possible mem leak suspect? but removing manually is too slow...
             this.octree = new THREE.Octree({undeferred: true});
-
             _.each(this.totalMaterials, function(material) {
                 material.dispose();
             });
-
             ironbane.scene.remove(this.models);
         }
-
-
         _.each(this.objects, function(object) {
             object.Destroy();
-
             // Remove from unitList
             ironbane.unitList = _.without(ironbane.unitList, object);
         });
 
         this.objects = [];
-
         this.status = cellStatusEnum.DESTROYED;
     },
     ReloadWaypointsOnly: function() {
@@ -185,7 +178,6 @@ var Cell = Class.extend({
         _.each(this.objects, function(object) {
             if ( object instanceof Waypoint) {
                 object.Destroy();
-
                 // Remove from unitList
                 ironbane.unitList = _.without(ironbane.unitList, object);
                 this.objects = _.without(this.objects, object);
@@ -201,7 +193,6 @@ var Cell = Class.extend({
         for(var o=0;o<this.objects.length;o++) {
             this.objects[o].Destroy();
             // Remove from unitList
-
             ironbane.unitList = _.without(ironbane.unitList, this.objects[o]);
         }
 
@@ -390,22 +381,14 @@ var Cell = Class.extend({
                                                 this.waypointMeshes.push(aH);
                                                 ironbane.scene.add(aH);
                                             }
-
                                         }
-
                                     }
-
                                 }
                             }
-                        }
-
+                       }
                     }
-
-
                 }
             }
-
         }
-
     }
 });

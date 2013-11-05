@@ -183,14 +183,12 @@ var Unit = Class.extend({
 
       var id = unit.id;
 
-
       var packet = {
         id: id,
         position: unit.position,
         rotY: unit.rotation.y,
         param: unit.param
       };
-
 
       if (unit instanceof Fighter) {
 
@@ -241,18 +239,11 @@ var Unit = Class.extend({
         if (unit.template.special) {
           packet.metadata = unit.data;
         }
-
-
-
       }
-
-
       this.socket.emit("addUnit", packet);
-
     }
-
-
   },
+
   RemoveOtherUnit: function(unit) {
     // Auto send AddUnit if we're a player
 
@@ -265,8 +256,6 @@ var Unit = Class.extend({
         id: unit.id
       });
     }
-
-
   },
   UpdateOtherUnitsList: function() {
 
@@ -284,8 +273,6 @@ var Unit = Class.extend({
     // Loop over the world cells nearby and add all units
     var cx = this.cellX;
     var cz = this.cellZ;
-
-
 
     for (var x = cx - 1; x <= cx + 1; x++) {
       for (var z = cz - 1; z <= cz + 1; z++) {
@@ -359,9 +346,6 @@ var Unit = Class.extend({
         return spawn;
     },
   ChangeCell: function(newCellX, newCellZ) {
-
-
-
     // Make sure we generate adjacent cells if they don't exist
     var cx = this.cellX;
     var cz = this.cellZ;
@@ -412,7 +396,6 @@ var Unit = Class.extend({
             x: x,
             z: z
           });
-
         }
       }
 
@@ -509,25 +492,23 @@ var Unit = Class.extend({
           var units = worldHandler.world[zone][x][z].units;
 
           for (var u = 0; u < units.length; u++) {
-            if (!(units[u] instanceof Player)) continue;
+            if (units[u].isPlayer()) {
 
-            // Don't send to ourselves...?
-            if (!allowSelf && units[u] == this) {
-              continue;
+              // Don't send to ourselves...?
+              if (!allowSelf && units[u] == this) {
+                continue;
+              }
+
+              var distance = DistanceBetweenPoints(this.position.x, this.position.z, units[u].position.x, units[u].position.z);
+              // Check if the unit is too far from us
+              if (maxDistance > 0 && distance > maxDistance) continue;
+
+              units[u].socket.emit(event, data);
             }
-
-            var distance = DistanceBetweenPoints(this.position.x, this.position.z, units[u].position.x, units[u].position.z);
-            // Check if the unit is too far from us
-            if (maxDistance > 0 && distance > maxDistance) continue;
-
-            units[u].socket.emit(event, data);
-
           }
         }
       }
     }
-
-
   },
   CalculatePath: function(targetPosition) {
 

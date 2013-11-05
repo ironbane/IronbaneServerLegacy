@@ -35,7 +35,7 @@ var Fighter = Unit.extend({
     armorMax = armorMax || 0;
 
 
-    this.drawNameMesh = id > 0 && !(this instanceof Player) ? true : false;
+    this.drawNameMesh = id > 0 && !(this.isPlayer());
 
 
     if ( id < 0 && !isProduction ) {
@@ -92,13 +92,10 @@ var Fighter = Unit.extend({
     this.appearance.body = 0;
     this.appearance.feet = 0;
 
-
-
     // Used for size calculation
     this.meshHeight = 1.0;
 
     this.timers.lastJumpTimer = 0;
-
 
     this.spriteIndex = 0;
 
@@ -111,29 +108,12 @@ var Fighter = Unit.extend({
     this.canSelectWithEditor = true;
   },
   Add: function() {
-
-
-
-
-    //this.UpdateWeapon();
-    //this.UpdateClothes();
-
     this._super();
-
-
-
   },
   Destroy: function() {
-
-
-    //        if ( this.weaponMesh ) {
-    //            ironbane.scene.remove(this.weaponMesh);
-    //        }
-
     if ( this.weaponOrigin ) {
       ironbane.scene.remove(this.weaponOrigin);
     }
-
     this._super();
 
   },
@@ -213,10 +193,6 @@ var Fighter = Unit.extend({
 
   },
   UpdateWeapon: function(weapon) {
-
-
-
-
     if ( this.weaponOrigin ) {
       // Possible memory leak..which one to delete?
       ironbane.scene.remove(this.weaponOrigin);
@@ -233,7 +209,6 @@ var Fighter = Unit.extend({
     var imgWeapon = this.weaponTemplate.image;
 
     var texture = 'images/items/' + imgWeapon + '.png';
-
 
     planeGeo = new THREE.PlaneGeometry(0.6, 0.6, 1, 1);
 
@@ -271,17 +246,8 @@ var Fighter = Unit.extend({
     if ( stealth ) shaderMaterial.wireframe = true;
 
     shaderMaterial.side = THREE.DoubleSide;
-    //shaderMaterial.wireframe = true;
-
-    //shaderMaterial = new THREE.MeshBasicMaterial( { map: textureHandler.GetTexture( texture ) , alphaTest: 0.5, transparent: true } );
 
     this.weaponMesh = new THREE.Mesh(planeGeo, shaderMaterial);
-
-
-
-
-    //        this.weaponMesh.position.y = 0.3;
-    //        this.weaponMesh.position.x = -0.3;
 
     this.weaponMesh.geometry.dynamic = true;
 
@@ -297,12 +263,8 @@ var Fighter = Unit.extend({
 
   },
   Tick: function(dTime) {
-
-
-    
-
     // Update speed (used for walking animations
-    if ( !(this instanceof Player) ) {
+    if ( !(this.isPlayer()) ) {
       //            var targetVelX = (this.targetPosition.x-this.object3D.position.x)/dTime/10;
       //            var targetVelZ = (this.targetPosition.z-this.object3D.position.z)/dTime/10;
       //this.speed = this.fakeVelocity.length();
@@ -317,21 +279,8 @@ var Fighter = Unit.extend({
       bogusVelocity.y = 0;
 
       this.speed = bogusVelocity.length();
-
-
-
     //sw("TEST speed", this.speed);
     }
-
-
-    //        debug.SetWatch('speed', this.speed);
-    //        debug.SetWatch(this.id+': name', this.name);
-    //debug.SetWatch(this.id+': speed', this.speed);
-    //        debug.SetWatch(this.id+': targetSpeed', this.targetSpeed);
-    //debug.SetWatch(this.id+': targetPosition', this.targetPosition.ToString());
-    //debug.SetWatch(this.id+': velocity', this.velocity.ToString());
-
-
 
     if ( this.timers.meleeHitTimer <= 0 && this.timers.meleeAttackTimer <= 0 ) {
       // Reset position
@@ -340,31 +289,22 @@ var Fighter = Unit.extend({
       }
     }
     else {
-
       if ( this.timers.meleeHitTimer > 0 ) {
         this.renderOffsetMultiplier = this.timers.meleeHitTimer/meleeTime;
       }
       if ( this.timers.meleeAttackTimer > 0 ) {
         this.renderOffsetMultiplier = this.timers.meleeAttackTimer/(meleeTime*1);
       }
-
-
       if ( this.renderOffsetMultiplier > 1 ) this.renderOffsetMultiplier = 1-(this.renderOffsetMultiplier-1);
 
       this.renderOffsetMultiplier = Math.sin(this.renderOffsetMultiplier*Math.PI);
     }
 
-
     this.lastSpriteIndex = this.spriteIndex;
     this.spriteIndex = this.GetDirectionSpriteIndex();
 
-
-
     if ( this.mesh ) {
       this.mesh.LookFlatAt(ironbane.camera.position, true);
-
-
-
       this.mesh.material.uniforms.hue.value.set(1,1,1);
 
       if ( this.timers.meleeHitTimer > 0 ) {
@@ -385,9 +325,6 @@ var Fighter = Unit.extend({
       if ( this.health < max ) {
 
         var mp = 0.5+(Math.cos(new Date().getTime()/1000*(5))/2);
-
-        //debug.SetWatch('mp', mp.Round(2));
-
 
         this.mesh.material.uniforms.hue.value.y = mp;
         this.mesh.material.uniforms.hue.value.z = mp;
@@ -411,7 +348,7 @@ var Fighter = Unit.extend({
 
     if ( this.weaponMesh ) {
 
-      var firstPerson = (this instanceof Player) && this.cameraStatus == CameraStatusEnum.FirstPerson;
+      var firstPerson = (this.isPlayer()) && this.cameraStatus == CameraStatusEnum.FirstPerson;
 
       var offset = new THREE.Vector3(0.0, firstPerson ? 0.25 : 0, firstPerson ? -0.5 : 0);
       var front = true;
@@ -447,7 +384,7 @@ var Fighter = Unit.extend({
       if ( firstPerson ) weaponSpriteIndex = 0;
 
       var pointDirection = null;
-      if ( this instanceof Player && currentMouseToWorldData) {
+      if ( this.isPlayer() && currentMouseToWorldData) {
         pointDirection = ConvertVector3(currentMouseToWorldData.point).sub(this.position).normalize();
       }
 
@@ -667,7 +604,7 @@ var Fighter = Unit.extend({
 
       var offsetMultiplier = 1.0;
 
-      if (this.id < 0) offsetMultiplier = this.template.weaponoffsetmultiplier;
+      if (!(this.isPlayer())) offsetMultiplier = this.template.weaponoffsetmultiplier;
 
       var zPosition = ((front ? 0.02 : -0.02)*this.size*offsetMultiplier)+offset.z;
 
@@ -716,7 +653,7 @@ var Fighter = Unit.extend({
     if ( this.speed > 0.1 ) {
       this.spriteStatus = this.SpriteStatusEnum.WALK;
       if(this.timers.walkSoundTimer <= 0 ) {
-        if(this instanceof Player) {
+        if(this.isPlayer()) {
           //soundHandler.Play("Footsteps");
       }
       this.timers.walkSoundTimer = walkSoundTime;
@@ -769,14 +706,6 @@ var Fighter = Unit.extend({
   //debug.SetWatch('spriteStep', this.spriteStep);
   },
   SwingWeapon: function(pos, weapon) {
-
-
-
-    //        if ( !pos ) pos = this.position;
-    //pos = null;
-
-
-
     if ( this.timers.attackStateTimer > 0 ) return;
 
     this.meleeHitPosition = null;
@@ -790,9 +719,6 @@ var Fighter = Unit.extend({
 
 
     if ( weapon ) {
-
-
-
       switch (weapon.subtype) {
         case 'bow':
           soundHandler.Play("battle/fireArrow", this.position);
@@ -820,7 +746,6 @@ var Fighter = Unit.extend({
 
   },
   Jump: function() {
-
     if ( this.terrainAngle > 45 && this.position.y > GetZoneConfig('fluidLevel') ) return;
 
     this.velocity.y = 5;
@@ -863,13 +788,8 @@ var Fighter = Unit.extend({
 
   },
   GetMeleeHit: function(attacker, power) {
-
-
     if ( attacker ) {
-      // Don't get hit by healing spells
-      if ( attacker.id > 0 && this.id > 0 ) return;
-
-
+      if ( attacker.isPlayer()  && this.isPlayer()) return;
       // We can't hit dead people
       if ( this.dead ) return;
 
@@ -889,32 +809,17 @@ var Fighter = Unit.extend({
 
       this.renderOffset = force;
 
-
-      // if ( this.armor > 0 ) {
-      //   soundHandler.Play("hit1", this.position);
-      // }
-      // else {
-      //   soundHandler.Play("hit2", this.position);
-      // }
-
-      //        if ( attacker != ironbane.player && pos ) {
-      //            attacker.SwingWeapon(pos);
-      //        }
-      //
     }
 
     if ( this.health <= 0 ) {
 
       this.playSound("battle/die");
-
       this.Die();
 
     }
     else {
       this.playSound("battle/hit");
     }
-
-
   },
 
   playSound: function(sound) {
@@ -953,9 +858,6 @@ var Fighter = Unit.extend({
 
     this.dead = true;
     this.canMove = false;
-
-
-
     if ( this === ironbane.player ) {
       bm('<span style="color:red">You died.</span>');
       // setTimeout(function(){
@@ -963,33 +865,22 @@ var Fighter = Unit.extend({
       // }, 6000);
 
       socketHandler.playerData.items = [];
-
       hudHandler.ReloadInventory();
-
       hudHandler.HideHUD();
     }
-
-
-
   },
   Respawn: function() {
 
-
     this.mesh.visible = true;
-
     if ( this.weaponMesh ) {
       this.weaponMesh.visible = true;
     }
-
     if ( this.nameMesh ) {
       this.nameMesh.visible = true;
     }
-
     if ( this.shadowMesh ) {
       this.shadowMesh.visible = true;
     }
-
-
   },
   SetHealth: function(newHealth, noParticles) {
 
@@ -1001,11 +892,7 @@ var Fighter = Unit.extend({
 
     if ( !noParticles ) {
 
-      var heal = false;
-
-      if ( damage < 0 ) {
-        heal = true;
-      }
+      var heal = ( damage < 0 );
 
       damage = Math.abs(damage);
 
@@ -1108,9 +995,6 @@ var Fighter = Unit.extend({
           }, delay);
           })(this);
       }
-
-
-
       if ( this == ironbane.player && damage > 0) {
         hudHandler.MakeArmorBar(true);
         setTimeout(function(){
@@ -1120,8 +1004,3 @@ var Fighter = Unit.extend({
     }
   }
 });
-
-
-
-
-

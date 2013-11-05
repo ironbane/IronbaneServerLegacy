@@ -17,20 +17,18 @@
 
 
 
-
+var TEXTURE_HEARTPIECE = "misc/heartpiece";
 
 var HeartPiece = Billboard.extend({
     Init: function(position, id) {
 
-
-        var texture = "misc/heartpiece";
 
         if ( !isProduction ) {
             this.drawNameMesh = true;
             this.overrideName = Math.abs(id);
         }
 
-        this._super(position, 0, id, texture, true);
+        this._super(position, 0, id, TEXTURE_HEARTPIECE, true);
 
                 this.renderOffsetMultiplier = 1.0;
 

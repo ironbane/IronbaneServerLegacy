@@ -31,9 +31,7 @@ var ParticleHandler = Class.extend({
             this.particleEmitters[i].removeNextTick = true;
         }
     },
-    Tick: function (dTime) {
-
-	
+    Tick: function (dTime) {	
         for (var i = 0; i < this.particleEmitters.length; ++i) {
 			this.particleEmitters[i].Tick(dTime);
 		
@@ -42,8 +40,6 @@ var ParticleHandler = Class.extend({
                 this.particleEmitters.splice(i--, 1);
             }
         }
-
-
     }
 });
 

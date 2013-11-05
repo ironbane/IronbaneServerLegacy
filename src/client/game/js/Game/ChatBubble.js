@@ -29,7 +29,6 @@ var ChatBubble = PhysicsObject.extend({
 
         this.textMesh = null;
 
-
         this.MakeTextMesh(ironbane.mouthwash(text));
 
         this.text = text;
@@ -56,11 +55,8 @@ var ChatBubble = PhysicsObject.extend({
             var ctx = c.getContext('2d');
             var fillText = text;
 
-            c.width=1200;
-            c.height=70;
-
-
-
+            c.width = 1200;
+            c.height = 70;
 
             ctx.font = '26pt Arial Black';
             ctx.textAlign = 'center';
@@ -82,11 +78,6 @@ var ChatBubble = PhysicsObject.extend({
             ctx.lineTo((c.width/2)+10,48);
             ctx.lineTo((c.width/2),58);
             ctx.fill();
-
-
-
-            //c.getContext('2d').textAlign= 'center';
-
 
             ctx.fillText(fillText, c.width/2, 40);
             ctx.strokeText(fillText, c.width/2, 40);
@@ -124,8 +115,6 @@ var ChatBubble = PhysicsObject.extend({
 
     },
     Tick: function(dTime) {
-
-
         // Count the amount of bubbles that are on top of the player
         var count = 0;
         for(var x=ironbane.unitList.length;x>=0;x--){
@@ -144,19 +133,14 @@ var ChatBubble = PhysicsObject.extend({
 
         this.lifeTime -= dTime;
 
-
-
         this._super(dTime);
 
         if ( this.textMesh ) {
             this.textMesh.position.copy(this.object3D.position);
-
             this.textMesh.LookFlatAt(ironbane.camera.position);
-
         }
 
         if ( this.lifeTime <= 0 ) this.Destroy();
-
     }
 });
 

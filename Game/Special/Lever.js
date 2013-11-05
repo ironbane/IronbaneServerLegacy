@@ -63,15 +63,14 @@ var Lever = Unit.extend({
             var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
 
             for (var u = 0; u < units.length; u++) {
-                if (!(units[u] instanceof Player)) {
-                    continue;
-                }
+                if(units[u].isPlayer()){
 
-                if (units[u].InRangeOfUnit(this, 1)) {
-                    if (this.targetUnit) {
-                        this.targetUnit.Toggle(!this.on);
+                    if (units[u].InRangeOfUnit(this, 1)) {
+                        if (this.targetUnit) {
+                            this.targetUnit.Toggle(!this.on);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }

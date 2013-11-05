@@ -347,8 +347,6 @@ var HUDHandler = Class.extend({
                     TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
                     ironbane.unitList.push(new ChatBubble(ironbane.player.lootUnit, "Then take yer stuff with ye!"));
                 });
-
-
                 return;
             }
 
@@ -470,14 +468,11 @@ var HUDHandler = Class.extend({
                 } else {
                     TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
                 }
-
                 return;
             }
-
             if ( reply.items ) {
                 socketHandler.playerData.items = reply.items;
             }
-
             if ( reply.loot ) {
                 ironbane.player.lootItems = reply.loot;
             }
@@ -528,9 +523,6 @@ var HUDHandler = Class.extend({
                     }
                 }
             }
-
-
-
             soundHandler.Play(ChooseRandom(["bag1"]));
 
         });

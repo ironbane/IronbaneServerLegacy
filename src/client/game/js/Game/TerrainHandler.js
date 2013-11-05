@@ -16,6 +16,8 @@
 */
 
 
+var REBUILD_OCTREE_THRESHOLD = 100;
+
 // Must be dividable by 2
 var cellLoadRange = cellSize+16;
 
@@ -340,7 +342,7 @@ var TerrainHandler = Class.extend({
       //30-6-2013 - Ingmar : check on existence of ironbane.player, during load of the game, the terrainhandler is loading first and then the player.
       // player does not have yet to exist here, so wait a few cycles
       if(ironbane.player) {
-        if ( DistanceSq(this.lastOctreeBuildPosition, ironbane.player.position) > 10*10 ) {
+        if ( DistanceSq(this.lastOctreeBuildPosition, ironbane.player.position) > REBUILD_OCTREE_THRESHOLD ) {
             this.RebuildOctree();
         }
 
@@ -506,10 +508,6 @@ var TerrainHandler = Class.extend({
 
       this.currentMusic = this.targetMusic;
     }
-
-
-
-
   },
   IsLoadingCells: function() {
     return _.every(this.cells, function(cell) {
