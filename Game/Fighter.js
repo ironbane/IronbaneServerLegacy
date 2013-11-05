@@ -320,11 +320,17 @@ var Fighter = Actor.extend({
                 items: self.items
             });
 
-            // People who die in the tutorial need to do it again
-            if (self.zone === tutorialSpawnZone) {
-                self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+            // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
+            var spawnpoint = self.findNearestSpawnPoint();
+            if(spawnpoint) {
+                self.TeleportToUnit(spawnpoint);
             } else {
-                self.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
+                if (self.zone === tutorialSpawnZone) {
+                    self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+                } else {
+                    self.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                }
             }
         } else {
             if (self instanceof NPC) {

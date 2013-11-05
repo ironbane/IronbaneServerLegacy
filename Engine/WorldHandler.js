@@ -708,6 +708,60 @@ var WorldHandler = Class.extend({
 
         return null;
     },
+    // get ALL units matching name and in optional zone
+    findUnitsByName: function(name, zoneId) {
+        var self = this,
+            z, cx, cz, u, units,
+            results = [];
+
+        if (_.isNumber(zoneId)) {
+            for (cx in self.world[zoneId]) {
+                for (cz in self.world[zoneId][cx]) {
+                    if (!_.isUndefined(self.world[zoneId][cx][cz].units)) {
+                        units = self.world[zoneId][cx][cz].units;
+                        for (u = 0; u < units.length; u++) {
+                            if (units[u].id > 0) {
+                                continue;
+                            }
+
+                            if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
+                                continue;
+                            }
+
+                            if (units[u].data.name === name) {
+                                results.push(units[u]);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            for (z in self.world) {
+                for (cx in self.world[z]) {
+                    for (cz in self.world[z][cx]) {
+                        if (!_.isUndefined(self.world[z][cx][cz].units)) {
+                            units = self.world[z][cx][cz].units;
+                            for (u = 0; u < units.length; u++) {
+                                if (units[u].id > 0) {
+                                    continue;
+                                }
+
+                                if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
+                                    continue;
+                                }
+
+                                if (units[u].data.name === name) {
+                                    results.push(units[u]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return results;
+    },
     BuildWaypointListFromUnitIds: function(list) {
         var self = this,
             newList = [];

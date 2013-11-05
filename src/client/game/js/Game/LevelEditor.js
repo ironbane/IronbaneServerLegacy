@@ -210,7 +210,7 @@ var EditorGUI = function() {
       position: ironbane.player.position,
       template: heartPieceTemplate
     });
-  }
+  };
 
   this.epsType = firstOfObject(SignTypeEnum);
   this.epsText = "";
@@ -226,12 +226,16 @@ var EditorGUI = function() {
         rotY: ironbane.player.rotation.y
       }
     });
-  }
+  };
 
+  this.epWaypointName = 'waypoint';
   this.epwAdd = function() {
       socketHandler.socket.emit('addNPC', {
           position: ironbane.player.position,
-          template: waypointTemplate
+          template: waypointTemplate,
+          data: {
+              name: levelEditor.editorGUI.epWaypointName
+          }
       });
   };
 
@@ -777,6 +781,7 @@ var LevelEditor = Class.extend({
     guiControls['epsAdd'] = fSigns.add(this.editorGUI, 'epsAdd');
 
     var fWaypoints = fEntityPlacer.addFolder('Waypoints');
+    guiControls['epWaypointName'] = fWaypoints.add(this.editorGUI, 'epWaypointName');
     guiControls['epwAdd'] = fWaypoints.add(this.editorGUI, 'epwAdd');
 
     var fTriggers = fEntityPlacer.addFolder('Triggers');

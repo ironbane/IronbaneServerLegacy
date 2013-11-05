@@ -99,7 +99,6 @@ var Unit = Class.extend({
       }
     }
 
-
     this.startPosition = this.position.clone();
     this.startRotation = this.rotation.clone();
 
@@ -332,6 +331,30 @@ var Unit = Class.extend({
     }
     return nearestUnit;
   },
+    findNearestSpawnPoint: function() {
+        var unit = this,
+            spawn = null,
+            spawns = worldHandler.findUnitsByName('player_spawn_point');
+
+        if(spawns.length === 0) {
+            return spawn;
+        }
+
+        if(spawns.length === 1) {
+            spawn = spawns[0];
+        }
+
+        var distance = Number.MAX_VALUE;
+        _.each(spawns, function(point) {
+            var d = DistanceBetweenPoints(unit.position.x, unit.position.z, point.position.x, point.position.z);
+            if(d < distance) {
+                spawn = point;
+                distance = d;
+            }
+        });
+
+        return spawn;
+    },
   ChangeCell: function(newCellX, newCellZ) {
 
 
