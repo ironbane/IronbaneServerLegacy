@@ -27,6 +27,26 @@ var dictionary = {};
 /* pee. */dictionary.pee = "I pee on the street";
 /* cuddle. */dictionary.cuddle = "I cuddle trees during weekends";
 /* lick. */dictionary.lick = "I can lick my toes :)";
+/* bird. */dictionary.bird = "A bird pecked my pinky scab :("; //tits, boobies, hooters, etc. are birds...
+/* dog */dictionary.dog = "My dog is a royal magesty";
+/* cat. */dictionary.cat = "I am a cat; I have nine lives";
+/* chicken */dictionary.chicken = "There is a man eating chicken in my house";
+/* nigger */dictionary.nigger = "Black people, like Usain Bolt, are usually fast runners";
+/* genetalia */dictionary.genetalia = "I am not a human with a body";
+/* butt. */dictionary.butt = "I still take third grade science";
+/* hula. */dictionary.hula = "I sometimes like to hula hoop naked";
+/* noises. */dictionary.noises = "I'm afraid of the noises that typewriters make";
+/* awkward. */dictionary.awkward = "I'm won first place in the Weirdest Person Contest";
+/* scared. */dictionary.scared = "I'm scared of the Dora in the TV";
+/* developer. */dictionary.developer = "I want a ticket to get banned";
+/* bieber. */dictionary.bieber = "I want to kiss Justin Bieber all day";
+/* direction. */dictionary.direction = "I'm the only true Directioner";
+/* men. */dictionary.men = "It's raining men! Halleluja it's raining men! Hey hey";
+/* model. */dictionary.model = "Miley Cyrus is my role model";
+/* poop. */dictionary.poop = "I acceidentally pooped in my pants";
+/* big */dictionary.big = "I will always use big-boy words";
+/* anger */dictionary.anger = "I unleash my anger on my computer";
+
 
 module.exports = dictionary;
 
