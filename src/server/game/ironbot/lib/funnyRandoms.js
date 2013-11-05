@@ -27,7 +27,7 @@ var dictionary = {};
 /* pee. */dictionary.pee = "I pee on the street";
 /* cuddle. */dictionary.cuddle = "I cuddle trees during weekends";
 /* lick. */dictionary.lick = "I can lick my toes :)";
-/* bird. */dictionary.bird = "I am a bird."; //tits, boobies, hooters, etc. are birds...
+/* bird. */dictionary.bird = "A bird pecked my pinky scab :("; //tits, boobies, hooters, etc. are birds...
 /* dog */dictionary.dog = "My dog is a royal magesty";
 /* cat. */dictionary.cat = "I am a cat; I have nine lives";
 /* chicken */dictionary.chicken = "There is a man eating chicken in my house";
@@ -40,7 +40,13 @@ var dictionary = {};
 /* scared. */dictionary.scared = "I'm scared of the Dora in the TV";
 /* developer. */dictionary.developer = "I want a ticket to get banned";
 /* bieber. */dictionary.bieber = "I want to kiss Justin Bieber all day";
-/* direction */dictionary.direction = "I'm the only true Directioner";
+/* direction. */dictionary.direction = "I'm the only true Directioner";
+/* men. */dictionary.men = "It's raining men! Halleluja it's raining men! Hey hey";
+/* model. */dictionary.model = "Miley Cyrus is my role model";
+/* poop. */dictionary.poop = "I acceidentally pooped in my pants";
+/* big */dictionary.big = "I will always use big-boy words";
+/* anger */dictionary.anger = "I unleash my anger on my computer";
+
 
 module.exports = dictionary;
 
