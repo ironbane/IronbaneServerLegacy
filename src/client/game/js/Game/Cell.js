@@ -193,8 +193,8 @@ var Cell = Class.extend({
         for(var o=0;o<this.objects.length;o++) {
             this.objects[o].Destroy();
             // Remove from unitList
-            ironbane.unitList = _.without(ironbane.unitList, this.objects[o]);
         }
+        ironbane.unitList = _.difference(ironbane.unitList, this.objects);
 
         this.ClearWaypoints();
 

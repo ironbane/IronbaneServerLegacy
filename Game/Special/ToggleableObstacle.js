@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+var TIMER_KEY_TIME_OUT = 2.0;
 
 
 var ToggleableObstacle = Unit.extend({
@@ -96,7 +96,7 @@ var ToggleableObstacle = Unit.extend({
             if ( template.type === "tool" && template.subtype === "key" ) {
               if ( item.attr1 === -this.id ) {
                 this.Toggle(!this.on);
-                this.keyUseTimeout = 2.0;
+                this.keyUseTimeout = TIMER_KEY_TIME_OUT;
               }
             }
           }
