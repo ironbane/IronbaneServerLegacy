@@ -242,6 +242,11 @@ var SocketHandler = Class.extend({
                     unit = new Trigger(ConvertVector3(data.position), data.id);
                     break;
 
+                case UnitTypeEnum.BANK:
+                    //console.log('got bank!', data);
+                    unit = new Mesh(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, data.metadata.mesh, data.metadata);
+                    break;
+
                 case UnitTypeEnum.LOOTABLE:
                     if ( data.param < 10 ) {
                       unit = new LootBag(ConvertVector3(data.position), data.id, data.param);
@@ -431,6 +436,23 @@ var SocketHandler = Class.extend({
             socketHandler.playerData.items = data.items;
             hudHandler.ReloadInventory();
         });
+
+        // BANKING V1
+        this.socket.on('openBank', function(data) {
+            console.log('openBank!', data);
+            hudHandler.showBank(data);
+        });
+
+        this.socket.on('closeBank', function(data) {
+            console.log('closeBank!', data);
+            hudHandler.hideBank();
+        });
+
+        this.socket.on('syncBank', function(data) {
+            console.log('syncBank!', data);
+            hudHandler.showBank(data);
+        });
+        // BANKING...
 
         this.socket.on('lootFromBag', function(data) {
             // occurs when someone nearby loots from a bag

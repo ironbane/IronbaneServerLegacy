@@ -217,6 +217,33 @@ var HUDHandler = Class.extend({
             });
         }
     },
+    makeBankSlots: function(num) {
+        var HUD = this,
+            container = $('#bankBar'),
+            spaces = num;
+
+        container.empty();
+        for (var x = 0; x < spaces; x++) {
+            container.append('<div id="bs' + x + '" class="bankBarSlot"></div>');
+        }
+
+        container.children().each(function(child) {
+            $(child).droppable({
+                drop: HUD.onBankSlotDrop,
+                greedy: true
+            });
+        });
+    },
+    showBank: function(data) {
+        this.makeBankSlots(data.slots);
+        $('#bankBar').data('bank', data).show();
+    },
+    hideBank: function() {
+        $('#bankBar').removeData().empty().hide();
+    },
+    onBankSlotDrop: function(e, ui) {
+        console.log('onBankSlotDrop', arguments);
+    },
     UpdateEquippedItems: function() {
         for (var x = 0; x < 10; x++) {
             var item = hudHandler.FindItemBySlot(x, false);
@@ -754,8 +781,8 @@ var HUDHandler = Class.extend({
         $('#coinBar').css('left', '22px');
         $('#coinBar').css('top', '72px');
 
-        $('#lootBag').css('left', (halfWidth - 240) + 'px');
-        $('#lootBag').css('top', ((frameHeight) - 120) + 'px');
+        $('#lootBag, #bankBar').css('left', (halfWidth - 240) + 'px');
+        $('#lootBag, #bankBar').css('top', ((frameHeight) - 120) + 'px');
 
         $('#book').css('left', (halfWidth - 230) + 'px');
         $('#book').css('top', (halfHeight - 210) + 'px');

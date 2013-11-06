@@ -444,7 +444,7 @@ label {
     display:none;
 }
 
-#lootBag {
+#lootBag, #bankBar {
     display: none;
     position: absolute;
     width: 480px;
@@ -465,12 +465,16 @@ label {
     background-image: url(/game/images/misc/bar_3.png);
 }
 
-.lootBarSlot {
-  width:48px;
-  height:48px;
-  float:left;
-  background-image:url(/game/images/misc/bar_5.png);
+.lootBarSlot, .bankBarSlot {
+    width: 48px;
+    height: 48px;
+    float: left;
+    background-image: url(/game/images/misc/bar_5.png);
 }
+.bankBarSlot {
+    background-image: url(/game/images/misc/bar_9.png);
+}
+
 .buyBarSlot {
   width:48px;
   height:48px;

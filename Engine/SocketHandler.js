@@ -559,6 +559,52 @@ var SocketHandler = Class.extend({
                 }
             });
 
+            // BANKING
+            socket.on('bankStoreItem', function(data, reply) {
+                console.log('bankStoreItem', data);
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'bad socket unit.'});
+                    return;
+                }
+
+                var bank = worldHandler.FindUnit(data.id);
+                if(!bank) {
+                    reply({errmsg: 'bank not found!'});
+                    return;
+                }
+
+                // in this case data.slot refers to target bank slot
+                var result = bank.storeItem(data.item, player, data.slot);
+                if(result !== true) {
+                    reply({errmsg: result});
+                }
+            });
+
+            socket.on('bankTakeItem', function(data, reply) {
+                console.log('bankTakeItem', data);
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'bad socket unit.'});
+                    return;
+                }
+
+                var bank = worldHandler.FindUnit(data.id);
+                if(!bank) {
+                    reply({errmsg: 'bank not found!'});
+                    return;
+                }
+
+                // in this case data.slot refers to target player slot
+                var result = bank.takeItem(data.item, player, data.slot);
+                if(result !== true) {
+                    reply({errmsg: result});
+                }
+            });
+            // BANKING
+
             socket.on("dropItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('dropItem no callback defined!');
@@ -1460,65 +1506,68 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("addNPC", function (data) {
-
+            // this should prolly just be "addUnit"
+            socket.on("addNPC", function(data) {
                 // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
+                if (!socket.unit || socket.unit.editor === false) {
+                    return;
+                }
 
                 data.position = ConvertVector3(data.position);
                 data.position = data.position.Round(2);
 
                 var zone = socket.unit.zone;
-
                 var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
 
+                if (_.isUndefined(worldHandler.world[zone])) {
+                    return;
+                }
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                if (_.isUndefined(worldHandler.world[zone][cellPos.x])) {
+                    return;
+                }
 
+                if (_.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z])) {
+                    return;
+                }
 
                 data.x = data.position.x;
                 data.y = data.position.y;
                 data.z = data.position.z;
                 data.zone = zone;
 
-
-
-                if ( _.isUndefined(data.param) ) data.param = 0;
-
-
+                if (_.isUndefined(data.param)) {
+                    data.param = 0;
+                }
                 data.param = parseInt(data.param, 10);
 
-
-                if ( _.isUndefined(data.data) ) {
+                if (_.isUndefined(data.data)) {
                     data.data = null;
                 }
 
-
                 data.id = -server.GetAValidNPCID();
 
-                mysql.query('INSERT INTO ib_units SET ?',
-                {
-                    id:data.id,
-                    zone:data.zone,
-                    x:data.x,
-                    y:data.y,
-                    z:data.z,
-                    template:data.template,
-                    roty:data.roty,
-                    param:data.param,
-                    data:JSON.stringify(data.data)
-                },
-                function (err, result) {
+                mysql.query('INSERT INTO ib_units SET ?', {
+                        id: data.id,
+                        zone: data.zone,
+                        x: data.x,
+                        y: data.y,
+                        z: data.z,
+                        template: data.template,
+                        roty: data.roty,
+                        param: data.param,
+                        data: JSON.stringify(data.data)
+                    },
+                    function(err, result) {
+                        if (err) {
+                            throw err;
+                        }
 
-                    if (err) throw err;
-
-                    var unit = worldHandler.MakeUnitFromData(data);
-                    if ( unit ) unit.Awake();
-
-                });
-
+                        var unit = worldHandler.MakeUnitFromData(data);
+                        if (unit) {
+                            unit.Awake();
+                        }
+                    });
             });
 
             socket.on("moveNPC", function (data) {

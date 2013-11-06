@@ -39,6 +39,7 @@
     IB.waypointTemplate = 95;
     IB.trainTemplate = 96;
     IB.triggerTemplate = 109;
+    IB.bankTemplateId = 115;
 
     IB.UnitTypeEnum = {
         PLAYER: 0,
@@ -58,6 +59,7 @@
         MUSICPLAYER: 14,
         WAYPOINT: 15,
         TRIGGER: 16,
+        BANK: 17,
 
         // NPC's
         MONSTER: 20,
@@ -140,7 +142,7 @@
         "lightSystem": IB.LightSystemEnum.DUNGEON,
         "music": ["music/castle"]
     };
-    
+
     IB.zoneTypeConfig[IB.ZoneTypeEnum.HAUNTEDMANSION] = {
         "enableFluid": true,
         "fluidLevel": 0.5,
@@ -154,7 +156,7 @@
         "lightSystem": IB.LightSystemEnum.DUNGEON,
         "music": ["music/dissonantwaltz"]
     };
-    
+
         IB.LootBagTypeEnum = {
         COMMON: 0,
         UNCOMMON: 1,
