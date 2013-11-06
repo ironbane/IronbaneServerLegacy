@@ -64,7 +64,9 @@ var Fighter = Unit.extend({
 
 
     this.spriteStep = 0;
-    this.timers.walkSpriteTimer = 0.0;
+    // the logic for this one doesn't decrease like other "timers"
+    // it increases based on this.size, do not convert to "timers"
+    this.walkSpriteTimer = 0.0;
 
 
     this.timers.attackStateTimer = 0.0;
@@ -668,7 +670,7 @@ var Fighter = Unit.extend({
 
     //var oldSpriteIndex = this.spriteStep;
 
-    this.timers.walkSpriteTimer += dTime / this.size;
+    this.walkSpriteTimer += dTime / this.size;
 
     //        this.speed = 2.0;
     //        this.spriteStatus = this.SpriteStatusEnum.WALK;
@@ -684,8 +686,8 @@ var Fighter = Unit.extend({
 
       //debug.SetWatch('stepFactor', stepFactor);
 
-      if ( this.timers.walkSpriteTimer > stepFactor ) {
-        this.timers.walkSpriteTimer = 0.0;
+      if ( this.walkSpriteTimer > stepFactor ) {
+        this.walkSpriteTimer = 0.0;
         if ( this.spriteForward ) {
           this.spriteStep++;
           if ( this.spriteStep >= 2 ) this.spriteForward = false;
