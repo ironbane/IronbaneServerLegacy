@@ -21,6 +21,7 @@
 var unitFriction = 3;
 var unitMaxSpeed = 5;
 var unitMaxSpeedBackwards = 3;
+var TEXTURE_SHADOW = 'images/misc/shadow.png';
 
 var sizeScalingSpeed = 2;
 
@@ -174,7 +175,7 @@ var Unit = PhysicsObject.extend({
         color: 0xff00ff,
         lineWidth: 5
       });
-      var line;
+      //var line;
       this.debugMesh = new THREE.Line(lineGeo, lineMat);
       this.debugMesh.type = THREE.Lines;
 
@@ -229,7 +230,7 @@ var Unit = PhysicsObject.extend({
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
-        textureHandler.GetTexture('images/misc/shadow.png', false, {
+        textureHandler.GetTexture(TEXTURE_SHADOW, false, {
           transparent:true,
           alphaTest:0.1
         }));
@@ -471,7 +472,7 @@ var Unit = PhysicsObject.extend({
             for ( var ro=0;ro<rayList.length;ro++ ) {
 
               var rayCastPos = this.position.clone().add(rayList[ro]);
-
+              //move the THREE.vector3(0, -1, 0) out of the loopscope so it does not get created everytime? it is not being modified anyway
               var ray = new THREE.Raycaster( rayCastPos, new THREE.Vector3(0, -1, 0));
               var normal = new THREE.Vector3();
               var point = new THREE.Vector3();

@@ -20,6 +20,7 @@
  */
 
 var meshPath = 'images/meshes/';
+var LIGHT_VISIBILITY_DISTANCE_THRESHOLD = 2500;
 
 var scaleModifierRightBeforeJSONLoader = 0;
 
@@ -62,9 +63,6 @@ var Mesh = Unit.extend({
     // model name. We're just going to check for the model name and do
     // what's necessary.
     this.children = [];
-
-
-
 
     this.object3D.setRotationFromEuler(this.rotation);
     this.object3D.rotation.copy(this.rotation);
@@ -393,7 +391,7 @@ var Mesh = Unit.extend({
     _.each(this.lightsToMaintain, function(light) {
 
       //if ( !ironbane.player.InRangeOfPosition(light.parent.position, 30) ) {
-      if ( light.parent && VectorDistanceSq(p, light.parent.position) > 50*50 ) {
+      if ( light.parent && VectorDistanceSq(p, light.parent.position) > LIGHT_VISIBILITY_DISTANCE_THRESHOLD ) {
         light.visible = false;
       }
       else {

@@ -668,7 +668,7 @@ var WorldHandler = Class.extend({
                     if (!_.isUndefined(self.world[zoneId][cx][cz].units)) {
                         units = self.world[zoneId][cx][cz].units;
                         for (u = 0; u < units.length; u++) {
-                            if (units[u].id > 0) {
+                            if (units[u].isPlayer()) {
                                 continue;
                             }
 
@@ -690,7 +690,7 @@ var WorldHandler = Class.extend({
                         if (!_.isUndefined(self.world[z][cx][cz].units)) {
                             units = self.world[z][cx][cz].units;
                             for (u = 0; u < units.length; u++) {
-                                if (units[u].id > 0) {
+                                if (units[u].isPlayer()) {
                                     continue;
                                 }
 
@@ -722,7 +722,7 @@ var WorldHandler = Class.extend({
                     if (!_.isUndefined(self.world[zoneId][cx][cz].units)) {
                         units = self.world[zoneId][cx][cz].units;
                         for (u = 0; u < units.length; u++) {
-                            if (units[u].id > 0) {
+                            if (units[u].isPlayer()) {
                                 continue;
                             }
 
@@ -744,7 +744,7 @@ var WorldHandler = Class.extend({
                         if (!_.isUndefined(self.world[z][cx][cz].units)) {
                             units = self.world[z][cx][cz].units;
                             for (u = 0; u < units.length; u++) {
-                                if (units[u].id > 0) {
+                                if (units[u].isPlayer()) {
                                     continue;
                                 }
 

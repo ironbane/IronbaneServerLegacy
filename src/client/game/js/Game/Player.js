@@ -155,34 +155,55 @@ var Player = Fighter.extend({
     }
 
   },
-  Tick: function(dTime) {
+  positionTheCamera: function(target, dTime){
 
-    _.each(this.timers, function(value, key){
-      debug.SetWatch(key, value);
-    });
-    this.pathFinder.tick(dTime);
- debug.SetWatch("timercount from player.js: ", _.keys(this.timers).length);
-   
-    // Check for loot bags, chests, and vendors nearby
-    var found = false;
-    for(var u=0;u<ironbane.unitList.length;u++) {
-      var lootBag = ironbane.unitList[u];
+    var radians = (this.rotation.y + (Math.PI/2));
+    var firstPersonTarget = this.position.clone().add(new THREE.Vector3(-Math.sin(radians)*0.001, 0, -Math.cos(radians)*0.001));
+      firstPersonTarget.y += 1;
 
-      if ( lootBag == this ) continue;
+      switch(this.cameraStatus) {
+        case CameraStatusEnum.FirstPerson:
+          ironbane.camera.position.copy(firstPersonTarget);
 
-      if ( lootBag instanceof Fighter && !(lootBag.isPlayer()) ) {
-        if ( lootBag.template.type != UnitTypeEnum.VENDOR ) continue;
+          break;
+        case CameraStatusEnum.ThirdPersonToFirstPersonTransition:
+          ironbane.camera.position.lerp(firstPersonTarget, dTime*10);
+
+          if ( (ironbane.camera.position.clone().sub(firstPersonTarget)).length() < 0.01 ) {
+            this.cameraStatus = CameraStatusEnum.FirstPerson;
+          }
+          break;
+        case CameraStatusEnum.ThirdPerson:
+          if ( this.unitStandingOn ) {
+            ironbane.camera.position.copy(target);
+          }
+          else {
+            ironbane.camera.position.lerp(target, dTime*3);
+          }
+          break;
       }
-      else if ( !((lootBag instanceof LootBag) || (lootBag instanceof LootableMesh)) ) continue;
-      if ( this.InRangeOfUnit(lootBag, (lootBag instanceof LootableMesh) ? 2.0 : 1.0) ) {
-        found = lootBag;
-        return;
-      }
-    }
 
-    if ( this.canLoot ) {
-      if ( !found ) {
-        // Remove the loot bag
+      //debug.SetWatch("this.cameraStatus", this.cameraStatus);
+
+      var lookAtTarget = null;
+      if ( this.cameraStatus !== CameraStatusEnum.ThirdPerson ) {
+        lookAtTarget = this.position.clone().add(new THREE.Vector3(Math.sin(radians), 1, Math.cos(radians)));
+      }
+      else {
+        lookAtTarget = this.position.clone().add(new THREE.Vector3(0, 1, 0));
+      }
+      if ( this.unitStandingOn ) {
+        this.lookAtPosition.copy(lookAtTarget);
+      }
+      else {
+        this.lookAtPosition.lerp(lookAtTarget, dTime * 10);
+      }
+
+
+      ironbane.camera.lookAt(this.lookAtPosition);
+    },
+    hideLoot: function(){
+         // Remove the loot bag
         $('#lootBag').hide();
 
 
@@ -207,12 +228,9 @@ var Player = Fighter.extend({
         if ( this.lastFoundLootBag && this.lastFoundLootBag.id === -267 ) {
           this.HideTutorial(1);
         }
-      }
-    }
-    else {
-      if ( found ) {
-        // Show the loot bag
-        $('#lootBag').show();
+      },
+    showLoot: function(found){
+      $('#lootBag').show();
 
         // Check for tutorial #1
         if ( found.id === -267 ) {
@@ -239,6 +257,46 @@ var Player = Fighter.extend({
         this.canLoot = true;
 
         this.lootUnit = found;
+    },
+
+  checkForLoot: function(){
+    var found = false;
+    for(var u=0;u<ironbane.unitList.length;u++) {
+      var lootBag = ironbane.unitList[u];
+
+      if ( lootBag == this ) continue;
+
+      if ( lootBag instanceof LootBag || lootBag instanceof LootableMesh){
+      if ( this.InRangeOfUnit(lootBag, (lootBag instanceof LootableMesh) ? 2.0 : 1.0) ) {
+        found = lootBag;
+        return;
+      }
+    }
+  }
+    return found;
+  },
+  Tick: function(dTime) {
+
+    _.each(this.timers, function(value, key){
+      debug.SetWatch(key, value);
+    });
+    this.pathFinder.tick(dTime);
+ debug.SetWatch("timercount from player.js: ", _.keys(this.timers).length);
+ debug.SetWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+   
+    // Check for loot bags, chests, and vendors nearby
+    var found = this.checkForLoot();
+
+    if ( this.canLoot ) {
+      if ( !found ) {
+      this.hideLoot();
+      }
+    }
+    else {
+      if ( found ) {
+        console.log("got one!");
+        // Show the loot bag
+        this.showLoot(found);
       }
     }
     this.lastFoundLootBag = found;
@@ -321,53 +379,9 @@ var Player = Fighter.extend({
     var radians = (this.rotation.y + (Math.PI/2));
 
     if ( !cinema.IsPlaying() ) {
+      this.positionTheCamera(target, dTime);
       // Set our position behind the playe
-      var firstPersonTarget = this.position.clone().add(new THREE.Vector3(-Math.sin(radians)*0.001, 0, -Math.cos(radians)*0.001));
-      firstPersonTarget.y += 1;
-
-      switch(this.cameraStatus) {
-        case CameraStatusEnum.FirstPerson:
-          ironbane.camera.position.copy(firstPersonTarget);
-
-          break;
-        case CameraStatusEnum.ThirdPersonToFirstPersonTransition:
-          ironbane.camera.position.lerp(firstPersonTarget, dTime*10);
-
-          if ( (ironbane.camera.position.clone().sub(firstPersonTarget)).length() < 0.01 ) {
-            this.cameraStatus = CameraStatusEnum.FirstPerson;
-          }
-          break;
-        case CameraStatusEnum.ThirdPerson:
-          if ( this.unitStandingOn ) {
-            ironbane.camera.position.copy(target);
-          }
-          else {
-            ironbane.camera.position.lerp(target, dTime*3);
-          }
-
-
-          break;
-      }
-
-      //debug.SetWatch("this.cameraStatus", this.cameraStatus);
-
-      var lookAtTarget = null;
-      if ( this.cameraStatus !== CameraStatusEnum.ThirdPerson ) {
-        lookAtTarget = this.position.clone().add(new THREE.Vector3(Math.sin(radians), 1, Math.cos(radians)));
-      }
-      else {
-        lookAtTarget = this.position.clone().add(new THREE.Vector3(0, 1, 0));
-
-      }
-      if ( this.unitStandingOn ) {
-        this.lookAtPosition.copy(lookAtTarget);
-      }
-      else {
-        this.lookAtPosition.lerp(lookAtTarget, dTime * 10);
-      }
-
-
-      ironbane.camera.lookAt(this.lookAtPosition);
+      
     }
     //var factor = 6 / Math.max(Math.max(Math.abs(this.speed), 6), 0.1);
 
@@ -742,7 +756,7 @@ var Player = Fighter.extend({
         var dir = unit.position.clone().add(new THREE.Vector3(0, 0.5, 0)).sub( ourpos );
         // With a small offset to account for NPCs stuck in walls
         var distance = dir.length() - 0.5;
-        var ray = new THREE.Raycaster( ourpos, dir.clone().normalize(), 0, distance );
+        var ray = new THREE.Raycaster( ourpos, dir.normalize(), 0, distance );
 
 
         var intersects = terrainHandler.RayTest(ray, {

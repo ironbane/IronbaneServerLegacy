@@ -765,14 +765,6 @@ var Fighter = Unit.extend({
 
     this.allowJump = false;
 
-    // if(this.template.type !== UnitTypeEnum.PLAYER) {
-    //   soundHandler.Play(this.npctype + "/jump", this.position);
-    // }
-    // else
-    // {
-    //   soundHandler.Play("player/jump/", this.position);
-    // }
-
     soundHandler.Play("jump", this.position);
   },
   DoMeleeHitAnimation: function(position, power) {
@@ -825,14 +817,6 @@ var Fighter = Unit.extend({
   playSound: function(sound) {
 
     soundHandler.Play(sound, this.position);
-
-    // if(this.template.type !== UnitTypeEnum.PLAYER) {
-    //   soundHandler.Play("npcs/" +this.npctype + "/" + sound, this.position);
-    // }
-    // else
-    // {
-    //   soundHandler.Play("player/" + sound, this.position);
-    // }
 
   },
   Die: function(noParticle) {

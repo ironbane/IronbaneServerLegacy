@@ -19,11 +19,6 @@
 
 var NPC = Fighter.extend({
     Init: function(data) {
-
-
-
-
-
         this._super(data);
 
         // HACKY HACKY!!! See LootBag
