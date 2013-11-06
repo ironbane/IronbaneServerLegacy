@@ -258,24 +258,21 @@ var Player = Fighter.extend({
 
         this.lootUnit = found;
     },
+    checkForLoot: function() {
+        var player = this;
 
-  checkForLoot: function(){
-    var found = false;
-    for(var u=0;u<ironbane.unitList.length;u++) {
-      var lootBag = ironbane.unitList[u];
-
-      if ( lootBag == this ) continue;
-
-      if ( lootBag instanceof LootBag || lootBag instanceof LootableMesh){
-      if ( this.InRangeOfUnit(lootBag, (lootBag instanceof LootableMesh) ? 2.0 : 1.0) ) {
-        found = lootBag;
-        return;
-      }
-    }
-  }
-    return found;
-  },
+        return _.find(ironbane.unitList, function(unit) {
+            if(unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template.type === UnitTypeEnum.VENDOR)) {
+                var range = (unit instanceof LootableMesh) ? 2 : 1;
+                if(player.InRangeOfUnit(unit, range)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    },
   Tick: function(dTime) {
+      var player = this;
 
     _.each(this.timers, function(value, key){
       debug.SetWatch(key, value);
@@ -283,23 +280,17 @@ var Player = Fighter.extend({
     this.pathFinder.tick(dTime);
  debug.SetWatch("timercount from player.js: ", _.keys(this.timers).length);
  debug.SetWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
-   
-    // Check for loot bags, chests, and vendors nearby
-    var found = this.checkForLoot();
 
-    if ( this.canLoot ) {
-      if ( !found ) {
-      this.hideLoot();
-      }
+    // Check for loot bags, chests, and vendors nearby
+    var found = player.checkForLoot();
+    if(player.canLoot && !found) {
+        //console.log('some kind of loot found!', found, this.canLoot);
+        player.hideLoot();
+    } else if(found && !player.canLoot) {
+        player.showLoot(found);
     }
-    else {
-      if ( found ) {
-        console.log("got one!");
-        // Show the loot bag
-        this.showLoot(found);
-      }
-    }
-    this.lastFoundLootBag = found;
+    player.lastFoundLootBag = found;
+
     var rotrad = ((Math.PI*1.5)-this.rotation.y);
     //rotrad = 0;
 
@@ -381,7 +372,7 @@ var Player = Fighter.extend({
     if ( !cinema.IsPlaying() ) {
       this.positionTheCamera(target, dTime);
       // Set our position behind the playe
-      
+
     }
     //var factor = 6 / Math.max(Math.max(Math.abs(this.speed), 6), 0.1);
 
@@ -632,7 +623,7 @@ var Player = Fighter.extend({
               && !u.template.friendly
               && u.health > 0 ){
                 ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
-             
+
             }
           });
 
@@ -1056,7 +1047,7 @@ var Player = Fighter.extend({
     else {
       currentMouseToWorldData = null;
     }
-    
+
     if ( le("globalEnable") && lastMouseToWorldData != currentMouseToWorldData ) {
       levelEditor.BuildPreviewBuildMesh();
     }
