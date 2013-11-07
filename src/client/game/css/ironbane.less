@@ -444,55 +444,54 @@ label {
     display:none;
 }
 
-#lootBag, #bankBar {
-    display: none;
+// DRAGON BARS - inv, loot, bank, etc.
+// dragon because you drag on stuff :P
+.dragon-bar {
+    display: none; // start hidden
     position: absolute;
-    //width: 480px;
-    height: 48px;
     background-color: black;
+    .dragon-slot {
+        width: 48px;
+        height: 48px;
+        float: left;
+        img {
+            top: 3px;
+            left: 2px;
+        }
+        &.bankBarSlot {
+            background-image: url(/game/images/misc/bar_9.png);
+        }
+        &.lootBarSlot {
+            background-image: url(/game/images/misc/bar_5.png);
+        }
+        &.vendorBarSlot {
+            background-image:url(/game/images/misc/bar_8.png);
+        }
+    }
 }
 #bankBar {
     background-color: transparent;
 }
-
-#itemBar {
-    display: none;
-    position: absolute;
-    background-color: black;
-}
-
-.itemBarSlot {
-    width: 48px;
-    height: 48px;
-    float: left;
-    background-image: url(/game/images/misc/bar_3.png);
-}
-
-.lootBarSlot, .bankBarSlot {
-    width: 48px;
-    height: 48px;
-    float: left;
-    background-image: url(/game/images/misc/bar_5.png);
-    img {
-        top: 3px;
-        left: 2px;
+@iterations: 10;
+.itemBarSlotLoop (@index) when (@index > 0) {
+    .itemBarSlot {
+        @t: ~":nth-child(@{index})";
+        @i: @index - 1;
+        &@{t} {
+            background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_3.png);
+            &.equipped {
+                background: url(/game/images/misc/bar_equip.png);
+            }
+            &.used {
+                background: url(/game/images/misc/bar_used.png);
+            }
+        }
     }
+    .itemBarSlotLoop(@index - 1);
 }
-.bankBarSlot {
-    background-image: url(/game/images/misc/bar_9.png);
-}
-
-.buyBarSlot {
-  width:48px;
-  height:48px;
-  float:left;
-  background-image:url(/game/images/misc/bar_8.png);
-}
-.itemSlot {
-    width: 48px;
-    height: 48px;
-    position: absolute;
-}
+.itemBarSlotLoop (0) {}
+.itemBarSlotLoop (@iterations);
+// DRAGON BARS
 
 #dropItemsBox {
     position: absolute;
@@ -517,32 +516,6 @@ label {
     margin: 0px 0 0;
     width: 350px;
     display: block;
-}
-
-.equipped {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_equip.png);
-}
-
-.used {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_use.png);
-}
-
-.unequipped {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_7.png);
-}
-.unoccupied {
-  width:48px;
-  height:48px;
-  position:absolute;
 }
 
 .hudIconWrapper {
