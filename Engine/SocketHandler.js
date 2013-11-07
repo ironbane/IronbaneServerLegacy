@@ -577,8 +577,11 @@ var SocketHandler = Class.extend({
 
                 // in this case data.slot refers to target bank slot
                 var result = bank.storeItem(data.item, player, data.slot);
-                if(result !== true) {
+                if(_.isString(result)) {
                     reply({errmsg: result});
+                } else {
+                    // if it's not a string, it'll be the modified item data (see bank)
+                    reply(result);
                 }
             });
 
@@ -599,8 +602,11 @@ var SocketHandler = Class.extend({
 
                 // in this case data.slot refers to target player slot
                 var result = bank.takeItem(data.item, player, data.slot);
-                if(result !== true) {
+                if(_.isString(result)) {
                     reply({errmsg: result});
+                } else {
+                    // if it's not a string, it'll be the modified item data (see bank)
+                    reply(result);
                 }
             });
             // BANKING

@@ -86,16 +86,17 @@ var Bank = Trigger.extend({
             // remove player's item!
             player.removeItemById(itemId);
 
+            /*
             player.socket.emit('syncBank', {
                 id: bank.id,
                 slots: bank.slots,
                 vault: bank.getItemsForPlayer(player.id)
-            });
+            });*/
 
             // save to DB
             itemService.persist(item);
 
-            return true;
+            return item; // todo: dont send _persistID
         } else {
             // player doesn't have the item?
             return 'item not in player inventory!';
@@ -123,16 +124,17 @@ var Bank = Trigger.extend({
 
             bank.vault = _.without(bank.vault, item);
 
+            /*
             player.socket.emit('syncBank', {
                 id: bank.id,
                 slots: bank.slots,
                 vault: bank.getItemsForPlayer(player.id)
-            });
+            });*/
 
             // save the item to db
             itemService.persist(item);
 
-            return true;
+            return item;
         } else {
             // bank doesn't have this item, why did the client request it?
             return 'item not found in bank!';

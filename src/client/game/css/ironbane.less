@@ -447,9 +447,12 @@ label {
 #lootBag, #bankBar {
     display: none;
     position: absolute;
-    width: 480px;
+    //width: 480px;
     height: 48px;
     background-color: black;
+}
+#bankBar {
+    background-color: transparent;
 }
 
 #itemBar {
@@ -470,6 +473,10 @@ label {
     height: 48px;
     float: left;
     background-image: url(/game/images/misc/bar_5.png);
+    img {
+        top: 3px;
+        left: 2px;
+    }
 }
 .bankBarSlot {
     background-image: url(/game/images/misc/bar_9.png);

@@ -224,25 +224,75 @@ var HUDHandler = Class.extend({
 
         container.empty();
         for (var x = 0; x < spaces; x++) {
-            container.append('<div id="bs' + x + '" class="bankBarSlot"></div>');
+            var slot = $('<div id="bs' + x + '" class="bankBarSlot"></div>');
+            slot.data('slot', x);
+            container.append(slot);
+            slot.droppable({
+                drop: function(e, ui) { _.partial(HUD.onBankSlotDrop, e, ui, HUD)(); },
+                greedy: true,
+                accept: '.itemSlot' // only accept items from the item bar
+            });
+            slot.click(function() {
+                console.log($(this).attr('id') + " clicked!");
+            });
+        }
+    },
+    fillBankSlot: function(vaultItem) {
+        var itemurl;
+        if (vaultItem.type === 'armor') {
+            itemurl = 'images/characters/base/' + vaultItem.subtype + '/big.php?i=' + vaultItem.$template.image + '';
+        } else {
+            itemurl = 'images/items/big.php?i=' + vaultItem.$template.image;
         }
 
-        container.children().each(function(child) {
-            $(child).droppable({
-                drop: HUD.onBankSlotDrop,
-                greedy: true
-            });
+        var slotSelector = '#bs' + vaultItem.slot;
+        var bsItem = $('<img src="' + itemurl + '" class="bankSlotItem" />');
+        bsItem.data('item', vaultItem);
+        //HUD.MakeItemHover(bsItem, vaultItem);
+        $(slotSelector).droppable('disable').append(bsItem);
+
+        bsItem.draggable({
+            containment: '#gameFrame',
+            snap: '.itemBarSlot'
         });
     },
     showBank: function(data) {
-        this.makeBankSlots(data.slots);
+        var HUD = this;
+        HUD.makeBankSlots(data.slots);
         $('#bankBar').data('bank', data).show();
+
+        _.each(data.items, function(vaultItem) {
+            HUD.fillBankSlot(vaultItem);
+        });
     },
     hideBank: function() {
         $('#bankBar').removeData().empty().hide();
     },
-    onBankSlotDrop: function(e, ui) {
-        console.log('onBankSlotDrop', arguments);
+    onBankSlotDrop: function(e, ui, HUD) {
+        var slot = $(e.target),
+            dropped = $(e.toElement),
+            item = dropped.data('item'),
+            bank = $("#bankBar").data('bank');
+
+        console.log('onBankSlotDrop', e, bank, slot, item);
+
+        socketHandler.socket.emit('bankStoreItem', {
+            id: bank.id,
+            item: item.id,
+            slot: slot.data('slot')
+        }, function(response) {
+            if(response.errmsg) {
+                console.error(response.errmsg);
+            } else {
+                // success!
+                // create the item in the bank
+                HUD.fillBankSlot(response);
+                // delete the old draggable node
+                dropped.remove();
+                // remove from player's inv
+
+            }
+        });
     },
     UpdateEquippedItems: function() {
         for (var x = 0; x < 10; x++) {
@@ -280,6 +330,7 @@ var HUDHandler = Class.extend({
         $('#' + name + '_equip').attr('class', 'unoccupied');
     },
     ItemSwitchEvent: function(event, ui) {
+        console.log('ItemSwitchEvent', arguments);
         var draggable = ui.draggable;
 
         // Are we dragging an inventory item?
@@ -676,7 +727,9 @@ var HUDHandler = Class.extend({
             var template = items[item.template];
 
             var name = isLoot ? 'li' + item.id : 'ii' + item.id;
-            $('#gameFrame').append('<div id="' + name + '" class="itemSlot"></div>');
+            var itemBarItem = $('<div id="' + name + '" class="itemSlot"></div>');
+            itemBarItem.data('item', item);
+            $('#gameFrame').append(itemBarItem);
 
             var targetName = isLoot ? 'ls' + item.slot : 'is' + item.slot;
             TeleportElement(name, targetName);

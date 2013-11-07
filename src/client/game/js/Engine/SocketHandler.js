@@ -447,11 +447,6 @@ var SocketHandler = Class.extend({
             console.log('closeBank!', data);
             hudHandler.hideBank();
         });
-
-        this.socket.on('syncBank', function(data) {
-            console.log('syncBank!', data);
-            hudHandler.showBank(data);
-        });
         // BANKING...
 
         this.socket.on('lootFromBag', function(data) {
