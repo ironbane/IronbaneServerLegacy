@@ -61,7 +61,7 @@ $(document).keydown(function(event){
   if ( !socketHandler.inGame ) return;
 
     if (window.hasChatFocus === true) {
-        console.log('hasChatFocus!');
+        //console.log('hasChatFocus!');
         return;
     }
 

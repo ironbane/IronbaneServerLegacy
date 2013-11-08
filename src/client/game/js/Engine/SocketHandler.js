@@ -177,7 +177,8 @@ var SocketHandler = Class.extend({
                 levelEditor.Start();
             }
 
-            hudHandler.MakeSlotItems(false);
+            // successful, show hud now we're in game
+            hudHandler.ShowHUD();
         });
     },
     Setup: function() {
@@ -420,14 +421,10 @@ var SocketHandler = Class.extend({
 
         });
 
+        // comes from GiveItem and addItem on server
         this.socket.on('receiveItem', function(data) {
-            // occurs when someone nearby loots from a bag
-            // refresh the bag
-
             socketHandler.playerData.items.push(data);
-
-            hudHandler.ReloadInventory();
-
+            hudHandler.fillInvSlot(data);
         });
 
         // replace player inv with server inv

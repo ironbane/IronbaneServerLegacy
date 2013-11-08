@@ -122,14 +122,9 @@ var HUDHandler = Class.extend({
         this.oldButtonClasses = {};
 
         setTimeout(function() {
-            // todo: move these to build when shown
-            HUD.makeInventorySlots();
-            HUD.makeLootSlots();
-            HUD.makeVendorSlots();
-
             $('#gameFrame').droppable({
-                accept: '.itemSlot', // can only drop things from your own inv (not from bank or other)
-                drop: HUD.ItemSwitchEvent
+                accept: '.invSlotItem', // can only drop things from your own inv (not from bank or other)
+                drop: function(e, ui) { _.partial(HUD.onDropItem, e, ui, HUD)(); },
             });
 
             HUD.ShowMainMenuHUD();
@@ -192,23 +187,6 @@ var HUDHandler = Class.extend({
     ShowMainMenuHUD: function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
     },
-    makeLootSlots: function(num) {
-        var HUD = this,
-            container = $('#lootBar'),
-            spaces = num;
-
-        container.empty();
-        for (var x = 0; x < spaces; x++) {
-            var slot = $('<div id="ls' + x + '" class="dragon-slot lootBarSlot"></div>');
-            slot.data('slot', x);
-            container.append(slot);
-            // loot is NOT droppable! you may only take it
-            slot.click(function() {
-                // handle use based on child data
-                console.log($(this).attr('id') + " clicked!");
-            });
-        }
-    },
     makeVendorSlots: function(num) {
         var HUD = this,
             container = $('#vendorBar'),
@@ -244,29 +222,20 @@ var HUDHandler = Class.extend({
                 drop: function(e, ui) { _.partial(HUD.onInvSlotDrop, e, ui, HUD)(); },
                 greedy: true
             });
-            slot.click(function() {
-                // handle use based on child data
-                console.log($(this).attr('id') + " clicked!");
-            });
-        }
-    },
-    makeBankSlots: function(num) {
-        var HUD = this,
-            container = $('#bankBar'),
-            spaces = num;
+            slot.click(function(e) {
+                var $slot = $(this),
+                    $item = $slot.children().data('item'); // there should only ever be 1 or 0 (null)
 
-        container.empty();
-        for (var x = 0; x < spaces; x++) {
-            var slot = $('<div id="bs' + x + '" class="dragon-slot bankBarSlot"></div>');
-            slot.data('slot', x);
-            container.append(slot);
-            slot.droppable({
-                drop: function(e, ui) { _.partial(HUD.onBankSlotDrop, e, ui, HUD)(); },
-                greedy: true,
-                accept: '.itemSlot' // only accept items from the item bar
-            });
-            slot.click(function() {
-                console.log($(this).attr('id') + " clicked!");
+                // handle use based on child data
+                console.log($slot.attr('id') + " clicked!", $item);
+
+                if($item) {
+                    if(e.shiftKey) {
+                        ironbane.player.splitItem($item.slot);
+                    } else {
+                        ironbane.player.useItem($item.slot);
+                    }
+                }
             });
         }
     },
@@ -280,16 +249,66 @@ var HUDHandler = Class.extend({
 
         var slotSelector = '#is' + item.slot;
         if(item.equipped === 1) {
-            slotSelector.addClass('equipped');
+            $(slotSelector).addClass('equipped');
         }
         var itemImg = $('<img src="' + imageUrl + '" class="invSlotItem" />');
         itemImg.data('item', item);
         //HUD.MakeItemHover(itemImg, item);
+        $(slotSelector).append(itemImg);
 
         itemImg.draggable({
             containment: '#gameFrame',
             revert: 'invalid'
         });
+    },
+    clearInvSlot: function(slotNum) {
+        $('#is' + slotNum).empty().removeClass('equipped used');
+    },
+    updateInvSlotStatus: function(slotNum, status) {
+        var $slot = $('#is' + slotNum);
+
+        if(status === 'equipped') {
+            $slot.addClass(status);
+        } else {
+            $slot.removeClass('equipped');
+        }
+
+        if(status === 'used') {
+            $slot.addClass(status);
+            // todo: better animation?
+            setTimeout(function() {
+                $slot.removeClass('used');
+            }, 500);
+        }
+    },
+    showInv: function(data) {
+        var HUD = this;
+        HUD.makeInventorySlots(data.slots);
+        $('#itemBar').show();
+
+        _.each(data.items, function(invItem) {
+            HUD.fillInvSlot(invItem);
+        });
+    },
+    hideInv: function() {
+        $('#itemBar').removeData().empty().hide();
+    },
+    makeLootSlots: function(num) {
+        var HUD = this,
+            container = $('#lootBar'),
+            spaces = num;
+
+        container.empty();
+        for (var x = 0; x < spaces; x++) {
+            var slot = $('<div id="ls' + x + '" class="dragon-slot lootBarSlot"></div>');
+            slot.data('slot', x);
+            container.append(slot);
+            // loot is NOT droppable! you may only take it
+            slot.click(function() {
+                // handle use based on child data
+                console.log($(this).attr('id') + " clicked!");
+            });
+        }
     },
     fillLootSlot: function(item) {
         var imageUrl;
@@ -303,13 +322,28 @@ var HUDHandler = Class.extend({
         var itemImg = $('<img src="' + imageUrl + '" class="lootSlotItem" />');
         itemImg.data('item', item);
         //HUD.MakeItemHover(itemImg, item);
-        $(slotSelector).droppable('disable').append(itemImg);
+        $(slotSelector).append(itemImg);
 
         itemImg.draggable({
             containment: '#gameFrame',
             revert: 'invalid',
             snap: '.itemBarSlot'
         });
+    },
+    showLoot: function(data) {
+        //console.log('showLoot', data);
+        var HUD = this;
+        HUD.makeLootSlots(data.slots);
+        $('#lootBar').show();
+
+        _.each(data.items, function(invItem, index) {
+            // set the slot so that it's not the one we dropped it from
+            invItem.slot = index;
+            HUD.fillLootSlot(invItem);
+        });
+    },
+    hideLoot: function() {
+        $('#lootBar').removeData().empty().hide();
     },
     fillVendorSlot: function(item) {
         var imageUrl;
@@ -330,6 +364,26 @@ var HUDHandler = Class.extend({
             revert: 'invalid',
             snap: '.itemBarSlot'
         });
+    },
+    makeBankSlots: function(num) {
+        var HUD = this,
+            container = $('#bankBar'),
+            spaces = num;
+
+        container.empty();
+        for (var x = 0; x < spaces; x++) {
+            var slot = $('<div id="bs' + x + '" class="dragon-slot bankBarSlot"></div>');
+            slot.data('slot', x);
+            container.append(slot);
+            slot.droppable({
+                drop: function(e, ui) { _.partial(HUD.onBankSlotDrop, e, ui, HUD)(); },
+                greedy: true,
+                accept: '.invSlotItem' // only accept items from the item bar
+            });
+            slot.click(function() {
+                console.log($(this).attr('id') + " clicked!");
+            });
+        }
     },
     fillBankSlot: function(item) {
         var imageUrl;
@@ -389,6 +443,14 @@ var HUDHandler = Class.extend({
             }
         });
     },
+    // when you drop an item on the ground / gameFrame
+    onDropItem: function(e, ui, HUD) {
+        var dropped = $(e.toElement),
+            item = dropped.data('item');
+
+        ironbane.player.dropItem(item);
+        HUD.clearInvSlot(item.slot);
+    },
     UpdateEquippedItems: function() {
         for (var x = 0; x < 10; x++) {
             var item = hudHandler.FindItemBySlot(x, false);
@@ -407,22 +469,6 @@ var HUDHandler = Class.extend({
                 this.SetUnoccupied(x);
             }
         }
-    },
-    SetEquipped: function(slot) {
-        var name = 'is' + slot;
-        $('#' + name + '_equip').attr('class', 'equipped');
-    },
-    SetUsed: function(slot) {
-        var name = 'is' + slot;
-        $('#' + name + '_equip').attr('class', 'used');
-    },
-    SetUnequipped: function(slot) {
-        var name = 'is' + slot;
-        $('#' + name + '_equip').attr('class', 'unequipped');
-    },
-    SetUnoccupied: function(slot) {
-        var name = 'is' + slot;
-        $('#' + name + '_equip').attr('class', 'unoccupied');
     },
     ItemSwitchEvent: function(event, ui) {
         console.log('ItemSwitchEvent', arguments);
@@ -575,48 +621,6 @@ var HUDHandler = Class.extend({
             hudHandler.UpdateEquippedItems();
 
             soundHandler.Play(ChooseRandom(["bag1"]));
-
-        });
-    },
-    DropItem: function(startItem, itemID, itemNumber) {
-        socketHandler.socket.emit('dropItem', {
-            'itemID': itemNumber
-        }, function(reply) {
-
-            if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.MessageAlert(reply.errmsg);
-
-                // Teleport back!
-                TeleportElement('li' + startItem.id, 'ls' + startItem.slot);
-
-                return;
-            }
-
-            // Hide the tooltip
-            $('#tooltip').hide();
-
-            // If it was armor, update our appearance
-            if (startItem.equipped) {
-                if (items[startItem.template].type === 'armor') {
-                    ironbane.player.UpdateAppearance();
-                }
-                if (items[startItem.template].type === 'weapon' ||
-                    items[startItem.template].type === 'tool') {
-                    ironbane.player.UpdateWeapon(0);
-                }
-            }
-            else {
-                if(items[startItem.template].type === 'cash') {
-                    hudHandler.MakeCoinBar(true);
-                }
-            }
-
-            if ( reply.items ) {
-                socketHandler.playerData.items = reply.items;
-            }
-
-            hudHandler.ReloadInventory();
-            hudHandler.UpdateEquippedItems();
 
         });
     },
@@ -808,73 +812,6 @@ var HUDHandler = Class.extend({
 
         MakeHoverBox(div, content);
     },
-    MakeSlotItems: function(isLoot) {
-        var data = isLoot ? ironbane.player.lootItems : socketHandler.playerData.items;
-
-        if (isLoot) {
-            $('div[id^="li"]').remove();
-        } else {
-            $('div[id^="ii"]').remove();
-        }
-
-        for (var i = 0; i < data.length; i++) {
-            var item = data[i];
-            var template = items[item.template];
-
-            var name = isLoot ? 'li' + item.id : 'ii' + item.id;
-            var itemBarItem = $('<div id="' + name + '" class="itemSlot"></div>');
-            itemBarItem.data('item', item);
-            $('#gameFrame').append(itemBarItem);
-
-            var targetName = isLoot ? 'ls' + item.slot : 'is' + item.slot;
-            TeleportElement(name, targetName);
-            this.MakeItemHover(name, item);
-
-            //bm("item:"+item.id+",slot"+item.slot+"");
-
-            var itemurl;
-            if (template.type === 'armor') {
-                itemurl = 'images/characters/base/' + (template['subtype']) + '/big.php?i=' + (template['image']) + '';
-            } else {
-                itemurl = 'images/items/big.php?i=' + (template['image']);
-            }
-
-            $('#' + name).css('background-image', 'url(' + itemurl + ')');
-            //$('#'+name).css('background-color','orange');
-            //var hue = 'rgb(' + getRandomInt(50,255) + ',' + getRandomInt(50,255) + ',' + getRandomInt(50,255) + ')';
-            //$('#'+name).css('background-color', hue);
-            $('#' + name).css('background-repeat', 'no-repeat');
-            $('#' + name).css('background-position', 'center');
-
-            // Clicking it uses it!
-            // But not dragging!
-            //if ( !isLoot ) {
-            (function(item) {
-                $('#' + name).click(function(e) {
-                    if ($(this).hasClass('noclick')) {
-                        $(this).removeClass('noclick');
-                    } else {
-                        if (_.contains(socketHandler.playerData.items, item)) {
-                            if(e.shiftKey) {
-                                ironbane.player.splitItem(item.slot);
-                            } else {
-                                ironbane.player.UseItem(item.slot);
-                            }
-                        }
-                    }
-                });
-            })(item);
-
-            $('#' + name).draggable({
-                containment: "#gameFrame",
-                start: function(event, ui) {
-                    $(this).addClass('noclick');
-                }
-            });
-        }
-
-        hudHandler.UpdateEquippedItems();
-    },
     ReloadInventory: function() {
         if (ironbane.player) {
             this.MakeSlotItems(false);
@@ -926,11 +863,12 @@ var HUDHandler = Class.extend({
         $('#itemBar').css('left', (halfWidth - 240) + 'px');
         $('#itemBar').css('top', ((frameHeight) - 48) + 'px');
 
+        // todo: move these to their respective "show" methods
+        $('#lootBar, #bankBar, #vendorBar').css('left', (halfWidth - 240) + 'px');
+        $('#lootBar, #bankBar, #vendorBar').css('top', ((frameHeight) - 120) + 'px');
+
         $('#coinBar').css('left', '22px');
         $('#coinBar').css('top', '72px');
-
-        $('#lootBag, #bankBar').css('left', (halfWidth - 240) + 'px');
-        $('#lootBag, #bankBar').css('top', ((frameHeight) - 120) + 'px');
 
         $('#book').css('left', (halfWidth - 230) + 'px');
         $('#book').css('top', (halfHeight - 210) + 'px');
@@ -1109,24 +1047,20 @@ var HUDHandler = Class.extend({
         }
     },
     HideHUD: function() {
-        $('.dragon-bar').hide();
+        this.hideInv();
 
         $("#coinBar").hide();
         $("#statBar").hide();
-        $('div[id^="li"]').hide();
-        $('div[id^="ii"]').hide();
     },
     ShowHUD: function() {
-        $('#itemBar').show();
+        this.showInv({slots: 10, items: socketHandler.playerData.items});
+
         $("#coinBar").show();
         $("#statBar").show();
-        $('div[id^="li"]').show();
-        $('div[id^="ii"]').show();
+        $('#chatContent').trigger('show');
     },
     HideMenuScreen: function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
-        $('#itemBar, #coinBar, #statBar').show();
-        $('#chatContent').trigger('show');
         soundHandler.FadeOut("music/maintheme", 5000);
     },
     ShowMenuScreen: function() {
@@ -1789,17 +1723,14 @@ var HUDHandler = Class.extend({
     AddBigMessage: function(msg, duration) {
         this.bigMessages.push(new BigMessage(msg, duration));
     },
-    ShowMap: function() {
-
+    showMap: function() {
         $("#map").css("background-image", "url(data/" + terrainHandler.zone + "/map.png" + (isEditor ? "?" + (new Date()).getTime() : "") + ")");
-
         $("#map").show();
-
     },
-    HideMap: function() {
+    hideMap: function() {
         $("#map").hide();
     },
-    ShowBook: function(text, page) {
+    showBook: function(text, page) {
 
         //<button id="bookPrevPage" class="ibutton_book" style="width:150px">Previous Page</button>
         //<button id="bookNextPage" class="ibutton_book" style="width:150px">Next Page</button>
@@ -1825,7 +1756,7 @@ var HUDHandler = Class.extend({
         if (!_.isUndefined(textArray[page - 2])) {
             $("#bookFooterLeft").html('<button id="bookPrevPage" class="ibutton_book" style="width:150px">Previous Page</button>');
             $("#bookPrevPage").click(function() {
-                hudHandler.ShowBook(text, page - 2);
+                hudHandler.showBook(text, page - 2);
             });
         } else {
             $("#bookFooterLeft").empty();
@@ -1833,13 +1764,13 @@ var HUDHandler = Class.extend({
         if (!_.isUndefined(textArray[page + 2])) {
             $("#bookFooterRight").html('<button id="bookNextPage" class="ibutton_book" style="width:150px">Next Page</button>');
             $("#bookNextPage").click(function() {
-                hudHandler.ShowBook(text, page + 2);
+                hudHandler.showBook(text, page + 2);
             });
         } else {
             $("#bookFooterRight").empty();
         }
     },
-    HideBook: function() {
+    hideBook: function() {
         $("#book").hide();
     },
     AddChatMessage: function(msg) {

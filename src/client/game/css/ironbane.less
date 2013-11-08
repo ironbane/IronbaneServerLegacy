@@ -225,12 +225,10 @@ a {
 }
 
 #chatContent {
-    border: 1px solid gold;
-    background-color: rgba(4, 4, 4, 0.5);
     position: absolute;
     .content {
         pointer-events: none;
-        width: 100%;
+        width: 95%;
         height: 160px;
         color: white;
         text-shadow: 1px 1px black;
@@ -238,14 +236,19 @@ a {
         text-align: right;
         float: right;
         overflow: auto;
-        padding-bottom: 20px;
+        margin-right: 8px;
         word-wrap: break-word;
     }
-    button {
-        min-width: 100px;
-        pointer-events: auto;
-        &.active {
-            background-color: #5ba997;
+    .tabs {
+        padding: 2px;
+        text-align: right;
+        visibility: hidden;
+        button {
+            min-width: 100px;
+            pointer-events: auto;
+            &.active {
+                background-color: #5ba997;
+            }
         }
     }
    .jspVerticalBar {
@@ -253,6 +256,7 @@ a {
     }
     .messages {
         list-style-type: none;
+        padding: 0;
         .name {
             color: #fff; // should never happen...(no rank)
             &.gm {
@@ -271,8 +275,26 @@ a {
         }
     }
     #chatInput {
-        width: 98%;
+        width: 95%;
         height: 15px;
+        float: right;
+        visibility: hidden;
+        &.focused {
+            visibility: visible;
+        }
+    }
+    &:hover {
+        border: 1px solid gold;
+        background-color: rgba(4, 4, 4, 0.5);
+        .tabs {
+            visibility: visible;
+            transition: visibility 0s .2s ease;
+        }
+        #chatInput {
+            visibility: visible;
+            transition: visibility 0s .2s ease;
+        }
+        transition: background-color .25s, border .25s ease;
     }
 }
 

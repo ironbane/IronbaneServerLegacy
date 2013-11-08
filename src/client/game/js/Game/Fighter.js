@@ -27,98 +27,98 @@ var walkSoundTime = 0.4;
 var meleeTime = 0.3;
 
 var Fighter = Unit.extend({
-  Init: function(position, rotation, id, name, param, size, health, armor, healthMax, armorMax) {
-    this.npctype = name;
-    health = health || 0;
-    healthMax = healthMax || 0;
-    armor = armor || 0;
-    armorMax = armorMax || 0;
+    Init: function(position, rotation, id, name, param, size, health, armor, healthMax, armorMax) {
+        this.items = [];
 
+        this.npctype = name;
+        health = health || 0;
+        healthMax = healthMax || 0;
+        armor = armor || 0;
+        armorMax = armorMax || 0;
 
-    this.drawNameMesh = id > 0 && !(this.isPlayer());
+        // isn't this condition cancelling itself?
+        this.drawNameMesh = id > 0 && !(this.isPlayer());
 
+        if (id < 0 && !isProduction) {
+          this.drawNameMesh = true;
+          this.overrideName = Math.abs(id);
+        }
 
-    if ( id < 0 && !isProduction ) {
-        this.drawNameMesh = true;
-        this.overrideName = Math.abs(id);
-    }
+        this._super(position, rotation, id, name, param, size);
 
-//    if ( local && debugging ) {
-//      this.drawNameMesh = true;
-//      name = name+": "+id;
-//    }
+        this.SpriteStatusEnum = {
+            STAND : 0,
+            WALK : 1,
+            FIGHT : 2,
+            CAST : 3
+        };
 
-    this._super(position, rotation, id, name, param, size);
+        this.spriteStatus = this.SpriteStatusEnum.STAND;
+        this.spriteForward = true;
 
-    this.SpriteStatusEnum = {
-      STAND : 0,
-      WALK : 1,
-      FIGHT : 2,
-      CAST : 3
-    };
+        this.timers.walkSoundTimer = 0.0;
 
-    this.spriteStatus = this.SpriteStatusEnum.STAND;
-    this.spriteForward = true;
+        this.spriteStep = 0;
+        // the logic for this one doesn't decrease like other "timers"
+        // it increases based on this.size, do not convert to "timers"
+        this.walkSpriteTimer = 0.0;
 
-    this.timers.walkSoundTimer = 0.0;
+        this.timers.attackStateTimer = 0.0;
+        this.timers.attackTimeout = 0.0;
 
+        this.targetFactor = 0;
 
-    this.spriteStep = 0;
-    // the logic for this one doesn't decrease like other "timers"
-    // it increases based on this.size, do not convert to "timers"
-    this.walkSpriteTimer = 0.0;
+        this.timers.meleeHitTimer = 0.0;
+        this.meleeHitPosition = new THREE.Vector3();
 
+        this.timers.meleeAttackTimer = 0.0;
+        this.meleeAttackPosition = new THREE.Vector3();
+        this.timers.deathTimer = 0.0;
+        this.dead = false;
 
-    this.timers.attackStateTimer = 0.0;
-    this.timers.attackTimeout = 0.0;
+        this.health = health;
+        this.healthMax = healthMax;
+        this.armor = armor;
+        this.armorMax = armorMax;
 
-    this.targetFactor = 0;
+        this.appearance = {};
+        this.appearance.skin = 0;
+        this.appearance.hair = 0;
+        this.appearance.head = 0;
+        this.appearance.body = 0;
+        this.appearance.feet = 0;
 
-    this.timers.meleeHitTimer = 0.0;
-    this.meleeHitPosition = new THREE.Vector3();
+        // Used for size calculation
+        this.meshHeight = 1.0;
 
-    this.timers.meleeAttackTimer = 0.0;
-    this.meleeAttackPosition = new THREE.Vector3();
-    this.timers.deathTimer = 0.0;
-    this.dead = false;
+        this.timers.lastJumpTimer = 0;
 
-    this.health = health;
-    this.healthMax = healthMax;
-    this.armor = armor;
-    this.armorMax = armorMax;
+        this.spriteIndex = 0;
 
-    this.appearance = {};
-    this.appearance.skin = 0;
-    this.appearance.hair = 0;
-    this.appearance.head = 0;
-    this.appearance.body = 0;
-    this.appearance.feet = 0;
+        // why is this??
+        (function(unit) {
+            setTimeout(function() {
+                if (unit.health <= 0) {
+                    unit.Die(true);
+                }
+            }, 0);
+        })(this);
 
-    // Used for size calculation
-    this.meshHeight = 1.0;
-
-    this.timers.lastJumpTimer = 0;
-
-    this.spriteIndex = 0;
-
-    (function(unit){
-      setTimeout(function(){
-        if ( unit.health <= 0 ) unit.Die(true);
-      }, 0);
-    })(this);
-
-    this.canSelectWithEditor = true;
-  },
-  Add: function() {
-    this._super();
-  },
-  Destroy: function() {
-    if ( this.weaponOrigin ) {
-      ironbane.scene.remove(this.weaponOrigin);
-    }
-    this._super();
-
-  },
+        this.canSelectWithEditor = true;
+    },
+    // function so that we can add hooks...
+    addItem: function(item) {
+        this.items.push(item);
+    },
+    Add: function() {
+        this._super();
+    },
+    Destroy: function() {
+        if ( this.weaponOrigin ) {
+            ironbane.scene.remove(this.weaponOrigin);
+        }
+        this._super();
+    },
   UpdateClothes: function() {
     var me = this;
 
