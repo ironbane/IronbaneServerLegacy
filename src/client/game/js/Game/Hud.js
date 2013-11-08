@@ -279,6 +279,9 @@ var HUDHandler = Class.extend({
         }
 
         var slotSelector = '#is' + item.slot;
+        if(item.equipped === 1) {
+            slotSelector.addClass('equipped');
+        }
         var itemImg = $('<img src="' + imageUrl + '" class="invSlotItem" />');
         itemImg.data('item', item);
         //HUD.MakeItemHover(itemImg, item);
