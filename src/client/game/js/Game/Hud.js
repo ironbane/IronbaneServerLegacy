@@ -187,27 +187,6 @@ var HUDHandler = Class.extend({
     ShowMainMenuHUD: function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
     },
-    makeVendorSlots: function(num) {
-        var HUD = this,
-            container = $('#vendorBar'),
-            spaces = num;
-
-        container.empty();
-        for (var x = 0; x < spaces; x++) {
-            var slot = $('<div id="vs' + x + '" class="dragon-slot vendorBarSlot"></div>');
-            slot.data('slot', x);
-            container.append(slot);
-            slot.droppable({
-                drop: function(e, ui) { _.partial(HUD.onVendorSlotDrop, e, ui, HUD)(); },
-                greedy: true,
-                accept: '.itemBarItem' // only allow inv for sales, no vendor rearranging
-            });
-            slot.click(function() {
-                // handle use based on child data
-                console.log($(this).attr('id') + " clicked!");
-            });
-        }
-    },
     makeInventorySlots: function(num) {
         var HUD = this,
             container = $('#itemBar'),
@@ -345,6 +324,27 @@ var HUDHandler = Class.extend({
     hideLoot: function() {
         $('#lootBar').removeData().empty().hide();
     },
+    makeVendorSlots: function(num) {
+        var HUD = this,
+            container = $('#vendorBar'),
+            spaces = num;
+
+        container.empty();
+        for (var x = 0; x < spaces; x++) {
+            var slot = $('<div id="vs' + x + '" class="dragon-slot vendorBarSlot"></div>');
+            slot.data('slot', x);
+            container.append(slot);
+            slot.droppable({
+                drop: function(e, ui) { _.partial(HUD.onVendorSlotDrop, e, ui, HUD)(); },
+                greedy: true,
+                accept: '.itemBarItem' // only allow inv for sales, no vendor rearranging
+            });
+            slot.click(function() {
+                // handle use based on child data
+                console.log($(this).attr('id') + " clicked!");
+            });
+        }
+    },
     fillVendorSlot: function(item) {
         var imageUrl;
         if (item.type === 'armor') {
@@ -364,6 +364,18 @@ var HUDHandler = Class.extend({
             revert: 'invalid',
             snap: '.itemBarSlot'
         });
+    },
+    showVendor: function(data) {
+        var HUD = this;
+        HUD.makeVendorSlots(data.slots);
+        $('#vendorBar').show();
+
+        _.each(data.items, function(item) {
+            HUD.fillVendorSlot(item);
+        });
+    },
+    hideVendor: function() {
+        $('#vendorBar').removeData().empty().hide();
     },
     makeBankSlots: function(num) {
         var HUD = this,
@@ -450,25 +462,6 @@ var HUDHandler = Class.extend({
 
         ironbane.player.dropItem(item);
         HUD.clearInvSlot(item.slot);
-    },
-    UpdateEquippedItems: function() {
-        for (var x = 0; x < 10; x++) {
-            var item = hudHandler.FindItemBySlot(x, false);
-            if (item) {
-                var template = items[item.template];
-                if (item.equipped) {
-                    if (template.type === "consumable") {
-                        this.SetUsed(x);
-                    } else {
-                        this.SetEquipped(x);
-                    }
-                } else {
-                    this.SetUnequipped(x);
-                }
-            } else {
-                this.SetUnoccupied(x);
-            }
-        }
     },
     ItemSwitchEvent: function(event, ui) {
         console.log('ItemSwitchEvent', arguments);
@@ -618,8 +611,6 @@ var HUDHandler = Class.extend({
             // Do the UI actions
             TeleportElement('li' + startItem.id, slotID);
 
-            hudHandler.UpdateEquippedItems();
-
             soundHandler.Play(ChooseRandom(["bag1"]));
 
         });
@@ -656,7 +647,6 @@ var HUDHandler = Class.extend({
 
             hudHandler.ReloadInventory();
             hudHandler.MakeCoinBar(true);
-            hudHandler.UpdateEquippedItems();
 
         });
     },
@@ -687,7 +677,6 @@ var HUDHandler = Class.extend({
 
             hudHandler.ReloadInventory();
             hudHandler.MakeCoinBar(true);
-            hudHandler.UpdateEquippedItems();
 
             if (switchItem) {
                 // If it was armor, update our appearance
@@ -1242,8 +1231,7 @@ var HUDHandler = Class.extend({
         });
 
         var enterChar = function() {
-
-            if (!socketHandler.serverOnline) return;
+            if (!socketHandler.serverOnline) {return;}
 
             hudHandler.DisableButtons(['btnLogOut', 'btnEnterChar',
                     'btnNextChar', 'btnPrevChar', 'btnDelChar'
@@ -1285,8 +1273,6 @@ var HUDHandler = Class.extend({
                 }
             });
         };
-
-
 
         $('#btnEnterChar').click(enterChar);
 
@@ -1363,7 +1349,6 @@ var HUDHandler = Class.extend({
         });
 
         $('#btnLogin').click(function() {
-
             if (slotsLeft <= 0) {
                 return;
             }
@@ -1425,7 +1410,7 @@ var HUDHandler = Class.extend({
             $('#btnBack').click(function() {
                 hudHandler.MakeCharSelectionScreen();
             });
-        })
+        });
 
         $('#btnRegister').click(function() {
             if (startdata.loggedIn) {
@@ -1696,10 +1681,8 @@ var HUDHandler = Class.extend({
                 hudHandler.MakeCharSelectionScreen();
             });
         });
-
     },
     Tick: function(dTime) {
-
         var output = '';
 
         for (var m = 0; m < this.bigMessages.length; m++) {
@@ -1712,13 +1695,9 @@ var HUDHandler = Class.extend({
             } else {
                 output += '<div style="opacity:' + msg.opacity + '">' + msg.message + '</div><br>';
             }
-
         }
 
-
         $('#bigMessagesBox').html(output);
-
-
     },
     AddBigMessage: function(msg, duration) {
         this.bigMessages.push(new BigMessage(msg, duration));
