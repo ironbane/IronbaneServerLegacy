@@ -734,7 +734,7 @@ var SocketHandler = Class.extend({
                 if (bag.template.type === UnitTypeEnum.VENDOR) {
                     if (item.price > 0 && player.getTotalCoins() < item.price) {
                         reply({
-                            errmsg: ChooseRandom(["Ye got no money, bum!", "Show me some gold coins!", "Wher's the gold?"])
+                            errmsg: _.sample(["Ye got no money, bum!", "Show me some gold coins!", "Wher's the gold?"])
                         });
                         return;
                     }
@@ -846,12 +846,11 @@ var SocketHandler = Class.extend({
                     // Update the money
                     player.purchase(item);
 
-                    bag.Say(ChooseRandom(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
+                    bag.Say(_.sample(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
 
                     // It's now our property, so remove the price tag
                     delete item.price;
                 }
-
 
                 // HACK HACK HACK for halloween 1/11/2013
                 // Quick fix to teleport people out of the mansion when they loot from the chest
@@ -862,7 +861,6 @@ var SocketHandler = Class.extend({
                         player.TeleportToUnit(exit);
                     }
                 }
-
 
                 reply({
                     items: player.items,

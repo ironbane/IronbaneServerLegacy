@@ -469,10 +469,12 @@ label {
 // DRAGON BARS - inv, loot, bank, etc.
 // dragon because you drag on stuff :P
 .dragon-bar {
+    z-index: 100;
     display: none; // start hidden
     position: absolute;
-    background-color: black;
+    //background-color: black;
     .dragon-slot {
+        z-index: 105;
         width: 48px;
         height: 48px;
         float: left;
@@ -489,16 +491,23 @@ label {
         &.vendorBarSlot {
             background-image:url(/game/images/misc/bar_8.png);
         }
+        &.dragon-hover {
+            background-color: rgba(242, 211, 0, 0.5);
+            cursor: pointer;
+        }
     }
+}
+.dragon-item {
+    z-index: 1100;
 }
 #bankBar {
     background-color: transparent;
 }
-@iterations: 10;
-.itemBarSlotLoop (@index) when (@index > 0) {
+@iterations: 11;
+.itemBarSlotLoop (@index) when (@index > 1) {
     .itemBarSlot {
-        @t: ~":nth-child(@{index})";
         @i: @index - 1;
+        @t: ~":nth-child(@{i})";
         &@{t} {
             background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_3.png);
             &.equipped {
@@ -511,7 +520,7 @@ label {
     }
     .itemBarSlotLoop(@index - 1);
 }
-.itemBarSlotLoop (0) {}
+.itemBarSlotLoop (1) {}
 .itemBarSlotLoop (@iterations);
 // DRAGON BARS
 
@@ -520,6 +529,7 @@ label {
 }
 
 #tooltip {
+    z-index: 2000;
     position: absolute;
     display: none;
     width: 200px;

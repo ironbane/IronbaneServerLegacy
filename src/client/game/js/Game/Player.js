@@ -218,6 +218,8 @@ var Player = Fighter.extend({
         if (player.lastFoundLootBag && player.lastFoundLootBag.id === -267) {
             player.HideTutorial(1);
         }
+
+        player.lastFoundLootBag = null;
     },
     showLoot: function(found) {
         //console.log('showLoot', found);
@@ -239,9 +241,9 @@ var Player = Fighter.extend({
             player.lootItems = reply;
 
             if (found.template.type === UnitTypeEnum.VENDOR) {
-                hudHandler.showVendor({slots: 10, items: player.lootItems});
+                hudHandler.showVendor({id: found.id, slots: 10, items: player.lootItems});
             } else {
-                hudHandler.showLoot({slots: player.lootItems.length, items: player.lootItems});
+                hudHandler.showLoot({id: found.id, slots: player.lootItems.length, items: player.lootItems});
             }
         });
 
@@ -963,7 +965,7 @@ var Player = Fighter.extend({
         player.appearance.body = 0;
         player.appearance.feet = 0;
 
-        _.each(player.getItems, function(item) {
+        _.each(player.getItems(), function(item) {
             if (item.equipped) {
                 if (item.type === 'armor') {
                     if (item.subtype === 'head') {

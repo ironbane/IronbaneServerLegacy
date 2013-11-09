@@ -400,48 +400,44 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('updateClothes', function(data) {
-            //if ( !socketHandler.loggedIn ) return;
-
             var unit = FindUnit(data.id);
 
-            unit.appearance.head = data['head'];
-            unit.appearance.body = data['body'];
-            unit.appearance.feet = data['feet'];
+            unit.appearance.head = data.head;
+            unit.appearance.body = data.body;
+            unit.appearance.feet = data.feet;
 
             unit.UpdateClothes();
-
         });
 
         this.socket.on('updateWeapon', function(data) {
-            //if ( !socketHandler.loggedIn ) return;
-
             var unit = FindUnit(data.id);
-
-            unit.UpdateWeapon(data['weapon']);
-
+            unit.UpdateWeapon(data.weapon);
         });
 
         // comes from GiveItem and addItem on server
-        this.socket.on('receiveItem', function(data) {
-            socketHandler.playerData.items.push(data);
-            hudHandler.fillInvSlot(data);
+        this.socket.on('receiveItem', function(item) {
+            socketHandler.playerData.items.push(item);
+            hudHandler.fillInvSlot(item);
+
+            if(item.type === 'cash') {
+                hudHandler.MakeCoinBar(true);
+            }
         });
 
         // replace player inv with server inv
         this.socket.on('updateInventory', function(data) {
-            // TODO: if changes are made to equipped items do we need additional events?
             socketHandler.playerData.items = data.items;
-            hudHandler.ReloadInventory();
+            hudHandler.showInv({slots: 10, items: data.items});
         });
 
         // BANKING V1
         this.socket.on('openBank', function(data) {
-            console.log('openBank!', data);
+            //console.log('openBank!', data);
             hudHandler.showBank(data);
         });
 
         this.socket.on('closeBank', function(data) {
-            console.log('closeBank!', data);
+            //console.log('closeBank!', data);
             hudHandler.hideBank();
         });
         // BANKING...
@@ -449,11 +445,7 @@ var SocketHandler = Class.extend({
         this.socket.on('lootFromBag', function(data) {
             // occurs when someone nearby loots from a bag
             // refresh the bag
-            console.log('lootFromBag REPLY:', data);
-            hudHandler.ReloadInventory();
-            if (ironbane.player.canLoot) {
-                ironbane.player.lootItems = data.loot;
-            }
+            hudHandler.updateLoot(data);
         });
 
         this.socket.on('respawn', function(data) {
@@ -485,7 +477,7 @@ var SocketHandler = Class.extend({
                         hudHandler.ShowHUD();
                         hudHandler.MakeHealthBar(true);
 
-                        hudHandler.ReloadInventory();
+                        hudHandler.showInv({slots: 10, items: socketHandler.playerData.items});
                     });
                 }
 

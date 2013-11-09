@@ -30,50 +30,8 @@ var offsetY = startOffsetY;
 var mouseDownLeft = false;
 var mouseDownRight = false;
 
-var tooltipWidth = 0;
-var tooltipHeight = 0;
-
-var currentHoverDiv = "";
-function MakeHoverBox(div,text) {
-
-    (function(div){
-    $("#"+div).mouseenter(function(e){
-
-        currentHoverDiv = div;
-
-        var t = $("#tooltip").html();
-        $("#tooltip").show();
-        $("#tooltip").html(text);
-        tooltipWidth = parseInt($("#tooltip").width());
-        tooltipHeight = parseInt($("#tooltip").height());
-        offsetY = - tooltipHeight - 50;
-        offsetX = - tooltipWidth /2;
-    });
-    $("#"+div).mouseleave(function(e){
-        $("#tooltip").hide();
-    });
-    })(div);
-}
-
 $(document).ready(function(){
     frameWidth = $(window).width();
     frameHeight = $(window).height();
 });
 
-$(document).mousemove(function(e){
-
-    mouseX = e.pageX;
-    mouseY = e.pageY;
-
-
-    var tposx = mouseX + offsetX;
-    var tposy = mouseY + offsetY;
-   if ( tposx+tooltipWidth+10 > frameWidth ) tposx -= (tooltipWidth+10+(1*offsetX));
-//    if ( tposy+tooltipHeight-40 > frameHeight ) tposy -= (tooltipHeight+(1*offsetY));
-    while (tposy+tooltipHeight-20 > frameHeight ) tposy -= 1;
-    //while (tposx+tooltipWidth+10 > frameWidth ) tposx -= 1;
-
-    $("#tooltip").css("left", (tposx)+"px");
-    $("#tooltip").css("top", (tposy)+"px");
-
-});

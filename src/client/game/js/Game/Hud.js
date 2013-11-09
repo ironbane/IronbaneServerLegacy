@@ -124,7 +124,9 @@ var HUDHandler = Class.extend({
         setTimeout(function() {
             $('#gameFrame').droppable({
                 accept: '.invSlotItem', // can only drop things from your own inv (not from bank or other)
-                drop: function(e, ui) { _.partial(HUD.onDropItem, e, ui, HUD)(); },
+                drop: function(e, ui) {
+                    _.partial(HUD.onDropItem, e, ui, HUD)();
+                },
             });
 
             HUD.ShowMainMenuHUD();
@@ -155,7 +157,7 @@ var HUDHandler = Class.extend({
     MakeSoundButton: function() {
         var checkSoundToggle = function(value) {
 
-            if ( !gotFlashInstalled ) {
+            if (!gotFlashInstalled) {
                 value = false;
                 hudHandler.MessageAlert("Flash was not detected.<br><br>Sound effects are disabled.");
             }
@@ -198,8 +200,12 @@ var HUDHandler = Class.extend({
             slot.data('slot', x);
             container.append(slot);
             slot.droppable({
-                drop: function(e, ui) { _.partial(HUD.onInvSlotDrop, e, ui, HUD)(); },
-                greedy: true
+                drop: function(e, ui) {
+                    _.partial(HUD.onInvSlotDrop, e, ui, HUD)();
+                },
+                greedy: true,
+                tolerance: 'touch',
+                hoverClass: 'dragon-hover'
             });
             slot.click(function(e) {
                 var $slot = $(this),
@@ -208,8 +214,8 @@ var HUDHandler = Class.extend({
                 // handle use based on child data
                 console.log($slot.attr('id') + " clicked!", $item);
 
-                if($item) {
-                    if(e.shiftKey) {
+                if ($item) {
+                    if (e.shiftKey && $item.stackable) {
                         ironbane.player.splitItem($item.slot);
                     } else {
                         ironbane.player.useItem($item.slot);
@@ -219,7 +225,9 @@ var HUDHandler = Class.extend({
         }
     },
     fillInvSlot: function(item) {
-        var imageUrl;
+        var HUD = this,
+            imageUrl;
+
         if (item.type === 'armor') {
             imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
         } else {
@@ -227,32 +235,42 @@ var HUDHandler = Class.extend({
         }
 
         var slotSelector = '#is' + item.slot;
-        if(item.equipped === 1) {
+        if (item.equipped === 1) {
             $(slotSelector).addClass('equipped');
         }
-        var itemImg = $('<img src="' + imageUrl + '" class="invSlotItem" />');
+        var itemImg = $('<img src="' + imageUrl + '" class="dragon-item invSlotItem" />');
         itemImg.data('item', item);
-        //HUD.MakeItemHover(itemImg, item);
         $(slotSelector).append(itemImg);
+        if (item.type !== 'cash') {
+            $(slotSelector).droppable('disable');
+        }
+
+        HUD.makeItemHover(itemImg, item);
 
         itemImg.draggable({
             containment: '#gameFrame',
-            revert: 'invalid'
+            revert: 'invalid',
+            zIndex: 110,
+            helper: 'clone',
+            appendTo: 'body',
+            start: function(e, ui) {
+                ui.helper.data('item', item);
+            }
         });
     },
     clearInvSlot: function(slotNum) {
-        $('#is' + slotNum).empty().removeClass('equipped used');
+        $('#is' + slotNum).empty().removeClass('equipped used').droppable('enable');
     },
     updateInvSlotStatus: function(slotNum, status) {
         var $slot = $('#is' + slotNum);
 
-        if(status === 'equipped') {
+        if (status === 'equipped') {
             $slot.addClass(status);
         } else {
             $slot.removeClass('equipped');
         }
 
-        if(status === 'used') {
+        if (status === 'used') {
             $slot.addClass(status);
             // todo: better animation?
             setTimeout(function() {
@@ -272,6 +290,45 @@ var HUDHandler = Class.extend({
     hideInv: function() {
         $('#itemBar').removeData().empty().hide();
     },
+    onInvSlotDrop: function(e, ui, HUD) {
+        // we can drop onto inventory from a vendor, loot, or bank (currently) OR itself
+        var slot = $(e.target),
+            dropped = $(e.toElement),
+            item = dropped.data('item');
+
+        if (dropped.hasClass('lootSlotItem') || dropped.hasClass('vendorSlotItem')) {
+            HUD.lootItem(null, item, slot.data('slot'));
+        }
+
+        if (dropped.hasClass('bankSlotItem')) {
+            var bank = $('#bankBar').data('bank');
+            if (!bank) {
+                console.error('bank has gone away!');
+            }
+            var bankSlot = item.slot; // before it gets changed
+            socketHandler.socket.emit('bankTakeItem', {
+                id: bank.id,
+                item: item.id,
+                slot: slot.data('slot')
+            }, function(response) {
+                if (response.errmsg) {
+                    console.error(response.errmsg);
+                } else {
+                    // success
+                    HUD.clearBankSlot(bankSlot);
+                    //the bank is actually going to post receiveItem so no need for further action here
+                }
+            });
+        }
+
+        if (dropped.hasClass('vendorSlotItem')) {
+
+        }
+
+        if (dropped.hasClass('invSlotItem')) {
+
+        }
+    },
     makeLootSlots: function(num) {
         var HUD = this,
             container = $('#lootBar'),
@@ -290,7 +347,9 @@ var HUDHandler = Class.extend({
         }
     },
     fillLootSlot: function(item) {
-        var imageUrl;
+        var HUD = this,
+            imageUrl;
+
         if (item.type === 'armor') {
             imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
         } else {
@@ -298,22 +357,39 @@ var HUDHandler = Class.extend({
         }
 
         var slotSelector = '#ls' + item.slot;
-        var itemImg = $('<img src="' + imageUrl + '" class="lootSlotItem" />');
+        var itemImg = $('<img src="' + imageUrl + '" class="dragon-item lootSlotItem" />');
         itemImg.data('item', item);
-        //HUD.MakeItemHover(itemImg, item);
         $(slotSelector).append(itemImg);
+
+        HUD.makeItemHover(itemImg, item);
 
         itemImg.draggable({
             containment: '#gameFrame',
-            revert: 'invalid',
-            snap: '.itemBarSlot'
+            revert: 'invalid'
         });
+    },
+    // this happens when someone else nearby loots an item from something you might have open
+    updateLoot: function(data) {
+        var vendor = $('#vendorBar').data('vendor'),
+            bag = $('#lootBar').data('bag');
+
+        if(vendor && vendor.id === data.bag) {
+            hudHandler.showLoot({id: data.bag, slots: data.loot.length, items: data.loot});
+        }
+
+        if(bag && bag.id === data.bag) {
+            hudHandler.showLoot({id: data.bag, slots: data.loot.length, items: data.loot});
+        }
+
+        if (ironbane.player.canLoot) {
+            ironbane.player.lootItems = data.loot;
+        }
     },
     showLoot: function(data) {
         //console.log('showLoot', data);
         var HUD = this;
         HUD.makeLootSlots(data.slots);
-        $('#lootBar').show();
+        $('#lootBar').data('bag', data).show();
 
         _.each(data.items, function(invItem, index) {
             // set the slot so that it's not the one we dropped it from
@@ -335,9 +411,11 @@ var HUDHandler = Class.extend({
             slot.data('slot', x);
             container.append(slot);
             slot.droppable({
-                drop: function(e, ui) { _.partial(HUD.onVendorSlotDrop, e, ui, HUD)(); },
+                drop: function(e, ui) {
+                    _.partial(HUD.onVendorSlotDrop, e, ui, HUD)();
+                },
                 greedy: true,
-                accept: '.itemBarItem' // only allow inv for sales, no vendor rearranging
+                accept: '.invSlotItem' // only allow inv for sales, no vendor rearranging
             });
             slot.click(function() {
                 // handle use based on child data
@@ -346,7 +424,9 @@ var HUDHandler = Class.extend({
         }
     },
     fillVendorSlot: function(item) {
-        var imageUrl;
+        var HUD = this,
+            imageUrl;
+
         if (item.type === 'armor') {
             imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
         } else {
@@ -354,21 +434,21 @@ var HUDHandler = Class.extend({
         }
 
         var slotSelector = '#vs' + item.slot;
-        var itemImg = $('<img src="' + imageUrl + '" class="vendorSlotItem" />');
+        var itemImg = $('<img src="' + imageUrl + '" class="dragon-item vendorSlotItem" />');
         itemImg.data('item', item);
-        //HUD.MakeItemHover(itemImg, item);
         $(slotSelector).droppable('disable').append(itemImg);
+
+        HUD.makeItemHover(itemImg, item);
 
         itemImg.draggable({
             containment: '#gameFrame',
-            revert: 'invalid',
-            snap: '.itemBarSlot'
+            revert: 'invalid'
         });
     },
     showVendor: function(data) {
         var HUD = this;
         HUD.makeVendorSlots(data.slots);
-        $('#vendorBar').show();
+        $('#vendorBar').data('vendor', data).show();
 
         _.each(data.items, function(item) {
             HUD.fillVendorSlot(item);
@@ -376,6 +456,29 @@ var HUDHandler = Class.extend({
     },
     hideVendor: function() {
         $('#vendorBar').removeData().empty().hide();
+    },
+    onVendorSlotDrop: function(e, ui, HUD) {
+        // this should be when we are trying to sell something only
+        var slot = $(e.target),
+            dropped = $(e.toElement),
+            item = dropped.data('item'),
+            vendor = $("#vendorBar").data('vendor');
+
+        var data = {
+            npcID: vendor.id,
+            itemID: item.id,
+            slotNumber: slot.data('slot')
+        };
+
+        console.log('onVendorSlotDrop', slot, dropped, item, vendor, data);
+
+        if (acceptOffer) {
+            socketHandler.socket.emit('putItem', data, function(reply) {
+
+            });
+        } else {
+
+        }
     },
     makeBankSlots: function(num) {
         var HUD = this,
@@ -388,9 +491,13 @@ var HUDHandler = Class.extend({
             slot.data('slot', x);
             container.append(slot);
             slot.droppable({
-                drop: function(e, ui) { _.partial(HUD.onBankSlotDrop, e, ui, HUD)(); },
+                drop: function(e, ui) {
+                    _.partial(HUD.onBankSlotDrop, e, ui, HUD)();
+                },
                 greedy: true,
-                accept: '.invSlotItem' // only accept items from the item bar
+                accept: '.invSlotItem', // only accept items from the item bar
+                tolerance: 'touch',
+                hoverClass: 'dragon-hover'
             });
             slot.click(function() {
                 console.log($(this).attr('id') + " clicked!");
@@ -398,7 +505,9 @@ var HUDHandler = Class.extend({
         }
     },
     fillBankSlot: function(item) {
-        var imageUrl;
+        var HUD = this,
+            imageUrl;
+
         if (item.type === 'armor') {
             imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
         } else {
@@ -406,14 +515,14 @@ var HUDHandler = Class.extend({
         }
 
         var slotSelector = '#bs' + item.slot;
-        var itemImg = $('<img src="' + imageUrl + '" class="bankSlotItem" />');
+        var itemImg = $('<img src="' + imageUrl + '" class="dragon-item bankSlotItem" />');
         itemImg.data('item', item);
-        //HUD.MakeItemHover(itemImg, item);
         $(slotSelector).droppable('disable').append(itemImg);
+
+        HUD.makeItemHover(itemImg, item);
 
         itemImg.draggable({
             containment: '#gameFrame',
-            snap: '.itemBarSlot',
             revert: 'invalid'
         });
     },
@@ -429,29 +538,39 @@ var HUDHandler = Class.extend({
     hideBank: function() {
         $('#bankBar').removeData().empty().hide();
     },
+    clearBankSlot: function(slotNum) {
+        $('#bs' + slotNum).empty().droppable('enable');
+    },
     onBankSlotDrop: function(e, ui, HUD) {
         var slot = $(e.target),
             dropped = $(e.toElement),
             item = dropped.data('item'),
             bank = $("#bankBar").data('bank');
 
-        console.log('onBankSlotDrop', e, bank, slot, item);
+        //console.log('onBankSlotDrop', e, bank, slot, item);
 
         socketHandler.socket.emit('bankStoreItem', {
             id: bank.id,
             item: item.id,
             slot: slot.data('slot')
         }, function(response) {
-            if(response.errmsg) {
+            if (response.errmsg) {
                 console.error(response.errmsg);
             } else {
                 // success!
                 // create the item in the bank
                 HUD.fillBankSlot(response);
                 // delete the old draggable node
-                dropped.remove();
-                // remove from player's inv
-
+                HUD.clearInvSlot(item.slot);
+                if (item.equipped) {
+                    if (item.type === 'armor') {
+                        ironbane.player.UpdateAppearance();
+                        HUD.MakeArmorBar();
+                    }
+                    if (item.type === 'weapon' || item.type === 'tool') {
+                        ironbane.player.UpdateWeapon(0);
+                    }
+                }
             }
         });
     },
@@ -462,6 +581,18 @@ var HUDHandler = Class.extend({
 
         ironbane.player.dropItem(item);
         HUD.clearInvSlot(item.slot);
+        if (item.equipped) {
+            if (item.type === 'armor') {
+                ironbane.player.UpdateAppearance();
+                HUD.MakeArmorBar();
+            }
+            if (item.type === 'weapon' || item.type === 'tool') {
+                ironbane.player.UpdateWeapon(0);
+            }
+        }
+        if(item.type === 'cash') {
+            HUD.MakeCoinBar(true);
+        }
     },
     ItemSwitchEvent: function(event, ui) {
         console.log('ItemSwitchEvent', arguments);
@@ -565,7 +696,7 @@ var HUDHandler = Class.extend({
             // because money bags may have been adjusted, entire inventory is sync'd up
             if (_.isArray(reply.items)) {
                 socketHandler.playerData.items = reply.items;
-                hudHandler.ReloadInventory();
+                //hudHandler.ReloadInventory();
                 hudHandler.MakeCoinBar(true);
 
                 // Remove the loot bag
@@ -638,82 +769,55 @@ var HUDHandler = Class.extend({
                 }
                 return;
             }
-            if ( reply.items ) {
+            if (reply.items) {
                 socketHandler.playerData.items = reply.items;
             }
-            if ( reply.loot ) {
+            if (reply.loot) {
                 ironbane.player.lootItems = reply.loot;
             }
 
-            hudHandler.ReloadInventory();
+            //hudHandler.ReloadInventory();
             hudHandler.MakeCoinBar(true);
 
         });
     },
-    LootItem: function(switchItem, startItem, slotNumber, slotID) {
-        var data = {
-            'npcID': ironbane.player.lootUnit.id,
-            'switchID': switchItem ? switchItem.id : 0,
-            'slotNumber': slotNumber,
-            'itemID': startItem.id
-        };
+    // this is a combined vendor / loot bag method, should be split
+    lootItem: function(switchItem, startItem, slotNumber) {
+        var HUD = this,
+            data = {
+                'npcID': ironbane.player.lootUnit.id,
+                'switchID': switchItem ? switchItem.id : 0,
+                'slotNumber': slotNumber,
+                'itemID': startItem.id
+            };
 
         socketHandler.socket.emit('lootItem', data, function(reply) {
             if (!_.isUndefined(reply.errmsg)) {
                 hudHandler.MessageAlert(reply.errmsg);
 
-                // Teleport back!
-                TeleportElement('li' + startItem.id, 'ls' + startItem.slot);
+                // revert transaction!
+                // showInv + loot?
                 return;
             }
 
-            if ( reply.items ) {
+            if (reply.items) {
                 socketHandler.playerData.items = reply.items;
             }
 
-            if ( reply.loot ) {
+            if (reply.loot) {
                 ironbane.player.lootItems = reply.loot;
             }
 
-            hudHandler.ReloadInventory();
-            hudHandler.MakeCoinBar(true);
+            // gotta update the bag too...? or is that being handled by lootFromBag?
 
-            if (switchItem) {
-                // If it was armor, update our appearance
-                if (switchItem.equipped) {
-                    if (items[switchItem.template].type === 'armor') {
-                        ironbane.player.UpdateAppearance();
-                    }
-                    if (items[switchItem.template].type === 'weapon') {
-                        ironbane.player.UpdateWeapon(0);
-                    }
-                }
-            }
-            soundHandler.Play(ChooseRandom(["bag1"]));
+            // redo the whole inv, shouldn't be necessary... punting for now
+            HUD.showInv({slots: 10, items: reply.items});
+            HUD.MakeCoinBar(true);
 
+            soundHandler.Play(_.sample(["bag1"]));
         });
     },
-    FindItemBySlot: function(slot, inLoot) {
-        var list = inLoot ? ironbane.player.lootItems : socketHandler.playerData.items;
-        for (var i = 0; i < list.length; i++) {
-            var item = list[i];
-            if (item.slot === slot) {
-                return item;
-            }
-        }
-        return null;
-    },
-    FindItemByID: function(id, inLoot) {
-        var list = inLoot ? ironbane.player.lootItems : socketHandler.playerData.items;
-        for (var i = 0; i < list.length; i++) {
-            var item = list[i];
-            if (item.id === id) {
-                return item;
-            }
-        }
-        return null;
-    },
-    MakeItemHover: function(div, item) {
+    makeItemHover: function(targetEl, item) {
         var template = items[item.template],
             content = '',
             itemUrl = '',
@@ -721,9 +825,9 @@ var HUDHandler = Class.extend({
 
         if (template.type === 'armor') {
             itemUrl = [
-                    'images/characters/base/',
+                'images/characters/base/',
                 template.subtype,
-                    '/medium.php?i=',
+                '/medium.php?i=',
                 template.image
             ].join('');
         } else {
@@ -759,23 +863,23 @@ var HUDHandler = Class.extend({
         // if selling vendor sets price on server...
         if (item.price) {
             var priceHtml = [
-                    '<span class="amount" style="color:gold;padding-left: 16px;',
-                    'background-image:url(images/misc/coin_full.png);',
-                    'background-repeat:no-repeat;">',
-                    'x ', item.price,
-                    '</span>'
+                '<span class="amount" style="color:gold;padding-left: 16px;',
+                'background-image:url(images/misc/coin_full.png);',
+                'background-repeat:no-repeat;">',
+                'x ', item.price,
+                '</span>'
             ].join('');
             itemInfo += infoRow('Price', priceHtml);
         }
 
         // for now only show cash value
-        if(template.type === 'cash') {
+        if (template.type === 'cash') {
             var valueHTML = [
-                    '<span class="amount" style="color:gold;padding-left: 16px;',
-                    'background-image:url(images/misc/coin_full.png);',
-                    'background-repeat:no-repeat;">',
-                    'x ', item.value,
-                    '</span>'
+                '<span class="amount" style="color:gold;padding-left: 16px;',
+                'background-image:url(images/misc/coin_full.png);',
+                'background-repeat:no-repeat;">',
+                'x ', item.value,
+                '</span>'
             ].join('');
             itemInfo += infoRow('Value', valueHTML);
         }
@@ -790,24 +894,27 @@ var HUDHandler = Class.extend({
         }
 
         content = [
-                '<div style="min-height:20px;">',
+            '<div style="min-height:20px;">',
                 '<div style="margin-top:-3px;width:33px;height:30px;float:left;">',
-                '<img src="', itemUrl, '">',
+                    '<img src="', itemUrl, '">',
                 '</div>',
                 '<div style="margin-top:3px;">', template.name, '</div>',
-                '</div>',
+            '</div>',
             itemInfo
         ].join('');
 
-        MakeHoverBox(div, content);
-    },
-    ReloadInventory: function() {
-        if (ironbane.player) {
-            this.MakeSlotItems(false);
-            if (ironbane.player.canLoot) {
-                this.MakeSlotItems(true);
-            }
-        }
+        targetEl
+            .on('mouseenter', function(e) {
+                $("#tooltip").html(content).show()
+                    .position({
+                        my: 'left bottom',
+                        at: 'left-20 top-10',
+                        of: targetEl
+                    });
+            })
+            .on('mouseleave', function(e) {
+                $("#tooltip").hide();
+            });
     },
     ResizeFrame: function() {
         frameWidth = $(window).width();
@@ -816,9 +923,6 @@ var HUDHandler = Class.extend({
         $('#gameFrame').css('height', frameHeight);
 
         this.PositionHud();
-
-        this.ReloadInventory();
-        //this.MakeSlotItems(true);
 
         if (ironbane.stats && ironbane.stats.domElement) {
             ironbane.stats.domElement.style.top = ($(window).height() - 55) + 'px';
@@ -939,31 +1043,40 @@ var HUDHandler = Class.extend({
         }
     },
     MakeHealthBar: function(doFlash) {
+        var HUD = this;
         doFlash = doFlash || false;
         var content = this.GetStatContent(ironbane.player.health, doFlash ? 'misc/heart_medium_flash' : 'misc/heart_medium', ironbane.player.healthMax);
         //var content = this.GetStatContent(1, 'misc/heart_medium', 6);
         $('#healthBar').html(content);
         if (doFlash) {
             setTimeout(function() {
-                hudHandler.MakeHealthBar();
+                HUD.MakeHealthBar();
             }, 50);
         }
     },
     MakeArmorBar: function(doFlash) {
+        var HUD = this;
+
         doFlash = doFlash || false;
         var content = this.GetStatContent(ironbane.player.armor, doFlash ? 'misc/armor_medium_flash' : 'misc/armor_medium', ironbane.player.armorMax);
         $('#armorBar').html(content);
-        if (doFlash) setTimeout(function() {
-                hudHandler.MakeArmorBar()
+        if (doFlash) {
+            setTimeout(function() {
+                HUD.MakeArmorBar();
             }, 50);
+        }
     },
     HideAlert: function() {
+        var HUD = this;
         $('#alertBox').hide();
-        hudHandler.alertBoxActive = false;
+        HUD.alertBoxActive = false;
 
-        if (!_.isUndefined(hudHandler.doYes)) hudHandler.doYes = undefined;
-        if (!_.isUndefined(hudHandler.doNo)) hudHandler.doNo = undefined;
-
+        if (!_.isUndefined(HUD.doYes)) {
+            HUD.doYes = undefined;
+        }
+        if (!_.isUndefined(HUD.doNo)) {
+            HUD.doNo = undefined;
+        }
     },
     MessageAlert: function(message, options, doYes, doNo) {
 
@@ -1042,7 +1155,10 @@ var HUDHandler = Class.extend({
         $("#statBar").hide();
     },
     ShowHUD: function() {
-        this.showInv({slots: 10, items: socketHandler.playerData.items});
+        this.showInv({
+            slots: 10,
+            items: socketHandler.playerData.items
+        });
 
         $("#coinBar").show();
         $("#statBar").show();
@@ -1062,7 +1178,7 @@ var HUDHandler = Class.extend({
         var lastChar = 0;
         var lastTimeFound = 0;
         _.each(chars, function(char) {
-            if ( char.lastplayed > lastTimeFound ) {
+            if (char.lastplayed > lastTimeFound) {
                 lastTimeFound = char.lastplayed;
                 lastChar = char.id;
             }
@@ -1184,7 +1300,7 @@ var HUDHandler = Class.extend({
         }
 
         $('#btnPrevChar').click(function() {
-            if(window.chars && window.chars.length === 0) {
+            if (window.chars && window.chars.length === 0) {
                 return;
             }
 
@@ -1207,7 +1323,7 @@ var HUDHandler = Class.extend({
         });
 
         $('#btnNextChar').click(function() {
-            if(window.chars && window.chars.length === 0) {
+            if (window.chars && window.chars.length === 0) {
                 return;
             }
 
@@ -1231,15 +1347,17 @@ var HUDHandler = Class.extend({
         });
 
         var enterChar = function() {
-            if (!socketHandler.serverOnline) {return;}
+            if (!socketHandler.serverOnline) {
+                return;
+            }
 
             hudHandler.DisableButtons(['btnLogOut', 'btnEnterChar',
-                    'btnNextChar', 'btnPrevChar', 'btnDelChar'
+                'btnNextChar', 'btnPrevChar', 'btnDelChar'
             ]);
 
             function abortConnect() {
                 hudHandler.EnableButtons(['btnLogOut', 'btnEnterChar',
-                        'btnNextChar', 'btnPrevChar', 'btnDelChar'
+                    'btnNextChar', 'btnPrevChar', 'btnDelChar'
                 ]);
                 $('#gameFrame').animate({
                     opacity: 1.00
@@ -1296,13 +1414,13 @@ var HUDHandler = Class.extend({
 
         $('#btnDelChar').click(function() {
             var contents = ['To confirm the deletion of this character, please enter its name exactly.',
-                    '<div class="spacersmall"></div>',
-                    '<label for="charName">Name</label>',
-                    '<div class="spacersmall"></div>',
-                    '<input type="charName" id="charName" class="iinput" style="width:305px" />',
-                    '<div class="spacersmall"></div>',
-                    '<button id="btnConfirmDeletion" class="ibutton_attention" style="width:150px">Delete</button>',
-                    '<button id="btnBack" class="ibutton" style="width:150px">Back</button>'
+                '<div class="spacersmall"></div>',
+                '<label for="charName">Name</label>',
+                '<div class="spacersmall"></div>',
+                '<input type="charName" id="charName" class="iinput" style="width:305px" />',
+                '<div class="spacersmall"></div>',
+                '<button id="btnConfirmDeletion" class="ibutton_attention" style="width:150px">Delete</button>',
+                '<button id="btnBack" class="ibutton" style="width:150px">Back</button>'
             ].join('');
             $('#charSelect').html(contents);
             $('#charName').focus();
@@ -1315,7 +1433,7 @@ var HUDHandler = Class.extend({
                 hudHandler.DisableButtons(['btnConfirmDeletion', 'btnBack']);
 
                 var confirm = $('#charName').val();
-                if(confirm !== delChar.name) {
+                if (confirm !== delChar.name) {
                     hudHandler.MessageAlert('Name does not match character name!');
                     hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
                 } else {
@@ -1368,33 +1486,33 @@ var HUDHandler = Class.extend({
                     username: username,
                     password: password
                 })
-                .done(function(user) {
-                    startdata.loggedIn = true;
-                    startdata.name = user.name;
-                    startdata.user = user.id;
-                    window.isEditor = user.editor === 1;
+                    .done(function(user) {
+                        startdata.loggedIn = true;
+                        startdata.name = user.name;
+                        startdata.user = user.id;
+                        window.isEditor = user.editor === 1;
 
-                    // get characters for user
-                    $.get('/api/user/' + user.id + '/characters')
-                        .done(function(data) {
+                        // get characters for user
+                        $.get('/api/user/' + user.id + '/characters')
+                            .done(function(data) {
 
-                            location.reload();
+                                location.reload();
 
-                            // window.chars = data;
-                            // window.charCount = window.chars.length;
-                            // hudHandler.MakeCharSelectionScreen();
-                        })
-                        .fail(function(err) {
-                            console.error('error getting chars...', err);
-                        });
-                })
-                .fail(function(err) {
-                    hudHandler.MessageAlert(err.responseText);
-                    hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
-                    if(err.responseText === "Invalid username or password!") {
-                        $('#password').val("");
-                    }
-                });
+                                // window.chars = data;
+                                // window.charCount = window.chars.length;
+                                // hudHandler.MakeCharSelectionScreen();
+                            })
+                            .fail(function(err) {
+                                console.error('error getting chars...', err);
+                            });
+                    })
+                    .fail(function(err) {
+                        hudHandler.MessageAlert(err.responseText);
+                        hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
+                        if (err.responseText === "Invalid username or password!") {
+                            $('#password').val("");
+                        }
+                    });
             });
 
             (function(doLogin) {
@@ -1452,27 +1570,27 @@ var HUDHandler = Class.extend({
                     s8HO5oYe: email,
                     url: url
                 })
-                .done(function(response) {
-                    hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function () {
-                        location.reload();
+                    .done(function(response) {
+                        hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function() {
+                            location.reload();
+                        });
+
+                        // startdata.loggedIn = true;
+                        // startdata.name = response.name;
+                        // startdata.user = response.id;
+                        // startdata.characterUsed = 0; // we just registered, so we have no characters
+                        // window.chars = [];
+                        // window.charCount = 0;
+                        // window.isEditor = response.editor === 1;
+
+                        // hudHandler.MakeCharSelectionScreen();
+
+
+                    })
+                    .fail(function(err) {
+                        hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
+                        hudHandler.MessageAlert(err.responseText);
                     });
-
-                    // startdata.loggedIn = true;
-                    // startdata.name = response.name;
-                    // startdata.user = response.id;
-                    // startdata.characterUsed = 0; // we just registered, so we have no characters
-                    // window.chars = [];
-                    // window.charCount = 0;
-                    // window.isEditor = response.editor === 1;
-
-                    // hudHandler.MakeCharSelectionScreen();
-
-
-                })
-                .fail(function(err) {
-                    hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
-                    hudHandler.MessageAlert(err.responseText);
-                });
             });
 
             $('#charSelect').keydown(function(event) {
@@ -1497,11 +1615,11 @@ var HUDHandler = Class.extend({
                 '<div class="spacersmall"></div>',
                 '<input type="text" id="ncname" class="iinput" style="width:305px" maxlength="12" />',
                 '<div id="charCustomizationContainer">',
-                    '<div id="charCustomizationButtonsLeft"></div>',
-                    '<div id="charCustomizationPreview">',
-                        '<div id="charSkinLayer"></div>',
-                    '</div>',
-                    '<div id="charCustomizationButtonsRight"></div>',
+                '<div id="charCustomizationButtonsLeft"></div>',
+                '<div id="charCustomizationPreview">',
+                '<div id="charSkinLayer"></div>',
+                '</div>',
+                '<div id="charCustomizationButtonsRight"></div>',
                 '</div>',
                 '<button id="btnConfirmNewChar" class="ibutton_attention" style="width:150px">Create</button>',
                 '<button id="btnBackMainChar" class="ibutton" style="width:150px">Cancel</button>'
@@ -1529,46 +1647,46 @@ var HUDHandler = Class.extend({
             var custChar = '';
             var constrainCustomizers = function() {
                 if (selectedMale) {
-                    if ( selectedSkin > skinIdMaleEnd ) {
+                    if (selectedSkin > skinIdMaleEnd) {
                         selectedSkin = skinIdMaleStart;
                     }
-                    if ( selectedSkin < skinIdMaleStart ) {
+                    if (selectedSkin < skinIdMaleStart) {
                         selectedSkin = skinIdMaleEnd;
                     }
 
-                    if ( selectedEyes > eyesIdMaleEnd ) {
+                    if (selectedEyes > eyesIdMaleEnd) {
                         selectedEyes = eyesIdMaleStart;
                     }
-                    if ( selectedEyes < eyesIdMaleStart ) {
+                    if (selectedEyes < eyesIdMaleStart) {
                         selectedEyes = eyesIdMaleEnd;
                     }
 
-                    if ( selectedHair > hairIdMaleEnd ) {
+                    if (selectedHair > hairIdMaleEnd) {
                         selectedHair = hairIdMaleStart;
                     }
-                    if ( selectedHair < hairIdMaleStart ) {
+                    if (selectedHair < hairIdMaleStart) {
                         selectedHair = hairIdMaleEnd;
                     }
 
                 } else {
-                    if ( selectedSkin > skinIdFemaleEnd ) {
+                    if (selectedSkin > skinIdFemaleEnd) {
                         selectedSkin = skinIdFemaleStart;
                     }
-                    if ( selectedSkin < skinIdFemaleStart ) {
+                    if (selectedSkin < skinIdFemaleStart) {
                         selectedSkin = skinIdFemaleEnd;
                     }
 
-                    if ( selectedEyes > eyesIdFemaleEnd ) {
+                    if (selectedEyes > eyesIdFemaleEnd) {
                         selectedEyes = eyesIdFemaleStart;
                     }
-                    if ( selectedEyes < eyesIdFemaleStart ) {
+                    if (selectedEyes < eyesIdFemaleStart) {
                         selectedEyes = eyesIdFemaleEnd;
                     }
 
-                    if ( selectedHair > hairIdFemaleEnd ) {
+                    if (selectedHair > hairIdFemaleEnd) {
                         selectedHair = hairIdFemaleStart;
                     }
-                    if ( selectedHair < hairIdFemaleStart ) {
+                    if (selectedHair < hairIdFemaleStart) {
                         selectedHair = hairIdFemaleEnd;
                     }
 
@@ -1580,8 +1698,7 @@ var HUDHandler = Class.extend({
                     selectedSkin = getRandomInt(skinIdMaleStart, skinIdMaleEnd);
                     selectedHair = getRandomInt(hairIdMaleStart, hairIdMaleEnd);
                     selectedEyes = getRandomInt(eyesIdMaleStart, eyesIdMaleEnd);
-                }
-                else {
+                } else {
                     selectedSkin = getRandomInt(skinIdFemaleStart, skinIdFemaleEnd);
                     selectedHair = getRandomInt(hairIdFemaleStart, hairIdFemaleEnd);
                     selectedEyes = getRandomInt(eyesIdFemaleStart, eyesIdFemaleEnd);
@@ -1656,18 +1773,18 @@ var HUDHandler = Class.extend({
                         hair: selectedHair
                     })
                 })
-                .done(function(response) {
-                    chars.push(response);
+                    .done(function(response) {
+                        chars.push(response);
 
-                    charCount = chars.length;
-                    startdata.characterUsed = response.id;
+                        charCount = chars.length;
+                        startdata.characterUsed = response.id;
 
-                    hudHandler.MakeCharSelectionScreen();
-                })
-                .fail(function(err) {
-                    hudHandler.MessageAlert(err.responseText);
-                    hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
-                });
+                        hudHandler.MakeCharSelectionScreen();
+                    })
+                    .fail(function(err) {
+                        hudHandler.MessageAlert(err.responseText);
+                        hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
+                    });
             });
 
             $('#charSelect').keydown(function(event) {

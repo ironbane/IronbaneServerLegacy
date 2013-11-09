@@ -29,7 +29,7 @@ $(document).keydown(function(event) {
 
     // This prevents the SNAFU with items floating above itembar when pressing enter when an alertBox is active
     if (event.keyCode === 13 && hudHandler.alertBoxActive) {
-        hudHandler.ReloadInventory();
+        hudHandler.showInv({slots: 10, items: socketHandler.playerData.items});
     }
 
     keyTracker[event.keyCode] = true;
