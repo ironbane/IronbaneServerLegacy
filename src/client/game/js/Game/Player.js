@@ -865,16 +865,15 @@ var Player = Fighter.extend({
 
         if (!item) {
             // error msg?
+            console.error('useItem: not found!');
             return;
         }
 
         switch (item.type) {
             case 'consumable':
+                //console.log('useItem: consumable');
                 if (item.subtype === 'restorative') {
                     soundHandler.Play(_.sample(["bubble1", "bubble2", "bubble3"]));
-                }
-                if (item.subtype === 'cash') {
-                    soundHandler.Play(_.sample(["getCoin1", "getCoin2", "getCoin3"]), player.position);
                 }
                 // remove item from inv
                 player.removeItem(item);

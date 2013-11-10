@@ -648,6 +648,86 @@ var SocketHandler = Class.extend({
                 reply('success');
             });
 
+            // player is dropping stackable item on a stackable item
+            socket.on('stackItemSlot', function(data, reply) {
+                if (!_.isFunction(reply)) {
+                    log('updateItemSlot no callback defined!');
+                    return;
+                }
+
+                var player = socket.unit;
+
+                if(!player) {
+                    reply({errmsg: 'Invalid player for socket!'});
+                    return;
+                }
+
+                var item,
+                    bag,
+                    itemId = data.id,
+                    targetSlot = data.slot,
+                    bagId = data.bag; // optional bag for if we're coming from loot / vendor
+
+                // check if there is an item already in destination slot
+                var occupied = _.find(player.items, function(i) {
+                    return i.slot === targetSlot;
+                });
+
+                if(!occupied) {
+                    reply({errmsg: 'Nothing to stack onto!'});
+                    return;
+                }
+
+                if(_.isUndefined(bagId)) {
+                    // we are looking for the item that is being dropped in player inv
+                    item = _.find(player.items, function(i) {
+                        return i.id === itemId;
+                    });
+                } else {
+                    // we are looking for the item being dropped in loot / vendor inv
+                    bag = worldHandler.FindUnitNear(bagId, player);
+                    if (!bag) {
+                        reply({
+                            errmsg: "Bag not found (too far?)"
+                        });
+                        return;
+                    }
+
+                    if (bag.template.type !== UnitTypeEnum.LOOTABLE && bag.template.type !== UnitTypeEnum.VENDOR) {
+                        reply({
+                            errmsg: "Wrong NPC type for loot!"
+                        });
+                        return;
+                    }
+
+                    item = _.find(bag.loot, function(i) {
+                        return i.id === itemId;
+                    });
+                }
+
+                if(!item) {
+                    reply({errmsg: 'Item to swap not found!'});
+                    return;
+                }
+
+                // now we've got both items, ready to stack (currently only cash supported)
+                if(item.type === 'cash' && occupied.type === 'cash') {
+                    occupied.value += item.value;
+                    // now destroy the original
+                    if(bag) {
+                        bag.loot = _.without(bag.loot, item);
+                    } else {
+                        player.items = _.without(player.items, item);
+                    }
+                } else {
+                    reply({errmsg: 'items are not stackable together!'});
+                    return;
+                }
+
+                // return the updated (stacked) item
+                reply({item: occupied});
+            });
+
             // this is for dropping an inv item on the ground
             socket.on("dropItem", function (data, reply) {
                 if (!_.isFunction(reply)) {

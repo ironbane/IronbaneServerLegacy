@@ -330,6 +330,20 @@ var HUDHandler = Class.extend({
             // dropping inv on inv means you either are swapping or stacking (gold)
             var occupied = slot.children().data('item');
             if(occupied) {
+                if(item.type === 'cash' && occupied.type === 'cash') { // later do other stackables
+                    HUD.clearInvSlot(item.slot);
+                    socketHandler.socket.emit('stackItemSlot', {id: item.id, slot: slot.data('slot')}, function(response) {
+                        if(response.errmsg) {
+                            console.error('error stackItemSlot', response.errmsg);
+                            // revert!
+                        }
+                        // otherwise we're successful
+                        HUD.clearInvSlot(occupied.slot);
+                        HUD.fillInvSlot(response.item); // item should be updated with new "stacked" amount
+                        HUD.MakeCoinBar(true);
+                    });
+                    return;
+                }
                 occupied.slot = item.slot;
                 item.slot = slot.data('slot');
                 HUD.clearInvSlot(item.slot);
