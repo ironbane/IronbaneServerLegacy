@@ -806,6 +806,80 @@ var SocketHandler = Class.extend({
                 });
             });
 
+            // specific method for buying items from vendors
+            socket.on('buyItem', function(data, reply) {
+                if(!_.isFunction(reply)) {
+                    log('buyItem: no callback!');
+                    return;
+                }
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'invalid player!!'});
+                    return;
+                }
+
+                var vendorId = data.vendorId,
+                    itemId = data.itemId,
+                    targetSlot = data.slot;
+
+                if(_.find(player.items, function(i) {
+                    return i.slot === targetSlot;
+                })) {
+                    reply({errmsg: 'target slot not empty!'});
+                    return;
+                }
+
+                var vendor = worldHandler.FindUnitNear(vendorId, player);
+                if(!vendor) {
+                    reply({errmsg: 'vendor has gone away!'});
+                    return;
+                }
+
+                // todo: remove this check to allow other types of "shops"??
+                if(vendor.template.type !== UnitTypeEnum.VENDOR) {
+                    reply({errmsg: 'unit is not a vendor!'});
+                    return;
+                }
+
+                var item = _.find(vendor.loot, function(i) {
+                    return i.id === itemId;
+                });
+
+                if(!item) {
+                    reply({errmsg: 'item to buy not found!'});
+                    return;
+                }
+
+                // ready to attempt purchase!
+                if (item.price > 0 && player.getTotalCoins() < item.price) {
+                    reply({
+                        // todo: move these messages to script
+                        errmsg: _.sample(["Ye got no money, bum!", "Show me some gold coins!", "Where's the gold?"])
+                    });
+                    return;
+                }
+
+                // ok, made it this far, go ahead and buy!
+                // Update the money
+                player.purchase(item);
+                vendor.Say(_.sample(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
+                // It's now our property, so remove the price tag
+                delete item.price;
+                item.owner = player.id;
+                item.slot = targetSlot;
+
+                // move the item
+                vendor.loot = _.without(vendor.loot, item);
+                player.items.push(item);
+
+                // update everyone around who might also be looking
+                player.EmitNearby("updateVendor", {id: vendor.id, loot: vendor.loot}, 20, true);
+
+                // reply with full player item list as gold may have changed (todo: optimize delta?)
+                reply({items: player.items});
+            });
+
             socket.on("lootItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('lootItem no callback defined!');

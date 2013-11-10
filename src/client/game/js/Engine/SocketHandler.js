@@ -448,6 +448,11 @@ var SocketHandler = Class.extend({
             hudHandler.updateLoot(data);
         });
 
+        // someone nearby has purchased something, or perhaps on restock
+        this.socket.on('updateVendor', function(data) {
+            hudHandler.updateVendor(data);
+        });
+
         this.socket.on('respawn', function(data) {
             var unit = FindUnit(data.id);
 

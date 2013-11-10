@@ -287,6 +287,9 @@ var HUDHandler = Class.extend({
         _.each(data.items, function(invItem) {
             HUD.fillInvSlot(invItem);
         });
+
+        // any time we show the inventory, we should update the gold
+        HUD.MakeCoinBar();
     },
     hideInv: function() {
         $('#itemBar').removeData().empty().hide();
@@ -297,7 +300,7 @@ var HUDHandler = Class.extend({
             dropped = $(e.toElement),
             item = dropped.data('item');
 
-        if (dropped.hasClass('lootSlotItem') || dropped.hasClass('vendorSlotItem')) {
+        if (dropped.hasClass('lootSlotItem')) {
             HUD.lootItem(null, item, slot.data('slot'));
         }
 
@@ -305,6 +308,7 @@ var HUDHandler = Class.extend({
             var bank = $('#bankBar').data('bank');
             if (!bank) {
                 console.error('bank has gone away!');
+                return;
             }
             var bankSlot = item.slot; // before it gets changed
             socketHandler.socket.emit('bankTakeItem', {
@@ -323,7 +327,28 @@ var HUDHandler = Class.extend({
         }
 
         if (dropped.hasClass('vendorSlotItem')) {
+            // here we are buying an item (or trying to) (todo: get price on client side for pre-check)
+            var vendor = $('#vendorBar').data('vendor');
+            if(!vendor) {
+                // we've moved too far or some other reason the vendor left
+                console.error('vendor has gone away!');
+                // revert!
+                return;
+            }
 
+            socketHandler.socket.emit('buyItem', {vendorId: vendor.id, itemId: item.id, slot: slot.data('slot')}, function(response) {
+                if(response.errmsg) {
+                    HUD.MessageAlert(response.errmsg);
+                    // revert! - error message is most likely lack of funds
+                    HUD.fillVendorSlot(item);
+                    return;
+                }
+
+                // success! - all items sent because gold bags will get auto adjusted
+                HUD.showInv({slots: 10, items: response.items});
+                // vendor should be updated
+                HUD.clearVendorSlot(item.slot);
+            });
         }
 
         if (dropped.hasClass('invSlotItem')) {
@@ -406,15 +431,11 @@ var HUDHandler = Class.extend({
     },
     // this happens when someone else nearby loots an item from something you might have open
     updateLoot: function(data) {
-        var vendor = $('#vendorBar').data('vendor'),
+        var HUD = this,
             bag = $('#lootBar').data('bag');
 
-        if(vendor && vendor.id === data.bag) {
-            hudHandler.showLoot({id: data.bag, slots: data.loot.length, items: data.loot});
-        }
-
         if(bag && bag.id === data.bag) {
-            hudHandler.showLoot({id: data.bag, slots: data.loot.length, items: data.loot});
+            HUD.showLoot({id: data.bag, slots: data.loot.length, items: data.loot});
         }
 
         if (ironbane.player.canLoot) {
@@ -493,6 +514,26 @@ var HUDHandler = Class.extend({
     hideVendor: function() {
         $('#vendorBar').removeData().empty().hide();
     },
+    clearVendorSlot: function(slotNum) {
+        $('#vs' + slotNum).empty().droppable('enable');
+    },
+    updateVendor: function(data) {
+        var HUD = this,
+            vendor = $('#vendorBar').data('vendor');
+
+        if(!vendor) {
+            return;
+        }
+
+        if(vendor.id === data.id) {
+            HUD.showVendor({id: data.id, slots: 10, items: data.loot});
+        }
+
+        // not sure if this is necessary
+        if(ironbane.player.canLoot) {
+            ironbane.player.lootItems = data.loot;
+        }
+    },
     onVendorSlotDrop: function(e, ui, HUD) {
         // this should be when we are trying to sell something only
         var slot = $(e.target),
@@ -508,13 +549,7 @@ var HUDHandler = Class.extend({
 
         console.log('onVendorSlotDrop', slot, dropped, item, vendor, data);
 
-        if (acceptOffer) {
-            socketHandler.socket.emit('putItem', data, function(reply) {
 
-            });
-        } else {
-
-        }
     },
     makeBankSlots: function(num) {
         var HUD = this,
@@ -630,69 +665,6 @@ var HUDHandler = Class.extend({
             HUD.MakeCoinBar(true);
         }
     },
-    ItemSwitchEvent: function(event, ui) {
-        console.log('ItemSwitchEvent', arguments);
-        var draggable = ui.draggable;
-
-        // Are we dragging an inventory item?
-        var itemID = draggable.attr('id');
-        var itemPrefix = itemID.substr(0, 2);
-        var itemNumber = parseInt(itemID.substr(2), 10);
-        var slotID = $(this).attr('id');
-        var slotPrefix = slotID.substr(0, 2);
-        var slotNumber = parseInt(slotID.substr(2), 10);
-        var startItem, switchItem;
-
-        if (hudHandler.alertBoxActive) {
-            startItem = hudHandler.FindItemByID(itemNumber, false);
-            TeleportElement(itemID, 'is' + startItem.slot);
-            return;
-        }
-
-        if (itemPrefix === 'ii') {
-            startItem = hudHandler.FindItemByID(itemNumber, false);
-            if (slotPrefix === 'is') {
-                // Inventory to inventory
-                // First check if the target slot is taken, and switch it first
-                hudHandler.SwitchItem(slotNumber, startItem, itemID, slotID, false);
-            } else if (slotPrefix === 'ls') {
-                // Inventory to loot
-                switchItem = hudHandler.FindItemBySlot(slotNumber, true);
-                if (switchItem) {
-                    TeleportElement(itemID, 'is' + startItem.slot);
-                    hudHandler.LootItem(startItem, switchItem, startItem.slot, 'is' + startItem.slot);
-                } else {
-                    hudHandler.PutItem(startItem, slotNumber, slotID);
-                }
-            } else if (!ironbane.player.canLoot && slotID === 'gameFrame') {
-                // Send a request
-                hudHandler.DropItem(startItem, itemID, itemNumber);
-            } else {
-                // Revert
-                TeleportElement(itemID, 'is' + startItem.slot);
-            }
-        } else if (itemPrefix === 'li') {
-            startItem = hudHandler.FindItemByID(itemNumber, true);
-
-            if (slotPrefix === 'ls') {
-                // loot to loot
-                // First check if the target slot is taken, and switch it first
-
-                hudHandler.SwitchItem(slotNumber, startItem, itemID, slotID, true);
-            } else if (slotPrefix === 'is') {
-                // Loot to inventory
-                // Delete the item from the loot array, and add it to the player items
-                // If there is an item present at the slot, switch it
-
-                switchItem = hudHandler.FindItemBySlot(slotNumber, false);
-
-                hudHandler.LootItem(switchItem, startItem, slotNumber, slotID);
-            } else {
-                // Revert
-                TeleportElement(itemID, 'ls' + startItem.slot);
-            }
-        }
-    },
     PutItem: function(startItem, slotNumber, slotID, acceptOffer) {
         // We put something from the inventory to the loot
         var data = {
@@ -779,41 +751,6 @@ var HUDHandler = Class.extend({
             TeleportElement('li' + startItem.id, slotID);
 
             soundHandler.Play(ChooseRandom(["bag1"]));
-
-        });
-    },
-    SwitchItem: function(slotNumber, startItem, itemID, slotID, inLoot) {
-        var data = {
-            'slotNumber': slotNumber,
-            'itemID': startItem.id
-        };
-
-        if (inLoot) {
-            data.npcID = ironbane.player.lootUnit.id;
-        }
-
-        socketHandler.socket.emit('switchItem', data, function(reply) {
-            //console.log('switchItem reply', reply);
-            if (reply.errmsg) {
-                hudHandler.MessageAlert(reply.errmsg);
-
-                // Teleport back!
-                if (inLoot) {
-                    TeleportElement('li' + startItem.id, 'ls' + startItem.slot);
-                } else {
-                    TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
-                }
-                return;
-            }
-            if (reply.items) {
-                socketHandler.playerData.items = reply.items;
-            }
-            if (reply.loot) {
-                ironbane.player.lootItems = reply.loot;
-            }
-
-            //hudHandler.ReloadInventory();
-            hudHandler.MakeCoinBar(true);
 
         });
     },
