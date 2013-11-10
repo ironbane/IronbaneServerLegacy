@@ -242,7 +242,8 @@ var HUDHandler = Class.extend({
         itemImg.data('item', item);
         $(slotSelector).append(itemImg);
         if (item.type !== 'cash') {
-            $(slotSelector).droppable('disable');
+            // with the exception of gold bags, we only allow INV to INV drops (if we aren't blank)
+            $(slotSelector).droppable({ accept: ".invSlotItem" });
         }
 
         HUD.makeItemHover(itemImg, item);
@@ -259,7 +260,7 @@ var HUDHandler = Class.extend({
         });
     },
     clearInvSlot: function(slotNum) {
-        $('#is' + slotNum).empty().removeClass('equipped used').droppable('enable');
+        $('#is' + slotNum).empty().removeClass('equipped used').droppable({accept: '*'});
     },
     updateInvSlotStatus: function(slotNum, status) {
         var $slot = $('#is' + slotNum);
@@ -326,7 +327,28 @@ var HUDHandler = Class.extend({
         }
 
         if (dropped.hasClass('invSlotItem')) {
-
+            // dropping inv on inv means you either are swapping or stacking (gold)
+            var occupied = slot.children().data('item');
+            if(occupied) {
+                occupied.slot = item.slot;
+                item.slot = slot.data('slot');
+                HUD.clearInvSlot(item.slot);
+                HUD.clearInvSlot(occupied.slot);
+                HUD.fillInvSlot(item);
+                HUD.fillInvSlot(occupied);
+            } else {
+                HUD.clearInvSlot(item.slot);
+                item.slot = slot.data('slot');
+                HUD.fillInvSlot(item);
+            }
+            // notify server of change
+            socketHandler.socket.emit('updateItemSlot', {id: item.id, slot: item.slot}, function(response) {
+                if(response.errmsg) {
+                    console.error('error updateItemSlot', response.errmsg);
+                    // revert!
+                }
+                // otherwise we're successful and we dont care
+            });
         }
     },
     makeLootSlots: function(num) {

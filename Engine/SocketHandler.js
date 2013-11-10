@@ -611,6 +611,44 @@ var SocketHandler = Class.extend({
             });
             // BANKING
 
+            // this is inv to inv slot swap only
+            socket.on('updateItemSlot', function(data, reply) {
+                if (!_.isFunction(reply)) {
+                    log('updateItemSlot no callback defined!');
+                    return;
+                }
+
+                var player = socket.unit;
+
+                if(!player) {
+                    reply({errmsg: 'Invalid player for socket!'});
+                    return;
+                }
+
+                var item = _.find(player.items, function(i) {
+                    return i.id === data.id;
+                });
+
+                if(!item) {
+                    reply({errmsg: 'Item to swap not found!'});
+                    return;
+                }
+
+                // check if there is an item already in destination slot
+                var occupied = _.find(player.items, function(i) {
+                    return i.slot === data.slot;
+                });
+
+                if(occupied) {
+                    // swap the slots
+                    occupied.slot = item.slot;
+                }
+                item.slot = data.slot;
+
+                reply('success');
+            });
+
+            // this is for dropping an inv item on the ground
             socket.on("dropItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('dropItem no callback defined!');
