@@ -33,7 +33,7 @@ var ParticleHandler = Class.extend({
     },
     tick: function (dTime) {	
         for (var i = 0; i < this.particleEmitters.length; ++i) {
-			this.particleEmitters[i].Tick(dTime);
+			this.particleEmitters[i].tick(dTime);
 		
             if (this.particleEmitters[i].removeNextTick) {
                 this.particleEmitters[i].Destroy();
