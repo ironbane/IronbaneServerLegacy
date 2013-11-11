@@ -293,7 +293,7 @@ var Unit = PhysicsObject.extend({
     if  ( !this.mesh ) return;
     DisplayUVFrame(this.mesh, indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror);
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
     // When are we allowed to jump?
     _.each(this.timers, function(value, timer) {

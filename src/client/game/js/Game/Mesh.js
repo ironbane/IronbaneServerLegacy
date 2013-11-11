@@ -357,7 +357,7 @@ var Mesh = Unit.extend({
     this.changeRotationNextTick = false;
 
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
     // Adjust to the time of the day
     _.each(this.lightsToMaintain, function(light) {

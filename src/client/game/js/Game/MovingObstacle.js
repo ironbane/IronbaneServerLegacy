@@ -22,7 +22,7 @@ var MovingObstacle = DynamicMesh.extend({
     Init: function(position, rotation, id, param, metadata) {
         this._super(position, rotation, id, param, metadata);
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         if ( this.mesh ) {
 

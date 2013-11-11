@@ -27,7 +27,7 @@ var Train = DynamicMesh.extend({
 
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         //var newvel = this.targetPosition.clone().sub(this.position);
 

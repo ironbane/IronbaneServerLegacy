@@ -394,7 +394,7 @@ var TerrainHandler = Class.extend({
         .concat(cell.octree.search(this.lastOctreeBuildPosition, 15, true));
     }, this);
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
     var p = this.GetReferenceLocation();
 
@@ -484,12 +484,12 @@ var TerrainHandler = Class.extend({
               cell.Destroy();
             }
             else {
-               cell.Tick(dTime);
+               cell.tick(dTime);
             }
         });
 
 
-        if ( this.skybox ) this.skybox.Tick(dTime);
+        if ( this.skybox ) this.skybox.tick(dTime);
 
     }
 

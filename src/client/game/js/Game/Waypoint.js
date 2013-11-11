@@ -34,7 +34,7 @@ var Trigger = Billboard.extend({
         this.enableGravity = false;
         this.dynamic = true;
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         if(this.mesh) {
             if(le('globalEnable')) {
                 this.mesh.visible = true;

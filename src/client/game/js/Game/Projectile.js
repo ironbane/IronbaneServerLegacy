@@ -374,7 +374,7 @@ var Projectile = Unit.extend({
 
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         this.lifeTime -= dTime;
 
         //this.velocity = this.targetPosition.clone().sub(this.position).normalize().multiplyScalar(this.type.speed);

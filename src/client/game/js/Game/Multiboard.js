@@ -38,7 +38,7 @@ var Multiboard = Unit.extend({
 
 
 	},
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         this._super(dTime);
 

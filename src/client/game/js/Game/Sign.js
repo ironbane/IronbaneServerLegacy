@@ -135,7 +135,7 @@ var Sign = Mesh.extend({
 
     this.object3D.add(this.textMesh);
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
 
     this._super(dTime);

@@ -76,7 +76,7 @@ var ToggleableObstacle = Train.extend({
 
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         switch (this.movementType) {
             case ToggleableObstacleMovementTypeEnum.SwitchVertical:

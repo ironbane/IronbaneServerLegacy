@@ -41,7 +41,7 @@ var Debugger = Class.extend({
 
             this.watches.push({ name: name, variable: variable });
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         // if ( !showEditor ) return;
 
             var text = '';

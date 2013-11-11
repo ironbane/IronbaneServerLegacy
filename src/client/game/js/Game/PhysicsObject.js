@@ -102,7 +102,7 @@ var PhysicsObject = Class.extend({
 
         releaseMesh(this.object3D);
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
 
         this.oldPosition = this.object3D.position.clone();

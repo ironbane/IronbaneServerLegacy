@@ -24,8 +24,25 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params, errorMessage) {
-            var message = "/join (Join/create a room)<br>/leave (Leave a room)<br>/rooms (List all rooms)<br>/who (Who is online)<br>/who roomname (Who is in this room)<br>/me (Say what you are doing)<br>/zone playername (See where your buddies hangout)<br>/dice number (Number is optional)";
-            chatHandler.announcePersonally(unit, message, "yellow");
+            var color = '#EFC4FF',
+	    sides = params[0];
+
+	    if(Number(sides) > 1) {
+		if(sides > 93) sides = 93;
+		var randomdice=Math.floor((Math.random() * 10000 % sides) + 1);
+	    } else {
+		sides = 6;
+		var randomdice=Math.floor((Math.random() * 10000 % sides) + 1);
+		
+	    }
+
+            message = '<b>* ' + unit.name + " rolled " + randomdice + ' on a ' + sides + ' sided dice. *</b>';
+
+            if(target) {
+                chatHandler.announceRoom(target, message, color);
+            } else {
+                chatHandler.announce(message, color);
+            }
 
             return {
                 errorMessage: errorMessage

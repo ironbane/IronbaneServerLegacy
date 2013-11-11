@@ -109,7 +109,7 @@ var Billboard = Unit.extend({
 
         ironbane.scene.add(this.mesh);
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         this._super(dTime);
 
         if (this.mesh) {

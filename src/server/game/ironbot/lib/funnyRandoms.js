@@ -46,7 +46,10 @@ var dictionary = {};
 /* poop. */dictionary.poop = "I acceidentally pooped in my pants";
 /* big */dictionary.big = "I will always use big-boy words";
 /* anger */dictionary.anger = "I unleash my anger on my computer";
-
+/* smelly. */dictionary.smelly = "My armpits are smellier than my bellybutton";
+/* blue. */dictionary.blue = "I sometimes get blue pee";
+/* monster. */dictionary.monster = "There is a monster under my bed";
+/* gross. */dictionary.gross = "The pee spot in my bed is gross";
 
 module.exports = dictionary;
 
