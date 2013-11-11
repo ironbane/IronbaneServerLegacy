@@ -51,17 +51,5 @@ var dictionary = {};
 /* monster. */dictionary.monster = "There is a monster under my bed";
 /* gross. */dictionary.gross = "The pee spot in my bed is gross";
 
-//At this point, i'm not a big fan of 1D or any boy singers
-
-/* horan. */dictionary.horan = "OMG Niall Horan is hot hot hot";
-/* malik. */dictionary.malik = "OMG Zayn Malik is hot hot hot";
-/* styles. */dictionary.styles = "OMG Harry Styles is hot hot hot";
-/* tomlinson. */dictionary.tomlinson = "OMG Louis Tomlinson is hot hot hot";
-/* payne. */dictionary.payne = "OMG Liam Payne is hot hot hot";
-/* sheeran. */dictionary.sheeran = "I can't wait to hug Ed Sheeran";
-
-//Okay, done with dat hating
-
-
 module.exports = dictionary;
 
