@@ -6,7 +6,7 @@ IronbaneApp
         restrict: 'E',
         template: [
             '<div>',
-                '<div>',
+                '<div class="ib-chat-tab-buttons">',
                     '<button ng-class="{active: msgFilterCategory === \'all\'}" ng-click="setFilter(\'all\')">All</button>',
                     '<button ng-class="{active: msgFilterCategory === \'system\'}" ng-click="setFilter(\'system\')">System</button>',
                     '<button ng-class="{active: msgFilterCategory === \'global\'}" ng-click="setFilter(\'global\')">Global</button>',

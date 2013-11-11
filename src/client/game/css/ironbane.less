@@ -225,8 +225,6 @@ a {
 }
 
 #chatContent {
-    border: 1px solid gold;
-    background-color: rgba(4, 4, 4, 0.5);
     position: absolute;
     .content {
         pointer-events: none;
@@ -242,10 +240,28 @@ a {
         word-wrap: break-word;
     }
     button {
-        min-width: 100px;
+        background-color: #245448;
+        border: 1px solid #1f453c;
+        display: inline-block;
+        color: #37ffac;
+        font-family: Verdana;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 2px 2px;
+        text-decoration: none;
+        text-shadow: 1px 1px 0px #06452d;
+        margin: 0px -2px;
+
+        min-width: 90px;
         pointer-events: auto;
+
+        position: relative;
+
+        z-index: 90;
+
         &.active {
-            background-color: #5ba997;
+            z-index: 100;
+            background-color:#5ba997;
         }
     }
    .jspVerticalBar {
@@ -273,7 +289,15 @@ a {
     #chatInput {
         width: 98%;
         height: 15px;
+        opacity: 0.2;
     }
+    #chatInput:focus {
+        opacity: 1;
+    }
+}
+
+.ib-chat-tab-buttons {
+    text-align: right;
 }
 
 #debugBox {
