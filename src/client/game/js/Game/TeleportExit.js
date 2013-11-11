@@ -46,7 +46,7 @@ var TeleportExit = Unit.extend({
         })(this);
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
 
         this._super(dTime);

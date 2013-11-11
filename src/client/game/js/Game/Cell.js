@@ -53,7 +53,7 @@ var Cell = Class.extend({
 
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         switch(this.status) {
             case cellStatusEnum.INIT:

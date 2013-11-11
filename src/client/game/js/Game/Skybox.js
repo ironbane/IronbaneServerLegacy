@@ -146,7 +146,7 @@ var Skybox = PhysicsObject.extend({
 
     this.isLoaded = false;
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
     var p = terrainHandler.GetReferenceLocationNoClone();
 

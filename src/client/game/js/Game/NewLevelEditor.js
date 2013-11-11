@@ -352,7 +352,7 @@ var NewLevelEditor = PhysicsObject.extend({
         this.transformControls.detach();
         this.selectionBox.visible = false;
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
 
 

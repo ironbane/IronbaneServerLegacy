@@ -164,7 +164,7 @@ var MeshHandler = Class.extend({
 
 
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
 
 

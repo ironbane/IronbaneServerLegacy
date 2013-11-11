@@ -68,7 +68,7 @@ var Cinema = Class.extend({
     IsPlaying: function() {
         return this.queue.length !== 0;
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         if ( this.queue.length === 0 ) return;
 

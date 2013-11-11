@@ -44,7 +44,7 @@ var LootableMesh = Mesh.extend({
     // this.UpdateRotation();
 
 	},
-  Tick: function(dTime) {
+  tick: function(dTime) {
     this._super(dTime);
   }
 });

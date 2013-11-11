@@ -45,7 +45,7 @@ var BigMessage = Class.extend({
         this.timeLeft = duration;
         this.opacity = 1;
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         this.timeLeft -= dTime;
 
         var opac = 0;
@@ -1590,14 +1590,14 @@ var HUDHandler = Class.extend({
         });
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         var output = '';
 
         for (var m = 0; m < this.bigMessages.length; m++) {
             var msg = this.bigMessages[m];
 
-            msg.Tick(dTime);
+            msg.tick(dTime);
 
             if (msg.timeLeft <= 0) {
                 this.bigMessages.splice(m, 0);

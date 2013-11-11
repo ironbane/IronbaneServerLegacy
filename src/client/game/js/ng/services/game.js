@@ -158,7 +158,7 @@ IronbaneApp
                     $window.startdata.characterUsed = $window.hudHandler.GetLastCharacterPlayed();
 
                     $window.hudHandler.MakeCharSelectionScreen();
-                    $window.terrainHandler.Tick(0.1);
+                    $window.terrainHandler.tick(0.1);
 
                     game.isRunning = true;
                     game.startTime = window.performance.now(); // shimmed!
@@ -188,7 +188,7 @@ IronbaneApp
             var game = this;
 
             // if ( showEditor  ) {
-            $window.debug.Tick(dTime);
+            $window.debug.tick(dTime);
             // }
 
             if (game.stats) {
@@ -196,10 +196,10 @@ IronbaneApp
             }
 
             if ($window.showEditor) {
-                $window.levelEditor.Tick(dTime);
+                $window.levelEditor.tick(dTime);
             }
 
-            $window.hudHandler.Tick(dTime);
+            $window.hudHandler.tick(dTime);
 
             if (!$window.socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
                 game.camera.position.x = $window.previewLocation.x + (Math.cos(new Date().getTime() / 20000) * $window.previewDistance) - 0;
@@ -208,7 +208,7 @@ IronbaneApp
                 game.camera.lookAt($window.previewLocation);
             }
 
-            $window.terrainHandler.Tick(dTime);
+            $window.terrainHandler.tick(dTime);
 
             if ($window.socketHandler.loggedIn) {
                 // Add the player once we have terrain we can walk on
@@ -221,22 +221,22 @@ IronbaneApp
                 }
             }
 
-            $window.particleHandler.Tick(dTime);
+            $window.particleHandler.tick(dTime);
 
             for (var x = 0; x < game.unitList.length; x++) {
-                game.unitList[x].Tick(dTime);
+                game.unitList[x].tick(dTime);
             }
 
             if ( game.player ) {
                 if ( le("globalEnable") && game.newLevelEditor ) {
-                    game.newLevelEditor.Tick(dTime);
+                    game.newLevelEditor.tick(dTime);
                 }
                 else {
-                    game.player.Tick(dTime);
+                    game.player.tick(dTime);
                 }
             }
 
-            $window.cinema.Tick(dTime);
+            $window.cinema.tick(dTime);
 
             $window.sw("THREE.Object3DIdCount", $window.THREE.Object3DIdCount);
             $window.sw("THREE.GeometryIdCount", $window.THREE.GeometryIdCount);

@@ -114,7 +114,7 @@ var ChatBubble = PhysicsObject.extend({
         }
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         // Count the amount of bubbles that are on top of the player
         var count = 0;
         for(var x=ironbane.unitList.length;x>=0;x--){

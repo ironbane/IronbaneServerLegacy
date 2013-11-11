@@ -178,7 +178,7 @@ var ParticleEmitter = Class.extend({
     // ironbane.scene.remove(this.particleSystem);
 
     },
-    Tick: function (dTime) {
+    tick: function (dTime) {
 
 
         // Keep aligned with our followUnit if we have one

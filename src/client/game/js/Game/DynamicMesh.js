@@ -46,7 +46,7 @@ var DynamicMesh = Mesh.extend({
 // //        this.rotation.copy(this.startRotation);
 // //        this.RotateVertices();
 //     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         // if ( this.changeRotation ) {
 

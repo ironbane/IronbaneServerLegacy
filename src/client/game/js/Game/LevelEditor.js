@@ -1122,7 +1122,7 @@ var LevelEditor = Class.extend({
     terrainHandler.RebuildOctree();
 
   },
-  Tick: function(dTime) {
+  tick: function(dTime) {
 
 
 
@@ -1187,7 +1187,7 @@ var LevelEditor = Class.extend({
 
         }
 
-        this.previewMesh.Tick(dTime);
+        this.previewMesh.tick(dTime);
       }
     }
 

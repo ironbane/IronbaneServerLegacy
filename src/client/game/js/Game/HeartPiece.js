@@ -44,7 +44,7 @@ var HeartPiece = Billboard.extend({
         })(this);
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
 
         this.renderOffset = new THREE.Vector3(0, 0.5 + (Math.cos((new Date()).getTime()/1000.0)*0.25), 0);
 
