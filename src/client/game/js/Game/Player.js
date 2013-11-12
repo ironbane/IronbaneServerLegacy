@@ -262,7 +262,7 @@ var Player = Fighter.extend({
         var player = this;
 
         return _.find(ironbane.unitList, function(unit) {
-            if(unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template.type === UnitTypeEnum.VENDOR)) {
+            if(unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
                 if(player.InRangeOfUnit(unit, range)) {
                     return true;
