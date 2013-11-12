@@ -122,6 +122,8 @@ var Player = Fighter.extend({
         var me = this,
             message;
 
+        console.log(me.name, ' is trying to be kicked because ', reason);
+
         // Immunity
         if (me.editor) {
             chatHandler.announce(me.name + ' has immunity.', "yellow");
@@ -222,7 +224,7 @@ var Player = Fighter.extend({
     var u = 0;
     // Remove the unit from the world cells
     if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
-     
+
       worldHandler.world[zone][cx][cz].units = _.without(worldHandler.world[zone][cx][cz].units, this);
     }
 

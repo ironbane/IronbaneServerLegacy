@@ -1778,7 +1778,7 @@ var HUDHandler = Class.extend({
         for (var m = 0; m < this.bigMessages.length; m++) {
             var msg = this.bigMessages[m];
 
-            msg.Tick(dTime);
+            msg.tick(dTime);
 
             if (msg.timeLeft <= 0) {
                 this.bigMessages.splice(m, 0);
