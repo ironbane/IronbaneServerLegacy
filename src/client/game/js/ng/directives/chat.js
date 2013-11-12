@@ -1,7 +1,7 @@
 // chat.js
 
 IronbaneApp
-.directive('chatWindow', ['$log', '$window', function($log, $window) {
+.directive('chatWindow', ['$log', '$window', '$timeout', function($log, $window, $timeout) {
     return {
         restrict: 'E',
         template: [
@@ -52,6 +52,10 @@ IronbaneApp
             el.on('show', function() {
                 scope.$apply(function() {
                     scope.showMe = true;
+                    $timeout(function() {
+                        scroller.reinitialise();
+                        scroller.scrollToBottom();
+                    }, 100);
                 });
             });
 
@@ -74,6 +78,12 @@ IronbaneApp
                 } else {
                     scope.msgFilter = 'all';
                 }
+
+                // when we change tabs, update the scroller
+                $timeout(function() {
+                    scroller.reinitialise();
+                    scroller.scrollToBottom();
+                }, 100);
             };
 
             scope.filterMsgs = function(msg) {

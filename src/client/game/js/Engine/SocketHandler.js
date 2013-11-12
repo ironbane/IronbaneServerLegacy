@@ -166,6 +166,8 @@ var SocketHandler = Class.extend({
 
             setTimeout(function() {
                 ironbane.showingGame = false;
+                // successful, show hud now we're in game
+                hudHandler.ShowHUD();
             }, 100);
 
             terrainHandler.ChangeZone(reply.zone);
@@ -177,8 +179,7 @@ var SocketHandler = Class.extend({
                 levelEditor.Start();
             }
 
-            // successful, show hud now we're in game
-            hudHandler.ShowHUD();
+
         });
     },
     Setup: function() {

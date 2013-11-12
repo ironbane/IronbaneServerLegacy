@@ -238,15 +238,30 @@ a {
         overflow: auto;
         margin-right: 8px;
         word-wrap: break-word;
+        min-width: 400px;
     }
     .tabs {
         padding: 2px;
         text-align: right;
         visibility: hidden;
         button {
-            min-width: 100px;
+            background-color: #245448;
+            border: 1px solid #1f453c;
+            display: inline-block;
+            color: #37ffac;
+            font-family: Verdana;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 2px 2px;
+            text-decoration: none;
+            text-shadow: 1px 1px 0px #06452d;
+            margin: 0px -2px;
+            min-width: 90px;
             pointer-events: auto;
+            position: relative;
+            z-index: 90;
             &.active {
+                z-index: 100;
                 background-color: #5ba997;
             }
         }
