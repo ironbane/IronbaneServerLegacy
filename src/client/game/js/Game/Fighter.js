@@ -35,7 +35,7 @@ var Fighter = Unit.extend({
     armorMax = armorMax || 0;
 
 
-    this.drawNameMesh = id > 0 && !(this.isPlayer());
+    this.drawNameMesh = id > 0 && !(this.isMainPlayer());
 
 
     if ( id < 0 && !isProduction ) {
@@ -266,7 +266,7 @@ var Fighter = Unit.extend({
   },
   tick: function(dTime) {
     // Update speed (used for walking animations
-    if ( !(this.isPlayer()) ) {
+    if ( !(this.isMainPlayer()) ) {
       //            var targetVelX = (this.targetPosition.x-this.object3D.position.x)/dTime/10;
       //            var targetVelZ = (this.targetPosition.z-this.object3D.position.z)/dTime/10;
       //this.speed = this.fakeVelocity.length();
@@ -350,7 +350,7 @@ var Fighter = Unit.extend({
 
     if ( this.weaponMesh ) {
 
-      var firstPerson = (this.isPlayer()) && this.cameraStatus == CameraStatusEnum.FirstPerson;
+      var firstPerson = this.isMainPlayer() && this.cameraStatus == CameraStatusEnum.FirstPerson;
 
       var offset = new THREE.Vector3(0.0, firstPerson ? 0.25 : 0, firstPerson ? -0.5 : 0);
       var front = true;
@@ -386,7 +386,7 @@ var Fighter = Unit.extend({
       if ( firstPerson ) weaponSpriteIndex = 0;
 
       var pointDirection = null;
-      if ( this.isPlayer() && currentMouseToWorldData) {
+      if ( this.isMainPlayer() && currentMouseToWorldData) {
         pointDirection = ConvertVector3(currentMouseToWorldData.point).sub(this.position).normalize();
       }
 
@@ -655,7 +655,7 @@ var Fighter = Unit.extend({
     if ( this.speed > 0.1 ) {
       this.spriteStatus = this.SpriteStatusEnum.WALK;
       if(this.timers.walkSoundTimer <= 0 ) {
-        if(this.isPlayer()) {
+        if(this.isMainPlayer()) {
           //soundHandler.Play("Footsteps");
       }
       this.timers.walkSoundTimer = walkSoundTime;

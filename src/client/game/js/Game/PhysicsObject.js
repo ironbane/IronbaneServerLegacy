@@ -114,7 +114,7 @@ var PhysicsObject = Class.extend({
                     ironbane.scene.add(this.object3D);
                     this.object3D.position.copy(this.position);
 
-                    if ( this.isPlayer()) {
+                    if ( this.isMainPlayer()) {
                         // Add the object's rotation to rotY
                         this.object3D.rotation.y += this.lastUnitStandingOn.object3D.rotation.y;
                     }
@@ -132,7 +132,7 @@ var PhysicsObject = Class.extend({
 
                     this.object3D.position.applyMatrix4(rotationMatrix);
 
-                    if ( this.isPlayer() ) {
+                    if ( this.isMainPlayer() ) {
                         // Add the object's rotation to rotY
                         this.object3D.rotation.y -= this.unitStandingOn.object3D.rotation.y;
                     }
