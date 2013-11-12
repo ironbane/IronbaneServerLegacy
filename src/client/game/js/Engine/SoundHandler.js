@@ -63,7 +63,7 @@ var SoundHandler = Class.extend({
             loops: 1
         },
            {
-            file: "music/dissonantwaltz.mp3",
+            file: "music/dissonantwaltz.ogg",
             volume: 0.5,
             loops: 999
         },
