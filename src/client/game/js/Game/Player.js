@@ -263,7 +263,7 @@ var Player = Fighter.extend({
             return false;
         });
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         var player = this;
 
         _.each(this.timers, function(value, key) {

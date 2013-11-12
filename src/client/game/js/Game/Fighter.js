@@ -262,7 +262,7 @@ var Fighter = Unit.extend({
         ironbane.scene.add(this.weaponOrigin);
 
     },
-    Tick: function(dTime) {
+    tick: function(dTime) {
         // Update speed (used for walking animations
         if (!(this.isPlayer())) {
             //            var targetVelX = (this.targetPosition.x-this.object3D.position.x)/dTime/10;
