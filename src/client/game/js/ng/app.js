@@ -13,8 +13,8 @@ IronbaneApp
                 });
         }
     ])
-    .run(['$log', '$window', 'Game', 'FeatureDetection',
-        function($log, $window, Game, Features) {
+    .run(['$log', '$window', 'Game', 'FeatureDetection', '$rootScope',
+        function($log, $window, Game, Features, $rootScope) {
             if(!Features.webgl) {
                 // display webgl solutions
                 $log.error('no webgl support!', Features);
@@ -26,6 +26,9 @@ IronbaneApp
 
                 // here we go!
                 ironbane.start();
+
+                // hacky hack for now
+                $rootScope.currentPlayer = socketHandler.playerData;
             }
         }
     ]);

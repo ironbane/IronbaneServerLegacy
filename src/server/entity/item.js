@@ -31,14 +31,6 @@ var Item = Class.extend({
             throw "must init using a template!";
         }
 
-        // update any additional properties
-        if(config) {
-            _.extend(this, config);
-        }
-
-        // id is really only useful while the game is running, this id should *not* be persisted
-        this.id = ID++;
-
         // reference to the entire template object
         this.$template = template;
         // just the ID
@@ -50,6 +42,14 @@ var Item = Class.extend({
         // copy for faster searching
         this.type = template.type;
         this.subtype = template.subtype;
+
+        // update any additional properties
+        if(config) {
+            _.extend(this, config);
+        }
+
+        // id is really only useful while the game is running, this id should *not* be persisted
+        this.id = ID++;
     },
     // these getters setup so that the item instance could in the future have values
     // not on the template, but in the data JSON

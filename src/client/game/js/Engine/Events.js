@@ -32,16 +32,16 @@ var isHoveringHud = false;
 //  function(event) { isHoveringHud = true; }
 //);
 $('#gameFrame').on("mouseover",
-  function(event) {
-    isHoveringHud = false;
-  }
-  );
-$('#statBar,#coinBar,#itemBar,#lootBag,#editorControls,div[id^="li"],div[id^="ii"]').on("mouseover",
-  function(event) {
-    event.stopPropagation();
-    isHoveringHud = true;
-  }
-  );
+    function(event) {
+        isHoveringHud = false;
+    }
+);
+$('#statBar,#coinBar,#itemBar,#lootBag,#bankBar,#editorControls,div[id^="li"],div[id^="ii"]').on("mouseover",
+    function(event) {
+        event.stopPropagation();
+        isHoveringHud = true;
+    }
+);
 
 $(window).resize(function() {
   //alert('resize');
@@ -60,7 +60,10 @@ $(document).keydown(function(event){
 
   if ( !socketHandler.inGame ) return;
 
-  if ( window.hasChatFocus ) {return;}
+    if (window.hasChatFocus === true) {
+        //console.log('hasChatFocus!');
+        return;
+    }
 
   keyTracker[event.keyCode] = true;
 

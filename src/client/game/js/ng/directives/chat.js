@@ -1,12 +1,12 @@
 // chat.js
 
 IronbaneApp
-.directive('chatWindow', ['$log', '$window', function($log, $window) {
+.directive('chatWindow', ['$log', '$window', '$timeout', function($log, $window, $timeout) {
     return {
         restrict: 'E',
         template: [
             '<div>',
-                '<div class="ib-chat-tab-buttons">',
+                '<div class="tabs">',
                     '<button ng-class="{active: msgFilterCategory === \'all\'}" ng-click="setFilter(\'all\')">All</button>',
                     '<button ng-class="{active: msgFilterCategory === \'system\'}" ng-click="setFilter(\'system\')">System</button>',
                     '<button ng-class="{active: msgFilterCategory === \'global\'}" ng-click="setFilter(\'global\')">Global</button>',
@@ -25,10 +25,11 @@ IronbaneApp
         link: function(scope, el, attrs) {
             scope.messages = [];
 
+            var width = Math.floor($(window).width() * 0.4);
             el.css({
-                width: Math.floor($(window).width() * 0.5) + 'px',
-                left: (Math.floor($(window).width() * 0.5) - 5) + 'px',
-                top: '5px'
+                width: width + 'px',
+                left: ($(window).width() - width - 8) + 'px',
+                top: '8px'
             });
 
             var scroller = el.find('.content').jScrollPane({
@@ -37,7 +38,7 @@ IronbaneApp
             }).data('jsp');
 
             // hook into external (non-angular) sources
-            el.bind('onMessage', function(e, data) {
+            el.on('onMessage', function(e, data) {
                 //$log.log('chat onMessage', e, data);
 
                 scope.$apply(function() {
@@ -48,13 +49,17 @@ IronbaneApp
                 scroller.scrollToBottom();
             });
 
-            el.bind('show', function() {
+            el.on('show', function() {
                 scope.$apply(function() {
                     scope.showMe = true;
+                    $timeout(function() {
+                        scroller.reinitialise();
+                        scroller.scrollToBottom();
+                    }, 100);
                 });
             });
 
-            el.bind('hide', function() {
+            el.on('hide', function() {
                 scope.$apply(function() {
                     scope.showMe = false;
                 });
@@ -73,6 +78,12 @@ IronbaneApp
                 } else {
                     scope.msgFilter = 'all';
                 }
+
+                // when we change tabs, update the scroller
+                $timeout(function() {
+                    scroller.reinitialise();
+                    scroller.scrollToBottom();
+                }, 100);
             };
 
             scope.filterMsgs = function(msg) {
@@ -161,12 +172,12 @@ IronbaneApp
             var lastUsedChatSelectCounter = 0;
 
             el.on('focus', function(e) {
-                $(this).val('');
+                $(this).val('').addClass('focused');
                 $window.hasChatFocus = true;
             });
 
             el.on('blur', function(e) {
-                $(this).val('');
+                $(this).val('').removeClass('focused');
                 $window.hasChatFocus = false;
             });
 

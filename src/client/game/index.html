@@ -11,8 +11,8 @@
 
     <!-- todo: automate libs? -->
     <script src="/game/lib/game_shim/game-shim.js"></script>
-    <script src="/game/lib/jquery/1.7.1/jquery-1.7.1.min.js"></script>
-    <script src="/game/lib/jquery/plugins/jquery-ui-1.8.22.custom.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="/game/lib/jquery/plugins/jquery.mousewheel.js"></script>
     <script src="/game/lib/jquery/plugins/jquery.jscrollpane.min.js"></script>
     <script src="/game/lib/angular/1.1.5/angular.min.js"></script>
@@ -81,8 +81,13 @@
             <div id="armorBar"></div>
         </div>
         <div id="coinBar"></div>
-        <div id="itemBar"></div>
-        <div id="lootBag"></div>
+
+        <!-- all the dragons -->
+        <div id="itemBar" class="dragon-bar"></div>
+        <div id="vendorBar" class="dragon-bar"></div>
+        <div id="bankBar" class="dragon-bar"></div>
+        <div id="lootBar" class="dragon-bar"></div>
+
         <div id="debugBox"></div>
         <div id="soundToggleBox">
             <button id="btnToggleSound" class="ibutton" style="width:40px"></button>
@@ -103,10 +108,7 @@
         <div id="black-bar-top"></div>
         <div id="black-bar-bottom"></div>
         <div id="editorControls"></div>
-        <div class="ib-tutorial">
-        </div>
-
-        <friends-dialog user-id="currentUser.id" character-id="currentCharacter.id"></friends-dialog>
+        <div class="ib-tutorial"></div>
     </div>
 
     <script>

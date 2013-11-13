@@ -228,7 +228,7 @@ a {
     position: absolute;
     .content {
         pointer-events: none;
-        width: 100%;
+        width: 95%;
         height: 160px;
         color: white;
         text-shadow: 1px 1px black;
@@ -236,32 +236,34 @@ a {
         text-align: right;
         float: right;
         overflow: auto;
-        padding-bottom: 20px;
+        margin-right: 8px;
         word-wrap: break-word;
+        min-width: 400px;
     }
-    button {
-        background-color: #245448;
-        border: 1px solid #1f453c;
-        display: inline-block;
-        color: #37ffac;
-        font-family: Verdana;
-        font-size: 14px;
-        font-weight: bold;
-        padding: 2px 2px;
-        text-decoration: none;
-        text-shadow: 1px 1px 0px #06452d;
-        margin: 0px -2px;
-
-        min-width: 90px;
-        pointer-events: auto;
-
-        position: relative;
-
-        z-index: 90;
-
-        &.active {
-            z-index: 100;
-            background-color:#5ba997;
+    .tabs {
+        padding: 2px;
+        text-align: right;
+        visibility: hidden;
+        button {
+            background-color: #245448;
+            border: 1px solid #1f453c;
+            display: inline-block;
+            color: #37ffac;
+            font-family: Verdana;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 2px 2px;
+            text-decoration: none;
+            text-shadow: 1px 1px 0px #06452d;
+            margin: 0px -2px;
+            min-width: 90px;
+            pointer-events: auto;
+            position: relative;
+            z-index: 90;
+            &.active {
+                z-index: 100;
+                background-color: #5ba997;
+            }
         }
     }
    .jspVerticalBar {
@@ -269,6 +271,7 @@ a {
     }
     .messages {
         list-style-type: none;
+        padding: 0;
         .name {
             color: #fff; // should never happen...(no rank)
             &.gm {
@@ -287,18 +290,27 @@ a {
         }
     }
     #chatInput {
-        float:right;
-        width: 50%;
-        height: 15px;
-        opacity: 0.2;
+        width: 95%;
+        height: 18px;
+        float: right;
+        visibility: hidden;
+        &.focused {
+            visibility: visible;
+        }
     }
-    #chatInput:focus {
-        opacity: 1;
+    &:hover {
+        border: 1px solid gold;
+        background-color: rgba(4, 4, 4, 0.5);
+        .tabs {
+            visibility: visible;
+            transition: visibility 0s .2s ease;
+        }
+        #chatInput {
+            visibility: visible;
+            transition: visibility 0s .2s ease;
+        }
+        transition: background-color .25s, border .25s ease;
     }
-}
-
-.ib-chat-tab-buttons {
-    text-align: right;
 }
 
 #debugBox {
@@ -469,50 +481,70 @@ label {
     display:none;
 }
 
-#lootBag {
-    display: none;
+// DRAGON BARS - inv, loot, bank, etc.
+// dragon because you drag on stuff :P
+.dragon-bar {
+    z-index: 100;
+    display: none; // start hidden
     position: absolute;
-    width: 480px;
-    height: 48px;
-    background-color: black;
+    //background-color: black;
+    .dragon-slot {
+        z-index: 105;
+        width: 48px;
+        height: 48px;
+        float: left;
+        img {
+            top: 3px;
+            left: 2px;
+        }
+        &.bankBarSlot {
+            background-image: url(/game/images/misc/bar_9.png);
+        }
+        &.lootBarSlot {
+            background-image: url(/game/images/misc/bar_5.png);
+        }
+        &.vendorBarSlot {
+            background-image:url(/game/images/misc/bar_8.png);
+        }
+        &.dragon-hover {
+            background-color: rgba(242, 211, 0, 0.5);
+            cursor: pointer;
+        }
+    }
 }
-
-#itemBar {
-    display: none;
-    position: absolute;
-    background-color: black;
+.dragon-item {
+    z-index: 1100;
 }
-
-.itemBarSlot {
-    width: 48px;
-    height: 48px;
-    float: left;
-    background-image: url(/game/images/misc/bar_3.png);
+#bankBar {
+    background-color: transparent;
 }
-
-.lootBarSlot {
-  width:48px;
-  height:48px;
-  float:left;
-  background-image:url(/game/images/misc/bar_5.png);
+@iterations: 11;
+.itemBarSlotLoop (@index) when (@index > 1) {
+    .itemBarSlot {
+        @i: @index - 1;
+        @t: ~":nth-child(@{i})";
+        &@{t} {
+            background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_3.png);
+            &.equipped {
+                background: url(/game/images/misc/bar_equip.png);
+            }
+            &.used {
+                background: url(/game/images/misc/bar_used.png);
+            }
+        }
+    }
+    .itemBarSlotLoop(@index - 1);
 }
-.buyBarSlot {
-  width:48px;
-  height:48px;
-  float:left;
-  background-image:url(/game/images/misc/bar_8.png);
-}
-.itemSlot {
-    width: 48px;
-    height: 48px;
-    position: absolute;
-}
+.itemBarSlotLoop (1) {}
+.itemBarSlotLoop (@iterations);
+// DRAGON BARS
 
 #dropItemsBox {
     position: absolute;
 }
 
 #tooltip {
+    z-index: 2000;
     position: absolute;
     display: none;
     width: 200px;
@@ -531,32 +563,6 @@ label {
     margin: 0px 0 0;
     width: 350px;
     display: block;
-}
-
-.equipped {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_equip.png);
-}
-
-.used {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_use.png);
-}
-
-.unequipped {
-  width:48px;
-  height:48px;
-  position:absolute;
-  background-image:url(/game/images/misc/bar_7.png);
-}
-.unoccupied {
-  width:48px;
-  height:48px;
-  position:absolute;
 }
 
 .hudIconWrapper {

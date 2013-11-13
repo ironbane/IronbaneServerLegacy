@@ -23,22 +23,22 @@ var keyTracker = {};
 // Use direct keycodes for keypress, keyTracker for true keydown holds
 $(document).keydown(function(event) {
 
-    if (window.hasChatFocus) {
+    if (window.hasChatFocus === true) {
         return;
     }
 
     // This prevents the SNAFU with items floating above itembar when pressing enter when an alertBox is active
     if (event.keyCode === 13 && hudHandler.alertBoxActive) {
-        hudHandler.ReloadInventory();
+        hudHandler.showInv({slots: 10, items: socketHandler.playerData.items});
     }
 
     keyTracker[event.keyCode] = true;
 
     // open chat with enter, /, or @
     if ((event.keyCode === 13 || event.keyCode === 191 || (event.shiftKey && event.keyCode === 50)) && socketHandler.inGame) {
-        $('#chatInput').focus();
+        $('#chatInput').addClass('focused').focus();
         setTimeout(function() {
-            $('#chatInput').focus();
+            $('#chatInput').addClass('focused').focus();
             if(event.keyCode === 191) {
                 $('#chatInput').val('/');
             }
@@ -52,34 +52,34 @@ $(document).keydown(function(event) {
     // ITEM SLOT HOTKEYS
     if (ironbane.player) {
         if (event.keyCode === 49) {
-            ironbane.player.UseItem(0);
+            ironbane.player.useItem(0);
         }
         if (event.keyCode === 50) {
-            ironbane.player.UseItem(1);
+            ironbane.player.useItem(1);
         }
         if (event.keyCode === 51) {
-            ironbane.player.UseItem(2);
+            ironbane.player.useItem(2);
         }
         if (event.keyCode === 52) {
-            ironbane.player.UseItem(3);
+            ironbane.player.useItem(3);
         }
         if (event.keyCode === 53) {
-            ironbane.player.UseItem(4);
+            ironbane.player.useItem(4);
         }
         if (event.keyCode === 54) {
-            ironbane.player.UseItem(5);
+            ironbane.player.useItem(5);
         }
         if (event.keyCode === 55) {
-            ironbane.player.UseItem(6);
+            ironbane.player.useItem(6);
         }
         if (event.keyCode === 56) {
-            ironbane.player.UseItem(7);
+            ironbane.player.useItem(7);
         }
         if (event.keyCode === 57) {
-            ironbane.player.UseItem(8);
+            ironbane.player.useItem(8);
         }
         if (event.keyCode === 48) {
-            ironbane.player.UseItem(9);
+            ironbane.player.useItem(9);
         }
     }
 

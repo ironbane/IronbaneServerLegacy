@@ -25,7 +25,7 @@ var Fighter = Actor.extend({
         this.sendRotationPacketY = true;
 
         // default for players is 10, mobs are variable, default 30
-         
+
         if(this.isPlayer()){
             this._respawnTime = this.respawnTimer = 10;
         }
@@ -586,7 +586,7 @@ var Fighter = Actor.extend({
             return true;
         }
     },
-    // test if has item in inventory
+    // get the FIRST item in inventory by TEMPLATE!
     getItem: function(query) {
         var found;
 
@@ -603,6 +603,65 @@ var Fighter = Actor.extend({
         }
 
         return found;
+    },
+    // find a specific instance
+    getItemById: function(id) {
+        return _.find(this.items, function(item) {
+            return item.id === id;
+        });
+    },
+    // add an actual item object reference to their inv
+    addItem: function(item, slot) {
+        // check slot (todo: support "any available?")
+        if(slot < 0 || slot > 9 || _.find(this.items, function(i) {return i.slot === slot; })) {
+            return false;
+        }
+
+        item.slot = slot;
+        item.equipped = 0;
+        item.owner = this.id;
+
+        this.items.push(item);
+        this.socket.emit("receiveItem", item);
+
+        return true;
+    },
+    // remove a specific item
+    removeItemById: function(id) {
+        var self = this;
+        var item = _.find(self.items, function(i) {
+            return i.id === id;
+        });
+
+        if(!item) {
+            // item not found to remove!
+            return false;
+        }
+
+        self.items = _.without(self.items, item);
+
+        // update client!
+        if(item.equipped) {
+            // todo: get this logic cleaner somehow
+            if(item.getType() === 'armor') {
+                self.UpdateAppearance(true);
+                self.CalculateMaxHealth(true);
+                self.CalculateMaxArmor(true);
+            } else {
+                self.EmitNearby("updateWeapon", {
+                    id: self.id,
+                    // should weapon really be template id?
+                    weapon: 0
+                });
+            }
+        }
+
+        // let the client know
+        self.socket.emit('updateInventory', {
+            items: self.items
+        });
+
+        return true;
     },
     hasItemEquipped: function(query) {
         var found;

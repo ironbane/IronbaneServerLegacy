@@ -299,6 +299,7 @@ var includes = [
     '/Game/Special/Sign.js',
     '/Game/Special/Waypoint.js',
     '/Game/Special/trigger.js',
+    '/Game/bank.js', // subclass of trigger
     '/Game/Special/HeartPiece.js',
     '/Game/Special/MusicPlayer.js',
     '/Server.js'

@@ -26,10 +26,11 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     return {
         requiresEditor: true,
         action: function(unit, target, params, errorMessage) {
+            console.log('giveCoins: ', target, params);
             // find a "cash" item
-            var moneybag = _.where(items, {
+            var moneybag = _.findWhere(items, {
                     type: 'cash'
-                })[0],
+                }),
                 amount = parseInt(params[0], 10);
 
             if (moneybag) {

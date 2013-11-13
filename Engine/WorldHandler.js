@@ -460,7 +460,12 @@ var WorldHandler = Class.extend({
                 unit = new HeartPiece(data);
                 break;
 
+            case UnitTypeEnum.BANK:
+                unit = new Bank(data);
+                break;
+
             default:
+                //console.log('loading default Unit for: ', data);
                 unit = new Unit(data);
                 break;
         }
@@ -781,9 +786,9 @@ var WorldHandler = Class.extend({
     },
     // Only for players!!!!
     FindPlayerByName: function(name) {
-   
 
-   
+
+
     for(var z in worldHandler.world) {
       for(var cx in worldHandler.world[z]) {
         for(var cz in worldHandler.world[z][cx]) {

@@ -559,6 +559,176 @@ var SocketHandler = Class.extend({
                 }
             });
 
+            // BANKING
+            socket.on('bankStoreItem', function(data, reply) {
+                console.log('bankStoreItem', data);
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'bad socket unit.'});
+                    return;
+                }
+
+                var bank = worldHandler.FindUnit(data.id);
+                if(!bank) {
+                    reply({errmsg: 'bank not found!'});
+                    return;
+                }
+
+                // in this case data.slot refers to target bank slot
+                var result = bank.storeItem(data.item, player, data.slot);
+                if(_.isString(result)) {
+                    reply({errmsg: result});
+                } else {
+                    // if it's not a string, it'll be the modified item data (see bank)
+                    reply(result);
+                }
+            });
+
+            socket.on('bankTakeItem', function(data, reply) {
+                console.log('bankTakeItem', data);
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'bad socket unit.'});
+                    return;
+                }
+
+                var bank = worldHandler.FindUnit(data.id);
+                if(!bank) {
+                    reply({errmsg: 'bank not found!'});
+                    return;
+                }
+
+                // in this case data.slot refers to target player slot
+                var result = bank.takeItem(data.item, player, data.slot);
+                if(_.isString(result)) {
+                    reply({errmsg: result});
+                } else {
+                    // if it's not a string, it'll be the modified item data (see bank)
+                    reply(result);
+                }
+            });
+            // BANKING
+
+            // this is inv to inv slot swap only
+            socket.on('updateItemSlot', function(data, reply) {
+                if (!_.isFunction(reply)) {
+                    log('updateItemSlot no callback defined!');
+                    return;
+                }
+
+                var player = socket.unit;
+
+                if(!player) {
+                    reply({errmsg: 'Invalid player for socket!'});
+                    return;
+                }
+
+                var item = _.find(player.items, function(i) {
+                    return i.id === data.id;
+                });
+
+                if(!item) {
+                    reply({errmsg: 'Item to swap not found!'});
+                    return;
+                }
+
+                // check if there is an item already in destination slot
+                var occupied = _.find(player.items, function(i) {
+                    return i.slot === data.slot;
+                });
+
+                if(occupied) {
+                    // swap the slots
+                    occupied.slot = item.slot;
+                }
+                item.slot = data.slot;
+
+                reply('success');
+            });
+
+            // player is dropping stackable item on a stackable item
+            socket.on('stackItemSlot', function(data, reply) {
+                if (!_.isFunction(reply)) {
+                    log('updateItemSlot no callback defined!');
+                    return;
+                }
+
+                var player = socket.unit;
+
+                if(!player) {
+                    reply({errmsg: 'Invalid player for socket!'});
+                    return;
+                }
+
+                var item,
+                    bag,
+                    itemId = data.id,
+                    targetSlot = data.slot,
+                    bagId = data.bag; // optional bag for if we're coming from loot / vendor
+
+                // check if there is an item already in destination slot
+                var occupied = _.find(player.items, function(i) {
+                    return i.slot === targetSlot;
+                });
+
+                if(!occupied) {
+                    reply({errmsg: 'Nothing to stack onto!'});
+                    return;
+                }
+
+                if(_.isUndefined(bagId)) {
+                    // we are looking for the item that is being dropped in player inv
+                    item = _.find(player.items, function(i) {
+                        return i.id === itemId;
+                    });
+                } else {
+                    // we are looking for the item being dropped in loot / vendor inv
+                    bag = worldHandler.FindUnitNear(bagId, player);
+                    if (!bag) {
+                        reply({
+                            errmsg: "Bag not found (too far?)"
+                        });
+                        return;
+                    }
+
+                    if (bag.template.type !== UnitTypeEnum.LOOTABLE && bag.template.type !== UnitTypeEnum.VENDOR) {
+                        reply({
+                            errmsg: "Wrong NPC type for loot!"
+                        });
+                        return;
+                    }
+
+                    item = _.find(bag.loot, function(i) {
+                        return i.id === itemId;
+                    });
+                }
+
+                if(!item) {
+                    reply({errmsg: 'Item to swap not found!'});
+                    return;
+                }
+
+                // now we've got both items, ready to stack (currently only cash supported)
+                if(item.type === 'cash' && occupied.type === 'cash') {
+                    occupied.value += item.value;
+                    // now destroy the original
+                    if(bag) {
+                        bag.loot = _.without(bag.loot, item);
+                    } else {
+                        player.items = _.without(player.items, item);
+                    }
+                } else {
+                    reply({errmsg: 'items are not stackable together!'});
+                    return;
+                }
+
+                // return the updated (stacked) item
+                reply({item: occupied});
+            });
+
+            // this is for dropping an inv item on the ground
             socket.on("dropItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('dropItem no callback defined!');
@@ -636,6 +806,80 @@ var SocketHandler = Class.extend({
                 });
             });
 
+            // specific method for buying items from vendors
+            socket.on('buyItem', function(data, reply) {
+                if(!_.isFunction(reply)) {
+                    log('buyItem: no callback!');
+                    return;
+                }
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'invalid player!!'});
+                    return;
+                }
+
+                var vendorId = data.vendorId,
+                    itemId = data.itemId,
+                    targetSlot = data.slot;
+
+                if(_.find(player.items, function(i) {
+                    return i.slot === targetSlot;
+                })) {
+                    reply({errmsg: 'target slot not empty!'});
+                    return;
+                }
+
+                var vendor = worldHandler.FindUnitNear(vendorId, player);
+                if(!vendor) {
+                    reply({errmsg: 'vendor has gone away!'});
+                    return;
+                }
+
+                // todo: remove this check to allow other types of "shops"??
+                if(vendor.template.type !== UnitTypeEnum.VENDOR) {
+                    reply({errmsg: 'unit is not a vendor!'});
+                    return;
+                }
+
+                var item = _.find(vendor.loot, function(i) {
+                    return i.id === itemId;
+                });
+
+                if(!item) {
+                    reply({errmsg: 'item to buy not found!'});
+                    return;
+                }
+
+                // ready to attempt purchase!
+                if (item.price > 0 && player.getTotalCoins() < item.price) {
+                    reply({
+                        // todo: move these messages to script
+                        errmsg: _.sample(["Ye got no money, bum!", "Show me some gold coins!", "Where's the gold?"])
+                    });
+                    return;
+                }
+
+                // ok, made it this far, go ahead and buy!
+                // Update the money
+                player.purchase(item);
+                vendor.Say(_.sample(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
+                // It's now our property, so remove the price tag
+                delete item.price;
+                item.owner = player.id;
+                item.slot = targetSlot;
+
+                // move the item
+                vendor.loot = _.without(vendor.loot, item);
+                player.items.push(item);
+
+                // update everyone around who might also be looking
+                player.EmitNearby("updateVendor", {id: vendor.id, loot: vendor.loot}, 20, true);
+
+                // reply with full player item list as gold may have changed (todo: optimize delta?)
+                reply({items: player.items});
+            });
+
             socket.on("lootItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('lootItem no callback defined!');
@@ -682,7 +926,7 @@ var SocketHandler = Class.extend({
                 if (bag.template.type === UnitTypeEnum.VENDOR) {
                     if (item.price > 0 && player.getTotalCoins() < item.price) {
                         reply({
-                            errmsg: ChooseRandom(["Ye got no money, bum!", "Show me some gold coins!", "Wher's the gold?"])
+                            errmsg: _.sample(["Ye got no money, bum!", "Show me some gold coins!", "Wher's the gold?"])
                         });
                         return;
                     }
@@ -794,12 +1038,11 @@ var SocketHandler = Class.extend({
                     // Update the money
                     player.purchase(item);
 
-                    bag.Say(ChooseRandom(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
+                    bag.Say(_.sample(["Another satisfied customer!", "Hope ye kick some butt!", "Come again soon!", "Is that all ye buyin'?"]));
 
                     // It's now our property, so remove the price tag
                     delete item.price;
                 }
-
 
                 // HACK HACK HACK for halloween 1/11/2013
                 // Quick fix to teleport people out of the mansion when they loot from the chest
@@ -810,7 +1053,6 @@ var SocketHandler = Class.extend({
                         player.TeleportToUnit(exit);
                     }
                 }
-
 
                 reply({
                     items: player.items,
@@ -1460,65 +1702,68 @@ var SocketHandler = Class.extend({
 
             });
 
-            socket.on("addNPC", function (data) {
-
+            // this should prolly just be "addUnit"
+            socket.on("addNPC", function(data) {
                 // Later report them!
-                if ( !socket.unit || socket.unit.editor === false ) return;
+                if (!socket.unit || socket.unit.editor === false) {
+                    return;
+                }
 
                 data.position = ConvertVector3(data.position);
                 data.position = data.position.Round(2);
 
                 var zone = socket.unit.zone;
-
                 var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
 
+                if (_.isUndefined(worldHandler.world[zone])) {
+                    return;
+                }
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                if (_.isUndefined(worldHandler.world[zone][cellPos.x])) {
+                    return;
+                }
 
+                if (_.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z])) {
+                    return;
+                }
 
                 data.x = data.position.x;
                 data.y = data.position.y;
                 data.z = data.position.z;
                 data.zone = zone;
 
-
-
-                if ( _.isUndefined(data.param) ) data.param = 0;
-
-
+                if (_.isUndefined(data.param)) {
+                    data.param = 0;
+                }
                 data.param = parseInt(data.param, 10);
 
-
-                if ( _.isUndefined(data.data) ) {
+                if (_.isUndefined(data.data)) {
                     data.data = null;
                 }
 
-
                 data.id = -server.GetAValidNPCID();
 
-                mysql.query('INSERT INTO ib_units SET ?',
-                {
-                    id:data.id,
-                    zone:data.zone,
-                    x:data.x,
-                    y:data.y,
-                    z:data.z,
-                    template:data.template,
-                    roty:data.roty,
-                    param:data.param,
-                    data:JSON.stringify(data.data)
-                },
-                function (err, result) {
+                mysql.query('INSERT INTO ib_units SET ?', {
+                        id: data.id,
+                        zone: data.zone,
+                        x: data.x,
+                        y: data.y,
+                        z: data.z,
+                        template: data.template,
+                        roty: data.roty,
+                        param: data.param,
+                        data: JSON.stringify(data.data)
+                    },
+                    function(err, result) {
+                        if (err) {
+                            throw err;
+                        }
 
-                    if (err) throw err;
-
-                    var unit = worldHandler.MakeUnitFromData(data);
-                    if ( unit ) unit.Awake();
-
-                });
-
+                        var unit = worldHandler.MakeUnitFromData(data);
+                        if (unit) {
+                            unit.Awake();
+                        }
+                    });
             });
 
             socket.on("moveNPC", function (data) {

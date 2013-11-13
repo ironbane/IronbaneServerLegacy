@@ -1,6 +1,6 @@
 {
   "name": "ironbane",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Ironbane, the open source browser MMO.",
   "main": "main.js",
   "scripts": {
@@ -57,7 +57,7 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-three-obj": "~0.3.0",
     "grunt-contrib-jshint": "~0.6.4",
-    "grunt-contrib-less": "~0.7.0",
+    "grunt-contrib-less": "~0.8.1",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-copy": "~0.4.1",

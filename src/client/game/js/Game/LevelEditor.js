@@ -256,21 +256,38 @@ var EditorGUI = function() {
       });
   };
 
-  this.eplmMesh = firstOfObject(ModelEnum);
-  this.eplmLootItems = "";
-  this.eplmRespawnTime = 300;
-  this.eplmAdd = function() {
-    socketHandler.socket.emit('addNPC', {
-      position: ironbane.player.position,
-      template: lootableMeshTemplate,
-      param: levelEditor.editorGUI.eplmMesh,
-      data: {
-        loot:levelEditor.editorGUI.eplmLootItems,
-        respawnTime: levelEditor.editorGUI.eplmRespawnTime,
-        rotY: ironbane.player.rotation.y
-      }
-    });
-  }
+    // CONFIGURE BANK UNIT
+    this.epBankName = 'bank';
+    this.epBankSlots = 10;
+    this.epBankMesh = firstOfObject(ModelEnum);
+    this.epBankAdd = function() {
+        socketHandler.socket.emit('addNPC', {
+            position: ironbane.player.position,
+            template: bankTemplateId,
+            data: {
+                name: levelEditor.editorGUI.epBankName,
+                slots: levelEditor.editorGUI.epBankSlots,
+                mesh: levelEditor.editorGUI.epBankMesh,
+                rotY: ironbane.player.rotation.y
+            }
+        });
+    };
+
+    this.eplmMesh = firstOfObject(ModelEnum);
+    this.eplmLootItems = "";
+    this.eplmRespawnTime = 300;
+    this.eplmAdd = function() {
+        socketHandler.socket.emit('addNPC', {
+            position: ironbane.player.position,
+            template: lootableMeshTemplate,
+            param: levelEditor.editorGUI.eplmMesh,
+            data: {
+                loot: levelEditor.editorGUI.eplmLootItems,
+                respawnTime: levelEditor.editorGUI.eplmRespawnTime,
+                rotY: ironbane.player.rotation.y
+            }
+        });
+    };
 
 
   this.epmpMusicPiece = "";
@@ -795,6 +812,12 @@ var LevelEditor = Class.extend({
     guiControls['eptrMesh'] = fTrains.add(this.editorGUI, 'eptrMesh', ModelEnum);
     guiControls['eptrScriptName'] = fTrains.add(this.editorGUI, 'eptrScriptName');
     guiControls['eptrAdd'] = fTrains.add(this.editorGUI, 'eptrAdd');
+
+    var fBanks = fEntityPlacer.addFolder('Banks');
+    guiControls['epBankName'] = fBanks.add(this.editorGUI, 'epBankName');
+    guiControls['epBankMesh'] = fBanks.add(this.editorGUI, 'epBankMesh', ModelEnum);
+    guiControls['epBankSlots'] = fBanks.add(this.editorGUI, 'epBankSlots');
+    guiControls['epBankAdd'] = fBanks.add(this.editorGUI, 'epBankAdd');
 
     var fLootableMeshes = fEntityPlacer.addFolder('Lootable Meshes');
     guiControls['eplmMesh'] = fLootableMeshes.add(this.editorGUI, 'eplmMesh', ModelEnum);
