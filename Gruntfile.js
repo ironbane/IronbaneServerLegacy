@@ -264,7 +264,7 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'src/client/game'
                 }, {
-                    src: ['**/*', '!**/*.php'],
+                    src: ['**/*', '!**/*.php','!**/*.obj', '!**/*.mtl'],
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: '<%= cfg.get("assetDir") %>'
@@ -278,7 +278,7 @@ module.exports = function(grunt) {
             assets: {
                 files: [{
                     // Whats the '!**/*.php' for?
-                    src: ['**/*', '!**/*.php'],
+                    src: ['**/*', '!**/*.php', '!**/*.obj', '!**/*.mtl'],
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,
                     cwd: '<%= cfg.get("assetDir") %>'
