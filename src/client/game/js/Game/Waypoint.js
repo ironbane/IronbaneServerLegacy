@@ -33,6 +33,7 @@ var Trigger = Billboard.extend({
         this._super(position, 0, id, TEXTURE_TRIGGER, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
+        this.enableShadow = false;
     },
     tick: function(dTime) {
         if(this.mesh) {
