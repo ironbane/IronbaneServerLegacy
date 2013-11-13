@@ -946,8 +946,6 @@ var HUDHandler = Class.extend({
         $('#alertBox').css('top', (halfHeight - 75) + 'px');
         $('#alertBox').hide();
 
-        $('#chatInputBox').hide();
-
         $('#devNews').css('left', (halfWidth + 200) + 'px');
         $('#devNews').css('top', (halfHeight - 57) + 'px');
     },
@@ -1132,7 +1130,7 @@ var HUDHandler = Class.extend({
             slots: 10,
             items: socketHandler.playerData.items
         });
-
+        hudHandler.MakeHealthBar(true);
         $("#coinBar").show();
         $("#statBar").show();
         $('#chatContent').trigger('show');

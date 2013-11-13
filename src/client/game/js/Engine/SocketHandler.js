@@ -168,7 +168,7 @@ var SocketHandler = Class.extend({
                 ironbane.showingGame = false;
                 // successful, show hud now we're in game
                 hudHandler.ShowHUD();
-            }, 100);
+            }, 1000);
 
             terrainHandler.ChangeZone(reply.zone);
 
@@ -481,7 +481,7 @@ var SocketHandler = Class.extend({
                         ironbane.player.unitStandingOn = null;
 
                         hudHandler.ShowHUD();
-                        hudHandler.MakeHealthBar(true);
+
 
                         hudHandler.showInv({slots: 10, items: socketHandler.playerData.items});
                     });
