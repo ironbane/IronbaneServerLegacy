@@ -804,7 +804,7 @@ var Player = Fighter.extend({
                         var proj = new Projectile(player.position.clone().add(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
                         proj.velocity.add(player.velocity);
                         ironbane.unitList.push(proj);
-                        player.SwingWeapon(null, template);
+                        player.swingWeapon(null, template);
                     }
 
                     // either way wait to set delay until after reply
@@ -978,7 +978,7 @@ var Player = Fighter.extend({
             }
         });
 
-        player.UpdateClothes();
+        player.updateClothes();
     },
     updateMouseProjectedPosition: function() {
         if (!ironbane.player) return;

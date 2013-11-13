@@ -99,7 +99,7 @@ var Fighter = Unit.extend({
         (function(unit) {
             setTimeout(function() {
                 if (unit.health <= 0) {
-                    unit.Die(true);
+                    unit.die(true);
                 }
             }, 0);
         })(this);
@@ -119,11 +119,11 @@ var Fighter = Unit.extend({
         }
         this._super();
     },
-    UpdateClothes: function() {
+    updateClothes: function() {
         var me = this;
 
         var texture = getCharacterTexture(me.appearance);
-        var directionSpriteIndex = me.GetDirectionSpriteIndex();
+        var directionSpriteIndex = me.getDirectionSpriteIndex();
         if (me.mesh) {
             ironbane.scene.remove(me.mesh);
             me.mesh = null;
@@ -300,7 +300,7 @@ var Fighter = Unit.extend({
         }
 
         this.lastSpriteIndex = this.spriteIndex;
-        this.spriteIndex = this.GetDirectionSpriteIndex();
+        this.spriteIndex = this.getDirectionSpriteIndex();
 
         if (this.mesh) {
             this.mesh.LookFlatAt(ironbane.camera.position, true);
@@ -580,7 +580,7 @@ var Fighter = Unit.extend({
             //debug.setWatch("targetWalkAngleZ", targetWalkAngleZ);
 
 
-            DisplayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
+            displayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
 
 
             //this.weaponPivot.rotation.z = Math.cos(time);
@@ -639,7 +639,7 @@ var Fighter = Unit.extend({
 
         //        if ( this.lastJumpTimer <= 0 ) {
         //            this.lastJumpTimer = 3;
-        //            this.SwingWeapon(null);
+        //            this.swingWeapon(null);
         //        }
 
 
@@ -693,20 +693,20 @@ var Fighter = Unit.extend({
         }
 
         if (this.mesh) {
-            this.DisplayUVFrame(this.spriteStep, this.spriteIndex, 3, 8);
+            this.displayUVFrame(this.spriteStep, this.spriteIndex, 3, 8);
         }
         //debug.setWatch('spriteStep', this.spriteStep);
     },
-    SwingWeapon: function(pos, weapon) {
+    swingWeapon: function(pos, weapon) {
         if (this.timers.attackStateTimer > 0) return;
 
         this.meleeHitPosition = null;
 
         if (!this.weaponMesh) {
-            this.DoMeleeHitAnimation(pos, 0.5);
+            this.doMeleeHitAnimation(pos, 0.5);
         }
         // else {
-        //   this.DoMeleeHitAnimation(this.position.clone().add(this.heading), 0.5);
+        //   this.doMeleeHitAnimation(this.position.clone().add(this.heading), 0.5);
         // }
 
 
@@ -759,7 +759,7 @@ var Fighter = Unit.extend({
 
         soundHandler.Play("jump", this.position);
     },
-    DoMeleeHitAnimation: function(position, power) {
+    doMeleeHitAnimation: function(position, power) {
 
         power = power || 0.3;
 
@@ -778,7 +778,7 @@ var Fighter = Unit.extend({
             if (this.dead) return;
 
 
-            if (attacker !== ironbane.player) attacker.SwingWeapon(this.position, attacker.weaponTemplate);
+            if (attacker !== ironbane.player) attacker.swingWeapon(this.position, attacker.weaponTemplate);
 
 
             power = power || 0.3;
@@ -798,7 +798,7 @@ var Fighter = Unit.extend({
         if (this.health <= 0) {
 
             this.playSound("battle/die");
-            this.Die();
+            this.die();
 
         } else {
             this.playSound("battle/hit");
@@ -840,7 +840,7 @@ var Fighter = Unit.extend({
             // }, 6000);
 
             socketHandler.playerData.items = [];
-            hudHandler.HideHUD();
+            hudHandler.hideHUD();
         }
     },
     Respawn: function() {
@@ -856,7 +856,7 @@ var Fighter = Unit.extend({
             this.shadowMesh.visible = true;
         }
     },
-    SetHealth: function(newHealth, noParticles) {
+    setHealth: function(newHealth, noParticles) {
 
         var damage = this.health - newHealth;
         this.health = newHealth;
@@ -910,23 +910,13 @@ var Fighter = Unit.extend({
 
 
         if (this == ironbane.player && damage > 0) {
-            hudHandler.hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-makeHealthBar(true);
+            hudHandler.makeHealthBar(true);
             setTimeout(function() {
-                hudHandler.hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-makeHealthBar(true);
+                makeHealthBar(true);
             }, 100);
         }
     },
-    SetArmor: function(newArmor, noParticles) {
+    setArmor: function(newArmor, noParticles) {
 
         var damage = this.armor - newArmor;
         this.armor = newArmor;

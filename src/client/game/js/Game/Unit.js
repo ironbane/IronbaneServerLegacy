@@ -110,7 +110,7 @@ var Unit = PhysicsObject.extend({
 
   },
   // Taking into account the current camera position and the unit's rotation, get the appropriate vertical sprite index
-  GetDirectionSpriteIndex: function() {
+  getDirectionSpriteIndex: function() {
 
     // We need a vector from the unit to the camera
     var uc = ironbane.camera.position.clone();
@@ -187,7 +187,7 @@ var Unit = PhysicsObject.extend({
         this.renderNameMesh(this.name);
     }
 
-    this.AddShadow();
+    this.addShadow();
   },
   isPlayer: function(){
     // This only checks if units are networked players
@@ -233,7 +233,7 @@ var Unit = PhysicsObject.extend({
           unit.nameMesh.material.map = tex;
       }
   },
-  AddShadow: function() {
+  addShadow: function() {
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
@@ -248,7 +248,7 @@ var Unit = PhysicsObject.extend({
 
     }
   },
-  FullDestroy: function() {
+  fullDestroy: function() {
     ironbane.unitList = _.without(ironbane.unitList, this);
     this.Destroy();
   },
@@ -296,16 +296,14 @@ var Unit = PhysicsObject.extend({
     this._super();
 
   },
-  DisplayUVFrame: function(indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror) {
+  displayUVFrame: function(indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror) {
     if  ( !this.mesh ) return;
-    DisplayUVFrame(this.mesh, indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror);
+    displayUVFrame(this.mesh, indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror);
   },
   tick: function(dTime) {
 
-    // When are we allowed to jump?
     _.each(this.timers, function(value, timer) {
       if(value>0){
-
         this.timers[timer] -= dTime;
       }
     }, this);
@@ -372,7 +370,7 @@ var Unit = PhysicsObject.extend({
 
       }
 
-      this.RotateTowardsTargetPosition(dTime);
+      this.rotateTowardsTargetPosition(dTime);
 
       var cp = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
@@ -386,14 +384,12 @@ var Unit = PhysicsObject.extend({
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
-          if ( this.timers.waterSplashSoundTimeout >= 0 ) this.timers.waterSplashSoundTimeout -= dTime;
-          else {
-            this.waterSplashSoundTimeout = 0.5;
-            soundHandler.Play("splash", this.position);
+            if ( this.timers.waterSplashSoundTimeout >= 0 ) this.timers.waterSplashSoundTimeout -= dTime;
+            else {
+              this.waterSplashSoundTimeout = 0.5;
+              soundHandler.Play("splash", this.position);
+            }
           }
-          }
-
-
         }
         if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel') ) {
           if ( this.timers.waterSplashTimeout >= 0 ) this.timers.waterSplashTimeout -= dTime;
@@ -411,22 +407,14 @@ var Unit = PhysicsObject.extend({
           }
           else {
             this.velocity.lerp(new THREE.Vector3(this.velocity.x, 0, this.velocity.z), dTime*2);
-
             soundHandler.Play("stepWater", this.position);
           }
         }
-
       }
-
-
-
       // Used to align the shadow cast on the ground
       var raycastNormal = null;
       var raycastGroundPosition = null;
       this.isTouchingGround = false;
-
-
-
       if ( this.allowRaycastGround && cellStandingOn ) {
         // Handle collisions
 
@@ -461,23 +449,17 @@ var Unit = PhysicsObject.extend({
             this.object3D.position.add(raycastNormal.clone().multiplyScalar(distanceInside));
 
             this.velocity.add(raycastNormal.clone().multiplyScalar(-this.velocity.clone().dot(raycastNormal)));
-
           }
-
         }
 
         // Stand on top of terrain and meshes
         if ( true ) {
-
           this.terrainAngle = 0;
-
           // Again, increase by performance for other units by reducing raycasts
           /*var rayList = (this instanceof Player) ? this.rayOffsetList : this.rayOffsetList;*/
           var rayList = this.rayOffsetList;
-
           if ( !(this instanceof Projectile && this.impactDone) ) {
             for ( var ro=0;ro<rayList.length;ro++ ) {
-
               var rayCastPos = this.position.clone().add(rayList[ro]);
               //move the THREE.vector3(0, -1, 0) out of the loopscope so it does not get created everytime? it is not being modified anyway
               var ray = new THREE.Raycaster( rayCastPos, new THREE.Vector3(0, -1, 0));
@@ -486,9 +468,7 @@ var Unit = PhysicsObject.extend({
               var distance = 0;
               var succesfulRays = 0;
               var struckUnit = null;
-
               var distanceCheck = 0.5;
-
 
               var intersects = terrainHandler.rayTest(ray, {
                 testMeshesNearPosition:this.position,
@@ -501,22 +481,15 @@ var Unit = PhysicsObject.extend({
                 normal = intersects[i].face.normal;
                 point = intersects[i].point;
                 distance = intersects[i].distance.Round(2);
-
                 struckUnit = intersects[i].object.unit;
-
-
                 raycastNormal = normal;
                 raycastGroundPosition = point;
 
-
                  if ( (this.isMainPlayer() || this instanceof Projectile) ) {
                    if ( struckUnit instanceof DynamicMesh ) {
-
                        this.unitStandingOn = struckUnit;
-
                    }
                  }
-
 
                 if ( distance <= distanceCheck && this.restrictToGround ) {
 
@@ -701,7 +674,7 @@ var Unit = PhysicsObject.extend({
   InRangeOfPosition: function(position, range) {
     return position.clone().sub(this.position).lengthSq() < range*range;
   },
-  RotateTowardsTargetPosition: function(dTime) {
+  rotateTowardsTargetPosition: function(dTime) {
     var side = true;
     if(this.targetRotation.y < this.object3D.rotation.y) {
       side = Math.abs(this.targetRotation.y - this.object3D.rotation.y) < (Math.PI);
@@ -731,7 +704,3 @@ var Unit = PhysicsObject.extend({
     }
   }
 });
-
-
-
-

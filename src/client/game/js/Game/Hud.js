@@ -1119,7 +1119,7 @@ var HUDHandler = Class.extend({
             }
         }
     },
-    HideHUD: function() {
+    hideHUD: function() {
         this.hideInv();
 
         $("#coinBar").hide();

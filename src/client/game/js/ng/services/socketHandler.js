@@ -100,7 +100,7 @@ IronbaneApp
             var target = ConvertVector3(data.t);
 
             if (data.sw) {
-                unit.SwingWeapon(target, weapon);
+                unit.swingWeapon(target, weapon);
             }
 
             var particle = new Projectile(ConvertVector3(data.s), target, unit, data.w);
@@ -116,7 +116,7 @@ IronbaneApp
             unit.appearance.body = data.body;
             unit.appearance.feet = data.feet;
 
-            unit.UpdateClothes();
+            unit.updateClothes();
         });
 
         socket.on('updateWeapon', function(data) {
@@ -184,19 +184,14 @@ IronbaneApp
             if (unit) {
                 if (data.s === 'h') {
                     //unit.health = data['h'];
-                    unit.SetHealth(data.h, data.np);
+                    unit.setHealth(data.h, data.np);
                     if (unit === ironbane.player) {
-                        hudHandler.hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-makeHealthBar(true);
+                        makeHealthBar(true);
                     }
                 }
                 if (data.s === 'a') {
                     //unit.armor = data['a'];
-                    unit.SetArmor(data.a, data.np);
+                    unit.setArmor(data.a, data.np);
                     if (unit === ironbane.player) {
                         hudHandler.makeArmorBar(true);
                     }
@@ -204,12 +199,7 @@ makeHealthBar(true);
                 if (data.s === 'hm') {
                     unit.healthMax = data.hm;
                     if (unit === ironbane.player) {
-                        hudHandler.hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-hideTutoriahideTutorial
-makeHealthBar(true);
+                        makeHealthBar(true);
                     }
                 }
                 if (data.s === 'am') {
@@ -248,8 +238,8 @@ makeHealthBar(true);
             var victim = FindUnit(data.victim);
             var attacker = FindUnit(data.attacker);
 
-            victim.SetHealth(data.h);
-            victim.SetArmor(data.a);
+            victim.setHealth(data.h);
+            victim.setArmor(data.a);
             victim.GetMeleeHit(attacker);
         });
 

@@ -27,7 +27,7 @@ var Cinema = Class.extend({
     },
     PlayCutscene: function(id) {
         $("#chatBox").css("opacity", 0);
-        hudHandler.HideHUD();
+        hudHandler.hideHUD();
     $('#black-bar-top,#black-bar-bottom').animate({
         height: 60
       }, 1000, function() {

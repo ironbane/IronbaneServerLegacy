@@ -42,7 +42,7 @@ var Multiboard = Unit.extend({
 
         this._super(dTime);
 
-		//this.DisplayUVFrame(0, this.GetDirectionSpriteIndex(), 1, 8);
+		//this.displayUVFrame(0, this.getDirectionSpriteIndex(), 1, 8);
 
     }
 });

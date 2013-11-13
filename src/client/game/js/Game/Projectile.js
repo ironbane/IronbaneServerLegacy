@@ -383,7 +383,7 @@ var Projectile = Unit.extend({
 
         this._super(dTime);
 
-        var spriteIndex = this.GetDirectionSpriteIndex();
+        var spriteIndex = this.getDirectionSpriteIndex();
 
         if ( this.meshChild ) {
             if ( this.type.meshType == ProjectileMeshTypeEnum.MELEE ) {
@@ -525,12 +525,12 @@ var Projectile = Unit.extend({
                 this.particle = null;
             }
 
-            this.FullDestroy();
+            this.fullDestroy();
             return;
         }
 
         if ( this.type.has8Textures ) {
-            this.DisplayUVFrame(0, spriteIndex, 1, 8);
+            this.displayUVFrame(0, spriteIndex, 1, 8);
         }
 
         if ( this.mesh ) {

@@ -294,7 +294,7 @@ var SocketHandler = Class.extend({
 
             if (unit) {
                 if (unit instanceof Fighter) {
-                    unit.UpdateClothes();
+                    unit.updateClothes();
 
                     if (!_.isUndefined(data['weapon'])) {
                         unit.updateWeapon(data['weapon']);
@@ -388,7 +388,7 @@ var SocketHandler = Class.extend({
             var target = ConvertVector3(data['t']);
 
             if (data.sw) {
-                unit.SwingWeapon(target, weapon);
+                unit.swingWeapon(target, weapon);
             }
 
             var particle = new Projectile(ConvertVector3(data['s']), target, unit, data['w']);
@@ -407,7 +407,7 @@ var SocketHandler = Class.extend({
             unit.appearance.body = data.body;
             unit.appearance.feet = data.feet;
 
-            unit.UpdateClothes();
+            unit.updateClothes();
         });
 
         this.socket.on('updateWeapon', function(data) {
@@ -499,7 +499,7 @@ var SocketHandler = Class.extend({
         //
         //            var unit = FindUnit(data.id);
         //
-        //            unit.SwingWeapon();
+        //            unit.swingWeapon();
         //        });
         // this.socket.on('swingWeapon', function (data) {
         //     var attacker = FindUnit(data.id);
@@ -507,13 +507,13 @@ var SocketHandler = Class.extend({
         //     var weapon = !_.isUndefined(data.w) ? items[data.w] : null;
 
         //     if ( data['p'] == null ) {
-        //         attacker.SwingWeapon(null, weapon);
+        //         attacker.swingWeapon(null, weapon);
         //     }
         //     else {
         //         var attackPosition = ConvertVector3(data['p']);
 
         //         if ( attacker ) {
-        //             attacker.SwingWeapon(attackPosition, weapon);
+        //             attacker.swingWeapon(attackPosition, weapon);
         //         }
         //     }
         // });
@@ -524,14 +524,14 @@ var SocketHandler = Class.extend({
             if (unit) {
                 if (data['s'] == 'h') {
                     //unit.health = data['h'];
-                    unit.SetHealth(data['h'], data['np']);
+                    unit.setHealth(data['h'], data['np']);
                     if (unit == ironbane.player) {
                         hudHandler.makeHealthBar(true);
                     }
                 }
                 if (data['s'] == 'a') {
                     //unit.armor = data['a'];
-                    unit.SetArmor(data['a'], data['np']);
+                    unit.setArmor(data['a'], data['np']);
                     if (unit == ironbane.player) {
                         hudHandler.makeArmorBar(true);
                     }
@@ -590,11 +590,11 @@ var SocketHandler = Class.extend({
             var victim = FindUnit(data['victim']);
             var attacker = FindUnit(data['attacker']);
 
-            victim.SetHealth(data['h']);
+            victim.setHealth(data['h']);
 
 
 
-            victim.SetArmor(data['a']);
+            victim.setArmor(data['a']);
 
 
 
