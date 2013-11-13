@@ -134,7 +134,7 @@ var MeshHandler = Class.extend({
     for (var i=0; i<jsonMaterials.length; i++) {
 
       // if ( drawNameMesh ) {
-      //   materials.push(textureHandler.GetTexture('images/'+tiles[i] + '.png', false, {
+      //   materials.push(textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
       //     transparent:true,
       //     opacity:0.5,
       //     seeThrough:true,
@@ -144,7 +144,7 @@ var MeshHandler = Class.extend({
       //   }));
       // }
       // else {
-        materials.push(textureHandler.GetTexture('images/'+tiles[i] + '.png', false, {
+        materials.push(textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
           transparent:meshData["transparent"] && meshData["transparent"] === 1,
           alphaTest:0.1,
           useLighting:true

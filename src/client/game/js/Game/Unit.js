@@ -133,7 +133,7 @@ var Unit = PhysicsObject.extend({
 
     //console.warn(result);
 
-    //debug.SetWatch('atan2 result', result);
+    //debug.setWatch('atan2 result', result);
 
     var index = 0;
 
@@ -237,7 +237,7 @@ var Unit = PhysicsObject.extend({
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
-        textureHandler.GetTexture(TEXTURE_SHADOW, false, {
+        textureHandler.getTexture(TEXTURE_SHADOW, false, {
           transparent:true,
           alphaTest:0.1
         }));
@@ -338,7 +338,7 @@ var Unit = PhysicsObject.extend({
         this.unitStandingOn = null;
       }
       else {
-        if ( !this.InRangeOfUnit(ironbane.player, 15) ) {
+        if ( !this.inRangeOfUnit(ironbane.player, 15) ) {
           this.allowRaycastGround = false;
           this.enableGravity = false;
         }
@@ -382,7 +382,7 @@ var Unit = PhysicsObject.extend({
 
         var grav = gravity.clone();
 
-        if ( GetZoneConfig("enableFluid") && this.position.y < GetZoneConfig('fluidLevel')-0.5 ) {
+        if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel')-0.5 ) {
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
@@ -395,18 +395,18 @@ var Unit = PhysicsObject.extend({
 
 
         }
-        if ( GetZoneConfig("enableFluid") && this.position.y < GetZoneConfig('fluidLevel') ) {
+        if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel') ) {
           if ( this.timers.waterSplashTimeout >= 0 ) this.timers.waterSplashTimeout -= dTime;
           else {
             this.waterSplashTimeout = 0.1;
-            particleHandler.Add(GetZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
+            particleHandler.Add(getZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
               position:this.position.clone()
             });
           }
         }
 
-        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < GetZoneConfig('fluidLevel')) ) {
-          if ( !GetZoneConfig("enableFluid") || this.position.y < GetZoneConfig('fluidLevel')-0.6 || this.position.y > GetZoneConfig('fluidLevel')-0.4 ) {
+        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < getZoneConfig('fluidLevel')) ) {
+          if ( !getZoneConfig("enableFluid") || this.position.y < getZoneConfig('fluidLevel')-0.6 || this.position.y > getZoneConfig('fluidLevel')-0.4 ) {
             this.velocity.add(grav.clone().multiplyScalar(dTime));
           }
           else {
@@ -442,7 +442,7 @@ var Unit = PhysicsObject.extend({
           var ray = new THREE.Raycaster( this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), tVel);
 
 
-          var intersects = terrainHandler.RayTest(ray, {
+          var intersects = terrainHandler.rayTest(ray, {
             testMeshesNearPosition:this.position,
             noTerrain: le("chClimb"),
             unitReference: this,
@@ -490,7 +490,7 @@ var Unit = PhysicsObject.extend({
               var distanceCheck = 0.5;
 
 
-              var intersects = terrainHandler.RayTest(ray, {
+              var intersects = terrainHandler.rayTest(ray, {
                 testMeshesNearPosition:this.position,
                 reverseRaySortOrder:true,
                 unitReference: this,
@@ -573,14 +573,14 @@ var Unit = PhysicsObject.extend({
           // A failsafe mechanism would be welcome, but due to the nature of our octree coll search mechanism
           // the raycastGroundPosition sometimes returns null even though there is actually terrain below
           // if ( (this instanceof Player) &&
-          //   GetZoneConfig("enableFluid") && this.position.y <= GetZoneConfig('fluidLevel') ) {
+          //   getZoneConfig("enableFluid") && this.position.y <= getZoneConfig('fluidLevel') ) {
           //   if ( !raycastGroundPosition ) {
           //     // We didn't find anything for our shadow
           //     // Reverse a raycast
           //     // Keep casting upwards until we have a match. There should always be a match at some point
           //       ray = new THREE.Raycaster( this.position, new THREE.Vector3(0, 1, 0));
 
-          //       var intersects = terrainHandler.RayTest(ray, {
+          //       var intersects = terrainHandler.rayTest(ray, {
           //         testMeshesNearPosition:this.position,
           //         unitReference: this,
           //         unitRayName: "colunderneath"
@@ -604,7 +604,7 @@ var Unit = PhysicsObject.extend({
         if ( this.isMainPlayer() || (this instanceof Projectile && !this.impactDone) ) {
           ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
-          var intersects = terrainHandler.RayTest(ray, {
+          var intersects = terrainHandler.rayTest(ray, {
             testMeshesNearPosition:this.position,
             unitReference: this,
             unitRayName: "colup"
@@ -695,7 +695,7 @@ var Unit = PhysicsObject.extend({
     //this.mesh.position.y = renderPosition.y;
     }
   },
-  InRangeOfUnit: function(unit, range) {
+  inRangeOfUnit: function(unit, range) {
     return this.InRangeOfPosition(unit.position, range);
   },
   InRangeOfPosition: function(position, range) {

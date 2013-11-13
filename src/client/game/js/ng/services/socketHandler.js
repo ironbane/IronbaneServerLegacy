@@ -49,13 +49,13 @@ IronbaneApp
 
             if (!noDisconnectTrigger) {
                 //socketHandler.serverOnline = false;
-                hudHandler.MessageAlert('It appears the server crashed! Either that, or there is something wrong with your internet connection. I\'m terribly sorry about that.<br><br>In case the server crashed, an auto-restart will most-likely occur. Please refresh the page in a few seconds.', 'nobutton');
+                hudHandler.messageAlert('It appears the server crashed! Either that, or there is something wrong with your internet connection. I\'m terribly sorry about that.<br><br>In case the server crashed, an auto-restart will most-likely occur. Please refresh the page in a few seconds.', 'nobutton');
             }
         });
 
         socket.on('doJump', function(data) {
             var unit = FindUnit(data.id);
-            unit.Jump();
+            unit.jump();
         });
 
         socket.on('toggle', function(data) {
@@ -121,7 +121,7 @@ IronbaneApp
 
         socket.on('updateWeapon', function(data) {
             var unit = FindUnit(data.id);
-            unit.UpdateWeapon(data.weapon);
+            unit.updateWeapon(data.weapon);
         });
 
         socket.on('receiveItem', function(data) {
@@ -165,7 +165,7 @@ IronbaneApp
                         ironbane.player.unitStandingOn = null;
 
                         hudHandler.ShowHUD();
-                        hudHandler.MakeHealthBar(true);
+                        hudHandler.makeHealthBar(true);
 
                         hudHandler.ReloadInventory();
                     });
@@ -186,26 +186,36 @@ IronbaneApp
                     //unit.health = data['h'];
                     unit.SetHealth(data.h, data.np);
                     if (unit === ironbane.player) {
-                        hudHandler.MakeHealthBar(true);
+                        hudHandler.hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+makeHealthBar(true);
                     }
                 }
                 if (data.s === 'a') {
                     //unit.armor = data['a'];
                     unit.SetArmor(data.a, data.np);
                     if (unit === ironbane.player) {
-                        hudHandler.MakeArmorBar(true);
+                        hudHandler.makeArmorBar(true);
                     }
                 }
                 if (data.s === 'hm') {
                     unit.healthMax = data.hm;
                     if (unit === ironbane.player) {
-                        hudHandler.MakeHealthBar(true);
+                        hudHandler.hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+makeHealthBar(true);
                     }
                 }
                 if (data.s === 'am') {
                     unit.armorMax = data.am;
                     if (unit === ironbane.player) {
-                        hudHandler.MakeArmorBar(true);
+                        hudHandler.makeArmorBar(true);
                     }
                 }
             }

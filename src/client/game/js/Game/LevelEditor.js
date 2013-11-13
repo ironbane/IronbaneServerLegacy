@@ -369,7 +369,7 @@ var EditorGUI = function() {
       zone: levelEditor.editorGUI.tpZone
     }, function(reply) {
       if ( !_.isUndefined(reply.errmsg) ) {
-        hudHandler.MessageAlert(reply.errmsg);
+        hudHandler.messageAlert(reply.errmsg);
         return;
       }
     });

@@ -258,7 +258,7 @@ var Mesh = Unit.extend({
     var filename = (this.meshData['filename'].split("."))[0]+".js";
 
     var model = meshPath + filename;
-    //this.texture = textureHandler.GetTexture( texture, true);
+    //this.texture = textureHandler.getTexture( texture, true);
 
 
     var me = this;

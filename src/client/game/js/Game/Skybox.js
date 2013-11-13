@@ -42,7 +42,7 @@ var Skybox = PhysicsObject.extend({
     var material = new THREE.ShaderMaterial({
       uniforms : uniforms,
       vertexShader : $('#vertex_skybox').text(),
-      fragmentShader : $('#fragment_skybox_'+GetZoneConfig("skyboxShader")).text()
+      fragmentShader : $('#fragment_skybox_'+getZoneConfig("skyboxShader")).text()
     });
 
     material.side = THREE.BackSide;
@@ -55,7 +55,7 @@ var Skybox = PhysicsObject.extend({
 
     // Add a sun
     geometry = new THREE.PlaneGeometry(600, 600, 1, 1);
-    this.sunMesh = new THREE.Mesh(geometry, textureHandler.GetTexture('images/misc/sun.png', false, {
+    this.sunMesh = new THREE.Mesh(geometry, textureHandler.getTexture('images/misc/sun.png', false, {
       transparent:true,
       alphaTest:0.01
     }));
@@ -79,7 +79,7 @@ var Skybox = PhysicsObject.extend({
     // Add terrain
     //if ( zones[terrainHandler.zone]['type'] == ZoneTypeEnum.WORLD ) {
       var model = skyboxPath + terrainHandler.zone+".js";
-      //this.texture = textureHandler.GetTexture( texture, true);
+      //this.texture = textureHandler.getTexture( texture, true);
 
       var jsonLoader = new THREE.JSONLoader();
       (function(skybox){
@@ -175,12 +175,12 @@ var Skybox = PhysicsObject.extend({
 
 
       if ( (showEditor && levelEditor.editorGUI.chForceDay)
-        || GetZoneConfig("lightSystem") === LightSystemEnum.DAYONLY ) {
+        || getZoneConfig("lightSystem") === LightSystemEnum.DAYONLY ) {
         this.sunVector.set(0,1,0);
       }
       else if ( (showEditor && levelEditor.editorGUI.chForceNight)
-        || GetZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY
-        || GetZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
+        || getZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY
+        || getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
         this.sunVector.set(0,-1,0);
       }
       else {
@@ -224,7 +224,7 @@ var Skybox = PhysicsObject.extend({
 
 
 
-      if ( GetZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
+      if ( getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
         this.ambientLight.color.setRGB(0.2, 0.2, 0.3);
         this.sunLight.color.setRGB( 0.0, 0.0, 0.0 );
         this.moonLight.color.setRGB(0.2, 0.2, 0.3);

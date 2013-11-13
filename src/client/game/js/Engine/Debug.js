@@ -28,7 +28,7 @@ var Debugger = Class.extend({
 
         setTimeout(function(){debug.Clear()}, 0);
     },
-    SetWatch: function(name, variable, show) {
+    setWatch: function(name, variable, show) {
         // if ( !showEditor) return;
 
         show = _.isUndefined(show) ? debugging : showEditor;
@@ -71,9 +71,5 @@ var Debugger = Class.extend({
         ironbane.scene.add(aH);
     }
 });
-
-
-
-
 
 var debug = new Debugger();

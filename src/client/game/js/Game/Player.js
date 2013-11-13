@@ -57,13 +57,13 @@ var Player = Fighter.extend({
 
         (function(unit) {
             setTimeout(function() {
-                hudHandler.MakeHealthBar();
-                hudHandler.MakeArmorBar();
-                hudHandler.MakeCoinBar();
+                hudHandler.makeHealthBar();
+                hudHandler.makeArmorBar();
+                hudHandler.makeCoinBar();
             }, 0);
         })(this);
 
-        this.CheckForItemsBeforeMakingImage();
+        this.checkForItemsBeforeMakingImage();
 
         // Reddish glow that follows the mouse
         this.aimTexture = "";
@@ -105,29 +105,29 @@ var Player = Fighter.extend({
             return memo + num;
         }, 0);
     },
-    CheckForItemsBeforeMakingImage: function() {
+    checkForItemsBeforeMakingImage: function() {
         if (socketHandler.playerData.items === null) {
             setTimeout(function() {
-                ironbane.player.CheckForItemsBeforeMakingImage();
+                ironbane.player.checkForItemsBeforeMakingImage();
             }, 1000);
         } else {
-            this.UpdateAppearance();
-            var weapon = this.GetEquippedWeapon();
+            this.updateAppearance();
+            var weapon = this.getEquippedWeapon();
 
             if (weapon) {
                 var template = items[weapon.template];
-                this.UpdateWeapon(template.id);
+                this.updateWeapon(template.id);
             }
         }
     },
     Destroy: function() {
         //$('#loadingBar').show();
-        this.DestroyAimMesh();
-        this.DestroyAimHelperMesh();
+        this.destroyAimMesh();
+        this.destroyAimHelperMesh();
 
         this._super();
     },
-    DestroyAimMesh: function() {
+    destroyAimMesh: function() {
         if (this.aimMesh) {
             releaseMesh(this.aimMesh, {
                 removeMaterials: false
@@ -136,7 +136,7 @@ var Player = Fighter.extend({
             ironbane.scene.remove(this.aimMesh);
         }
     },
-    DestroyAimHelperMesh: function() {
+    destroyAimHelperMesh: function() {
         if (this.aimHelperMesh) {
             releaseMesh(this.aimHelperMesh, {
                 removeMaterials: false
@@ -181,7 +181,7 @@ var Player = Fighter.extend({
                 break;
         }
 
-        //debug.SetWatch("this.cameraStatus", this.cameraStatus);
+        //debug.setWatch("this.cameraStatus", this.cameraStatus);
 
         var lookAtTarget = null;
         if (this.cameraStatus !== CameraStatusEnum.ThirdPerson) {
@@ -212,11 +212,11 @@ var Player = Fighter.extend({
         player.lootUnit = null;
 
         if (hudHandler.alertBoxActive) {
-            hudHandler.HideAlert();
+            hudHandler.hideAlert();
         }
 
         if (player.lastFoundLootBag && player.lastFoundLootBag.id === -267) {
-            player.HideTutorial(1);
+            player.hideTutorial(1);
         }
 
         player.lastFoundLootBag = null;
@@ -228,13 +228,13 @@ var Player = Fighter.extend({
         // Check for tutorial #1
         // todo: some better way!
         if (found.id === -267) {
-            player.ShowTutorial(1);
+            player.showTutorial(1);
         }
 
         // Make a request for the items and update the UI when we receive them
         socketHandler.socket.emit('loot', found.id, function(reply) {
             if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.MessageAlert(reply.errmsg);
+                hudHandler.messageAlert(reply.errmsg);
                 return;
             }
 
@@ -256,7 +256,7 @@ var Player = Fighter.extend({
         return _.find(ironbane.unitList, function(unit) {
             if (unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
-                if (player.InRangeOfUnit(unit, range)) {
+                if (player.inRangeOfUnit(unit, range)) {
                     return true;
                 }
             }
@@ -266,12 +266,10 @@ var Player = Fighter.extend({
     tick: function(dTime) {
         var player = this;
 
-        _.each(this.timers, function(value, key) {
-            debug.SetWatch(key, value);
-        });
+        
         this.pathFinder.tick(dTime);
-        debug.SetWatch("timercount from player.js: ", _.keys(this.timers).length);
-        debug.SetWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+        debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
+        debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
 
         // Check for loot bags, chests, and vendors nearby
         var found = player.checkForLoot();
@@ -295,7 +293,7 @@ var Player = Fighter.extend({
 
         var preTarget = this.position.clone().add(uc);
         //        if ( this.mouseRayCastCheckTimeout <= 0 ) {
-        this.UpdateMouseProjectedPosition();
+        this.updateMouseProjectedPosition();
         //            this.mouseRayCastCheckTimeout = 0.1;
         //        }
 
@@ -312,7 +310,7 @@ var Player = Fighter.extend({
             var needFirstPersonMode = false;
             var ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.5, 0)), preTarget.clone().sub(this.position.clone()).normalize());
 
-            var intersects = terrainHandler.RayTest(ray, {
+            var intersects = terrainHandler.rayTest(ray, {
                 testMeshesNearPosition: ironbane.camera.position,
                 unitReference: this,
                 unitRayName: "camera"
@@ -320,7 +318,7 @@ var Player = Fighter.extend({
 
             if (intersects.length > 0) {
                 var relativeDifference = intersects[0].distance;
-                //debug.SetWatch("camera col!", relativeDifference);
+                //debug.setWatch("camera col!", relativeDifference);
                 if (!this.isLookingAround) {
                     if (relativeDifference < 2.5) {
                         //manualLerp = true;
@@ -356,8 +354,8 @@ var Player = Fighter.extend({
         }
 
         var target = this.position.clone().add(uc);
-        //debug.SetWatch("target", target.ToString());
-        //debug.SetWatch("manualLerp ", manualLerp );
+        //debug.setWatch("target", target.ToString());
+        //debug.setWatch("manualLerp ", manualLerp );
         var radians = (this.rotation.y + (Math.PI / 2));
 
         if (!cinema.IsPlaying()) {
@@ -430,7 +428,7 @@ var Player = Fighter.extend({
 
         var additionalCanMove = true;
 
-        if (this.terrainAngle > 45 && this.position.y > GetZoneConfig('fluidLevel')) additionalCanMove = false;
+        if (this.terrainAngle > 45 && this.position.y > getZoneConfig('fluidLevel')) additionalCanMove = false;
 
 
         var inputVelocity = new THREE.Vector3();
@@ -465,15 +463,15 @@ var Player = Fighter.extend({
                     this.object3D.position.y += dTime * 5;
                 } else if (this.timers.lastJumpTimer <= 0 &&
                     (this.isTouchingGround ||
-                        (this.position.y < GetZoneConfig('fluidLevel') && this.position.y > GetZoneConfig('fluidLevel') - 0.5))) {
+                        (this.position.y < getZoneConfig('fluidLevel') && this.position.y > getZoneConfig('fluidLevel') - 0.5))) {
 
-                    if (this.position.y < GetZoneConfig('fluidLevel')) {
-                        //this.position.y = GetZoneConfig('fluidLevel');
+                    if (this.position.y < getZoneConfig('fluidLevel')) {
+                        //this.position.y = getZoneConfig('fluidLevel');
 
                         this.timers.lastJumpTimer = 1.0;
                     }
 
-                    this.Jump();
+                    this.jump();
                     socketHandler.socket.emit('doJump', {});
 
 
@@ -502,7 +500,7 @@ var Player = Fighter.extend({
         frictionLength *= dTime;
 
         var rotTest = this.heading.dot(this.velocity.clone().normalize());
-        //debug.SetWatch("rotTest", rotTest);
+        //debug.setWatch("rotTest", rotTest);
 
         var maxSpeed = rotTest < -0.2 ? unitMaxSpeedBackwards : unitMaxSpeed;
 
@@ -512,12 +510,12 @@ var Player = Fighter.extend({
 
 
         //if ( zones[terrainHandler.zone]['enableFluid'] ) {
-        if (GetZoneConfig('enableFluid')) {
+        if (getZoneConfig('enableFluid')) {
             // Make some water splashes when we're moving under the fluidLevel
-            if (this.position.y < GetZoneConfig('fluidLevel')) {
+            if (this.position.y < getZoneConfig('fluidLevel')) {
                 var waterFrictionVector = this.velocity.clone().normalize().multiplyScalar(dTime * 10);
                 this.velocity.sub(waterFrictionVector);
-                maxSpeed -= (GetZoneConfig('fluidLevel') - this.position.y) * 4;
+                maxSpeed -= (getZoneConfig('fluidLevel') - this.position.y) * 4;
                 maxSpeed = Math.max(2, maxSpeed);
 
             }
@@ -552,10 +550,10 @@ var Player = Fighter.extend({
 
         this.velocity.y = oldvy;
         //
-        debug.SetWatch('player.speed', this.speed);
-        debug.SetWatch('player.rotation', this.rotation.ToString());
-        debug.SetWatch('player.position', this.position.ToString());
-        debug.SetWatch('player.velocity', this.velocity.ToString());
+        debug.setWatch('player.speed', this.speed);
+        debug.setWatch('player.rotation', this.rotation.ToString());
+        debug.setWatch('player.position', this.position.ToString());
+        debug.setWatch('player.velocity', this.velocity.ToString());
         //
 
 
@@ -563,7 +561,7 @@ var Player = Fighter.extend({
         if (socketHandler.serverOnline) {
             if (this.timers.sendDataTimeout <= 0.0) {
                 this.timers.sendDataTimeout = 0.25;
-                this.SendData();
+                this.sendData();
             }
         }
 
@@ -574,7 +572,7 @@ var Player = Fighter.extend({
 
 
             // Check the aim range
-            var weapon = this.GetEquippedWeapon();
+            var weapon = this.getEquippedWeapon();
             if (weapon) {
                 var template = items[weapon.template];
                 var range = WeaponRanges[template.subtype];
@@ -638,13 +636,13 @@ var Player = Fighter.extend({
 
         if (this.aimTexture != this.targetAimTexture) {
 
-            this.DestroyAimMesh();
+            this.destroyAimMesh();
 
             this.aimTexture = this.targetAimTexture;
 
             if (this.aimTexture !== "") {
                 this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-                    textureHandler.GetTexture('images/misc/' + this.aimTexture + '.png', false, {
+                    textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
                         transparent: true,
                         alphaTest: 0.1
                     }));
@@ -670,13 +668,13 @@ var Player = Fighter.extend({
         // Helper
         // if ( this.aimHelperTexture != this.targetAimHelperTexture ) {
 
-        //   this.DestroyAimHelperMesh();
+        //   this.destroyAimHelperMesh();
 
         //   this.aimHelperTexture = this.targetAimHelperTexture;
 
         //   if ( this.aimHelperTexture !== "" ) {
         //     this.aimHelperMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-        //       textureHandler.GetTexture('images/misc/'+this.aimHelperTexture+'.png', false, {
+        //       textureHandler.getTexture('images/misc/'+this.aimHelperTexture+'.png', false, {
         //         transparent:true,
         //         alphaTest:0.1
         //       }));
@@ -705,7 +703,7 @@ var Player = Fighter.extend({
         this._super(dTime);
 
     },
-    SendData: function() {
+    sendData: function() {
 
         // Don't send heavy packets
 
@@ -718,7 +716,7 @@ var Player = Fighter.extend({
         for (var u = 0; u < ironbane.unitList.length; u++) {
             var unit = ironbane.unitList[u];
 
-            if (unit instanceof Fighter && unit.InRangeOfUnit(ironbane.player, 30) && !(unit.isPlayer())) {
+            if (unit instanceof Fighter && unit.inRangeOfUnit(ironbane.player, 30) && !(unit.isPlayer())) {
 
 
 
@@ -728,7 +726,7 @@ var Player = Fighter.extend({
                 var ray = new THREE.Raycaster(ourpos, dir.normalize(), 0, distance);
 
 
-                var intersects = terrainHandler.RayTest(ray, {
+                var intersects = terrainHandler.rayTest(ray, {
                     testMeshesNearPosition: unit.position,
                     extraRange: distance,
                     unitReference: this,
@@ -756,7 +754,7 @@ var Player = Fighter.extend({
 
 
     },
-    AttemptAttack: function(position) {
+    attemptAttack: function(position) {
         var player = this;
 
         if (player.timers.attackTimeout > 0.0) {
@@ -768,7 +766,7 @@ var Player = Fighter.extend({
             return;
         }
 
-        var weapon = player.GetEquippedWeapon();
+        var weapon = player.getEquippedWeapon();
 
         if (weapon) {
             var template = items[weapon.template];
@@ -792,7 +790,7 @@ var Player = Fighter.extend({
                 }, function(reply) {
                     //console.log('addProjectile reply', reply);
                     if (!_.isUndefined(reply.errmsg)) {
-                        hudHandler.MessageAlert(reply.errmsg);
+                        hudHandler.messageAlert(reply.errmsg);
                         // hudHandler.ShowMenuScreen();
                         return;
                     }
@@ -831,21 +829,21 @@ var Player = Fighter.extend({
             itemID: item.id
         }, function(response) {
             if (response.errmsg) {
-                hudHandler.MessageAlert(response.errmsg);
+                hudHandler.messageAlert(response.errmsg);
                 return;
             }
 
             if (item.equipped === 1) {
                 if (item.type === 'armor') {
-                    player.UpdateAppearance();
+                    player.updateAppearance();
                 }
                 if (item.type === 'weapon' || item.type === 'tool') {
-                    player.UpdateWeapon(0);
+                    player.updateWeapon(0);
                 }
             }
 
             if (item.subtype === 'cash') {
-                hudHandler.MakeCoinBar(true);
+                hudHandler.makeCoinBar(true);
             }
 
             player.removeItem(item);
@@ -897,7 +895,7 @@ var Player = Fighter.extend({
                 }
                 item.equipped = +!item.equipped;
                 soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
-                player.UpdateWeapon(item.equipped ? item.template : 0);
+                player.updateWeapon(item.equipped ? item.template : 0);
                 hudHandler.updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
                 if (item.subtype === 'book') {
                     if (item.equipped === 1) {
@@ -910,7 +908,7 @@ var Player = Fighter.extend({
                                 hudHandler.showBook(response.text);
                             })
                             .fail(function(err) {
-                                hudHandler.MessageAlert(err.responseText);
+                                hudHandler.messageAlert(err.responseText);
                             });
                     } else {
                         hudHandler.hideBook();
@@ -936,25 +934,25 @@ var Player = Fighter.extend({
                 }
                 item.equipped = +!item.equipped;
                 soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
-                player.UpdateAppearance();
+                player.updateAppearance();
                 hudHandler.updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
                 break;
         }
 
         socketHandler.socket.emit('useItem', barIndex, function(reply) {
             if (reply && reply.errmsg) {
-                hudHandler.MessageAlert(reply.errmsg);
+                hudHandler.messageAlert(reply.errmsg);
                 return;
             }
             // todo: undo?
         });
     },
-    GetEquippedWeapon: function() {
+    getEquippedWeapon: function() {
         return _.find(this.getItems(), function(item) {
             return item.equipped === 1 && (item.type === 'weapon' || item.type === 'tool');
         });
     },
-    UpdateAppearance: function() {
+    updateAppearance: function() {
         var player = this;
 
         player.appearance.skin = socketHandler.playerData.skin;
@@ -982,7 +980,7 @@ var Player = Fighter.extend({
 
         player.UpdateClothes();
     },
-    UpdateMouseProjectedPosition: function() {
+    updateMouseProjectedPosition: function() {
         if (!ironbane.player) return;
 
         var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
@@ -990,7 +988,7 @@ var Player = Fighter.extend({
 
         var ray = new THREE.Raycaster(ironbane.camera.position, vector.sub(ironbane.camera.position).normalize());
 
-        var intersects = terrainHandler.RayTest(ray, {
+        var intersects = terrainHandler.rayTest(ray, {
             testMeshesNearPosition: this.position,
             extraRange: 20,
             allowBillboards: true,
@@ -1012,10 +1010,10 @@ var Player = Fighter.extend({
 
     },
     // todo: move these to HUD
-    ShowTutorial: function(id) {
+    showTutorial: function(id) {
         $(".ib-tutorial").addClass("tut" + id);
     },
-    HideTutorial: function(id) {
+    hideTutorial: function(id) {
         $(".ib-tutorial").removeClass("tut" + id);
     }
 });

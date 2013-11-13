@@ -76,7 +76,7 @@ var HUDHandler = Class.extend({
                 $('#loginContent').show();
             } else {
                 setTimeout(function() {
-                    hudHandler.MessageAlert('The server is currently offline. Please try again later.', 'nobutton');
+                    hudHandler.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
                 }, 1000);
             }
         } else {
@@ -159,7 +159,7 @@ var HUDHandler = Class.extend({
 
             if (!gotFlashInstalled) {
                 value = false;
-                hudHandler.MessageAlert("Flash was not detected.<br><br>Sound effects are disabled.");
+                hudHandler.messageAlert("Flash was not detected.<br><br>Sound effects are disabled.");
             }
 
             // We can only change the toggle in the main menu, so always stop/play
@@ -289,7 +289,7 @@ var HUDHandler = Class.extend({
         });
 
         // any time we show the inventory, we should update the gold
-        HUD.MakeCoinBar();
+        HUD.makeCoinBar();
     },
     hideInv: function() {
         $('#itemBar').removeData().empty().hide();
@@ -338,7 +338,7 @@ var HUDHandler = Class.extend({
 
             socketHandler.socket.emit('buyItem', {vendorId: vendor.id, itemId: item.id, slot: slot.data('slot')}, function(response) {
                 if(response.errmsg) {
-                    HUD.MessageAlert(response.errmsg);
+                    HUD.messageAlert(response.errmsg);
                     // revert! - error message is most likely lack of funds
                     HUD.fillVendorSlot(item);
                     return;
@@ -365,7 +365,7 @@ var HUDHandler = Class.extend({
                         // otherwise we're successful
                         HUD.clearInvSlot(occupied.slot);
                         HUD.fillInvSlot(response.item); // item should be updated with new "stacked" amount
-                        HUD.MakeCoinBar(true);
+                        HUD.makeCoinBar(true);
                     });
                     return;
                 }
@@ -636,10 +636,10 @@ var HUDHandler = Class.extend({
                 if (item.equipped) {
                     if (item.type === 'armor') {
                         ironbane.player.UpdateAppearance();
-                        HUD.MakeArmorBar();
+                        HUD.makeArmorBar();
                     }
                     if (item.type === 'weapon' || item.type === 'tool') {
-                        ironbane.player.UpdateWeapon(0);
+                        ironbane.player.updateWeapon(0);
                     }
                 }
             }
@@ -655,14 +655,14 @@ var HUDHandler = Class.extend({
         if (item.equipped) {
             if (item.type === 'armor') {
                 ironbane.player.UpdateAppearance();
-                HUD.MakeArmorBar();
+                HUD.makeArmorBar();
             }
             if (item.type === 'weapon' || item.type === 'tool') {
-                ironbane.player.UpdateWeapon(0);
+                ironbane.player.updateWeapon(0);
             }
         }
         if(item.type === 'cash') {
-            HUD.MakeCoinBar(true);
+            HUD.makeCoinBar(true);
         }
     },
     PutItem: function(startItem, slotNumber, slotID, acceptOffer) {
@@ -679,7 +679,7 @@ var HUDHandler = Class.extend({
         socketHandler.socket.emit('putItem', data, function(reply) {
             //console.log('putItem reply', reply);
             if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.MessageAlert(reply.errmsg);
+                hudHandler.messageAlert(reply.errmsg);
                 // Teleport back!
                 TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
                 //if ( switchItem ) TeleportElement('li'+switchItem.id, 'ls'+switchItem.slot);
@@ -692,7 +692,7 @@ var HUDHandler = Class.extend({
 
                 var doReturn = false;
 
-                hudHandler.MessageAlert('I\'d offer <span style="color:rgb(255, 215, 0)">' + reply.offeredPrice + ' x ' + goldPieces + '</span> for yer ' + items[startItem.template].name + '. What do ye think?', 'question', function() {
+                hudHandler.messageAlert('I\'d offer <span style="color:rgb(255, 215, 0)">' + reply.offeredPrice + ' x ' + goldPieces + '</span> for yer ' + items[startItem.template].name + '. What do ye think?', 'question', function() {
                     hudHandler.PutItem(startItem, slotNumber, slotID, true);
                 }, function() { // Teleport back!
                     TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
@@ -705,7 +705,7 @@ var HUDHandler = Class.extend({
             if (_.isArray(reply.items)) {
                 socketHandler.playerData.items = reply.items;
                 //hudHandler.ReloadInventory();
-                hudHandler.MakeCoinBar(true);
+                hudHandler.makeCoinBar(true);
 
                 // Remove the loot bag
                 $('#lootBag').hide();
@@ -736,7 +736,7 @@ var HUDHandler = Class.extend({
                     ironbane.player.UpdateAppearance();
                 }
                 if (items[startItem.template].type === 'weapon') {
-                    ironbane.player.UpdateWeapon(0);
+                    ironbane.player.updateWeapon(0);
                 }
             }
 
@@ -766,7 +766,7 @@ var HUDHandler = Class.extend({
 
         socketHandler.socket.emit('lootItem', data, function(reply) {
             if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.MessageAlert(reply.errmsg);
+                hudHandler.messageAlert(reply.errmsg);
 
                 // revert transaction!
                 // showInv + loot?
@@ -785,7 +785,7 @@ var HUDHandler = Class.extend({
 
             // redo the whole inv, shouldn't be necessary... punting for now
             HUD.showInv({slots: 10, items: reply.items});
-            HUD.MakeCoinBar(true);
+            HUD.makeCoinBar(true);
 
             soundHandler.Play(_.sample(["bag1"]));
         });
@@ -990,7 +990,7 @@ var HUDHandler = Class.extend({
 
         return content;
     },
-    MakeCoinBar: function(flash) {
+    makeCoinBar: function(flash) {
         var self = this,
             el = $('#coinBar'),
             coins = ironbane.player.getTotalCoins(),
@@ -1009,11 +1009,11 @@ var HUDHandler = Class.extend({
         // if this was a "flash" run again without flash
         if (flash) {
             setTimeout(function() {
-                self.MakeCoinBar(false);
+                self.makeCoinBar(false);
             }, 50);
         }
     },
-    MakeHealthBar: function(doFlash) {
+    makeHealthBar: function(doFlash) {
         var HUD = this;
         doFlash = doFlash || false;
         var content = this.GetStatContent(ironbane.player.health, doFlash ? 'misc/heart_medium_flash' : 'misc/heart_medium', ironbane.player.healthMax);
@@ -1021,11 +1021,11 @@ var HUDHandler = Class.extend({
         $('#healthBar').html(content);
         if (doFlash) {
             setTimeout(function() {
-                HUD.MakeHealthBar();
+                HUD.makeHealthBar();
             }, 50);
         }
     },
-    MakeArmorBar: function(doFlash) {
+    makeArmorBar: function(doFlash) {
         var HUD = this;
 
         doFlash = doFlash || false;
@@ -1033,11 +1033,11 @@ var HUDHandler = Class.extend({
         $('#armorBar').html(content);
         if (doFlash) {
             setTimeout(function() {
-                HUD.MakeArmorBar();
+                HUD.makeArmorBar();
             }, 50);
         }
     },
-    HideAlert: function() {
+    hideAlert: function() {
         var HUD = this;
         $('#alertBox').hide();
         HUD.alertBoxActive = false;
@@ -1049,7 +1049,7 @@ var HUDHandler = Class.extend({
             HUD.doNo = undefined;
         }
     },
-    MessageAlert: function(message, options, doYes, doNo) {
+    messageAlert: function(message, options, doYes, doNo) {
 
         var options = options || null;
 
@@ -1130,7 +1130,7 @@ var HUDHandler = Class.extend({
             slots: 10,
             items: socketHandler.playerData.items
         });
-        hudHandler.MakeHealthBar(true);
+        hudHandler.makeHealthBar(true);
         $("#coinBar").show();
         $("#statBar").show();
         $('#chatContent').trigger('show');
@@ -1351,7 +1351,7 @@ var HUDHandler = Class.extend({
                     // Quickly make a character as a guest
                     $.get('/api/guest/characters', function(response) {
                         // should have a more global error handler...
-                        // hudHandler.MessageAlert(data.errmsg);
+                        // hudHandler.messageAlert(data.errmsg);
 
                         window.chars = [response];
                         window.charCount = window.chars.length;
@@ -1378,7 +1378,7 @@ var HUDHandler = Class.extend({
                         hudHandler.MakeCharSelectionScreen();
                     } else {
                         hudHandler.EnableButtons(['btnLogOut']);
-                        hudHandler.MessageAlert(response);
+                        hudHandler.messageAlert(response);
                     }
                 });
         });
@@ -1405,7 +1405,7 @@ var HUDHandler = Class.extend({
 
                 var confirm = $('#charName').val();
                 if (confirm !== delChar.name) {
-                    hudHandler.MessageAlert('Name does not match character name!');
+                    hudHandler.messageAlert('Name does not match character name!');
                     hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
                 } else {
                     $.ajax({
@@ -1418,7 +1418,7 @@ var HUDHandler = Class.extend({
                         hudHandler.MakeCharSelectionScreen();
                     }).fail(function(error) {
                         //console.error('error deleting character!', error);
-                        hudHandler.MessageAlert(error.responseText);
+                        hudHandler.messageAlert(error.responseText);
                         hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
                     });
                 }
@@ -1478,7 +1478,7 @@ var HUDHandler = Class.extend({
                             });
                     })
                     .fail(function(err) {
-                        hudHandler.MessageAlert(err.responseText);
+                        hudHandler.messageAlert(err.responseText);
                         hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
                         if (err.responseText === "Invalid username or password!") {
                             $('#password').val("");
@@ -1542,7 +1542,7 @@ var HUDHandler = Class.extend({
                     url: url
                 })
                     .done(function(response) {
-                        hudHandler.MessageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function() {
+                        hudHandler.messageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function() {
                             location.reload();
                         });
 
@@ -1560,7 +1560,7 @@ var HUDHandler = Class.extend({
                     })
                     .fail(function(err) {
                         hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
-                        hudHandler.MessageAlert(err.responseText);
+                        hudHandler.messageAlert(err.responseText);
                     });
             });
 
@@ -1753,7 +1753,7 @@ var HUDHandler = Class.extend({
                         hudHandler.MakeCharSelectionScreen();
                     })
                     .fail(function(err) {
-                        hudHandler.MessageAlert(err.responseText);
+                        hudHandler.messageAlert(err.responseText);
                         hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
                     });
             });

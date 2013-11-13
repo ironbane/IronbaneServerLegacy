@@ -394,7 +394,7 @@ if ( !SERVER ) {
     return http.status!=404;
   }
 
-  function GetZoneConfig(string) {
+  function getZoneConfig(string) {
     if ( _.isUndefined(zoneTypeConfig[zones[terrainHandler.zone]['type']][string]) ) {
       bm('Error: \''+string+'\' not defined for zone '+zones[terrainHandler.zone].name+'!');
       return 0;
@@ -412,7 +412,7 @@ if ( !SERVER ) {
     return showEditor && levelEditor.editorGUI[prop];
   }
   function sw(a,b,c) {
-    debug.SetWatch(a, b, c);
+    debug.setWatch(a, b, c);
   }
 
   function cl(msg) {

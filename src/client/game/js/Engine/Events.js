@@ -73,11 +73,11 @@ $(document).keydown(function(event){
   if ( event.keyCode === 27 ) {
 
     if (!cinema.IsPlaying()) {
-      hudHandler.MessageAlert("Back to the Main Menu?", "question", function() {
+      hudHandler.messageAlert("Back to the Main Menu?", "question", function() {
         socketHandler.readyToReceiveUnits = false;
         socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
           if (!_.isUndefined(reply.errmsg)) {
-            hudHandler.MessageAlert(reply.errmsg);
+            hudHandler.messageAlert(reply.errmsg);
             return;
           }
 
@@ -134,7 +134,7 @@ $(document).keydown(function(event){
 
     }
     else {
-      hudHandler.MessageAlert("Skip Cutscene?", "question", function() {
+      hudHandler.messageAlert("Skip Cutscene?", "question", function() {
         ironbane.player.canMove = true;
         cinema.Clear();
       }, function() {});
@@ -298,7 +298,7 @@ var mouseClickFunction = function(event) {
           socketHandler.socket.emit('ppAddNode', position.Round(2), function(reply) {
 
             if ( !_.isUndefined(reply.errmsg) ) {
-              hudHandler.MessageAlert(reply.errmsg);
+              hudHandler.messageAlert(reply.errmsg);
               return;
             }
 
@@ -314,7 +314,7 @@ var mouseClickFunction = function(event) {
                           }, function(reply) {
 
                           if ( !_.isUndefined(reply.errmsg) ) {
-                            hudHandler.MessageAlert(reply.errmsg);
+                            hudHandler.messageAlert(reply.errmsg);
                             return;
                           }
 
@@ -349,7 +349,7 @@ var mouseClickFunction = function(event) {
                 }, function(reply) {
 
                 if ( !_.isUndefined(reply.errmsg) ) {
-                  hudHandler.MessageAlert(reply.errmsg);
+                  hudHandler.messageAlert(reply.errmsg);
                   return;
                 }
 
@@ -386,7 +386,7 @@ var mouseClickFunction = function(event) {
             }, function(reply) {
 
             if ( !_.isUndefined(reply.errmsg) ) {
-              hudHandler.MessageAlert(reply.errmsg);
+              hudHandler.messageAlert(reply.errmsg);
               return;
             }
 
@@ -421,7 +421,7 @@ var mouseIntervalFunction = function(event){
     if ( event.button === 0 ) {
       if (currentMouseToWorldData) {
         var position = currentMouseToWorldData.point;
-        ironbane.player.AttemptAttack(position);
+        ironbane.player.attemptAttack(position);
       }
     }
     else {

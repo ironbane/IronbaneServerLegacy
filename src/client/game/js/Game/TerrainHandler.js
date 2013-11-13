@@ -90,7 +90,7 @@ var TerrainHandler = Class.extend({
 
     this.BuildWaterMesh();
 
-    if ( GetZoneConfig("enableClouds") ) {
+    if ( getZoneConfig("enableClouds") ) {
       particleHandler.Add(ParticleTypeEnum.CLOUD, {});
     }
 
@@ -106,17 +106,17 @@ var TerrainHandler = Class.extend({
       ironbane.scene.remove(this.waterMesh);
     }
 
-    if ( !GetZoneConfig('enableFluid') ) return;
+    if ( !getZoneConfig('enableFluid') ) return;
 
 
 
-    var texture = textureHandler.GetTexture( 'images/tiles/'+GetZoneConfig('fluidTexture')+'.png', true);
+    var texture = textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTexture')+'.png', true);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.x = 1000;
     texture.repeat.y = 1000;
 
-    var texture2 = textureHandler.GetTexture( 'images/tiles/'+GetZoneConfig('fluidTextureGlow')+'.png', true);
+    var texture2 = textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTextureGlow')+'.png', true);
     texture2.wrapS = THREE.RepeatWrapping;
     texture2.wrapT = THREE.RepeatWrapping;
     texture2.repeat.x = 1000;
@@ -160,9 +160,9 @@ var TerrainHandler = Class.extend({
 
     var shaderMaterial = new THREE.ShaderMaterial({
       uniforms : uniforms,
-      vertexShader : $('#vertex_'+GetZoneConfig("fluidType")).text(),
-      fragmentShader : $('#fragment_'+GetZoneConfig("fluidType")).text(),
-      transparent: GetZoneConfig("fluidType") === "lava" ? false : true
+      vertexShader : $('#vertex_'+getZoneConfig("fluidType")).text(),
+      fragmentShader : $('#fragment_'+getZoneConfig("fluidType")).text(),
+      transparent: getZoneConfig("fluidType") === "lava" ? false : true
     //alphaTest: 0.5
     });
 
@@ -170,7 +170,7 @@ var TerrainHandler = Class.extend({
 
     this.waterMesh = new THREE.Mesh(planeGeo, shaderMaterial);
     this.waterMesh.rotation.x = -Math.PI/2;
-    this.waterMesh.position.y = GetZoneConfig('fluidLevel');
+    this.waterMesh.position.y = getZoneConfig('fluidLevel');
     this.waterMesh.geometry.dynamic = true;
 
     ironbane.scene.add(this.waterMesh);
@@ -230,7 +230,7 @@ var TerrainHandler = Class.extend({
 
 
     if ( socketHandler.loggedIn ) {
-      this.targetMusic = ChooseRandom(GetZoneConfig("music"));
+      this.targetMusic = ChooseRandom(getZoneConfig("music"));
     }
 
   },
@@ -239,7 +239,7 @@ var TerrainHandler = Class.extend({
       cell.Reload();
     });
   },
-  RayTest: function(ray, options) {
+  rayTest: function(ray, options) {
 
     options = options || {};
 
@@ -402,7 +402,7 @@ var TerrainHandler = Class.extend({
       this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
       if ( this.skybox ) {
-        if ( GetZoneConfig("fluidType") === "lava" ) {
+        if ( getZoneConfig("fluidType") === "lava" ) {
           this.waterMesh.material.uniforms.vSun.value.set(0,1,0);
         }
         else {
@@ -440,7 +440,7 @@ var TerrainHandler = Class.extend({
       // Bring it on!
       socketHandler.socket.emit('readyToReceiveUnits', true, function (reply) {
         if ( !_.isUndefined(reply.errmsg) ) {
-          hudHandler.MessageAlert(reply.errmsg);
+          hudHandler.messageAlert(reply.errmsg);
           return;
         }
       });
@@ -451,8 +451,8 @@ var TerrainHandler = Class.extend({
 
     var cp = WorldToCellCoordinates(p.x, p.z, cellSize);
 
-    debug.SetWatch('Player Cell X', cp.x);
-    debug.SetWatch('Player Cell Z', cp.z);
+    debug.setWatch('Player Cell X', cp.x);
+    debug.setWatch('Player Cell Z', cp.z);
 
     switch(this.status) {
       case terrainHandlerStatusEnum.INIT:

@@ -35,7 +35,7 @@ var MusicPlayer = Billboard.extend({
     TIck: function(dTime) {
 
 
-        // if ( this.InRangeOfUnit(ironbane.player, this.metadata.range) ) {
+        // if ( this.inRangeOfUnit(ironbane.player, this.metadata.range) ) {
 
 
 

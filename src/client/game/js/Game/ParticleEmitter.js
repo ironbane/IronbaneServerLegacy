@@ -111,7 +111,7 @@ var ParticleEmitter = Class.extend({
             }
         }
 
-        var texture = textureHandler.GetTexture('images/' + texture + '.png', true);
+        var texture = textureHandler.getTexture('images/' + texture + '.png', true);
 
         var spriteMaterial = new THREE.SpriteMaterial({
             color: ColorEnum.WHITE,
@@ -210,7 +210,7 @@ var ParticleEmitter = Class.extend({
             this.AddParticle();
         }
 
-        //debug.SetWatch('Particles spawned', this.particles.length);
+        //debug.setWatch('Particles spawned', this.particles.length);
 
         //for (var i = 0; i < this.particleSystem.geometry.vertices.length; ++i) {
         for (var i = 0; i < this.particles.length; ++i) {

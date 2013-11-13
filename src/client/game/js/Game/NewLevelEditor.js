@@ -158,7 +158,7 @@ var NewLevelEditor = PhysicsObject.extend({
               if ( event.keyCode === 88 ) {
 
                 if ( me.selectedObject ) {
-                    hudHandler.MessageAlert("Delete model?", "question", function() {
+                    hudHandler.messageAlert("Delete model?", "question", function() {
                         me.DeleteSelectedObject();
                     });
                 }
@@ -361,7 +361,7 @@ var NewLevelEditor = PhysicsObject.extend({
 
         var ray = new THREE.Raycaster( ironbane.camera.position, vector.sub( ironbane.camera.position ).normalize() );
 
-        var intersects = terrainHandler.RayTest(ray, {
+        var intersects = terrainHandler.rayTest(ray, {
             testMeshesNearPosition: ironbane.camera.position,
             noTerrain: levelEditor.editorGUI.enableModelPlacer && levelEditor.editorGUI.mpTransformMode,
             extraRange: 500,
@@ -384,12 +384,12 @@ var NewLevelEditor = PhysicsObject.extend({
         }
 
         if ( currentMouseToWorldData ) {
-            debug.SetWatch("currentMouseToWorldData.point", ConvertVector3(currentMouseToWorldData.point).ToString());
-            debug.SetWatch("currentMouseToWorldData.normal", ConvertVector3(currentMouseToWorldData.face.normal).ToString());
-            debug.SetWatch("currentMouseToWorldData.rotation", ConvertVector3(currentMouseToWorldData.object.rotation).ToString());
+            debug.setWatch("currentMouseToWorldData.point", ConvertVector3(currentMouseToWorldData.point).ToString());
+            debug.setWatch("currentMouseToWorldData.normal", ConvertVector3(currentMouseToWorldData.face.normal).ToString());
+            debug.setWatch("currentMouseToWorldData.rotation", ConvertVector3(currentMouseToWorldData.object.rotation).ToString());
 
             if ( !_.isUndefined(currentMouseToWorldData.object.unit) ) {
-                debug.SetWatch("currentMouseToWorldData.unit.name", currentMouseToWorldData.object.unit.name);
+                debug.setWatch("currentMouseToWorldData.unit.name", currentMouseToWorldData.object.unit.name);
             }
         }
 

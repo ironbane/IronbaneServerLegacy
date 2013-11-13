@@ -97,7 +97,7 @@ var SocketHandler = Class.extend({
                 if (!noDisconnectTrigger) {
                     socketHandler.serverOnline = false;
 
-                    hudHandler.MessageAlert('The connection with the server was lost.<br><br>Trying to reconnect...', 'nobutton');
+                    hudHandler.messageAlert('The connection with the server was lost.<br><br>Trying to reconnect...', 'nobutton');
 
                     setTimeout(function() {
                         location.reload();
@@ -150,7 +150,7 @@ var SocketHandler = Class.extend({
 
         this.socket.emit('connectServer', data, function(reply) {
             if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.MessageAlert(reply.errmsg);
+                hudHandler.messageAlert(reply.errmsg);
                 abortConnect();
                 hudHandler.ShowMenuScreen();
                 return;
@@ -297,7 +297,7 @@ var SocketHandler = Class.extend({
                     unit.UpdateClothes();
 
                     if (!_.isUndefined(data['weapon'])) {
-                        unit.UpdateWeapon(data['weapon']);
+                        unit.updateWeapon(data['weapon']);
                     }
                 }
 
@@ -309,7 +309,7 @@ var SocketHandler = Class.extend({
 
             var unit = FindUnit(data.id);
 
-            unit.Jump();
+            unit.jump();
 
 
         });
@@ -412,7 +412,7 @@ var SocketHandler = Class.extend({
 
         this.socket.on('updateWeapon', function(data) {
             var unit = FindUnit(data.id);
-            unit.UpdateWeapon(data.weapon);
+            unit.updateWeapon(data.weapon);
         });
 
         // comes from GiveItem and addItem on server
@@ -421,7 +421,7 @@ var SocketHandler = Class.extend({
             hudHandler.fillInvSlot(item);
 
             if(item.type === 'cash') {
-                hudHandler.MakeCoinBar(true);
+                hudHandler.makeCoinBar(true);
             }
         });
 
@@ -474,7 +474,7 @@ var SocketHandler = Class.extend({
                         }, 100);
 
                         socketHandler.readyToReceiveUnits = false;
-                        ironbane.player.UpdateWeapon(0);
+                        ironbane.player.updateWeapon(0);
 
                         terrainHandler.ChangeZone(data.z);
 
@@ -526,26 +526,26 @@ var SocketHandler = Class.extend({
                     //unit.health = data['h'];
                     unit.SetHealth(data['h'], data['np']);
                     if (unit == ironbane.player) {
-                        hudHandler.MakeHealthBar(true);
+                        hudHandler.makeHealthBar(true);
                     }
                 }
                 if (data['s'] == 'a') {
                     //unit.armor = data['a'];
                     unit.SetArmor(data['a'], data['np']);
                     if (unit == ironbane.player) {
-                        hudHandler.MakeArmorBar(true);
+                        hudHandler.makeArmorBar(true);
                     }
                 }
                 if (data['s'] == 'hm') {
                     unit.healthMax = data['hm'];
                     if (unit == ironbane.player) {
-                        hudHandler.MakeHealthBar(true);
+                        hudHandler.makeHealthBar(true);
                     }
                 }
                 if (data['s'] == 'am') {
                     unit.armorMax = data['am'];
                     if (unit == ironbane.player) {
-                        hudHandler.MakeArmorBar(true);
+                        hudHandler.makeArmorBar(true);
                     }
                 }
             }

@@ -56,7 +56,7 @@ IB.PathFinder = function() {
                     new THREE.Vector3(0, -1, 0)
                 );
 
-                var intersects = terrainHandler.RayTest(ray, {
+                var intersects = terrainHandler.rayTest(ray, {
                     testMeshesNearPosition:position
                 });
 
@@ -70,7 +70,7 @@ IB.PathFinder = function() {
                 socketHandler.socket.emit('ppAddNode', position.clone().Round(2), function(reply) {
 
                     if ( !_.isUndefined(reply.errmsg) ) {
-                        hudHandler.MessageAlert(reply.errmsg);
+                        hudHandler.messageAlert(reply.errmsg);
                         return;
                     }
 
@@ -93,7 +93,7 @@ IB.PathFinder = function() {
                         new THREE.Vector3(0, -1, 0)
                     );
 
-                    var intersects = terrainHandler.RayTest(ray, {
+                    var intersects = terrainHandler.rayTest(ray, {
                         testMeshesNearPosition:position
                     });
 
@@ -125,7 +125,7 @@ IB.PathFinder = function() {
                             .normalize()
                     );
 
-                    intersects = terrainHandler.RayTest(ray, {
+                    intersects = terrainHandler.rayTest(ray, {
                         testMeshesNearPosition:position
                     });
 
@@ -152,7 +152,7 @@ IB.PathFinder = function() {
                                 }, function(reply) {
 
                                 if ( !_.isUndefined(reply.errmsg) ) {
-                                    hudHandler.MessageAlert(reply.errmsg);
+                                    hudHandler.messageAlert(reply.errmsg);
                                     return;
                                 }
 
@@ -162,7 +162,7 @@ IB.PathFinder = function() {
                             socketHandler.socket.emit('ppAddNode', pointOnGround.Round(2), function(reply) {
 
                                 if ( !_.isUndefined(reply.errmsg) ) {
-                                    hudHandler.MessageAlert(reply.errmsg);
+                                    hudHandler.messageAlert(reply.errmsg);
                                     return;
                                 }
 
@@ -173,7 +173,7 @@ IB.PathFinder = function() {
                                     }, function(reply) {
 
                                     if ( !_.isUndefined(reply.errmsg) ) {
-                                        hudHandler.MessageAlert(reply.errmsg);
+                                        hudHandler.messageAlert(reply.errmsg);
                                         return;
                                     }
 
@@ -241,7 +241,7 @@ IB.PathFinder = function() {
                                 }, function(reply) {
 
                                 if ( !_.isUndefined(reply.errmsg) ) {
-                                  hudHandler.MessageAlert(reply.errmsg);
+                                  hudHandler.messageAlert(reply.errmsg);
                                   return;
                                 }
 

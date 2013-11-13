@@ -543,18 +543,18 @@ var ParticleTypeEnum = {
             }
             pos.x += getRandomFloat(-100, 100);
             pos.z += getRandomFloat(-100, 100);
-            pos.y = GetZoneConfig('cloudLevel') + getRandomFloat(-5, 5);
+            pos.y = getZoneConfig('cloudLevel') + getRandomFloat(-5, 5);
             return pos;
         },
         particleStartVelocity: function(){return new THREE.Vector3(getRandomFloat(-1.0, 1.0), 0, getRandomFloat(-1.0, 1.0))},
         lifeTime: -1,
         particleLifeTime: 30.0,
         particleDelay: function() {
-            return (2.0-parseFloat(GetZoneConfig('cloudDensity')).clamp(0.1, 2));
+            return (2.0-parseFloat(getZoneConfig('cloudDensity')).clamp(0.1, 2));
         },
         particleStartScale: function(p){
             var scale = getRandomFloat(3, 2);
-            var tex = textureHandler.GetTexture('images/' + p.texture + '.png', true);
+            var tex = textureHandler.getTexture('images/' + p.texture + '.png', true);
             return new THREE.Vector2((tex.image.width/16)*scale, (tex.image.height/16)*scale);
         },
         particleOpacity: function(p){return (ParticleFunctions.OpacityLifeTime(p, 0.02, 0.98))*0.5;}

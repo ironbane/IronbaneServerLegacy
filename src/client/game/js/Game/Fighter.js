@@ -192,7 +192,7 @@ var Fighter = Unit.extend({
 
         ironbane.scene.add(me.mesh);
     },
-    UpdateWeapon: function(weapon) {
+    updateWeapon: function(weapon) {
         if (this.weaponOrigin) {
             // Possible memory leak..which one to delete?
             ironbane.scene.remove(this.weaponOrigin);
@@ -231,7 +231,7 @@ var Fighter = Unit.extend({
             },
             texture1: {
                 type: 't',
-                value: textureHandler.GetTexture(texture, true)
+                value: textureHandler.getTexture(texture, true)
             }
         };
 
@@ -577,7 +577,7 @@ var Fighter = Unit.extend({
 
             if (terrainHandler.skybox) this.weaponMesh.material.uniforms.vSun.value.copy(terrainHandler.skybox.sunVector);
 
-            //debug.SetWatch("targetWalkAngleZ", targetWalkAngleZ);
+            //debug.setWatch("targetWalkAngleZ", targetWalkAngleZ);
 
 
             DisplayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
@@ -595,7 +595,7 @@ var Fighter = Unit.extend({
             var swingRotation = (this.timers.attackStateTimer * 2) / attackSwingTime;
             if (swingRotation > 1) swingRotation = 2 - swingRotation;
             if (swingRotation <= 0) swingRotation = 0;
-            //debug.SetWatch("swingRotation", swingRotation);
+            //debug.setWatch("swingRotation", swingRotation);
 
             this.weaponPivot.rotation.x = ((swingRotation * swingXamount) + rotateX).ToRadians();
             this.weaponPivot.rotation.y = ((swingRotation * swingYamount) + rotateY).ToRadians();
@@ -676,7 +676,7 @@ var Fighter = Unit.extend({
             stepFactor = 1.0 - stepFactor;
             stepFactor = Math.max(stepFactor, 0.1);
 
-            //debug.SetWatch('stepFactor', stepFactor);
+            //debug.setWatch('stepFactor', stepFactor);
 
             if (this.walkSpriteTimer > stepFactor) {
                 this.walkSpriteTimer = 0.0;
@@ -695,7 +695,7 @@ var Fighter = Unit.extend({
         if (this.mesh) {
             this.DisplayUVFrame(this.spriteStep, this.spriteIndex, 3, 8);
         }
-        //debug.SetWatch('spriteStep', this.spriteStep);
+        //debug.setWatch('spriteStep', this.spriteStep);
     },
     SwingWeapon: function(pos, weapon) {
         if (this.timers.attackStateTimer > 0) return;
@@ -737,11 +737,11 @@ var Fighter = Unit.extend({
         this.timers.attackStateTimer = attackSwingTime;
 
     },
-    Jump: function() {
-        if (this.terrainAngle > 45 && this.position.y > GetZoneConfig('fluidLevel')) return;
+    jump: function() {
+        if (this.terrainAngle > 45 && this.position.y > getZoneConfig('fluidLevel')) return;
 
         this.velocity.y = 5;
-        if (this.position.y < GetZoneConfig('fluidLevel')) {
+        if (this.position.y < getZoneConfig('fluidLevel')) {
             this.velocity.y = 2;
         }
 
@@ -910,9 +910,19 @@ var Fighter = Unit.extend({
 
 
         if (this == ironbane.player && damage > 0) {
-            hudHandler.MakeHealthBar(true);
+            hudHandler.hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+makeHealthBar(true);
             setTimeout(function() {
-                hudHandler.MakeHealthBar(true);
+                hudHandler.hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+hideTutoriahideTutorial
+makeHealthBar(true);
             }, 100);
         }
     },
@@ -970,9 +980,9 @@ var Fighter = Unit.extend({
                 })(this);
             }
             if (this == ironbane.player && damage > 0) {
-                hudHandler.MakeArmorBar(true);
+                hudHandler.makeArmorBar(true);
                 setTimeout(function() {
-                    hudHandler.MakeArmorBar(true);
+                    hudHandler.makeArmorBar(true);
                 }, 100);
             }
         }

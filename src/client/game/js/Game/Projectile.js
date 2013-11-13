@@ -120,7 +120,7 @@ var Projectile = Unit.extend({
 
         this.weapon = null;
         if ( this.owner == ironbane.player ) {
-            this.weapon = ironbane.player.GetEquippedWeapon();
+            this.weapon = ironbane.player.getEquippedWeapon();
             this.weaponTemplate = items[this.weapon.template];
         }
         else if (!(this.owner.isPlayer())) {
@@ -251,7 +251,7 @@ var Projectile = Unit.extend({
         this.mesh.add(this.meshChild);
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
-            var mat = textureHandler.GetTexture(ProjectileTypeEnum.ARROW.texture.FULL , false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.getTexture(ProjectileTypeEnum.ARROW.texture.FULL , false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -272,7 +272,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI/2;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.ARROW.texture.BACK, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.BACK, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -281,7 +281,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.ARROW.texture.HEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.HEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -293,7 +293,7 @@ var Projectile = Unit.extend({
         }
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.BONE ) {
-            var mat = textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.FULL, false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.FULL, false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -315,7 +315,7 @@ var Projectile = Unit.extend({
             this.meshChild.add(mesh);
 
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -324,7 +324,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.GetTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -341,7 +341,7 @@ var Projectile = Unit.extend({
 
             var texture = 'images/items/'+weaponImage+'.png';
 
-            var mat = textureHandler.GetTexture(texture, false, {transparent:true, doubleSided:true});
+            var mat = textureHandler.getTexture(texture, false, {transparent:true, doubleSided:true});
 
             var planeGeo = new THREE.PlaneGeometry(1,1, 1, 1);
 
@@ -423,7 +423,7 @@ var Projectile = Unit.extend({
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
                             && u != ironbane.player
-                            && unit.InRangeOfUnit(u, 1)
+                            && unit.inRangeOfUnit(u, 1)
                             && u.health > 0
                             && (u.id < 0 || (u.isPlayer() && unit.weapon.attr1 <= 0))
                             && (u.isPlayer() || !u.template.friendly) ){
@@ -436,7 +436,7 @@ var Projectile = Unit.extend({
                         socketHandler.socket.emit('hit', {w:unit.weapon.id,l:list}, function (reply) {
 
                             if ( !_.isUndefined(reply.errmsg) ) {
-                                hudHandler.MessageAlert(reply.errmsg);
+                                hudHandler.messageAlert(reply.errmsg);
                                 return;
                             }
 
@@ -463,7 +463,7 @@ var Projectile = Unit.extend({
                     (function(unit){
                     var list = [];
 
-                    if ( unit.InRangeOfUnit(ironbane.player, 1) ) {
+                    if ( unit.inRangeOfUnit(ironbane.player, 1) ) {
                         list.push(ironbane.player);
                     }
 
@@ -471,7 +471,7 @@ var Projectile = Unit.extend({
                         socketHandler.socket.emit('ghit', {w:unit.weapon.id,o:unit.owner.id}, function (reply) {
 
                             if ( !_.isUndefined(reply.errmsg) ) {
-                                hudHandler.MessageAlert(reply.errmsg);
+                                hudHandler.messageAlert(reply.errmsg);
                                 return;
                             }
 
@@ -495,7 +495,7 @@ var Projectile = Unit.extend({
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
                             && u != unit.owner
-                            && unit.InRangeOfUnit(u, 1)
+                            && unit.inRangeOfUnit(u, 1)
                             && u.health > 0
                             && unit.weapon.attr1 <= 0){
                             list.push(u);
