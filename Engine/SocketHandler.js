@@ -45,7 +45,7 @@ var SocketHandler = Class.extend({
             // Link the unit with the player ID
             unit.playerID = req.user ? req.user.id : 0; // either authenticated user or guest, don't trust the client data
             unit.isGuest = !!!req.user;
-            unit.editor = (req.user && req.user.editor === 1);
+            unit.editor = !!(req.user && req.user.editor === 1);
 
             // Provide a circular reference
             socket.unit = unit;

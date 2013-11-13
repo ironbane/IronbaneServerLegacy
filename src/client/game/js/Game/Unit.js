@@ -190,7 +190,14 @@ var Unit = PhysicsObject.extend({
     this.AddShadow();
   },
   isPlayer: function(){
-    return this instanceof Player;
+    // This only checks if units are networked players
+    // The actual Player class is the one which us used to control the main character
+    // on the client. This class will also return true for isPlayer
+    // If you want to check for the current player (the character of the client) use isMainPlayer
+    return this.id > 0;
+  },
+  isMainPlayer: function() {
+    return ironbane.player === this;
   },
   renderNameMesh: function(name) {
 
@@ -298,11 +305,11 @@ var Unit = PhysicsObject.extend({
     // When are we allowed to jump?
     _.each(this.timers, function(value, timer) {
       if(value>0){
-        
+
         this.timers[timer] -= dTime;
       }
     }, this);
-    
+
 
     //move this to Player.js
     if ( this instanceof Player &&
@@ -327,7 +334,7 @@ var Unit = PhysicsObject.extend({
 
 
     if ( ironbane.player && this instanceof Fighter) {
-      if ( this.isPlayer() ) {
+      if ( this.isMainPlayer() ) {
         this.unitStandingOn = null;
       }
       else {
@@ -348,7 +355,7 @@ var Unit = PhysicsObject.extend({
 
       // For all server-controlled units, simulate their actual position by walking to their targetPosition
       // instead of laggy teleports all the time
-      if ( !(this.isPlayer()) && !(this instanceof Projectile) ) {
+      if ( !(this.isMainPlayer()) && !(this instanceof Projectile) ) {
 
         if ( !(le("mpTransformMode")
             && ironbane.newLevelEditor
@@ -427,7 +434,7 @@ var Unit = PhysicsObject.extend({
         // Only for the player to reduce performance
         // NPC's use waypoints and other players should do their own local collision detection
         // Will make cheaters easier to spot
-        if ( (this.isPlayer()) || (this instanceof Projectile && !this.impactDone) ) {
+        if ( (this.isMainPlayer()) || (this instanceof Projectile && !this.impactDone) ) {
           var tVel = this.velocity.clone();
           tVel.y = 0;
           tVel.normalize();
@@ -502,7 +509,7 @@ var Unit = PhysicsObject.extend({
                 raycastGroundPosition = point;
 
 
-                 if ( (this.isPlayer() || this instanceof Projectile) ) {
+                 if ( (this.isMainPlayer() || this instanceof Projectile) ) {
                    if ( struckUnit instanceof DynamicMesh ) {
 
                        this.unitStandingOn = struckUnit;
@@ -594,7 +601,7 @@ var Unit = PhysicsObject.extend({
 
         // Collide against meshes to the top
         // Only for the player
-        if ( this.isPlayer() || (this instanceof Projectile && !this.impactDone) ) {
+        if ( this.isMainPlayer() || (this instanceof Projectile && !this.impactDone) ) {
           ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0, 0.8, 0)), new THREE.Vector3(0, 1, 0));
 
           var intersects = terrainHandler.RayTest(ray, {
