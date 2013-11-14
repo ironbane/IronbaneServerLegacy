@@ -22,6 +22,7 @@ IronbaneApp
                 '<input chat-input type="text" name="chatInput" id="chatInput" class="iinput">',
             '</div>'
         ].join(''),
+        scope: true,
         link: function(scope, el, attrs) {
             scope.messages = [];
 
@@ -51,7 +52,7 @@ IronbaneApp
 
             el.on('show', function() {
                 scope.$apply(function() {
-                    scope.showMe = true;
+                    scope.showChatWindow = true;
                     $timeout(function() {
                         scroller.reinitialise();
                         scroller.scrollToBottom();
@@ -61,7 +62,7 @@ IronbaneApp
 
             el.on('hide', function() {
                 scope.$apply(function() {
-                    scope.showMe = false;
+                    scope.showChatWindow = false;
                 });
             });
 
