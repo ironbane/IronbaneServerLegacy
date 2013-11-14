@@ -542,14 +542,42 @@ var HUDHandler = Class.extend({
             vendor = $("#vendorBar").data('vendor');
 
         var data = {
-            npcID: vendor.id,
-            itemID: item.id,
-            slotNumber: slot.data('slot')
+            vendorId: vendor.id,
+            itemId: item.id,
+            slot: slot.data('slot')
         };
 
         console.log('onVendorSlotDrop', slot, dropped, item, vendor, data);
 
+        socketHandler.socket.emit('sellItem', data, function(response) {
+            if(response.errmsg) {
+                HUD.messageAlert(response.errmsg);
+            } else {
+                // success!
 
+                // delete the old draggable node
+                HUD.clearInvSlot(item.slot);
+
+                if (item.equipped) {
+                    if (item.type === 'armor') {
+                        ironbane.player.UpdateAppearance();
+                        HUD.makeArmorBar();
+                    }
+                    if (item.type === 'weapon' || item.type === 'tool') {
+                        ironbane.player.updateWeapon(0);
+                    }
+                }
+
+                // create the item in the vendor
+                item.slot = slot.data('slot');
+                item.equipped = 0;
+                item.owner = vendor.id;
+                HUD.fillVendorSlot(item);
+
+                // success! - all items sent because gold bags will get auto adjusted
+                HUD.showInv({slots: 10, items: response.items});
+            }
+        });
     },
     makeBankSlots: function(num) {
         var HUD = this,
@@ -664,95 +692,6 @@ var HUDHandler = Class.extend({
         if(item.type === 'cash') {
             HUD.makeCoinBar(true);
         }
-    },
-    PutItem: function(startItem, slotNumber, slotID, acceptOffer) {
-        // We put something from the inventory to the loot
-        var data = {
-            "npcID": ironbane.player.lootUnit.id,
-            "slotNumber": slotNumber,
-            "itemID": startItem.id
-        };
-
-        if (!_.isUndefined(acceptOffer)) {
-            data.acceptOffer = true;
-        }
-        socketHandler.socket.emit('putItem', data, function(reply) {
-            //console.log('putItem reply', reply);
-            if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.messageAlert(reply.errmsg);
-                // Teleport back!
-                TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
-                //if ( switchItem ) TeleportElement('li'+switchItem.id, 'ls'+switchItem.slot);
-                return;
-            }
-
-            if (!_.isUndefined(reply.offeredPrice)) {
-
-                var goldPieces = hudHandler.GetStatContent(1, 'misc/coin_medium', 1, true, true);
-
-                var doReturn = false;
-
-                hudHandler.messageAlert('I\'d offer <span style="color:rgb(255, 215, 0)">' + reply.offeredPrice + ' x ' + goldPieces + '</span> for yer ' + items[startItem.template].name + '. What do ye think?', 'question', function() {
-                    hudHandler.PutItem(startItem, slotNumber, slotID, true);
-                }, function() { // Teleport back!
-                    TeleportElement('ii' + startItem.id, 'is' + startItem.slot);
-                    ironbane.unitList.push(new ChatBubble(ironbane.player.lootUnit, "Then take yer stuff with ye!"));
-                });
-                return;
-            }
-
-            // because money bags may have been adjusted, entire inventory is sync'd up
-            if (_.isArray(reply.items)) {
-                socketHandler.playerData.items = reply.items;
-                //hudHandler.ReloadInventory();
-                hudHandler.makeCoinBar(true);
-
-                // Remove the loot bag
-                $('#lootBag').hide();
-
-                // Todo: remove the items via UI
-                for (var i = 0; i < ironbane.player.lootItems.length; i++) {
-                    var lootItem = ironbane.player.lootItems[i];
-
-                    $('#li' + lootItem.id).remove();
-
-                    if (currentHoverDiv === 'li' + lootItem.id) {
-                        $('#tooltip').hide();
-                    }
-                }
-
-                ironbane.player.lootItems = [];
-                ironbane.player.canLoot = false;
-                ironbane.player.lootUnit = null;
-            }
-
-            // Delete from playerData
-            socketHandler.playerData.items = _.without(socketHandler.playerData.items, startItem);
-            ironbane.player.lootItems.push(startItem);
-
-            // If it was armor, update our appearance
-            if (startItem.equipped) {
-                if (items[startItem.template].type === 'armor') {
-                    ironbane.player.UpdateAppearance();
-                }
-                if (items[startItem.template].type === 'weapon') {
-                    ironbane.player.updateWeapon(0);
-                }
-            }
-
-            startItem.equipped = 0;
-
-            startItem.slot = slotNumber;
-
-            // Adjust the DOM element's name from ii to li
-            $('#ii' + startItem.id).attr('id', 'li' + startItem.id);
-
-            // Do the UI actions
-            TeleportElement('li' + startItem.id, slotID);
-
-            soundHandler.Play(ChooseRandom(["bag1"]));
-
-        });
     },
     // this is a combined vendor / loot bag method, should be split
     lootItem: function(switchItem, startItem, slotNumber) {

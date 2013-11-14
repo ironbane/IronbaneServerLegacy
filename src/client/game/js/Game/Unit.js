@@ -296,10 +296,14 @@ var Unit = PhysicsObject.extend({
     this._super();
 
   },
-  displayUVFrame: function(indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror) {
-    if  ( !this.mesh ) return;
-    displayUVFrame(this.mesh, indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror);
-  },
+    displayUVFrame: function(indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror) {
+        if (!this.mesh) {
+            return;
+        }
+
+        // this method is a "shared" method, todo: factor it locally?
+        DisplayUVFrame(this.mesh, indexH, indexV, numberOfSpritesH, numberOfSpritesV, mirror);
+    },
   tick: function(dTime) {
 
     _.each(this.timers, function(value, timer) {

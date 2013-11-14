@@ -580,7 +580,7 @@ var Fighter = Unit.extend({
             //debug.setWatch("targetWalkAngleZ", targetWalkAngleZ);
 
 
-            displayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
+            DisplayUVFrame(this.weaponMesh, 0, 0, 1, 1, true);
 
 
             //this.weaponPivot.rotation.z = Math.cos(time);

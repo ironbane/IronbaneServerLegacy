@@ -880,6 +880,94 @@ var SocketHandler = Class.extend({
                 reply({items: player.items});
             });
 
+            socket.on('sellItem', function(data, reply) {
+                if(!_.isFunction(reply)) {
+                    log('sellItem: no callback!');
+                    return;
+                }
+
+                var player = socket.unit;
+                if(!player) {
+                    reply({errmsg: 'invalid player!!'});
+                    return;
+                }
+
+                var vendorId = data.vendorId,
+                    itemId = data.itemId,
+                    targetSlot = data.slot;
+
+                var vendor = worldHandler.FindUnitNear(vendorId, player);
+                if(!vendor) {
+                    reply({errmsg: 'vendor has gone away!'});
+                    return;
+                }
+
+                if(_.find(vendor.loot, function(i) {
+                    return i.slot === targetSlot;
+                })) {
+                    reply({errmsg: 'target slot not empty!'});
+                    return;
+                }
+
+                // todo: remove this check to allow other types of "shops"??
+                if(vendor.template.type !== UnitTypeEnum.VENDOR) {
+                    reply({errmsg: 'unit is not a vendor!'});
+                    return;
+                }
+
+                var item = _.find(player.items, function(i) {
+                    return i.id === itemId;
+                });
+
+                if(!item) {
+                    reply({errmsg: 'item to sell not found!'});
+                    return;
+                }
+
+                if(item.value <= 0) {
+                    reply({errmsg: 'I don\'t buy that!'});
+                    return;
+                }
+
+                var offeredPrice = Math.max(Math.floor(item.value * 0.5), 1);
+                if(vendor.data && vendor.data.buyPercentage) {
+                    offeredPrice = Math.max(Math.floor(item.value * vendor.data.buyPercentage), 1);
+                }
+
+                // proceed with the selling!
+                item.owner = vendor.id;
+                item.slot = targetSlot;
+
+                // If it was equipped and type was armor/weapon, update the appearance
+                if (item.equipped) {
+                    if (item.getType() === 'armor') {
+                        player.UpdateAppearance(true);
+                    }
+                    if (item.getType() === 'weapon' || item.getType() === 'tool') {
+                        player.EmitNearby("updateWeapon", {
+                            id: player.id,
+                            weapon: 0
+                        });
+                    }
+                }
+                item.equipped = 0;
+
+                // we need to remove the item first or else the player might not have room for money bag
+                vendor.loot.push(item);
+                player.items = _.without(player.items, item);
+
+                // Give the player the original price
+                player.addCoins(offeredPrice);
+
+                vendor.Say(_.sample(["A pleasure doing business!", "Ye got a good deal!", "'Tis most splendid!"]));
+
+                // update everyone around who might also be looking
+                player.EmitNearby("updateVendor", {id: vendor.id, loot: vendor.loot}, 20, true);
+
+                // reply with full player item list as gold may have changed (todo: optimize delta?)
+                reply({items: player.items});
+            });
+
             socket.on("lootItem", function (data, reply) {
                 if (!_.isFunction(reply)) {
                     log('lootItem no callback defined!');
