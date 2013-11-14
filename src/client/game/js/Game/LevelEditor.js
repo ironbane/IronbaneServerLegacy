@@ -390,6 +390,13 @@ var EditorGUI = function() {
 
   };
 
+    // launch the npc editor dialog
+    this.npcShowEditor = function() {
+        $('#NPCEditor').scope().$apply(function(scope) {
+            scope.showNpcEditor = true;
+        });
+    };
+
 
   this.selectTile = function() {
 
@@ -724,8 +731,9 @@ var LevelEditor = Class.extend({
     //var fObjectPlacer = this.editorGUI.gui.addFolder('Object Placer');
     var fModelPlacer = this.editorGUI.gui.addFolder('Model Placer');
     var fModelPainter = this.editorGUI.gui.addFolder('Model Painter');
-    var fEntityPlacer = this.editorGUI.gui.addFolder('Entity Placer');
     var fNPCEditor = this.editorGUI.gui.addFolder('NPC Editor');
+    var fEntityPlacer = this.editorGUI.gui.addFolder('Entity Placer');
+
     var fPathPlacer = this.editorGUI.gui.addFolder('Path Placer');
 
 
@@ -831,15 +839,11 @@ var LevelEditor = Class.extend({
 
     guiControls['enableNPCEditor'] = fNPCEditor.add(this.editorGUI, 'enableNPCEditor');
     guiControls['neDeleteMode'] = fNPCEditor.add(this.editorGUI, 'neDeleteMode');
-
-
-
     guiControls['npcTemplate'] = fNPCEditor.add(this.editorGUI, 'npcTemplate', Object.keys(unitTemplates).sort());
-
     guiControls['npcParam'] = fNPCEditor.add(this.editorGUI, 'npcParam');
-
     fNPCEditor.add(this.editorGUI, 'addNPC');
     //        fNPCEditor.add(this.editorGUI, 'editNPC');
+    guiControls['npcShowEditor'] = fNPCEditor.add(this.editorGUI, 'npcShowEditor');
 
     guiControls['tpPlayerName'] = fTeleport.add(this.editorGUI, 'tpPlayerName');
     guiControls['tpZone'] = fTeleport.add(this.editorGUI, 'tpZone', zoneSelection);

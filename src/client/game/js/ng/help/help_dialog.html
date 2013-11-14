@@ -1,0 +1,16 @@
+<div class="dialog editorDialog">
+    <header>
+        <button class="dialog-close" ng-click="showHelpDialog=false;">x</button>
+        <div class="inner">
+            <strong>Game Help</strong>
+        </div>
+    </header>
+    <div class="help-navigation">
+        <ul>
+            <li><a href="" ng-click="helpTemplate='/game/templates/help_controls.html'">Controls</a></li>
+            <li><a href="" ng-click="helpTemplate='/game/templates/help_chat.html'">Chat Commands</a></li>
+            <li><a href="" ng-click="helpTemplate='/game/templates/help_admin.html'">Admin Functions</a></li>
+        </ul>
+    </div>
+    <div class="help-contents" ng-include="helpTemplate"></div>
+</div>

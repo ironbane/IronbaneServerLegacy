@@ -1,0 +1,46 @@
+<div class="dialog editorDialog">
+    <header>
+        <button class="dialog-close" ng-click="showNpcEditor=false;">x</button>
+        <div class="inner">
+            <strong>NPC Editor <span ng-show="unit.$template.type">[{{ getUnitType(unit.$template.type) }}]</span></strong>
+        </div>
+    </header>
+    <form name="unitEditorForm" novalidate class="body">
+        <div class="control-group">
+            <label for="unitId">ID</label>
+            <input type="text" name="unitId" id="unitId" ng-model="unit.id" /><button ng-click="load(unit.id)">Load</button>
+            <label for="unitTemplate">Template</label>
+            <select id="unitTemplate" name="unitTemplate" ng-model="unit.$template" ng-options="t.name for t in templates"></select>
+        </div>
+        <div class="control-group">
+            <label>Postion</label>{
+            <label>X:</label><input type="number" step="any" ng-model="unit.x" />
+            <label>Y:</label><input type="number" step="any" ng-model="unit.y" />
+            <label>Z:</label><input type="number" step="any" ng-model="unit.z" />}
+        </div>
+        <div ng-switch="getUnitType(unit.$template.type)">
+            <label>Data</label>
+            <hr>
+            <table class="property-table" ng-switch-when="TRIGGER">
+                <tr>
+                    <td>Name:</td><td><input type="text" ng-model="unit.data.name" /></td>
+                </tr>
+                <tr>
+                    <td>Script:</td><td><input type="text" ng-model="unit.data.script" /></td>
+                </tr>
+                <tr>
+                    <td>Range:</td><td><input type="number" step="any" ng-model="unit.data.range" /></td>
+                </tr>
+                <tr>
+                    <td>Interval:</td><td><input type="number" step="any" ng-model="unit.data.triggerInterval" /></td>
+                </tr>
+            </div>
+        </div>
+    </form>
+    <footer>
+        <button>Save</button>
+        <button>New</button>
+        <button>Duplicate</button>
+        <button>Delete</button>
+    </footer>
+</div>

@@ -82,6 +82,15 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/filters/timeSince.js",
                     "<%= gameScriptPath %>/ng/filters/mouthwash.js",
 
+                    "<%= gameScriptPath %>/ng/unit/unit.js",
+                    "<%= gameScriptPath %>/ng/unit/unit.svc.js",
+                    "<%= gameScriptPath %>/ng/unit/unitTemplate.js",
+                    "<%= gameScriptPath %>/ng/unit/unitTemplate.svc.js",
+
+                    "<%= gameScriptPath %>/ng/editor/npc/npc_editor.js",
+
+                    "<%= gameScriptPath %>/ng/help/help_dialog.js",
+
                     // Shared between client and server
                     "Shared/Util.js",
                     "Shared/Shared.js",
@@ -249,7 +258,7 @@ module.exports = function(grunt) {
                     cwd: 'src/client/common',
                     expand: true
                 }, {
-                    src: 'src/client/game/js/ng/templates/*',
+                    src: 'src/client/game/js/ng/**/*.html',
                     dest: '<%= cfg.get("buildTarget") %>game/templates/',
                     expand: true,
                     flatten: true

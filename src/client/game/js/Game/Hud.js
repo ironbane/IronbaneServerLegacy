@@ -472,6 +472,8 @@ var HUDHandler = Class.extend({
                     _.partial(HUD.onVendorSlotDrop, e, ui, HUD)();
                 },
                 greedy: true,
+                hoverClass: 'dragon-hover',
+                tolerance: 'touch',
                 accept: '.invSlotItem' // only allow inv for sales, no vendor rearranging
             });
             slot.click(function() {

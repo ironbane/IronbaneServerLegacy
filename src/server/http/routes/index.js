@@ -13,6 +13,7 @@ module.exports = function(app, db) {
     require('./forum')(app, db);
     require('./articles')(app, db);
     require('./items')(app,db);
+    require('./units')(app, db);
     require('./messages')(app,db);
 
     if(config.get('github').enabled) {

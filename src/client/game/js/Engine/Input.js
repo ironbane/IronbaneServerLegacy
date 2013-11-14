@@ -49,6 +49,13 @@ $(document).keydown(function(event) {
         return;
     }
 
+    // H - HELP
+    if(event.keyCode === 72) {
+        $('#helpDialog').scope().$apply(function(scope) {
+            scope.showHelpDialog = !!!scope.showHelpDialog;
+        });
+    }
+
     // ITEM SLOT HOTKEYS
     if (ironbane.player) {
         if (event.keyCode === 49) {
