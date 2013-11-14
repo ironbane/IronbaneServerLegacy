@@ -24,6 +24,7 @@ var Waypoint = Billboard.extend({
         this._super(position, 0, id, TEXTURE_WAYPOINT, true, -id);
         this.enableGravity = false;
         this.dynamic = true;
+        this.enableShadow = false;
     }
 });
 
