@@ -29,7 +29,7 @@ IronbaneApp
             var width = Math.floor($(window).width() * 0.4);
             el.css({
                 width: width + 'px',
-                left: ($(window).width() - width - 8) + 'px',
+                right: '8px',
                 top: '8px'
             });
 
