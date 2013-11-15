@@ -1,8 +1,9 @@
 <div>
     <h2>{{ article.title }}</h2>
     <form name="articleForm">
-        <input type="text" name="title" ng-model="title" required />
-        <mark-it-up lang="markdown" ng-model="body"></mark-it-up>
+        <input type="text" name="title" ng-model="article.title" required />
+        <input type="text" name="articleId" ng-model="article.articleId" required />
+        <mark-it-up lang="markdown" ng-model="article.body"></mark-it-up>
         <button ng-click="save()">Save</button>
     </form>
 </div>

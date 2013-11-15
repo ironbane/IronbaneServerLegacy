@@ -20,6 +20,15 @@ var Article = function(json) {
              });
     };
 
+    Article.prototype.save = function(){
+        return $http.post('/api/article/'+this.articleId, {title: this.title, body: this.body})
+            .then(function(response){
+                return response;
+            }, function(error) {
+                return $q.reject("error saving article");
+            });
+    };
+
     Article.getAll = function(){
         return $http.get('/api/article')
         .then(function(response){

@@ -23,6 +23,24 @@ module.exports = function(app, db) {
         });
     });
 
+    app.post('/api/article/:articleId', function(req, res){
+        Article.get(req.params.articleId).then(function(article){
+            console.log("retrieved article");
+            console.log(req.body);
+            article.update({title: req.body.title, body: req.body.body, articleId: req.body.articleId}).then(function(updatedarticle){
+                console.log("updated article");
+
+                res.send(updatedarticle);
+            }, function(error){
+                console.log(error);
+                res.send(500, error);
+            });
+    }, function(err) {
+        console.log(err);
+        res.send(500, err);
+    });
+    });
+
     // get specific article (public view)
     app.get('/api/article/:articleId', function(req, res) {
         Article.get(req.params.articleId).then(function(article) {

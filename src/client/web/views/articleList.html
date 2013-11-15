@@ -4,6 +4,6 @@
 			<th>title</th>
 		<tr ng-repeat="article in articles | filter:search" >
 		<td><a ng-href="/editor/article/{{article.articleId}}">{{article.articleId}}</a></td>
-		<td><a ng-href="/editor/article/{{template.title}}">{{article.title}}</a></td>
+		<td><a ng-href="/editor/article/{{article.articleId}}">{{article.title}}</a></td>
 </tr>
 </table>

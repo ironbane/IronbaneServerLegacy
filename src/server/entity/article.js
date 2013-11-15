@@ -93,6 +93,25 @@ module.exports = function(db) {
         }
     });
 
+    Article.prototype.update = function(json){
+        var old_id = this.articleId;
+        console.log("JSON: "+JSON.stringify(json));
+        this.articleId = json.articleId;
+        this.title = json.title;
+        this.body = json.body;
+        var deferred = Q.defer();
+        db.query("UPDATE bcs_articles set ? where articleId = ?", [this.$schema(), old_id], function(err, results){
+        if(err) {
+                deferred.reject(err);
+                return;
+            }
+
+            deferred.resolve(true);
+        });
+
+        return deferred.promise;
+    }
+
     // get only the db schema elements from this instance
     Article.prototype.$schema = function() {
         return {
