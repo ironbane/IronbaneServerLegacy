@@ -549,7 +549,15 @@ var HUDHandler = Class.extend({
             slot: slot.data('slot')
         };
 
-        console.log('onVendorSlotDrop', slot, dropped, item, vendor, data);
+        //console.log('onVendorSlotDrop', slot, dropped, item, vendor, data);
+
+        if(item.type === 'cash') {
+            HUD.messageAlert('I don\'t want your blood money!');
+            // revert! todo: better way to revert
+            HUD.clearInvSlot(item.slot);
+            HUD.fillInvSlot(item);
+            return;
+        }
 
         socketHandler.socket.emit('sellItem', data, function(response) {
             if(response.errmsg) {
