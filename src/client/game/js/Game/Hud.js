@@ -808,11 +808,11 @@ var HUDHandler = Class.extend({
         }
 
         content = [
-            '<div style="min-height:20px;">',
+            '<div class="item-info-box" style="min-height:20px;">',
                 '<div style="margin-top:-3px;width:33px;height:30px;float:left;">',
                     '<img src="', itemUrl, '">',
                 '</div>',
-                '<div style="margin-top:3px;">', template.name, '</div>',
+                '<div class="item-name ' + item.type + ' ' + item.subtype + ' ' + item.rarity + '" style="margin-top:3px;">', template.name, '</div>',
             '</div>',
             itemInfo
         ].join('');

@@ -50,6 +50,9 @@ var Item = Class.extend({
 
         // id is really only useful while the game is running, this id should *not* be persisted
         this.id = ID++;
+
+        // set this so it gets sent down to the client (methods dont)
+        this.rarity = this.getRarity();
     },
     // these getters setup so that the item instance could in the future have values
     // not on the template, but in the data JSON
@@ -64,6 +67,51 @@ var Item = Class.extend({
     },
     getBaseValue: function() {
         return this.$template.basevalue;
+    },
+    getRarity: function() {
+        var item = this,
+            rValue = 0;
+
+        if(item.getType() === 'weapon') {
+            rValue = ((item.$template.delay - 1) * -2) + item.$template.attr1 * 0.5;
+            //console.log('WEAPON: ', item.$template.name, rValue);
+            if(rValue <= 1) {
+                return "weak";
+            }
+            if(rValue > 1 && rValue <= 2) {
+                return "normal";
+            }
+            if(rValue > 2 && rValue <= 3) {
+                return "strong";
+            }
+            if(rValue > 3 && rValue <= 5) {
+                return "epic";
+            }
+            if(rValue > 5) {
+                return "legendary";
+            }
+        }
+
+        if(item.getType() === 'armor') {
+            rValue = item.$template.attr1 * (item.getSubType() === 'body' ? 0.5 : 0.75);
+            if(rValue <= 2) {
+                return "weak";
+            }
+            if(rValue > 2 && rValue <= 3.5) {
+                return "normal";
+            }
+            if(rValue > 3.5 && rValue <= 5) {
+                return "strong";
+            }
+            if(rValue > 3.5 && rValue <= 6) {
+                return "epic";
+            }
+            if(rValue > 6) {
+                return "legendary";
+            }
+        }
+
+        return 'normal';
     }
 });
 

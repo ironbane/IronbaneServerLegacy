@@ -16,6 +16,18 @@
 @buttonAttentionTextColor:      #A9F8FC;
 @buttonDisabledTextColor:       #06452d;
 
+// WEAPON STR COLORS
+//Weak Weapon = 0-1p  key grey is 636363
+//Normal Weapon = 1-2p black 000000
+//Strong Weapon = 2-3p dark red 591818
+//Epic Weapon = 3-5p light blue 67AEBC
+//Legendary Weapon = 5p> Ib color 0CAC53
+@rarity_weak: #636363;
+@rarity_normal: #000000;
+@rarity_strong: #591818;
+@rarity_epic: #67aebc;
+@rarity_legendary: #0CAC53;
+
 .OffScreen {
     position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
 }
@@ -37,6 +49,26 @@ a {
     color: #66ff66;
     &:hover {
         text-decoration: underline;
+    }
+}
+
+.item-info-box {
+    .item-name {
+        &.weak {
+            color: @rarity_weak;
+        }
+        &.normal {
+            color: @rarity_normal;
+        }
+        &.strong {
+            color: @rarity_strong;
+        }
+        &.epic {
+            color: @rarity_epic;
+        }
+        &.legendary {
+            color: @rarity_legendary;
+        }
     }
 }
 
