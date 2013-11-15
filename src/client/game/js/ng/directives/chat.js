@@ -99,7 +99,7 @@ IronbaneApp
         }
     };
 }])
-.directive('chatMessage', ['$log', '$compile', 'DEATH_MESSAGES', function($log, $compile, DEATH_MESSAGES) {
+.directive('chatMessage', ['$log', '$compile', 'DEATH_MESSAGES', '$filter', function($log, $compile, DEATH_MESSAGES, $filter) {
     // logic for all of the different types of messages that are supported
     var templates = {
         welcome: '<div style="color:#46fc52;"><span>Hey there, {{ data.user.name }}</span><br>Players online: <span ng-repeat="user in data.online" class="name {{user.rank}}" ng-class="{delim: !$last}">{{ user.name }}</span><br>Use /help for all keys and commands.</div>',
@@ -107,7 +107,7 @@ IronbaneApp
         died: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by <span class="name {{ data.killer.rank }}">{{ data.killer.name }}.</span>',
         diedspecial: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by {{ data.cause }}.',
         leave: '<div><span class="name {{ data.user.rank }}">{{ data.user.name }}</span> has left the game.</div>',
-        say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
+        say: '<div><span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <<message>> </div>',
         "say:targetted": '<div><span class="target">[{{ data.target }}]</span> <span class="name {{ data.user.rank }}"><{{ data.user.name }}></span> <span ng-bind-html="data.message | mouthwash"></span></div>',
         "announce": '<div class="message announce {{ data.target }}" ng-style="{color: data.message.color}" ng-bind-html="data.message.text | mouthwash"></div>',
         "default": '<div class="message">{{ data.message | mouthwash }}</div>'
@@ -159,9 +159,39 @@ IronbaneApp
                 scope.data.target = scope.data.type.split(':')[1];
             }
 
-            el.html(getTemplate(scope.type));
+            // replace smileys, this requires "unsafe" html, should be getting scrubbed on the server tho
+            if(angular.isString(scope.data.message)) {
+                // clean it first, then replace!
+                scope.data.message = $filter('mouthwash')(scope.data.message);
+                scope.data.message = scope.data.message.replace(/\:\)/g, '<emoticon type="smiley"></emoticon>');
+                scope.data.message = scope.data.message.replace(':facebook:', '<i style="color:royalblue;" class="fa fa-facebook"></i>');
+                scope.data.message = scope.data.message.replace(':twitter:', '<i style="color:powderblue;" class="fa fa-twitter"></i>');
+            }
+
+            var template = getTemplate(scope.type);
+
+            // experimental hack to render some angular smileys
+            if(scope.type === 'say') {
+                template = template.replace('<<message>>', scope.data.message);
+            }
+
+            el.html(template);
 
             $compile(el.contents())(scope);
+        }
+    };
+}])
+.directive('emoticon', ['$log', function($log) {
+    return {
+        restrict: 'E',
+        replace: true,
+        scope: {
+            type: '='
+        },
+        template: '<img ng-src="{{ smile }}"/>',
+        link: function(scope, el, attrs) {
+            // todo: test on scope.type
+            scope.smile = '/game/images/misc/emotes/icon_smile.gif';
         }
     };
 }])
