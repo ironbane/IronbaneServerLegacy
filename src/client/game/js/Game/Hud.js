@@ -1074,7 +1074,7 @@ var HUDHandler = Class.extend({
         hudHandler.makeHealthBar(true);
         $("#coinBar").show();
         $("#statBar").show();
-        $('#chatContent').trigger('show');
+        $('#chatContent').show().trigger('show');
     },
     HideMenuScreen: function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
@@ -1083,7 +1083,7 @@ var HUDHandler = Class.extend({
     ShowMenuScreen: function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('.dragon-bar, #coinBar, #statBar').hide();
-        $('#chatContent').trigger('hide');
+        $('#chatContent').hide().trigger('hide');
         soundHandler.FadeIn("music/maintheme", 5000);
     },
     GetLastCharacterPlayed: function() {
