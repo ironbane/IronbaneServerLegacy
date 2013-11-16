@@ -586,6 +586,8 @@ var HUDHandler = Class.extend({
 
                 // success! - all items sent because gold bags will get auto adjusted
                 HUD.showInv({slots: 10, items: response.items});
+                socketHandler.playerData.items = response.items;
+                HUD.makeCoinBar(true);
             }
         });
     },
