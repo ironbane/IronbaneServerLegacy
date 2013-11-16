@@ -773,13 +773,18 @@ var Fighter = Unit.extend({
     },
     GetMeleeHit: function(attacker, power) {
         if (attacker) {
-            if (attacker.isPlayer() && this.isPlayer()) return;
+            if (attacker.isPlayer() && this.isPlayer()) {
+                return;
+            }
+
             // We can't hit dead people
-            if (this.dead) return;
+            if (this.dead) {
+                return;
+            }
 
-
-            if (attacker !== ironbane.player) attacker.swingWeapon(this.position, attacker.weaponTemplate);
-
+            if (attacker !== ironbane.player) {
+                attacker.swingWeapon(this.position, attacker.weaponTemplate);
+            }
 
             power = power || 0.3;
 
@@ -792,14 +797,11 @@ var Fighter = Unit.extend({
             force.y = power;
 
             this.renderOffset = force;
-
         }
 
         if (this.health <= 0) {
-
             this.playSound("battle/die");
             this.die();
-
         } else {
             this.playSound("battle/hit");
         }
@@ -810,7 +812,7 @@ var Fighter = Unit.extend({
         soundHandler.Play(sound, this.position);
 
     },
-    Die: function(noParticle) {
+    die: function(noParticle) {
         noParticle = noParticle || false;
 
         this.mesh.visible = false;
