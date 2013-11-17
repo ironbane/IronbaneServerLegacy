@@ -22,6 +22,7 @@ npm cache clean -f
 npm install -g n ( If your system already has vim this can give an error )
 n stable
 
+
 npm -g install forever
 
 ( Install mysql and gm )
