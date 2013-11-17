@@ -125,7 +125,6 @@ var Fighter = Actor.extend({
 	    }
 
             if (victim.isPlayer() && hurt === false) {
-		console.log('heal ' + damage + ' ' + hurt);
                 victim.health += Math.abs(damage);
                 victim.health = Math.min(victim.healthMax, victim.health);
 
@@ -142,7 +141,10 @@ var Fighter = Actor.extend({
                     return;
                 } else {
 			if(hurt === true) { // Only do damage if weapon doesnt heal
-				console.log('hurt ' + damage + ' ' + hurt);
+				var immune = JSON.parse(victim.template.immune); // Parse wich weapons victim is immune too
+				if(immune[weapon.$template.subtype] === true) { // Test for immunity
+					return;
+				}
 				damage = Math.abs(damage);
 				var remaining = damage - victim.armor;
 				victim.armor -= damage;
