@@ -914,7 +914,7 @@ var Fighter = Unit.extend({
         if (this == ironbane.player && damage > 0) {
             hudHandler.makeHealthBar(true);
             setTimeout(function() {
-                makeHealthBar(true);
+                hudHandler.makeHealthBar(true);
             }, 100);
         }
     },
