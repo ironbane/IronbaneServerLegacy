@@ -11,14 +11,15 @@ module.exports = function(app, db) {
         webPath = config.get('buildTarget') + 'web/';
 
     // legacy media
+    var month = 1000 * 60 * 60 * 24 * 30;
     app.use('/game/data', express.static(gamePath + 'data'));
-    app.use('/game/images', express.static(gamePath + 'images'));
-    app.use('/game/sound', express.static(gamePath + 'sound'));
+    app.use('/game/images', express.static(gamePath + 'images', { maxAge: month }));
+    app.use('/game/sound', express.static(gamePath + 'sound', { maxAge: month }));
 
     app.use('/game/css', express.static(gamePath + 'css'));
-    app.use('/game/fonts', express.static(gamePath + 'fonts'));
-    app.use('/game/flash', express.static(gamePath + 'flash'));
-    app.use('/game/media', express.static(gamePath + 'media'));
+    app.use('/game/fonts', express.static(gamePath + 'fonts', { maxAge: month }));
+    app.use('/game/flash', express.static(gamePath + 'flash', { maxAge: month }));
+    app.use('/game/media', express.static(gamePath + 'media', { maxAge: month }));
     app.use('/game/js', express.static(gamePath + 'js'));
     app.use('/game/lib', express.static(gamePath + 'lib'));
 
@@ -41,6 +42,8 @@ module.exports = function(app, db) {
             res.send(500, 'missing required param i');
             return;
         }
+
+        res.setHeader("Cache-Control", "max-age=" + month);
 
         fs.exists(path + '_big.png', function(exists) {
             if(exists) {
@@ -69,6 +72,8 @@ module.exports = function(app, db) {
             return;
         }
 
+        res.setHeader("Cache-Control", "max-age=" + month);
+
         fs.exists(path + '_medium.png', function(exists) {
             if(exists) {
                 res.sendfile(path + '_medium.png');
@@ -96,6 +101,8 @@ module.exports = function(app, db) {
             return;
         }
 
+        res.setHeader("Cache-Control", "max-age=" + month);
+
         fs.exists(path + '_medium.png', function(exists) {
             if(exists) {
                 res.sendfile(path + '_medium.png');
@@ -122,6 +129,8 @@ module.exports = function(app, db) {
             res.send(500, 'missing required param i');
             return;
         }
+
+        res.setHeader("Cache-Control", "max-age=" + month);
 
         fs.exists(path + '_medium.png', function(exists) {
             if(exists) {
@@ -161,6 +170,8 @@ module.exports = function(app, db) {
             return;
         }
 
+        res.setHeader("Cache-Control", "max-age=" + month);
+
         fs.exists(path + '_big.png', function(exists) {
             if(exists) {
                 res.sendfile(path + '_big.png');
@@ -198,6 +209,8 @@ module.exports = function(app, db) {
             res.send(500, 'missing required param i');
             return;
         }
+
+        res.setHeader("Cache-Control", "max-age=" + month);
 
         // no need to regenerate if it it already exists
         fs.exists(path + '_medium.png', function(exists) {

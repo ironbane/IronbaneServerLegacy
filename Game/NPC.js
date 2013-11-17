@@ -116,6 +116,9 @@ var NPC = Fighter.extend({
                     if (this.template.type === UnitTypeEnum.VENDOR) {
                         // Specifiy a price
                         temp.price = temp.value;
+                        if(this.data && this.data.sellPercentage) {
+                            temp.price = Math.max(Math.floor(temp.value * this.data.sellPercentage), 0.01);
+                        }
 
                         // And an owner
                         temp.owner = this.id;

@@ -980,7 +980,7 @@ var SocketHandler = Class.extend({
                 // adjust item price for selling back to the public
                 item.price = item.value;
                 if(vendor.data && vendor.data.sellPercentage) {
-                    item.price = Math.max(Math.floor(item.value * vendor.data.sellPercentage), 1);
+                    item.price = Math.max(Math.floor(item.value * vendor.data.sellPercentage), 0.01);
                 }
 
                 //console.log('buying: ', item, ' for ', offeredPrice);
