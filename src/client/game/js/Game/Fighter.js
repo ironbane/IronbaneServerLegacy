@@ -210,7 +210,7 @@ var Fighter = Unit.extend({
 
         var texture = 'images/items/' + imgWeapon + '.png';
 
-        planeGeo = new THREE.PlaneGeometry(0.6, 0.6, 1, 1);
+        var planeGeo = new THREE.PlaneGeometry(0.6, 0.6, 1, 1);
 
         uniforms = {
             uvScale: {

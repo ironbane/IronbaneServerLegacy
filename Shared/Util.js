@@ -372,7 +372,7 @@ if ( !SERVER ) {
 
     if ( ironbane.player && ironbane.player.id == id ) return ironbane.player;
 
-    for (i = 0; i < ironbane.unitList.length; i++) {
+    for (var i = 0; i < ironbane.unitList.length; i++) {
       if ( ironbane.unitList[i].id == id ) return ironbane.unitList[i];
     }
     return null;

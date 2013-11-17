@@ -608,7 +608,7 @@ var Player = Fighter.extend({
 
                 }
 
-                if (this.attackTimeout > 0.5) {
+                if (this.timers.attackTimeout > 0.5) {
                     // if ( this.targetAimHelperTexture === "aim_close" ) {
                     //   this.targetAimHelperTexture = "aim_close_fire";
                     // }

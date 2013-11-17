@@ -202,8 +202,8 @@ var Unit = PhysicsObject.extend({
   renderNameMesh: function(name) {
 
       var unit = this,
-          c = document.createElement('canvas');
-          ctx = c.getContext('2d');
+          c = document.createElement('canvas'),
+          ctx = c.getContext('2d'),
           fillText = name;
 
       c.width= 400;
