@@ -298,10 +298,66 @@ var HUDHandler = Class.extend({
         // we can drop onto inventory from a vendor, loot, or bank (currently) OR itself
         var slot = $(e.target),
             dropped = $(e.toElement),
-            item = dropped.data('item');
+            item = dropped.data('item'),
+            occupied = slot.children().data('item');
 
         if (dropped.hasClass('lootSlotItem')) {
-            HUD.lootItem(null, item, slot.data('slot'));
+            var bag = $('#lootBar').data('bag');
+            if(occupied) {
+                if(item.type === 'cash') {
+                    socketHandler.socket.emit('stackItemSlot', {id: item.id, slot: slot.data('slot'), bag: bag.id}, function(response) {
+                        if(response.errmsg) {
+                            console.error('error stackItemSlot', response.errmsg);
+                            // revert!
+                        }
+                        // otherwise we're successful
+                        console.log('loot cash success!', response, item, occupied);
+                        HUD.clearLootSlot(item.slot);
+                        HUD.clearInvSlot(occupied.slot);
+                        HUD.fillInvSlot(response.item); // item should be updated with new "stacked" amount
+                        // update playerData (todo: make class methods, like player.getLoot)
+                        socketHandler.playerData.items = _.filter(socketHandler.playerData.items, function(i) {
+                            return i.slot !== occupied.slot;
+                        });
+                        socketHandler.playerData.items.push(response.item);
+                        HUD.makeCoinBar(true);
+
+                        if (response.loot) {
+                            ironbane.player.lootItems = response.loot;
+                        }
+                    });
+                    return;
+                } else {
+                    // should be blocked already from drag rules...
+                    // revert if not?
+                }
+            } else {
+                socketHandler.socket.emit('lootItem', {npcID: ironbane.player.lootUnit.id, switchID: 0, slotNumber: slot.data('slot'), itemID: item.id}, function(reply) {
+                    if (!_.isUndefined(reply.errmsg)) {
+                        hudHandler.messageAlert(reply.errmsg);
+
+                        // revert transaction!
+                        // showInv + loot?
+                        return;
+                    }
+
+                    if (reply.items) {
+                        socketHandler.playerData.items = reply.items;
+                    }
+
+                    if (reply.loot) {
+                        ironbane.player.lootItems = reply.loot;
+                    }
+
+                    // gotta update the bag too...? or is that being handled by lootFromBag?
+
+                    // redo the whole inv, shouldn't be necessary... punting for now
+                    HUD.showInv({slots: 10, items: reply.items});
+                    HUD.makeCoinBar(true);
+
+                    soundHandler.Play(_.sample(["bag1"]));
+                });
+            }
         }
 
         if (dropped.hasClass('bankSlotItem')) {
@@ -353,7 +409,6 @@ var HUDHandler = Class.extend({
 
         if (dropped.hasClass('invSlotItem')) {
             // dropping inv on inv means you either are swapping or stacking (gold)
-            var occupied = slot.children().data('item');
             if(occupied) {
                 if(item.type === 'cash' && occupied.type === 'cash') { // later do other stackables
                     HUD.clearInvSlot(item.slot);
@@ -428,6 +483,9 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
+    },
+    clearLootSlot: function(slotNum) {
+        $('#ls' + slotNum).empty();
     },
     // this happens when someone else nearby loots an item from something you might have open
     updateLoot: function(data) {
@@ -570,7 +628,7 @@ var HUDHandler = Class.extend({
 
                 if (item.equipped) {
                     if (item.type === 'armor') {
-                        ironbane.player.UpdateAppearance();
+                        ironbane.player.updateAppearance();
                         HUD.makeArmorBar();
                     }
                     if (item.type === 'weapon' || item.type === 'tool') {
@@ -675,7 +733,7 @@ var HUDHandler = Class.extend({
                 HUD.clearInvSlot(item.slot);
                 if (item.equipped) {
                     if (item.type === 'armor') {
-                        ironbane.player.UpdateAppearance();
+                        ironbane.player.updateAppearance();
                         HUD.makeArmorBar();
                     }
                     if (item.type === 'weapon' || item.type === 'tool') {
@@ -694,7 +752,7 @@ var HUDHandler = Class.extend({
         HUD.clearInvSlot(item.slot);
         if (item.equipped) {
             if (item.type === 'armor') {
-                ironbane.player.UpdateAppearance();
+                ironbane.player.updateAppearance();
                 HUD.makeArmorBar();
             }
             if (item.type === 'weapon' || item.type === 'tool') {
@@ -704,42 +762,6 @@ var HUDHandler = Class.extend({
         if(item.type === 'cash') {
             HUD.makeCoinBar(true);
         }
-    },
-    // this is a combined vendor / loot bag method, should be split
-    lootItem: function(switchItem, startItem, slotNumber) {
-        var HUD = this,
-            data = {
-                'npcID': ironbane.player.lootUnit.id,
-                'switchID': switchItem ? switchItem.id : 0,
-                'slotNumber': slotNumber,
-                'itemID': startItem.id
-            };
-
-        socketHandler.socket.emit('lootItem', data, function(reply) {
-            if (!_.isUndefined(reply.errmsg)) {
-                hudHandler.messageAlert(reply.errmsg);
-
-                // revert transaction!
-                // showInv + loot?
-                return;
-            }
-
-            if (reply.items) {
-                socketHandler.playerData.items = reply.items;
-            }
-
-            if (reply.loot) {
-                ironbane.player.lootItems = reply.loot;
-            }
-
-            // gotta update the bag too...? or is that being handled by lootFromBag?
-
-            // redo the whole inv, shouldn't be necessary... punting for now
-            HUD.showInv({slots: 10, items: reply.items});
-            HUD.makeCoinBar(true);
-
-            soundHandler.Play(_.sample(["bag1"]));
-        });
     },
     makeItemHover: function(targetEl, item) {
         var template = items[item.template],

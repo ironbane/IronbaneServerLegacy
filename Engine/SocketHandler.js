@@ -716,6 +716,24 @@ var SocketHandler = Class.extend({
                     // now destroy the original
                     if(bag) {
                         bag.loot = _.without(bag.loot, item);
+                        // Check if the bag is now empty
+                        // If so, remove it from the world
+                        if (bag.template.type === UnitTypeEnum.LOOTABLE) {
+                            if (bag.loot.length === 0) {
+                                if (bag.param < 10) {
+                                    bag.Remove();
+                                }
+                            } else {
+                                // Renew the lifetimer so it doesn't suddenly disappear
+                                bag.lifeTime = 0.0;
+                            }
+                        }
+
+                        // No need to refresh if the bag is not empty anymore, since it'll get deleted anyway on the client
+                        // They will receive a BAG NOT FOUND error otherwise
+                        if (bag.loot.length > 0) {
+                            player.EmitNearby("lootFromBag", {bag: bag.id, loot: bag.loot}, 20, true);
+                        }
                     } else {
                         player.items = _.without(player.items, item);
                     }
@@ -725,7 +743,7 @@ var SocketHandler = Class.extend({
                 }
 
                 // return the updated (stacked) item
-                reply({item: occupied});
+                reply({item: occupied, loot: (bag && bag.loot)});
             });
 
             // this is for dropping an inv item on the ground
