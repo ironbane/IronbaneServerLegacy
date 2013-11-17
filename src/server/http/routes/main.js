@@ -21,13 +21,13 @@ module.exports = function(app, db) {
     app.use('/game/flash', express.static(gamePath + 'flash', { maxAge: month }));
     app.use('/game/media', express.static(gamePath + 'media', { maxAge: month }));
     app.use('/game/js', express.static(gamePath + 'js'));
-    app.use('/game/lib', express.static(gamePath + 'lib'));
+    app.use('/game/lib', express.static(gamePath + 'lib', { maxAge: month }));
 
     app.use('/css', express.static(webPath + 'css'));
-    app.use('/fonts', express.static(webPath + 'fonts'));
-    app.use('/images', express.static(webPath + 'images'));
+    app.use('/fonts', express.static(webPath + 'fonts', { maxAge: month }));
+    app.use('/images', express.static(webPath + 'images', { maxAge: month }));
     app.use('/js', express.static(webPath + 'js'));
-    app.use('/lib', express.static(webPath + 'lib'));
+    app.use('/lib', express.static(webPath + 'lib', { maxAge: month }));
     app.use('/partials', express.static(webPath + 'partials'));
     app.use('/views', express.static(webPath + 'views'));
 
