@@ -204,7 +204,7 @@ var HUDHandler = Class.extend({
                     _.partial(HUD.onInvSlotDrop, e, ui, HUD)();
                 },
                 greedy: true,
-                tolerance: 'touch',
+                tolerance: 'pointer',
                 hoverClass: 'dragon-hover'
             });
             slot.click(function(e) {
@@ -556,7 +556,7 @@ var HUDHandler = Class.extend({
                 },
                 greedy: true,
                 hoverClass: 'dragon-hover',
-                tolerance: 'touch',
+                tolerance: 'pointer',
                 accept: '.invSlotItem' // only allow inv for sales, no vendor rearranging
             });
             slot.click(function() {
@@ -690,7 +690,7 @@ var HUDHandler = Class.extend({
                 },
                 greedy: true,
                 accept: '.invSlotItem', // only accept items from the item bar
-                tolerance: 'touch',
+                tolerance: 'pointer',
                 hoverClass: 'dragon-hover'
             });
             slot.click(function() {
