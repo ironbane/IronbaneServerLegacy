@@ -107,6 +107,7 @@ var Fighter = Actor.extend({
         }
     },
     Attack: function(victim, weapon) {
+	console.log(weapon.$template);
         this.lastBattleActionTimer = battleStatusTimeout;
         // Do damage
         //        if ( this.id > 0 ) {
@@ -116,7 +117,15 @@ var Fighter = Actor.extend({
         var damage = this.ch999Damage ? 999 : weapon.attr1;
 
         if (!victim.chGodMode) {
-            if (victim.isPlayer() && damage < 0) {
+	    // test if damage is positive or negative
+	    if(damage > 0) { 
+		var hurt = true 
+	    } else { 
+		var hurt = false; 
+	    }
+
+            if (victim.isPlayer() && hurt === false) {
+		console.log('heal ' + damage + ' ' + hurt);
                 victim.health += Math.abs(damage);
                 victim.health = Math.min(victim.healthMax, victim.health);
 
@@ -131,25 +140,29 @@ var Fighter = Actor.extend({
                 // 22/12/12 No more PvP... :(
                 if (this.isPlayer() && victim.isPlayer()) {
                     return;
-                }
-                damage = Math.abs(damage);
-                var remaining = damage - victim.armor;
-                victim.armor -= damage;
+                } else {
+			if(hurt === true) { // Only do damage if weapon doesnt heal
+				console.log('hurt ' + damage + ' ' + hurt);
+				damage = Math.abs(damage);
+				var remaining = damage - victim.armor;
+				victim.armor -= damage;
 
-                if (remaining > 0) {
-                    victim.health -= remaining;
-                }
+				if (remaining > 0) {
+				    victim.health -= remaining;
+				}
 
-                victim.health = Math.max(victim.health, 0);
-                victim.armor = Math.max(victim.armor, 0);
+				victim.health = Math.max(victim.health, 0);
+				victim.armor = Math.max(victim.armor, 0);
 
-                this.HandleMessage("hurtTarget", {
-                    damage: damage
-                });
-                victim.HandleMessage("attacked", {
-                    attacker: this,
-                    damage: damage
-                });
+				this.HandleMessage("hurtTarget", {
+				    damage: damage
+				});
+				victim.HandleMessage("attacked", {
+				    attacker: this,
+				    damage: damage
+				});
+			}
+		}
             }
         }
 
