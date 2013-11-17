@@ -24,7 +24,7 @@
 //Legendary Weapon = 5p> Ib color 0CAC53
 @rarity_weak: #636363;
 @rarity_normal: #000000;
-@rarity_strong: #591818;
+@rarity_strong: #B00000;
 @rarity_epic: #67aebc;
 @rarity_legendary: #0CAC53;
 
@@ -52,7 +52,21 @@ a {
     }
 }
 
+// ITEM HOVER TOOLTIP
 .item-info-box {
+    min-height: 20px;
+    .item-image-container {
+        margin-top: -3px;
+        width: 33px;
+        height: 30px;
+        float: left;
+    }
+    .gold-value {
+        color: gold;
+        padding-left: 16px;
+        background-image: url(/game/images/misc/coin_full.png);
+        background-repeat: no-repeat;
+    }
     .item-name {
         &.weak {
             color: @rarity_weak;
@@ -68,6 +82,14 @@ a {
         }
         &.legendary {
             color: @rarity_legendary;
+        }
+    }
+    // table of info
+    .metadata {
+        width: 100%;
+        .info-row {
+            .label { text-align: right; }
+            .value { padding-left: 10px; }
         }
     }
 }

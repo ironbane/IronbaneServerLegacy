@@ -301,6 +301,26 @@ var HUDHandler = Class.extend({
             item = dropped.data('item'),
             occupied = slot.children().data('item');
 
+        function revert() {
+            // prolly a more elegant way to write this...
+            if(dropped.hasClass('lootSlotItem')) {
+                HUD.clearLootSlot(item.slot);
+                HUD.fillLootSlot(item);
+            }
+            if(dropped.hasClass('invSlotItem')) {
+                HUD.clearInvSlot(item.slot);
+                HUD.fillInvSlot(item);
+            }
+            if(dropped.hasClass('vendorSlotItem')) {
+                HUD.clearVendorSlot(item.slot);
+                HUD.fillVendorSlot(item);
+            }
+            if(dropped.hasClass('bankSlotItem')) {
+                HUD.clearBankSlot(item.slot);
+                HUD.fillBankSlot(item);
+            }
+        }
+
         if (dropped.hasClass('lootSlotItem')) {
             var bag = $('#lootBar').data('bag');
             if(occupied) {
@@ -309,6 +329,7 @@ var HUDHandler = Class.extend({
                         if(response.errmsg) {
                             console.error('error stackItemSlot', response.errmsg);
                             // revert!
+                            revert();
                         }
                         // otherwise we're successful
                         console.log('loot cash success!', response, item, occupied);
@@ -337,7 +358,7 @@ var HUDHandler = Class.extend({
                         hudHandler.messageAlert(reply.errmsg);
 
                         // revert transaction!
-                        // showInv + loot?
+                        revert();
                         return;
                     }
 
@@ -374,6 +395,7 @@ var HUDHandler = Class.extend({
             }, function(response) {
                 if (response.errmsg) {
                     console.error(response.errmsg);
+                    revert();
                 } else {
                     // success
                     HUD.clearBankSlot(bankSlot);
@@ -389,6 +411,7 @@ var HUDHandler = Class.extend({
                 // we've moved too far or some other reason the vendor left
                 console.error('vendor has gone away!');
                 // revert!
+                revert();
                 return;
             }
 
@@ -396,7 +419,7 @@ var HUDHandler = Class.extend({
                 if(response.errmsg) {
                     HUD.messageAlert(response.errmsg);
                     // revert! - error message is most likely lack of funds
-                    HUD.fillVendorSlot(item);
+                    revert();
                     return;
                 }
 
@@ -416,6 +439,7 @@ var HUDHandler = Class.extend({
                         if(response.errmsg) {
                             console.error('error stackItemSlot', response.errmsg);
                             // revert!
+                            revert();
                         }
                         // otherwise we're successful
                         HUD.clearInvSlot(occupied.slot);
@@ -440,6 +464,7 @@ var HUDHandler = Class.extend({
                 if(response.errmsg) {
                     console.error('error updateItemSlot', response.errmsg);
                     // revert!
+                    revert();
                 }
                 // otherwise we're successful and we dont care
             });
@@ -782,12 +807,11 @@ var HUDHandler = Class.extend({
 
         function infoRow(label, value) {
             return [
-                '<tr>',
-                '<td style="text-align:right;"><strong>', label, '</strong></td>',
-                '<td style="padding-left:10px;">',
-                value,
-                '</td>',
-                '</tr>'].join('');
+                '<tr class="info-row">',
+                    '<td class="label"><strong>', label, '</strong></td>',
+                    '<td class="value">', value, '</td>',
+                '</tr>'
+            ].join('');
         }
 
         // info section
@@ -809,23 +833,15 @@ var HUDHandler = Class.extend({
         // if selling vendor sets price on server...
         if (item.price) {
             var priceHtml = [
-                '<span class="amount" style="color:gold;padding-left: 16px;',
-                'background-image:url(images/misc/coin_full.png);',
-                'background-repeat:no-repeat;">',
-                'x ', item.price,
-                '</span>'
+                '<span class="gold-value"> x ', item.price, '</span>'
             ].join('');
             itemInfo += infoRow('Price', priceHtml);
         }
 
         // for now only show cash value
-        if (template.type === 'cash') {
+        if (template.type === 'cash' || debugging) {
             var valueHTML = [
-                '<span class="amount" style="color:gold;padding-left: 16px;',
-                'background-image:url(images/misc/coin_full.png);',
-                'background-repeat:no-repeat;">',
-                'x ', item.value,
-                '</span>'
+                '<span class="gold-value"> x ', item.value, '</span>'
             ].join('');
             itemInfo += infoRow('Value', valueHTML);
         }
@@ -840,13 +856,13 @@ var HUDHandler = Class.extend({
         }
 
         content = [
-            '<div class="item-info-box" style="min-height:20px;">',
-                '<div style="margin-top:-3px;width:33px;height:30px;float:left;">',
+            '<div class="item-info-box">',
+                '<div class="item-image-container">',
                     '<img src="', itemUrl, '">',
                 '</div>',
                 '<div class="item-name ' + item.type + ' ' + item.subtype + ' ' + item.rarity + '" style="margin-top:3px;">', template.name, '</div>',
-            '</div>',
-            itemInfo
+                itemInfo,
+            '</div>'
         ].join('');
 
         targetEl
