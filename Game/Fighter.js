@@ -136,14 +136,17 @@ var Fighter = Actor.extend({
                     damage: damage
                 });
             } else {
+		console.log(victim.template);
                 // 22/12/12 No more PvP... :(
                 if (this.isPlayer() && victim.isPlayer()) {
                     return;
                 } else {
 			if(hurt === true) { // Only do damage if weapon doesnt heal
-				var immune = JSON.parse(victim.template.immune); // Parse wich weapons victim is immune too
-				if(immune[weapon.$template.subtype] === true) { // Test for immunity
-					return;
+				if(!victim.isPlayer()) {
+					var immune = JSON.parse(victim.template.immune); // Parse wich weapons victim is immune too
+					if(immune[weapon.$template.subtype] === true) { // Test for immunity
+						return;
+					}
 				}
 				damage = Math.abs(damage);
 				var remaining = damage - victim.armor;
