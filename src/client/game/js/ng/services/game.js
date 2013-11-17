@@ -304,6 +304,11 @@ IronbaneApp
                 }
             }
 
+            // hacky hack, dunno what's blocking it!
+            if(game.showingGame) {
+                $('#chatContent').show();
+            }
+
             $window.relativeMouse = $window.mouse.clone().sub($window.lastMouse);
             $window.lastMouse = $window.mouse.clone();
         };

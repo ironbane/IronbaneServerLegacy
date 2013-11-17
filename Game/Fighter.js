@@ -26,13 +26,12 @@ var Fighter = Actor.extend({
 
         // default for players is 10, mobs are variable, default 30
 
-        if(this.isPlayer()){
+        if (this.isPlayer()) {
             this._respawnTime = this.respawnTimer = 10;
-        }
-        else{
+        } else {
 
-         this._respawnTime = this.respawnTimer =  (this.respawntime || 30);
-         }
+            this._respawnTime = this.respawnTimer = (this.respawntime || 30);
+        }
 
         // NPC's don't really have an items array, but nevertheless...
         if (this.items === undefined) {
@@ -43,7 +42,7 @@ var Fighter = Actor.extend({
         // Initially, their values come from MySQL and are afterwards updated within the server without updating MySQL
         // The template values are used for Maximum values, and should never be changed
 
-        if(!(this.isPlayer())){
+        if (!(this.isPlayer())) {
             this.healthMax = this.template.health;
             this.armorMax = this.template.armor;
         } else {
@@ -107,23 +106,13 @@ var Fighter = Actor.extend({
         }
     },
     Attack: function(victim, weapon) {
-	console.log(weapon.$template);
+        console.log("attack weapon tmpl: ", weapon.$template);
         this.lastBattleActionTimer = battleStatusTimeout;
-        // Do damage
-        //        if ( this.id > 0 ) {
-        //            var template = dataHandler.items[weapon.template];
-        //
-        //        }
-        var damage = this.ch999Damage ? 999 : weapon.attr1;
+
+        var damage = this.ch999Damage ? 999 : weapon.attr1,
+            hurt = !!(damage > 0);
 
         if (!victim.chGodMode) {
-	    // test if damage is positive or negative
-	    if(damage > 0) { 
-		var hurt = true 
-	    } else { 
-		var hurt = false; 
-	    }
-
             if (victim.isPlayer() && hurt === false) {
                 victim.health += Math.abs(damage);
                 victim.health = Math.min(victim.healthMax, victim.health);
@@ -136,38 +125,45 @@ var Fighter = Actor.extend({
                     damage: damage
                 });
             } else {
-		console.log(victim.template);
+                console.log("attack vic tmpl: ", victim.template);
                 // 22/12/12 No more PvP... :(
                 if (this.isPlayer() && victim.isPlayer()) {
                     return;
                 } else {
-			if(hurt === true) { // Only do damage if weapon doesnt heal
-				if(!victim.isPlayer()) {
-					var immune = JSON.parse(victim.template.immune); // Parse wich weapons victim is immune too
-					if(immune[weapon.$template.subtype] === true) { // Test for immunity
-						return;
-					}
-				}
-				damage = Math.abs(damage);
-				var remaining = damage - victim.armor;
-				victim.armor -= damage;
+                    if (hurt === true) { // Only do damage if weapon doesnt heal
+                        if (!victim.isPlayer()) {
+                            var immune;
+                            try {
+                                immune = JSON.parse(victim.template.immune); // Parse wich weapons victim is immune too
+                            }
+                            catch(e) {
+                                // failed to parse JSON, but OK
+                                immune = {};
+                            }
+                            if (immune[weapon.$template.subtype] === true) { // Test for immunity
+                                return;
+                            }
+                        }
+                        damage = Math.abs(damage);
+                        var remaining = damage - victim.armor;
+                        victim.armor -= damage;
 
-				if (remaining > 0) {
-				    victim.health -= remaining;
-				}
+                        if (remaining > 0) {
+                            victim.health -= remaining;
+                        }
 
-				victim.health = Math.max(victim.health, 0);
-				victim.armor = Math.max(victim.armor, 0);
+                        victim.health = Math.max(victim.health, 0);
+                        victim.armor = Math.max(victim.armor, 0);
 
-				this.HandleMessage("hurtTarget", {
-				    damage: damage
-				});
-				victim.HandleMessage("attacked", {
-				    attacker: this,
-				    damage: damage
-				});
-			}
-		}
+                        this.HandleMessage("hurtTarget", {
+                            damage: damage
+                        });
+                        victim.HandleMessage("attacked", {
+                            attacker: this,
+                            damage: damage
+                        });
+                    }
+                }
             }
         }
 
@@ -347,7 +343,7 @@ var Fighter = Actor.extend({
 
             // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
             var spawnpoint = self.findNearestSpawnPoint();
-            if(spawnpoint) {
+            if (spawnpoint) {
                 self.TeleportToUnit(spawnpoint);
             } else {
                 // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
@@ -425,7 +421,7 @@ var Fighter = Actor.extend({
         var armorMax = 0;
 
         _.each(this.items, function(item) {
-            if(item.equipped && item.getType() === 'armor') {
+            if (item.equipped && item.getType() === 'armor') {
                 armorMax += item.attr1;
             }
         });
@@ -559,14 +555,14 @@ var Fighter = Actor.extend({
         var self = this;
 
         var original = self.getItem(item);
-        if(!original) {
+        if (!original) {
             // we don't have the item to swap out
             return false;
         } else {
             var template = _.find(dataHandler.items, function(itemT) {
                 return itemT.name === replacement || itemT.id === replacement;
             });
-            if(!template) {
+            if (!template) {
                 // can't find template to replace item with!
                 return false;
             }
@@ -574,16 +570,16 @@ var Fighter = Actor.extend({
                 slot: original.slot,
                 owner: self.id
             };
-            if(_.isObject(replacementConfig)) {
+            if (_.isObject(replacementConfig)) {
                 _.extend(config, replacementConfig);
             }
             var replaced = new Item(template, config);
             self.items.push(replaced);
             self.items = _.without(self.items, original);
 
-            if(original.equipped) {
+            if (original.equipped) {
                 // todo: get this logic cleaner somehow
-                if(original.getType() === 'armor') {
+                if (original.getType() === 'armor') {
                     self.UpdateAppearance(true);
                     self.CalculateMaxHealth(true);
                     self.CalculateMaxArmor(true);
@@ -608,7 +604,7 @@ var Fighter = Actor.extend({
     getItem: function(query) {
         var found;
 
-        if(_.isString(query)) {
+        if (_.isString(query)) {
             // check by name
             found = _.find(this.items, function(item) {
                 return item.$template.name === query;
@@ -631,7 +627,9 @@ var Fighter = Actor.extend({
     // add an actual item object reference to their inv
     addItem: function(item, slot) {
         // check slot (todo: support "any available?")
-        if(slot < 0 || slot > 9 || _.find(this.items, function(i) {return i.slot === slot; })) {
+        if (slot < 0 || slot > 9 || _.find(this.items, function(i) {
+            return i.slot === slot;
+        })) {
             return false;
         }
 
@@ -651,7 +649,7 @@ var Fighter = Actor.extend({
             return i.id === id;
         });
 
-        if(!item) {
+        if (!item) {
             // item not found to remove!
             return false;
         }
@@ -659,9 +657,9 @@ var Fighter = Actor.extend({
         self.items = _.without(self.items, item);
 
         // update client!
-        if(item.equipped) {
+        if (item.equipped) {
             // todo: get this logic cleaner somehow
-            if(item.getType() === 'armor') {
+            if (item.getType() === 'armor') {
                 self.UpdateAppearance(true);
                 self.CalculateMaxHealth(true);
                 self.CalculateMaxArmor(true);
@@ -684,7 +682,7 @@ var Fighter = Actor.extend({
     hasItemEquipped: function(query) {
         var found;
 
-        if(_.isString(query)) {
+        if (_.isString(query)) {
             // check by name
             found = _.find(this.items, function(item) {
                 return item.$template.name === query;
@@ -824,7 +822,7 @@ var Fighter = Actor.extend({
 
                         return unit;
 
-                     }
+                    }
                 }
             }
         }
