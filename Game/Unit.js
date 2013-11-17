@@ -115,6 +115,10 @@ var Unit = Class.extend({
   isPlayer: function(){
     return this instanceof Player;
   },
+  isA: function(type) {
+      var self = this;
+      return eval('self instanceof ' + type);
+  },
   Awake: function() {
     //log(this.id+" is awake!");
   },
