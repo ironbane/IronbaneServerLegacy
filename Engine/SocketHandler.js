@@ -924,7 +924,7 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                if(item.value <= 0) {
+                if(item.value <= 0 || item.type === 'cash') {
                     reply({errmsg: 'I don\'t buy that!'});
                     return;
                 }
@@ -959,6 +959,13 @@ var SocketHandler = Class.extend({
                 // Give the player the original price
                 player.addCoins(offeredPrice);
 
+                // adjust item price for selling back to the public
+                item.price = item.value;
+                if(vendor.data && vendor.data.sellPercentage) {
+                    item.price = Math.max(Math.floor(item.value * vendor.data.sellPercentage), 1);
+                }
+
+                //console.log('buying: ', item, ' for ', offeredPrice);
                 vendor.Say(_.sample(["A pleasure doing business!", "Ye got a good deal!", "'Tis most splendid!"]));
 
                 // update everyone around who might also be looking
