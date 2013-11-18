@@ -23,7 +23,7 @@ var keyTracker = {};
 // Use direct keycodes for keypress, keyTracker for true keydown holds
 $(document).keydown(function(event) {
 
-    if (window.hasChatFocus === true) {
+    if (window.hasChatFocus === true || !socketHandler.inGame) {
         return;
     }
 
