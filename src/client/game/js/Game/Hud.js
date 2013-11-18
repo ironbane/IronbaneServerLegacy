@@ -74,6 +74,7 @@ var HUDHandler = Class.extend({
         if (Detector.webgl) {
             if (socketHandler.serverOnline) {
                 $('#loginContent').show();
+                $('#chatContent').hide().trigger('hide');
             } else {
                 setTimeout(function() {
                     hudHandler.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
@@ -1335,7 +1336,7 @@ var HUDHandler = Class.extend({
                 var tryConnect = function() {
                     socketHandler.Connect(abortConnect);
                 };
-
+                $('#chatContent').show();
                 if (startdata.loggedIn) {
                     tryConnect();
                 } else {
