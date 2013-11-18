@@ -84,7 +84,6 @@ IronbaneApp
 	/* prick */dictionary.prick = /\b(p+(\W|\d|_)*r+(\W|\d|_)*(1|i)+(\W|\d|_)*(\W|\d|_)*(c|k)+(\W|\d|_)*)\b/ig;
 	/* punanny, punta */dictionary.punanny = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(u)+(\W|\d|_)*(n)+(\W|\d|_)*(t|)+(\W|\d|_)*(a|2))/ig;
 	/* pussy */dictionary.pussy = /\b(p+(\W|\d|_)*u+(\W|\d|_)*(5|s|z)*(\W|\d|_)*(5|s|z)+(\W|\d|_)*(y|ie|ies)+(\W|\d|_)*)/ig;
-	/* puta */dictionary.puta = /\b(((\w)|())+(\W|\d|_)*(p)+(\W|\d|_)*(u)+(\W|\d|_)*(t)+(\W|\d|_)*(a|@|0))/ig;
 	/* queer, queef */dictionary.queer = /\b(q+(\W|\d|_)*(w|u|i|e)+(\W|\d|_)*(r|f)+(\W|\d|_)*)/ig;
 	/* rectum */dictionary.rectum = /\b(r+(\W|\d|_)*w*(\W|\d|_)*(3|e)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)*(\W|\d|_)*(7|t)+(\W|\d|_)*(0|o|u)*(\W|\d|_)*m+(\W|\d|_)*s*(\W|\d|_)*)/ig;
 	/* renob */dictionary.renob = /\b(((\w)|())+(\W|\d|_)*(r)+(\W|\d|_)*(e|3)+(\W|\d|_)*(n)+(\W|\d|_)*(o|0)+(\W|\d|_)*(b))\b/ig;
