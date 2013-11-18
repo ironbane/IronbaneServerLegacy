@@ -164,6 +164,8 @@ IronbaneApp
                 // clean it first, then replace!
                 scope.data.message = $filter('mouthwash')(scope.data.message);
                 scope.data.message = scope.data.message.replace(/\:\)/g, '<emoticon type="smiley"></emoticon>');
+                scope.data.message = scope.data.message.replace(/\:D/g, '<emoticon type="grin"></emoticon>');
+                scope.data.message = scope.data.message.replace(/\;\)/g, '<emoticon type="wink"></emoticon>');
                 scope.data.message = scope.data.message.replace(':facebook:', '<i style="color:royalblue;" class="fa fa-facebook"></i>');
                 scope.data.message = scope.data.message.replace(':twitter:', '<i style="color:powderblue;" class="fa fa-twitter"></i>');
             }
@@ -186,12 +188,17 @@ IronbaneApp
         restrict: 'E',
         replace: true,
         scope: {
-            type: '='
+            type: '@'
         },
         template: '<img ng-src="{{ smile }}"/>',
         link: function(scope, el, attrs) {
-            // todo: test on scope.type
-            scope.smile = '/game/images/misc/emotes/icon_smile.gif';
+            if(scope.type === 'grin') {
+                scope.smile = '/game/images/misc/emotes/cheese.png';
+            } else if(scope.type === 'wink') {
+                scope.smile = '/game/images/misc/emotes/wink.png';
+            } else {
+                scope.smile = '/game/images/misc/emotes/smile.png';
+            }
         }
     };
 }])
