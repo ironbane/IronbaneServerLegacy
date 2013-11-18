@@ -41,7 +41,7 @@ IronbaneApp
 	/* flamer */dictionary.flamer = /\b(f+(\W|\d|_)*(1|l)+(\W|\d|_)*a+(\W|\d|_)*m+(\W|\d|_)*(3|e)+(\W|\d|_)*r+(\W|\d|_)*)\b/ig;
 	/* fock */dictionary.fock = /\b((?!facebook)f+(\W|\d|_)*(0|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*)\b|\b(f+(\W|\d|_)*(0|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(c|k)+(\W|\d|_)*\w*)/ig;
 	/* foreskin */dictionary.foreskin = /\b(f+(\W|\d|_)*(0|o)+(\W|\d|_)*r+(\W|\d|_)*(3|e)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*(c|k)+(\W|\d|_)*(1|i)+(\W|\d|_)*n+(\W|\d|_)*)\b/ig;
-	/* fuck */dictionary.fuck = /\b^(?!face)(((\w)|())+(\W|\d|_)*(f|v)+(\W|\d|_)*(v|u|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|c|))/ig;
+	/* fuck */dictionary.fuck = /\b(((\w)|())+(\W|\d|_)*(f|v)+(\W|\d|_)*(v|u|a|o)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|c))/ig;
 	/* fudgepacker */dictionary.fudgepacker = /\b(((\w)|())+(\W|\d|_)*(f)+(\W|\d|_)*(u)+(\W|\d|_)*(d)+(\W|\d|_)*(g)+(\W|\d|_)*(e|3)+(\W|\d|_)*(p)+(\W|\d|_)*(a|@)+(\W|\d|_)*(c|k)+(\W|\d|_)*(k|)+(\W|\d|_)*(e|3)+(r))/ig;
 	/* gay, lez, lesbian */dictionary.gay = /(g+(\W|\d|_)*a+(\W|\d|_)*y+(\W|\d|_)*)|\b(g+(\W|\d|_)*(3|e)+(\W|\d|_)*y+(\W|\d|_)*)|\b(g+(\W|\d|_)*h+(\W|\d|_)*(3|e|a)+(\W|\d|_)*y+(\W|\d|_)*)|\b((1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*z+(\W|\d|_)*)|\b((1|l)+(\W|\d|_)*(3|e)+(\W|\d|_)*(5|s|z)+(\W|\d|_)*b+(\W|\d|_)*)|\b(g+(\W|\d|_)*(3|e)+(\W|\d|_)*h+(\W|\d|_)*y+(\W|\d|_)*)/ig;
 	/* god damn */dictionary.goddamn = /\b(g+(\W|\d|_)*(0|o)+(\W|\d|_)*d+(\W|\d|_)*d+(\W|\d|_)*a+(\W|\d|_)*(m|n)+(\W|\d|_)*\w*)/ig;
