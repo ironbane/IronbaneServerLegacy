@@ -424,9 +424,11 @@ var HUDHandler = Class.extend({
                 }
 
                 // success! - all items sent because gold bags will get auto adjusted
+                socketHandler.playerData.items = response.items; // todo: factor elsewhere
                 HUD.showInv({slots: 10, items: response.items});
                 // vendor should be updated
                 HUD.clearVendorSlot(item.slot);
+                HUD.makeCoinBar(true);
             });
         }
 
@@ -559,7 +561,7 @@ var HUDHandler = Class.extend({
                 tolerance: 'pointer',
                 accept: '.invSlotItem' // only allow inv for sales, no vendor rearranging
             });
-            slot.click(function() {
+            slot.on('dblclick', function() {
                 // handle use based on child data
                 console.log($(this).attr('id') + " clicked!");
             });
