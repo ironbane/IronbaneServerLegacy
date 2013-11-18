@@ -21,6 +21,8 @@ var config = require('../../../nconf'),
     Class = require('../../common/class'),
     log = require('util').log; // built in timestampped logger
 
+var logger = require('../logging/winston');
+
 var Server = Class.extend({
     init: function(config) {
         config = config || {};
@@ -37,6 +39,7 @@ var Server = Class.extend({
     start: function() {
         log('starting http server...');
 
+        logger.info("Starting http server");
         var db = this.db;
 
         // create http api server
