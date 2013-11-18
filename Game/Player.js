@@ -102,21 +102,21 @@ var Player = Fighter.extend({
     // Delete the items
     itemService.deleteAllByOwner(this.id);
   },
-  BigMessage: function(message) {
-    this.socket.emit("bigMessage", {
-      message: message
-    });
-  },
-  Cutscene: function(id) {
-    this.socket.emit("cutscene", id);
-  },
+    BigMessage: function(message) {
+        this.socket.emit("bigMessage", {
+            message: message
+        });
+    },
+    Cutscene: function(id) {
+        this.socket.emit("cutscene", id);
+    },
     LightWarn: function() {
         var message = this.name + ': ';
-        chatHandler.announce('' + message + '', "yellow");
+        chatHandler.announce('' + message + ' ' + MESSAGE_LIGHTWARNING, "yellow");
     },
     SeriousWarn: function() {
         var message = this.name + ': ';
-        chatHandler.announce('' + message + '', "red");
+        chatHandler.announce('' + message + ' ' + MESSAGE_SERIOUSWARNING, "red");
     },
     Kick: function(reason) {
         var me = this,

@@ -106,7 +106,7 @@ var Fighter = Actor.extend({
         }
     },
     Attack: function(victim, weapon) {
-        console.log("attack weapon tmpl: ", weapon.$template);
+        //console.log("attack weapon tmpl: ", weapon.$template);
         this.lastBattleActionTimer = battleStatusTimeout;
 
         var damage = this.ch999Damage ? 999 : weapon.attr1,
@@ -125,7 +125,7 @@ var Fighter = Actor.extend({
                     damage: damage
                 });
             } else {
-                console.log("attack vic tmpl: ", victim.template);
+                //console.log("attack vic tmpl: ", victim.template);
                 // 22/12/12 No more PvP... :(
                 if (this.isPlayer() && victim.isPlayer()) {
                     return;
