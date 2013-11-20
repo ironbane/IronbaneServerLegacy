@@ -73,6 +73,66 @@ var Service = Class.extend({
         }
 
         return deferred.promise;
+    },
+    create: function(config) {
+        // name, image, type, subtype, attr1, delay, particle, basevalue
+        var deferred = Q.defer();
+
+        db.query('INSERT INTO ib_item_templates SET ?', config, function(err, result) {
+            if(err) {
+                return deferred.reject('db error', err);
+            }
+
+            config.id = result.insertId;
+            cache[config.id] = new ItemTemplate(config);
+            deferred.resolve(cache[config.id]);
+        });
+
+        return deferred.promise;
+    },
+    remove: function(templateId) {
+        var deferred = Q.defer();
+
+        db.query('DELETE FROM ib_item_templates WHERE id = ?', [templateId], function(err, result) {
+            if(err) {
+                return deferred.reject('db error', err);
+            }
+
+            // remove from cache
+            if(cache[templateId]) {
+                delete cache[templateId];
+            }
+            deferred.resolve('removed!');
+        });
+
+        return deferred.promise;
+    },
+    update: function(template) {
+        var deferred = Q.defer(),
+            templateId = template.id,
+            // create new update obj to not pollute it with possible other in memory items
+            data = {
+                name: template.name,
+                image: template.image,
+                type: template.type,
+                subtype: template.subtype,
+                attr1: template.attr1,
+                delay: template.delay,
+                particle: template.particle,
+                basevalue: template.baseValue // use the camelcase?
+            };
+
+        db.query('UPDATE ib_item_templates SET ? WHERE id = ?', [data, templateId], function(err, results) {
+            if(err) {
+                return deferred.reject('db error: ', err);
+            }
+
+            // should just keep the reference instead??
+            cache[templateId] = new ItemTemplate(data);
+            deferred.resolve(cache[templateId]);
+        });
+
+        return deferred.promise;
     }
 });
 

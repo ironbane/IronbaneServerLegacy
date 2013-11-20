@@ -382,6 +382,12 @@ var EditorGUI = function() {
         });
     };
 
+    this.itemEditor = function() {
+        $('#ItemEditor').scope().$apply(function(scope) {
+            scope.showItemEditor = true;
+        });
+    };
+
 
   this.selectTile = function() {
 
@@ -713,11 +719,13 @@ var LevelEditor = Class.extend({
 
     guiControls['globalEnable'] = this.editorGUI.gui.add(this.editorGUI,'globalEnable');
 
+    guiControls['itemEditor'] = this.editorGUI.gui.add(this.editorGUI, 'itemEditor');
+
     //var fObjectPlacer = this.editorGUI.gui.addFolder('Object Placer');
     var fModelPlacer = this.editorGUI.gui.addFolder('Model Placer');
     var fModelPainter = this.editorGUI.gui.addFolder('Model Painter');
     var fNPCEditor = this.editorGUI.gui.addFolder('NPC Editor');
-    
+
     var fEntityPlacer = this.editorGUI.gui.addFolder('Entity Placer');
 
     var fTeleport = this.editorGUI.gui.addFolder('Teleport');

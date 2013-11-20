@@ -87,7 +87,11 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/unit/unitTemplate.js",
                     "<%= gameScriptPath %>/ng/unit/unitTemplate.svc.js",
 
+                    "<%= gameScriptPath %>/ng/items/itemTemplate.js",
+                    "<%= gameScriptPath %>/ng/items/itemTemplate.svc.js",
+
                     "<%= gameScriptPath %>/ng/editor/npc/npc_editor.js",
+                    "<%= gameScriptPath %>/ng/editor/item/item_editor.js",
 
                     "<%= gameScriptPath %>/ng/help/help_dialog.js",
 
