@@ -165,6 +165,12 @@ module.exports = function(app, db) {
 
         // todo: use config for subfolder
         log('no server route (web index redirect): ' + req.path);
-        res.render('web/index');
+        if ( config.get('useNewForum') ) {
+            res.render('web/index');
+        }
+        else {
+            res.redirect("/game");
+        }
+
     });
 };

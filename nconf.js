@@ -30,6 +30,7 @@ nconf.defaults({
 
     cryptSalt: '',
     isProduction: false,
+    useNewForum: false,
     use_nodetime: false,
     nodetime: {
         accountKey: '1234FOO',
