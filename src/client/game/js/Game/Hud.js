@@ -162,14 +162,20 @@ var HUDHandler = Class.extend({
             $('#statBar').hide();
             $('#itemBar').hide();
             $('#coinBar').hide();
+            $('#debugBox').hide();
+            $('#editorControls').hide();
         }
         else{
              $('#statBar').show();
             $('#itemBar').show();
             $('#coinBar').show();
+             $('#debugBox').show();
+             $('#editorControls').show();
+
         }
+        var me = this;
         $('#chatContent').scope().$apply(function(scope) {
-            scope.showChatWindow = !scope.showChatWindow;
+            scope.showChatWindow = !me.screenshotMode;
         });
     },
     MakeSoundButton: function() {
