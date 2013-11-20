@@ -22,6 +22,7 @@ var dictionary = {};
 /* leave. */dictionary.leave = "Leave me alone";
 /* defeat. */dictionary.leave = "You will never defeat me";
 /* castle. */dictionary.leave = "The castle is mine, stay out";
+/* soul. */dictionary.soul = "I will break your soul";
 
 module.exports = dictionary;
 
