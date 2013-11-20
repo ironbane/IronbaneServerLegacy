@@ -6,35 +6,61 @@
         </div>
     </header>
     <form name="itemEditorForm" novalidate class="body">
-        <div class="control-group">
-            <label for="existingItem">Items:</label>
-            <select id="existingItem" name="existingItem" ng-model="item" ng-options="t.name for t in templates | orderBy:'name'"></select>
+        <div class="pull-left">
+            <div class="control-group">
+                <label class="control-label" for="existingItem">Items:</label>
+                <div class="controls">
+                    <select id="existingItem" name="existingItem" ng-model="item" ng-options="t.name for t in templates | orderBy:'name'"></select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_name">Name:</label>
+                <div class="controls">
+                    <input id="item_name" type="text" ng-model="item.name" ng-required />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_type">Type:</label>
+                <div class="controls">
+                    <input id="item_type" type="text" ng-model="item.type" ng-required />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_subtype">Subtype:</label>
+                <div class="controls">
+                    <input id="item_subtype" type="text" ng-model="item.subtype" ng-required />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_basevalue">BaseValue:</label>
+                <div class="controls">
+                    <input id="item_basevalue" type="text" ng-model="item.baseValue" ng-required />
+                </div>
+            </div>
         </div>
-        <div class="control-group">
-            <label for="item_name">Name:</label>
-            <input id="item_name" type="text" ng-model="item.name" ng-required /> <br>
-
-            <label for="item_type">Type:</label>
-            <input id="item_type" type="text" ng-model="item.type" ng-required /> <br>
-
-            <label for="item_subtype">Subtype:</label>
-            <input id="item_subtype" type="text" ng-model="item.subtype" ng-required /> <br>
-
-            <label for="item_attr1">Attr1:</label>
-            <input id="item_attr1" type="text" ng-model="item.attr1" ng-required /> <br>
-
-            <label for="item_delay">Delay:</label>
-            <input id="item_delay" type="text" ng-model="item.delay" ng-required /> <br>
-
-            <label for="item_particle">Particle:</label>
-            <input id="item_particle" type="text" ng-model="item.particle" ng-required /> <br>
-
-            <label for="item_basevalue">BaseValue:</label>
-            <input id="item_basevalue" type="text" ng-model="item.baseValue" ng-required /> <br>
-        </div>
-        <div class="control-group">
-            Image: {{ item.image }}<br>
-            <img ng-src="{{ imageUrl }}" />
+        <div class="pull-left">
+            <div class="control-group image-control">
+                <label class="control-label" for="item_image">Image: {{ item.image }}</label>
+                <img id="item_image" ng-src="{{ imageUrl }}" />
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_attr1">Attr1:</label>
+                <div class="controls">
+                    <input id="item_attr1" type="text" ng-model="item.attr1" ng-required />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_delay">Delay:</label>
+                <div class="controls">
+                    <input id="item_delay" type="text" ng-model="item.delay" ng-required />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="item_particle">Particle:</label>
+                <div class="controls">
+                    <input id="item_particle" type="text" ng-model="item.particle" ng-required />
+                </div>
+            </div>
         </div>
     </form>
     <footer>

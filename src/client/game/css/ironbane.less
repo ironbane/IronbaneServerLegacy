@@ -1,5 +1,4 @@
-@import "../../common/css/variables.less";
-@import "../../common/css/mixins.less";
+@import "../../common/css/import.less";
 
 @textColor: #6DF2C0;
 @borderColor: #06452d;
@@ -94,6 +93,42 @@ a {
     }
 }
 
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+    border: 1px solid;
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+    .transition(~"border linear .2s, box-shadow linear .2s");
+    .placeholder(darken(@textColor, 10%));
+    color: @textColor;
+    border-color: @primary4;
+    background-color: @primary3;
+    padding: 2px;
+    text-indent: 2px;
+
+    // Focus state
+    &:focus {
+        border-color: rgba(113, 236, 82, .8);
+        outline: 0;
+        outline: thin dotted \9; /* IE6-9 */
+        .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(113, 236, 82, .6)");
+    }
+}
+
 // common class for transparent window dialogs
 .dialog {
     outline: 3px solid #06452d;
@@ -111,48 +146,13 @@ a {
 
     // in the future, hopefully wont need to nest it this way
     &.editorDialog {width: 500px; position: absolute; top: 15%; left: 35%; height: 420px;font-size: 12px;
-        label {
+        /*label {
             position: inherit;
             margin-right: 4px;
         }
         .control-group {
             margin-bottom: 5px;
-        }
-
-        textarea,
-        input[type="text"],
-        input[type="password"],
-        input[type="datetime"],
-        input[type="datetime-local"],
-        input[type="date"],
-        input[type="month"],
-        input[type="time"],
-        input[type="week"],
-        input[type="number"],
-        input[type="email"],
-        input[type="url"],
-        input[type="search"],
-        input[type="tel"],
-        input[type="color"],
-        .uneditable-input {
-            border: 1px solid;
-            .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
-            .transition(~"border linear .2s, box-shadow linear .2s");
-            .placeholder(darken(@textColor, 10%));
-            color: @textColor;
-            border-color: @primary4;
-            background-color: @primary3;
-            padding: 2px;
-            text-indent: 2px;
-
-            // Focus state
-            &:focus {
-                border-color: rgba(113, 236, 82, .8);
-                outline: 0;
-                outline: thin dotted \9; /* IE6-9 */
-                .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(113, 236, 82, .6)");
-            }
-        }
+        }*/
 
         // SLIDERS
         input[type=range] {
@@ -221,6 +221,21 @@ a {
     margin: 0px;
     width: 800px;
     height: 600px;
+}
+
+#ItemEditor {
+    .control-group {
+        margin-bottom: 0px;
+    }
+    .image-control {
+        text-align: right;
+        img {
+            width: 80px;
+            height: 80px;
+            border: 3px inset;
+            padding: 8px;
+        }
+    }
 }
 
 .insideInfo {
