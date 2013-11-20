@@ -88,7 +88,7 @@ var ProjectileTypeEnum = {
         parabolic: true,
         meshType: ProjectileMeshTypeEnum.ARROW,
         impactSound: "arrowhit",
-        texture: {FULL: 'images/projectiles/arrow_single.png', BACK: 'images/projectiles/arrow_back.png', HEAD:'images/projectiles/arrow_head.png'}
+        texture: {FULL: 'images/projectiles/arrow_single.png', BACK: 'images/projectiles/arrowback.png', HEAD:'images/projectiles/arrowhead.png'}
     },
     MELEE: {
         speed: 6,
