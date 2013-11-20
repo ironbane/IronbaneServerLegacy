@@ -33,7 +33,6 @@ $(document).keydown(function(event) {
     }
 
     keyTracker[event.keyCode] = true;
-
     // open chat with enter, /, or @
     if ((event.keyCode === 13 || event.keyCode === 191 || (event.shiftKey && event.keyCode === 50)) && socketHandler.inGame) {
         $('#chatInput').addClass('focused').focus();
@@ -50,10 +49,15 @@ $(document).keydown(function(event) {
     }
 
     // H - HELP
-    if(event.keyCode === 72) {
+    if(event.keyCode === 72 && socketHandler.inGame) {
         $('#helpDialog').scope().$apply(function(scope) {
             scope.showHelpDialog = !!!scope.showHelpDialog;
         });
+    }
+
+    //U - screenshotmode
+    if(event.keyCode === 85 && socketHandler.inGame){
+        hudHandler.toggleScreenShotMode();
     }
 
     // ITEM SLOT HOTKEYS

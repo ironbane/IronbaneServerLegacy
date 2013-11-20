@@ -66,6 +66,7 @@ var BigMessage = Class.extend({
 var HUDHandler = Class.extend({
     bigMessages: [],
     alertBoxActive: false,
+    screenshotMode: false,
     Init: function() {
         var HUD = this;
 
@@ -154,6 +155,22 @@ var HUDHandler = Class.extend({
         setTimeout(function() {
             handleClick(true);
         }, 1000);
+    },
+    toggleScreenShotMode: function(){
+        this.screenshotMode = !this.screenshotMode; 
+        if(this.screenshotMode === true){
+            $('#statBar').hide();
+            $('#itemBar').hide();
+            $('#coinBar').hide();
+        }
+        else{
+             $('#statBar').show();
+            $('#itemBar').show();
+            $('#coinBar').show();
+        }
+        $('#chatContent').scope().$apply(function(scope) {
+            scope.showChatWindow = !scope.showChatWindow;
+        });
     },
     MakeSoundButton: function() {
         var checkSoundToggle = function(value) {
