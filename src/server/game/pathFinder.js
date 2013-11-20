@@ -173,6 +173,8 @@ module.exports = {
     },
     getRandomNode: function(zone, group, nearPosition, nearRange) {
 
+        if ( !zoneNodes[zone] ) return new THREE.Vector3();
+
         nearPosition = nearPosition || null;
         nearRange = nearRange || 0;
 
