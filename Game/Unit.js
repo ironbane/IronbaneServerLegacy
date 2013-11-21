@@ -139,6 +139,7 @@ var Unit = Class.extend({
 
     this.UpdateNearbyUnitsOtherUnitsLists();
 
+    this.socket.leave('zone_'+this.zone);
     this.zone = zone;
     // copy instead of clone so that this can be a plain obj
     this.position.copy(position);
@@ -165,6 +166,7 @@ var Unit = Class.extend({
         zone: zone,
         pos: position
       });
+      this.socket.join('zone_'+zone);
     }
   },
   UpdateNearbyUnitsOtherUnitsLists: function() {
