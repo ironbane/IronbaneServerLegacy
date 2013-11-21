@@ -721,7 +721,7 @@ var Player = Fighter.extend({
     attemptAttack: function(position) {
         var player = this;
 
-        if (player.timers.attackTimeout > 0.0) {
+        if (player.timers.attackTimeout > 0.0 || player.isAttemptAttack) {
             return;
         }
 
@@ -744,6 +744,7 @@ var Player = Fighter.extend({
                 }
 
                 var newDelay = template.delay;
+                player.isAttemptAttack = true;
                 // Send the projectile
                 socketHandler.socket.emit('addProjectile', {
                     s: player.position.clone().Round(2),
@@ -752,6 +753,7 @@ var Player = Fighter.extend({
                     o: player.id,
                     sw: true
                 }, function(reply) {
+                    player.isAttemptAttack = false;
                     //console.log('addProjectile reply', reply);
                     if (!_.isUndefined(reply.errmsg)) {
                         hudHandler.messageAlert(reply.errmsg);

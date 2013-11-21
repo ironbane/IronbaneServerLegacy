@@ -378,7 +378,7 @@ var SocketHandler = Class.extend({
                         });
                         return;
                     }
-                    if (socket.unit.attackTimeout > 0) {
+                    if (socket.unit.attackTimeout > 0.2) {
                         //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
                         // send the real delay, even non cheating players will be slightly out of sync
                         // every now and then because of the server vs. client loops
