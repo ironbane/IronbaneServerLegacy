@@ -14,6 +14,43 @@ var distanceToSquared = function(a, b) {
 
 };
 
+
+//+ Jonas Raoni Soares Silva
+//@ http://jsfromhell.com/math/is-point-in-poly [rev. #0]
+function isPointInPoly(poly, pt){
+    for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+        ((poly[i].z <= pt.z && pt.z < poly[j].z) || (poly[j].z <= pt.z && pt.z < poly[i].z))
+        && (pt.x < (poly[j].x - poly[i].x) * (pt.z - poly[i].z) / (poly[j].z - poly[i].z) + poly[i].x)
+        && (c = !c);
+    return c;
+}
+
+function isVectorInPolygon(vector, polygon, vertices) {
+
+    // reference point will be the centroid of the polygon
+    // We need to rotate the vector as well as all the points which the polygon uses
+
+    var center = polygon.centroid;
+
+    var lowestPoint = 100000;
+    var highestPoint = -100000;
+
+    var polygonVertices = [];
+
+    _.each(polygon.vertexIds, function(vId) {
+        lowestPoint = Math.min(vertices[vId].y, lowestPoint);
+        highestPoint = Math.max(vertices[vId].y, highestPoint);
+        polygonVertices.push(vertices[vId]);
+    });
+
+    if ( vector.y < highestPoint+0.5 && vector.y > lowestPoint-0.5 &&
+        isPointInPoly(polygonVertices, vector) ) {
+        return true;
+    }
+    return false;
+}
+
+
 function triarea2(a, b, c) {
     var ax = b.x - a.x;
     var az = b.z - a.z;
@@ -218,7 +255,8 @@ module.exports = {
 
         _.each(allNodes, function(node) {
             var measuredDistance = distanceToSquared(node.centroid, targetPosition);
-            if (measuredDistance < distance) {
+            if (measuredDistance < distance &&
+                isVectorInPolygon(targetPosition, node, vertices)) {
                 farthestNode = node;
                 distance = measuredDistance;
             }
@@ -269,11 +307,6 @@ module.exports = {
 
         channel.stringPull();
 
-        // _.each(channel, function(c) {
-        //     console.log(c);
-        // });
-
-        // console.log(channel.path);
 
         var threeVectors = [];
 
@@ -281,17 +314,10 @@ module.exports = {
             threeVectors.push(new THREE.Vector3(c.x, c.y, c.z));
         });
 
+        // We don't need the first one, as we already know our start position
         threeVectors.shift();
 
         return threeVectors;
-
-        // channel.push(Point(0, 4), Point(4, 3));
-        // channel.push(Point(4, 7), Point(4, 3));
-        // channel.push(Point(16, 0), Point(10, 1));
-        // channel.push(Point(16, 0), Point(9, -5));
-        // channel.push(Point(12, -11));
-        // channel.stringPull();
-
     }
 };
 

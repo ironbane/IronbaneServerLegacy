@@ -22,6 +22,8 @@ var State = require('../state'),
     Wander = require('./wander'),
     ChaseEnemy = require('./chaseEnemy');
 
+var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
+
 var outsideSpawnGuardRadius = function(unit) {
     return unit.template.spawnguardradius > 0 && unit.startPosition.distanceToSquared(unit.position) > Math.pow(unit.template.spawnguardradius, 2);
 };
@@ -36,6 +38,8 @@ var MonsterState = State.extend({
             minWaitTime: 3,
             maxWaitTime: 10
         };
+
+        this.cantReachTable = {};
     },
     enter: function(unit) {
         var me = this;
@@ -48,10 +52,35 @@ var MonsterState = State.extend({
         if (!(unit.stateMachine.currentState instanceof ChaseEnemy)) {
             var target = unit.FindNearestTarget(unit.template.aggroradius, true);
 
-            if (target && !outsideSpawnGuardRadius(unit) && unit.InLineOfSight(target)) {
-                unit.maxSpeed = this.chaseSpeed;
-                // log("[MonsterState] Found enemy!");
-                unit.stateMachine.changeState(new ChaseEnemy(target));
+            var me = this;
+
+            if (target &&
+                !outsideSpawnGuardRadius(unit) &&
+                unit.InLineOfSight(target) ) {
+
+
+                if ( !this.cantReachTable[target.id] )  {
+                    if (unit.navigationMeshGroup) {
+                      var paths = pathFinder.findPath(unit.position,
+                        target.position,
+                        unit.zone,
+                        unit.navigationMeshGroup);
+                        if ( paths ) {
+                            unit.maxSpeed = this.chaseSpeed;
+                            // log("[MonsterState] Found enemy!");
+                            unit.stateMachine.changeState(new ChaseEnemy(target));
+                        }
+                        else {
+                            this.cantReachTable[target.id] = true;
+
+                            setTimeout(function() {
+                                delete me.cantReachTable[target.id];
+                            }, 2000);
+                        }
+                    }
+                }
+
+
             }
         }
     },

@@ -333,7 +333,7 @@ module.exports = function(grunt) {
         },
         buildnavnodes: {
              // src: ['<%= cfg.get("assetDir") %>images/**/*.nav.js']
-             src: ['<%= cfg.get("assetDir") %>images/**/3.nav.js']
+             src: ['<%= cfg.get("assetDir") %>images/**/*.nav.js']
         },
         dbutil: {
             options: {

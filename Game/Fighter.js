@@ -93,7 +93,7 @@ var Fighter = Actor.extend({
     },
     AttemptAttack: function(victim) {
         // log("attempt attack");
-        this.HandleMessage("attemptAttack", {});
+        this.handleMessage("attemptAttack", {});
         //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff" ) {
         //if ( this.weapon.subtype == "bow" || this.weapon.subtype == "staff"  ) {
         // debugger;
@@ -117,10 +117,10 @@ var Fighter = Actor.extend({
                 victim.health += Math.abs(damage);
                 victim.health = Math.min(victim.healthMax, victim.health);
 
-                this.HandleMessage("healTarget", {
+                this.handleMessage("healTarget", {
                     damage: damage
                 });
-                victim.HandleMessage("healed", {
+                victim.handleMessage("healed", {
                     attacker: this,
                     damage: damage
                 });
@@ -155,10 +155,10 @@ var Fighter = Actor.extend({
                         victim.health = Math.max(victim.health, 0);
                         victim.armor = Math.max(victim.armor, 0);
 
-                        this.HandleMessage("hurtTarget", {
+                        this.handleMessage("hurtTarget", {
                             damage: damage
                         });
-                        victim.HandleMessage("attacked", {
+                        victim.handleMessage("attacked", {
                             attacker: this,
                             damage: damage
                         });
@@ -277,7 +277,7 @@ var Fighter = Actor.extend({
 
         if (!(self.isPlayer())) {
             //debugger;
-            self.HandleMessage("killed", {
+            self.handleMessage("killed", {
                 killer: killer
             });
 
@@ -359,7 +359,7 @@ var Fighter = Actor.extend({
             }
             self.position = self.startPosition.clone();
             self.targetNodePosition = self.position.clone();
-            self.HandleMessage("respawned", {});
+            self.handleMessage("respawned", {});
         }
 
         // log("Respawned "+self.id);

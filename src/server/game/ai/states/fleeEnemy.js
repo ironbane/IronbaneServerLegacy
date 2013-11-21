@@ -39,7 +39,7 @@ var FleeEnemy = State.extend({
 
         if (!beingChased) {
             // log("[FleeEnemy] Enemy gave up!");
-            unit.HandleMessage("stopFlee");
+            unit.handleMessage("stopFlee");
         } else {
             // log("[FleeEnemy] Too close, running!");
             if (unit.InRangeOfPosition(this.fleePosition, 1)) {

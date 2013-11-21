@@ -70,7 +70,7 @@ var Actor = MovingUnit.extend({
 
         this._super(dTime);
     },
-    HandleMessage: function(message, data) {
+    handleMessage: function(message, data) {
         this.stateMachine.handleMessage(message, data);
     }
 });

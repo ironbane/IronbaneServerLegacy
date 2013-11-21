@@ -539,12 +539,13 @@ var Unit = Class.extend({
         this.targetNodePosition.copy(paths[0]);
       }
       else {
-        // No match found, just go straight for the target
+        // No match found! Let our state machine know that we can't reach the target
+        this.handleMessage("targetUnreachable");
         this.targetNodePosition.copy(this.position);
       }
     }
     else {
-      // With no navigation data, just go to the target
+      // With no navigation data, stay here!
       this.targetNodePosition.copy(this.position);
     }
 

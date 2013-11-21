@@ -78,7 +78,7 @@ var Patrol = State.extend({
 
                 me.targetPosition = newWaypoint.pos;
 
-                unit.HandleMessage("changeWaypoint", newWaypoint);
+                unit.handleMessage("changeWaypoint", newWaypoint);
 
                 me.sentTimeout = false;
             }, this.options.pause);

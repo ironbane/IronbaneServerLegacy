@@ -68,7 +68,7 @@ var ChaseEnemy = State.extend({
         if (isInvalidPlayer(this.enemy) || isDead(this.enemy) || outsideSpawnGuardRadius(unit) && this.minimumChaseTime <= 0) {
             // log("[ChaseEnemy] Stopping chase!");
             // should we not transition to another state? like previous?
-            unit.HandleMessage("stopChase");
+            unit.handleMessage("stopChase");
         } else if (distance < Math.pow(WeaponRanges[unit.weapon.subtype], 2)) {
             // should this transition to "attack" state instead?
             //this.chaseTimeBeforeGivingUp = 8;
@@ -95,6 +95,14 @@ var ChaseEnemy = State.extend({
             // log("[ChaseEnemy] Within aggro range, moving closer...");
             direction = unit.position.clone().sub(this.enemy.position).normalize().multiplyScalar(0.5);
             unit.TravelToPosition(this.enemy.position, true);
+        }
+    },
+    handleMessage: function(unit, message, data) {
+        switch (message) {
+            case "targetUnreachable":
+                // If the pathfinder can't guide us, stop chasing
+                unit.handleMessage("stopChase");
+                break;
         }
     }
 });
