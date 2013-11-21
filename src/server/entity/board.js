@@ -15,6 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var Class = require('../../common/class');
+var logger = require('../logging/winston');
 
 module.exports = function(db) {
     var Q = require('q'),
@@ -36,13 +37,12 @@ module.exports = function(db) {
         var recentUserQuery = "(SELECT bcs_users.name FROM bcs_users INNER JOIN forum_posts ON forum_posts.user = bcs_users.id WHERE forum_posts.topic_id = forum_topics.id ORDER BY forum_posts.time DESC LIMIT 1) as lastuser, "
         db.query('SELECT ' + recentUserQuery + ' forum_topics.sticky, forum_topics.locked, forum_topics.id, forum_topics.views as viewcount, MIN(forum_posts.time) AS firstposttime, MAX(forum_posts.time) as lastposttime, (COUNT(forum_posts.id) - 1 ) as postcount, bcs_users.name AS username, forum_topics.title FROM forum_topics INNER JOIN forum_posts ON forum_topics.id = forum_posts.topic_id INNER JOIN bcs_users ON forum_posts.user = bcs_users.id WHERE forum_topics.private = 0 and board_id = ? and forum_topics.time >= ? GROUP BY forum_topics.id', [boardId, minimumtime], function(err, results) {
             if (err) {
-                log('error getting topics');
+                logger.error('error in Board.getView ' + err);
                 deferred.reject(err);
                 return;
             }
             if(results.length === 0) {
-                log('no topics found');
-                deferred.resolve([]);
+                return deferred.resolve([]);
             }
             deferred.resolve(results);
         });
@@ -54,6 +54,7 @@ module.exports = function(db) {
 
         db.query('select * from forum_boards where id=?', [boardId], function(err, results) {
             if(err) {
+                logger.error('error in Board.get ' + err);
                 deferred.reject(err);
                 return;
             }
