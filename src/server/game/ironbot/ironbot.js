@@ -19,7 +19,8 @@ var Class = require('../../../common/class'),
 	sanitize = require('validator').sanitize,
 	_ = require('underscore'),
 	log = require('util').log,
-	unidecode = require('unidecode');
+	unidecode = require('unidecode'),
+	logger = require('../../logging/winston');
 
 // Now declare some objects and variables
 var dictionaries = {};
@@ -121,7 +122,8 @@ function filterBadwords(unit, message, dictionaries) {
 		}
 	} else { // nasty things are being said
 		// Need to add ifcase so the production server doesn't log that much
-		console.log('Ironbot badwords (' + unit.name + '): ' + wordHits.join());
+		logger.warn('Ironbot badwords (' + unit.name + '): ' + wordHits.join()+"; original message: " + message);
+
 		var badUnit = addUnitToList(unit);
 		if(badUnit.funnyActive) { // Return random funny message instead of real message
 			var keys = Object.keys(dictionaries.funnyRandom);
@@ -150,6 +152,8 @@ function filterBadwords(unit, message, dictionaries) {
 				break;
 			}
 		}
+
+		logger.warn('Ironbot badwords (' + unit.name + '): ' + wordHits.join()+"; original message: " + message+ "; status: " + status);
 		return { 
 			message: message,
 			status: status
