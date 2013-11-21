@@ -45,6 +45,22 @@ IronbaneApp
                   message: '/giveitem ' + $scope.item.id
                 });
             };
+
+            $scope.showAnalysis = function() {
+                if(!$scope.item || !$scope.item.id) {
+                    // can't give a non-final item (yet!)
+                    return;
+                }
+
+                ItemTemplateSvc.getAnalysis($scope.item.id).then(function(result) {
+                    var report = "This item is found " + result.items + " times in inventories.<br>";
+                    report += "It is in the loot of " + result.loots + " units.";
+
+                    hudHandler.messageAlert(report);
+                }, function(err) {
+                    hudHandler.messageAlert('Error' + err);
+                });
+            };
         }],
         link: function(scope, el, attrs) {
 

@@ -13,4 +13,12 @@ IronbaneApp
             return results;
         });
     };
+
+    this.getAnalysis = function(itemId) {
+        return $http.get('/api/item_templates/' + itemId + '/analysis').then(function(response) {
+            return response.data;
+        }, function(err) {
+            return $q.reject(err);
+        });
+    };
 }]);

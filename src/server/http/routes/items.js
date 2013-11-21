@@ -23,6 +23,14 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get('/api/item_templates/:templateId/analysis', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
+        ItemTemplateService.getUsageAnalysis(req.params.templateId).then(function(results) {
+            res.send(results);
+        }, function(error) {
+            res.send(error, 500);
+        });
+    });
+
     // create a new item template, editor only function
     app.post('/api/item_templates', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
         ItemTemplateService.create(req.body).then(function(template) {

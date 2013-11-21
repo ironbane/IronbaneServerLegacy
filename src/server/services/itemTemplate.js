@@ -74,6 +74,43 @@ var Service = Class.extend({
 
         return deferred.promise;
     },
+    getItemsUsingTemplate: function(templateId) {
+        var deferred = Q.defer();
+
+        db.query('SELECT count(*) FROM ib_items where template=?', [templateId], function(err, result) {
+            if(err) {
+                return deferred.reject('db error', err);
+            }
+
+            deferred.resolve(result[0]['count(*)']);
+        });
+
+        return deferred.promise;
+    },
+    getUnitsUsingTemplateAsLoot: function(templateId) {
+        var deferred = Q.defer();
+
+        db.query('SELECT count(*) FROM ib_unit_templates where loot like "' + templateId + ';%" OR loot like "%;' + templateId + ';%"', [], function(err, result) {
+            if(err) {
+                return deferred.reject('db error', err);
+            }
+
+            deferred.resolve(result[0]['count(*)']);
+        });
+
+        return deferred.promise;
+    },
+    getUsageAnalysis: function(templateId) {
+        return Q.all([this.getItemsUsingTemplate(templateId), this.getUnitsUsingTemplateAsLoot(templateId)])
+            .then(function(results) {
+                return {
+                    items: results[0],
+                    loots: results[1]
+                };
+            }, function(err) {
+                return Q.reject(err);
+            });
+    },
     create: function(config) {
         // name, image, type, subtype, attr1, delay, particle, basevalue
         var deferred = Q.defer();
