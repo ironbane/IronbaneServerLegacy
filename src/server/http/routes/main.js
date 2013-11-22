@@ -123,7 +123,7 @@ module.exports = function(app, db) {
                 gm(baseImage)
                     .crop(16, 16, cutpoint[0], cutpoint[1])
                     .filter('point')
-                    .resize(48, 48)
+                    .resize(width, height)
                     .write(path, function(err) {
                         if(err) {
                             res.send(500, err);

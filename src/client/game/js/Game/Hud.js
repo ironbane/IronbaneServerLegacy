@@ -20,10 +20,10 @@ function getImageUrlForItem(item, width, height) {
 
     // default to "big"
     if(!width) {
-        width = 48;
+        width = 32;
     }
     if(!height) {
-        height = 48;
+        height = 32;
     }
 
     if (item.type === 'armor') {
@@ -263,6 +263,8 @@ var HUDHandler = Class.extend({
         var slotSelector = '#is' + item.slot;
         if (item.equipped === 1) {
             $(slotSelector).addClass('equipped');
+        } else {
+            $(slotSelector).addClass('occupied');
         }
         var itemImg = $('<img src="' + imageUrl + '" class="dragon-item invSlotItem" />');
         itemImg.data('item', item);
@@ -286,7 +288,7 @@ var HUDHandler = Class.extend({
         });
     },
     clearInvSlot: function(slotNum) {
-        $('#is' + slotNum).empty().removeClass('equipped used').droppable({accept: '*'});
+        $('#is' + slotNum).empty().removeClass('occupied equipped used').droppable({accept: '*'});
     },
     updateInvSlotStatus: function(slotNum, status) {
         var $slot = $('#is' + slotNum);

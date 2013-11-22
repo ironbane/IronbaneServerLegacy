@@ -691,8 +691,9 @@ label {
         height: 48px;
         float: left;
         img {
-            top: 3px;
-            left: 2px;
+            position: relative;
+            top: 8px;
+            left: 8px;
         }
         &.bankBarSlot {
             background-image: url(/game/images/misc/bar_9.png);
@@ -715,6 +716,9 @@ label {
 #bankBar {
     background-color: transparent;
 }
+#itemBar {
+    background-color: @black;
+}
 @iterations: 11;
 .itemBarSlotLoop (@index) when (@index > 1) {
     .itemBarSlot {
@@ -724,6 +728,9 @@ label {
             background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_3.png);
             &.equipped {
                 background: url(/game/images/misc/bar_equip.png);
+            }
+            &.occupied {
+                background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_7.png);
             }
             &.used {
                 background: url(/game/images/misc/bar_used.png);
