@@ -90,7 +90,7 @@ var WorldHandler = Class.extend({
 
     },
     sendoutSnapshots: function() {
-        var snapshotCache = {};
+        var snapshotCache = [];
         var cacheCount = 0;
         var calculatedCount = 0;
         this.LoopUnits(function(unit) {
@@ -103,8 +103,10 @@ var WorldHandler = Class.extend({
                             ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
                             ud.template.type !== UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)) {
                             var id = ud.id;
-                            var packet = {};
-                            if (_.isUndefined(snapshotCache.id)) {
+                            var packet = _.find(snapshotCache, function(thePacket){ 
+                                return thePacket.id === ud.id;
+                            }) || {};
+                            if (_.isEmpty(packet)) {
                                 calculatedCount++;
                                 var pos = ud.position;
                                 packet.id = id;
@@ -133,10 +135,10 @@ var WorldHandler = Class.extend({
                                 if (ud.sendRotationPacketZ) {
                                     packet.rz = ud.rotation.z.Round(2);
                                 }
-                                snapshotCache.id = packet;
+                                snapshotCache.push(packet);
                             } else {
                                 cacheCount++;
-                                packet = snapshotCache.id;
+                                //packet = snapshotCache.id;
                             }
 
                             snapshot.push(packet);
