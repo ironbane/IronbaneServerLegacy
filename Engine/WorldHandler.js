@@ -66,7 +66,84 @@ var WorldHandler = Class.extend({
             if (hasLoadedUnits) {
                 this.Awake();
             }
+            return;
         }
+
+        this.updateUnits(dTime);
+        this.sendoutSnapshots();
+        
+    },
+    updateUnits: function(dTime) {
+        var unitCount = 0;
+        var players = 0;
+        this.LoopUnits(function(unit){
+            if ( unit.active ) {
+                unitCount++;
+                unit.Tick(dTime);
+            }
+            if ( unit instanceof Player){
+                players++;
+            }
+        });
+                    
+        console.log(unitCount + " active units, " + players + " logged in players");
+        
+    },
+    sendoutSnapshots: function(){
+        var snapshotCache = {};
+        var cacheCount = 0;
+        var calculatedCount = 0;
+        this.LoopUnits(function(unit){    
+            if (unit instanceof Player){
+                var snapshot = [];
+                var otherUnits = unit.otherUnits;
+                _.each(otherUnits, function(ud){
+                    if ( ud.id !== unit.id ){                        
+                        if( (ud.template && 
+                            ud.template.type != UnitTypeEnum.MOVINGOBSTACLE && 
+                            ud.template.type != UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)){                            
+                            var id = ud.id;
+                            var packet = {};
+                            if(_.isUndefined(snapshotCache.id)){
+                                calculatedCount ++;
+                                var pos = ud.position;
+                                packet.id = id;
+                                packet.p = pos.Round(2);
+
+                                if ( ud.standingOnUnitId ) {
+                                    packet.u = ud.standingOnUnitId;
+                                    packet.p = ud.localPosition.Round(2);
+                                }
+
+                                if ( !(ud instanceof Player) && (ud instanceof Fighter) ) {
+                                    // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
+                                    ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
+
+                                    if ( ud.rotation.y < 0 ) ud.rotation.y += (Math.PI*2);
+                                    ud.rotation.y = (Math.PI*2) - ud.rotation.y;
+
+                                }
+
+                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round(2);
+                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round(2);
+                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round(2);
+                                snapshotCache.id = packet;
+                            }
+                            else {
+                                cacheCount ++;
+                                packet = snapshotCache[id];
+                            }
+
+                            snapshot.push(packet);
+                        }
+                    }
+                });
+                if ( snapshot.length > 0 ){ 
+                    console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
+                    unit.socket.emit("snapshot", snapshot);
+                }
+            }
+        }); 
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
 

@@ -57,9 +57,6 @@ var Server = Class.extend({
             this.versionWarningTimer -= dTime;
             if ( this.versionWarningTimer <= 0 ) {
                 this.versionWarningTimer = 300.0;
-
-
-
                 var msg = ChooseSequenced([
 
                     "Welcome to Ironbane! Server uptime: "+timeSince(((new Date()).getTime()/1000.0)-(this.startTime/1000.0))+"<br>"+
@@ -79,139 +76,10 @@ var Server = Class.extend({
                     "Check out the Get Involved page on the website!"
 
                 ]);
-
                 chatHandler.announce(msg);
-
             }
         }
-
-
         worldHandler.Tick(dTime);
-
-
-        // console.log("Tick");
-
-        for(var z in worldHandler.world) {
-            for(var cx in worldHandler.world[z]) {
-                for(var cz in worldHandler.world[z][cx]) {
-
-                    if ( !_.isUndefined(worldHandler.world[z][cx][cz]["units"]) ) {
-
-                        var units = worldHandler.world[z][cx][cz]["units"];
-
-                        for(var u=0;u<units.length;u++) {
-
-                            //if ( units[u].id > 0 ) continue;
-
-                            if ( units[u].active ) {
-                                units[u].Tick(dTime);
-                            }
-
-                        }
-
-                    }
-                }
-            }
-        }
-        // Loop through all connected players in every cell and send each player an update of their otherUnits
-
-        for(var z in worldHandler.world) {
-            for(var cx in worldHandler.world[z]) {
-                for(var cz in worldHandler.world[z][cx]) {
-
-                    if ( !_.isUndefined(worldHandler.world[z][cx][cz]["units"]) ) {
-
-                        var units = worldHandler.world[z][cx][cz]["units"];
-
-                        //log(units);
-
-                        for(var u=0;u<units.length;u++) {
-
-
-                            if ( !(units[u] instanceof Player) ) continue;
-
-                            var snapshot = [];
-
-
-
-                            var otherUnits = units[u].otherUnits;
-
-                            //log(otherUnits);
-                            //throw new Error('test');
-
-                            // log("otherUnits:");
-                            // log(otherUnits);
-
-                            for( var ou=0;ou<otherUnits.length;ou++ ) {
-
-                                var ud = otherUnits[ou];
-
-                                if ( ud == units[u] ) continue;
-
-
-                                //var distance = DistanceBetweenPoints(ud.position.x, ud.position.z, units[u].position.x, units[u].position.z);
-                                //log("Adding unit "+ud.id+" for player "+units[u].id+" (distance "+distance+")");
-                                // Check if the unit is too far from us
-                                //if ( distance > 40 ) continue;
-
-
-                                if ( ud.id < 0 ) {
-                                    if ( ud.template.type == UnitTypeEnum.MOVINGOBSTACLE
-                                    || ud.template.type == UnitTypeEnum.TOGGLEABLEOBSTACLE ) {
-                                        // No movement packets for us, since we'll do everything locally
-                                        // Toggleable obstacles just receive toggle events and react on that
-                                        continue;
-                                    }
-                                }
-
-
-                                var id = ud.id;
-                                var pos = ud.position;
-
-                                var packet = {
-                                    id:id,
-                                    p:pos.Round(2)
-                                    };
-
-                                if ( ud.standingOnUnitId ) {
-                                    packet.u = ud.standingOnUnitId;
-
-                                    // Send our local position instead!
-                                    packet.p = ud.localPosition.Round(2);
-                                }
-
-
-                                if ( !(ud instanceof Player) && (ud instanceof Fighter) ) {
-                                    // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
-                                    ud.rotation.y = (Math.atan2(ud.heading.z, ud.heading.x));
-
-                                    if ( ud.rotation.y < 0 ) ud.rotation.y += (Math.PI*2);
-                                    ud.rotation.y = (Math.PI*2) - ud.rotation.y;
-
-                                }
-
-                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round(2);
-                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round(2);
-                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round(2);
-
-                                snapshot.push(packet);
-
-                            }
-
-
-                            if ( snapshot.length === 0 ) continue;
-
-
-                            units[u].socket.emit("snapshot", snapshot);
-
-                        }
-
-                    }
-
-                }
-            }
-        }
-
     }
 });
 
