@@ -38,6 +38,7 @@ var EditorGUI = function() {
   this.chGodMode = !_.isUndefined(localStorage.chGodMode) ? (localStorage.chGodMode === 'true') : false;
   this.chInvisibleByMonsters = !_.isUndefined(localStorage.chInvisibleByMonsters) ? (localStorage.chInvisibleByMonsters === 'true') : false;
   this.ch999Damage = !_.isUndefined(localStorage.ch999Damage) ? (localStorage.ch999Damage === 'true') : false;
+  this.chDevNinja = !_.isUndefined(localStorage.chDevNinja) ? (localStorage.chDevNinja === 'true') : false;
   this.chForceDay = !_.isUndefined(localStorage.chForceDay) ? (localStorage.chForceDay === 'true') : false;
   this.chForceNight = !_.isUndefined(localStorage.chForceNight) ? (localStorage.chForceNight === 'true') : false;
   this.chSunOffset = 0;
@@ -853,13 +854,11 @@ var LevelEditor = Class.extend({
     guiControls['chGodMode'] = fCheats.add(this.editorGUI, 'chGodMode');
     guiControls['chInvisibleByMonsters'] = fCheats.add(this.editorGUI, 'chInvisibleByMonsters');
     guiControls['ch999Damage'] = fCheats.add(this.editorGUI, 'ch999Damage');
+    guiControls['chDevNinja'] = fCheats.add(this.editorGUI, 'chDevNinja');
     guiControls['chForceDay'] = fCheats.add(this.editorGUI, 'chForceDay');
     guiControls['chForceNight'] = fCheats.add(this.editorGUI, 'chForceNight');
     guiControls['chSunOffset'] = fCheats.add(this.editorGUI, 'chSunOffset', 0, 359);
     guiControls['chFOV'] = fCheats.add(this.editorGUI, 'chFOV', 1, 90);
-
-
-
 
     guiControls['opShowDebug'] = fOptions.add(this.editorGUI, 'opShowDebug');
     //guiControls['opBackupServer'] = fOptions.add(this.editorGUI, 'opBackupServer');
@@ -900,6 +899,10 @@ var LevelEditor = Class.extend({
     });
     guiControls['ch999Damage'].onFinishChange(function(value) {
       socketHandler.socket.emit('ch999Damage', value);
+      localStorage.ch999Damage = value;
+    });
+    guiControls['chDevNinja'].onFinishChange(function(value) {
+      socketHandler.socket.emit('chDevNinja', value);
       localStorage.ch999Damage = value;
     });
     guiControls['chForceDay'].onFinishChange(function(value) {

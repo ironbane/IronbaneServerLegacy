@@ -164,11 +164,13 @@ module.exports = function(items, units, worldHandler) {
                 unit.Say(message);
             }
 
+	    var unitRank = unit.editor ? 'gm' : 'user';
+	    if (unit.chDevNinja === true) unitRank = 'user';
             var messageData = {
                 type: messageType,
                 user: {
                     name: unit.name,
-                    rank: unit.editor ? 'gm' : 'user'
+                    rank: unitRank
                 },
                 message: message
             };
