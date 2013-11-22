@@ -41,7 +41,14 @@
         <div class="pull-left">
             <div class="control-group image-control">
                 <label class="control-label" for="item_image">Image: {{ item.image }}</label>
-                <img id="item_image" ng-src="{{ imageUrl }}" />
+                <div class="pull-right item-image">
+                    <img ng-show="item.image" id="item_image" ng-src="{{ imageUrl }}" />
+                </div>
+                <div class="pull-right item-image-options">
+                    <button>Choose</button>
+                    <br>
+                    <button>Create</button>
+                </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="item_attr1">Attr1:</label>
