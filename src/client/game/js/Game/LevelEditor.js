@@ -903,7 +903,7 @@ var LevelEditor = Class.extend({
     });
     guiControls['chDevNinja'].onFinishChange(function(value) {
       socketHandler.socket.emit('chDevNinja', value);
-      localStorage.ch999Damage = value;
+      localStorage.chDevNinja = value;
     });
     guiControls['chForceDay'].onFinishChange(function(value) {
       localStorage.chForceDay = value;
