@@ -15,16 +15,24 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-function TeleportElement(id, to) {
-    //Get
-    var p = $("#" + to);
-    var offset = p.offset();
+function getImageUrlForItem(item, width, height) {
+    var imageUrl;
 
-    //set
-    $("#" + id).offset({
-        top: offset.top,
-        left: offset.left
-    });
+    // default to "big"
+    if(!width) {
+        width = 48;
+    }
+    if(!height) {
+        height = 48;
+    }
+
+    if (item.type === 'armor') {
+        imageUrl = 'images/characters/base/' + item.subtype + '/' + item.$template.image + '/' + width + '/' + height;
+    } else {
+        imageUrl = 'images/items/' + item.$template.image + '/' + width + '/' + height;
+    }
+
+    return imageUrl;
 }
 
 var props = ['skin', 'eyes', 'hair', 'feet', 'body', 'head', 'big'];
@@ -157,7 +165,7 @@ var HUDHandler = Class.extend({
         }, 1000);
     },
     toggleScreenShotMode: function(){
-        this.screenshotMode = !this.screenshotMode; 
+        this.screenshotMode = !this.screenshotMode;
         if(this.screenshotMode === true){
             $('#statBar').hide();
             $('#itemBar').hide();
@@ -250,13 +258,7 @@ var HUDHandler = Class.extend({
     },
     fillInvSlot: function(item) {
         var HUD = this,
-            imageUrl;
-
-        if (item.type === 'armor') {
-            imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
-        } else {
-            imageUrl = 'images/items/big.php?i=' + item.$template.image;
-        }
+            imageUrl = getImageUrlForItem(item);
 
         var slotSelector = '#is' + item.slot;
         if (item.equipped === 1) {
@@ -515,13 +517,7 @@ var HUDHandler = Class.extend({
     },
     fillLootSlot: function(item) {
         var HUD = this,
-            imageUrl;
-
-        if (item.type === 'armor') {
-            imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
-        } else {
-            imageUrl = 'images/items/big.php?i=' + item.$template.image;
-        }
+            imageUrl = getImageUrlForItem(item);
 
         var slotSelector = '#ls' + item.slot;
         var itemImg = $('<img src="' + imageUrl + '" class="dragon-item lootSlotItem" />');
@@ -593,13 +589,7 @@ var HUDHandler = Class.extend({
     },
     fillVendorSlot: function(item) {
         var HUD = this,
-            imageUrl;
-
-        if (item.type === 'armor') {
-            imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
-        } else {
-            imageUrl = 'images/items/big.php?i=' + item.$template.image;
-        }
+            imageUrl = getImageUrlForItem(item);
 
         var slotSelector = '#vs' + item.slot;
         var itemImg = $('<img src="' + imageUrl + '" class="dragon-item vendorSlotItem" />');
@@ -726,13 +716,7 @@ var HUDHandler = Class.extend({
     },
     fillBankSlot: function(item) {
         var HUD = this,
-            imageUrl;
-
-        if (item.type === 'armor') {
-            imageUrl = 'images/characters/base/' + item.subtype + '/big.php?i=' + item.$template.image + '';
-        } else {
-            imageUrl = 'images/items/big.php?i=' + item.$template.image;
-        }
+            imageUrl = getImageUrlForItem(item);
 
         var slotSelector = '#bs' + item.slot;
         var itemImg = $('<img src="' + imageUrl + '" class="dragon-item bankSlotItem" />');
@@ -817,19 +801,8 @@ var HUDHandler = Class.extend({
     makeItemHover: function(targetEl, item) {
         var template = items[item.template],
             content = '',
-            itemUrl = '',
+            itemUrl = getImageUrlForItem(item, 24, 24),
             itemInfo = '';
-
-        if (template.type === 'armor') {
-            itemUrl = [
-                'images/characters/base/',
-                template.subtype,
-                '/medium.php?i=',
-                template.image
-            ].join('');
-        } else {
-            itemUrl = 'images/items/medium.php?i=' + template.image;
-        }
 
         function infoRow(label, value) {
             return [

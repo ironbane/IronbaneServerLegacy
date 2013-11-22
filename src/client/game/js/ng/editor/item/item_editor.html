@@ -64,12 +64,12 @@
         </div>
     </form>
     <footer>
-        <button>Save</button>
+        <button ng-click="doSave()">Save</button>
         <button ng-click="doNew()">New</button>
         <button ng-click="doDuplicate()">Duplicate</button>
-        <button>Delete</button>
+        <button ng-click="doDelete()">Delete</button>
         <button ng-click="giveItem()" ng-disabled="!item.id">Give Item</button>
-        <button>Script</button>
+        <button ng-click="showScripts()">Script</button>
         <button ng-click="showAnalysis()" ng-disabled="!item.id">Analysis</button>
     </footer>
 </div>

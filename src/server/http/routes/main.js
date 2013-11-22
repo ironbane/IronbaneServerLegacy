@@ -33,6 +33,73 @@ module.exports = function(app, db) {
 
     app.use(app.router);
 
+    // get item images scaled to arbitrary sizes
+    app.get('/game/images/items/:imageId/:width/:height', function(req, res) {
+        var imageId = req.params.imageId,
+            width = req.params.width,
+            height = req.params.height,
+            baseImage = gamePath + 'images/items/' + imageId + '.png',
+            path = gamePath + 'images/items/' + imageId + '_' + width + '_' + height + '.png';
+
+        res.setHeader("Cache-Control", "max-age=" + month);
+
+        fs.exists(path, function(exists) {
+            if(exists) {
+                res.sendfile(path);
+            } else {
+                gm(baseImage)
+                    .filter('point')
+                    .resize(width, height)
+                    .write(path, function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path);
+                        }
+                    });
+            }
+        });
+    });
+
+    // get armor images scaled to arbitrary sizes
+    app.get('/game/images/characters/base/:subtype/:imageId/:width/:height', function(req, res) {
+        var imageId = req.params.imageId,
+            width = req.params.width,
+            height = req.params.height,
+            subtype = req.params.subtype,
+            baseImage = gamePath + 'images/characters/base/' + subtype + '/' + imageId + '.png',
+            path = gamePath + 'images/characters/base/' + subtype + '/' + imageId + '_' + width + '_' + height + '.png',
+            cutpoint = [16, 76]; // for body
+
+        if(subtype === 'head') {
+            cutpoint = [0, 70];
+        }
+
+        if(subtype === 'feet') {
+            cutpoint = [16, 80];
+        }
+
+        res.setHeader("Cache-Control", "max-age=" + month);
+
+        fs.exists(path, function(exists) {
+            if(exists) {
+                res.sendfile(path);
+            } else {
+                gm(baseImage)
+                    .crop(16, 16, cutpoint[0], cutpoint[1])
+                    .filter('point')
+                    .resize(48, 48)
+                    .write(path, function(err) {
+                        if(err) {
+                            res.send(500, err);
+                        } else {
+                            res.sendfile(path);
+                        }
+                    });
+            }
+        });
+    });
+
     // define special routes prior to statics
     app.get('/game/images/items/big.php', function(req, res) {
         var imageId = req.query.i,
@@ -354,6 +421,7 @@ module.exports = function(app, db) {
         createFullCharacterImage(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6])
             .then(function(image) {
                 //res.setHeader('Content-Type', 'image/png');
+                res.setHeader("Cache-Control", "max-age=" + month);
                 res.sendfile(image);
             }, function(err) {
                 res.send(500, err);

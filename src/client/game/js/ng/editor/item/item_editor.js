@@ -15,15 +15,28 @@ IronbaneApp
 
             $scope.$watch('item.image', function(image) {
                 if(!image || !$scope.item) {
+                    $scope.imageUrl = '';
                     return;
                 }
 
                 if ($scope.item.type === 'armor') {
-                    $scope.imageUrl = 'images/characters/base/' + $scope.item.subtype + '/big.php?i=' + image + '';
+                    $scope.imageUrl = 'images/characters/base/' + $scope.item.subtype + '/' + image + '/80/80';
                 } else {
-                    $scope.imageUrl = 'images/items/big.php?i=' + image;
+                    $scope.imageUrl = 'images/items/' + image + '/80/80';
                 }
             });
+
+            $scope.doSave = function() {
+                if($scope.item.id) {
+                    // update?
+                } else {
+                    ItemTemplateSvc.create($scope.item).then(function() {
+                        // notify success?
+                    }, function(err) {
+                        hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
+                    });
+                }
+            };
 
             $scope.doNew = function() {
                 $scope.item = {};
