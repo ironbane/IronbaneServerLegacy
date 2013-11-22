@@ -261,11 +261,11 @@ var HUDHandler = Class.extend({
             imageUrl = getImageUrlForItem(item);
 
         var slotSelector = '#is' + item.slot;
+        $(slotSelector).addClass('occupied');
         if (item.equipped === 1) {
             $(slotSelector).addClass('equipped');
-        } else {
-            $(slotSelector).addClass('occupied');
         }
+
         var itemImg = $('<img src="' + imageUrl + '" class="dragon-item invSlotItem" />');
         itemImg.data('item', item);
         $(slotSelector).append(itemImg);

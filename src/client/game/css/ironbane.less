@@ -726,11 +726,11 @@ label {
         @t: ~":nth-child(@{i})";
         &@{t} {
             background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_3.png);
-            &.equipped {
-                background: url(/game/images/misc/bar_equip.png);
-            }
             &.occupied {
                 background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_7.png);
+            }
+            &.equipped {
+                background: url(~"/game/images/misc/key_@{i}.png"), url(/game/images/misc/bar_equip.png);
             }
             &.used {
                 background: url(/game/images/misc/bar_used.png);
