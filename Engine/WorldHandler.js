@@ -136,7 +136,7 @@ var WorldHandler = Class.extend({
                                 snapshotCache.id = packet;
                             } else {
                                 cacheCount++;
-                                packet = snapshotCache[id];
+                                packet = snapshotCache.id;
                             }
 
                             snapshot.push(packet);
@@ -144,7 +144,7 @@ var WorldHandler = Class.extend({
                     }
                 });
                 if (snapshot.length > 0) {
-                    console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
+                    //console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
                     unit.socket.emit("snapshot", snapshot);
                 }
             }
