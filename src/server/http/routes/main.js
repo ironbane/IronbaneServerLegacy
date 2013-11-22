@@ -33,6 +33,41 @@ module.exports = function(app, db) {
 
     app.use(app.router);
 
+    // list available image ids
+    app.get('/game/images/items', function(req, res) {
+        var fs = require('q-io/fs'),
+            _ = require('underscore'),
+            path = require('path');
+
+        fs.listTree(gamePath + 'images/items', function(file) {
+            return path.extname(file) === '.png';
+        }).then(function(files) {
+            var names = _.map(files, function(file) {
+                return path.basename(file, '.png');
+            });
+            res.send(names);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
+    app.get('/game/images/armor/:subtype', function(req, res) {
+        var fs = require('q-io/fs'),
+            _ = require('underscore'),
+            path = require('path');
+
+        fs.listTree(gamePath + 'images/characters/base/' + req.params.subtype, function(file) {
+            return path.extname(file) === '.png';
+        }).then(function(files) {
+            var names = _.map(files, function(file) {
+                return path.basename(file, '.png');
+            });
+            res.send(names);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
     // get item images scaled to arbitrary sizes
     app.get('/game/images/items/:imageId/:width/:height', function(req, res) {
         var imageId = req.params.imageId,
