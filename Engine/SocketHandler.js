@@ -1671,7 +1671,10 @@ var SocketHandler = Class.extend({
                 if ( !socket.unit || socket.unit.editor === false ) return;
                 socket.unit.ch999Damage = value;
             });
-
+            socket.on("chDevNinja", function (value) {
+                if ( !socket.unit || socket.unit.editor === false ) return;
+                socket.unit.chDevNinja = value;
+            });
             socket.on("opReloadData", function (data) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
@@ -1684,7 +1687,6 @@ var SocketHandler = Class.extend({
 
             socket.on("pmManage", function (data) {
                 if ( !socket.unit || socket.unit.editor === false ) return;
-
                 if ( !CheckData(data, ["action", "characterName", "reason", "hours"]) ) {
                     reply({
                         errmsg:"Corrupt pmManage data"
