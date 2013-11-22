@@ -71,66 +71,71 @@ var WorldHandler = Class.extend({
 
         this.updateUnits(dTime);
         this.sendoutSnapshots();
-        
+
     },
     updateUnits: function(dTime) {
         var unitCount = 0;
         var players = 0;
-        this.LoopUnits(function(unit){
-            if ( unit.active ) {
+        this.LoopUnits(function(unit) {
+            if (unit.active) {
                 unitCount++;
                 unit.Tick(dTime);
             }
-            if ( unit instanceof Player){
+            if (unit instanceof Player) {
                 players++;
             }
         });
-                    
-        console.log(unitCount + " active units, " + players + " logged in players");
-        
+
+        // console.log(unitCount + " active units, " + players + " logged in players");
+
     },
-    sendoutSnapshots: function(){
+    sendoutSnapshots: function() {
         var snapshotCache = {};
         var cacheCount = 0;
         var calculatedCount = 0;
-        this.LoopUnits(function(unit){    
-            if (unit instanceof Player){
+        this.LoopUnits(function(unit) {
+            if (unit instanceof Player) {
                 var snapshot = [];
                 var otherUnits = unit.otherUnits;
-                _.each(otherUnits, function(ud){
-                    if ( ud.id !== unit.id ){                        
-                        if( (ud.template && 
-                            ud.template.type != UnitTypeEnum.MOVINGOBSTACLE && 
-                            ud.template.type != UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)){                            
+                _.each(otherUnits, function(ud) {
+                    if (ud.id !== unit.id) {
+                        if ((ud.template &&
+                            ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
+                            ud.template.type !== UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)) {
                             var id = ud.id;
                             var packet = {};
-                            if(_.isUndefined(snapshotCache.id)){
-                                calculatedCount ++;
+                            if (_.isUndefined(snapshotCache.id)) {
+                                calculatedCount++;
                                 var pos = ud.position;
                                 packet.id = id;
                                 packet.p = pos.Round(2);
 
-                                if ( ud.standingOnUnitId ) {
+                                if (ud.standingOnUnitId) {
                                     packet.u = ud.standingOnUnitId;
                                     packet.p = ud.localPosition.Round(2);
                                 }
 
-                                if ( !(ud instanceof Player) && (ud instanceof Fighter) ) {
+                                if (!(ud instanceof Player) && (ud instanceof Fighter)) {
                                     // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
                                     ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
 
-                                    if ( ud.rotation.y < 0 ) ud.rotation.y += (Math.PI*2);
-                                    ud.rotation.y = (Math.PI*2) - ud.rotation.y;
+                                    if (ud.rotation.y < 0) {ud.rotation.y += (Math.PI * 2);}
+                                    ud.rotation.y = (Math.PI * 2) - ud.rotation.y;
 
                                 }
 
-                                if ( ud.sendRotationPacketX ) packet.rx = ud.rotation.x.Round(2);
-                                if ( ud.sendRotationPacketY ) packet.ry = ud.rotation.y.Round(2);
-                                if ( ud.sendRotationPacketZ ) packet.rz = ud.rotation.z.Round(2);
+                                if (ud.sendRotationPacketX) {
+                                    packet.rx = ud.rotation.x.Round(2);
+                                }
+                                if (ud.sendRotationPacketY) {
+                                    packet.ry = ud.rotation.y.Round(2);
+                                }
+                                if (ud.sendRotationPacketZ) {
+                                    packet.rz = ud.rotation.z.Round(2);
+                                }
                                 snapshotCache.id = packet;
-                            }
-                            else {
-                                cacheCount ++;
+                            } else {
+                                cacheCount++;
                                 packet = snapshotCache[id];
                             }
 
@@ -138,12 +143,12 @@ var WorldHandler = Class.extend({
                         }
                     }
                 });
-                if ( snapshot.length > 0 ){ 
+                if (snapshot.length > 0) {
                     console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
                     unit.socket.emit("snapshot", snapshot);
                 }
             }
-        }); 
+        });
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
 
@@ -152,8 +157,7 @@ var WorldHandler = Class.extend({
 
         if (worldHandler.CheckWorldStructure(unit.zone, x, z)) {
             worldHandler.world[unit.zone][x][z].units.push(unit);
-        }
-        else {
+        } else {
             // We are in a bad cell??? Find a place to spawn! Or DC
             log("Bad cell found for " + unit.id);
 
@@ -164,10 +168,10 @@ var WorldHandler = Class.extend({
             }
         }
 
-        if ( unit.id > 0 ) {
+        if (unit.id > 0) {
             // Active all NPC's that are nearby
             this.LoopUnitsNear(unit.zone, newCellX, newCellZ, function(unit) {
-                if ( unit.id < 0 ) {
+                if (unit.id < 0) {
                     unit.active = true;
                 }
             });
@@ -184,17 +188,17 @@ var WorldHandler = Class.extend({
 
         var me = this;
 
-        if ( unit.id > 0 ) {
+        if (unit.id > 0) {
             // Active all NPC's that are nearby
             var allCells = [];
             var activeCells = [];
             this.LoopCells(function(cell) {
                 allCells.push(cell);
-                if ( cell.units ) {
+                if (cell.units) {
                     var foundUnit = _.find(cell.units, function(unit) {
                         return unit.id > 0;
                     });
-                    if ( foundUnit !== undefined ) {
+                    if (foundUnit !== undefined) {
                         // Add all nearby cells
                         me.LoopCellsNear(foundUnit.zone, foundUnit.cellX, foundUnit.cellZ, function(cell) {
                             activeCells.push(cell);
@@ -206,9 +210,9 @@ var WorldHandler = Class.extend({
             var cellsToBeDisabled = _.difference(allCells, activeCells);
 
             _.each(cellsToBeDisabled, function(cell) {
-                if ( cell.units ) {
+                if (cell.units) {
                     _.each(cell.units, function(unit) {
-                        if ( unit.id < 0 ) {
+                        if (unit.id < 0) {
                             unit.active = false;
                         }
                     });
@@ -524,8 +528,7 @@ var WorldHandler = Class.extend({
                     data.rotx = data.data.rotX;
                     data.roty = data.data.rotY;
                     data.rotz = data.data.rotZ;
-                }
-                else if (!data || !data.scriptName) {
+                } else if (!data || !data.scriptName) {
                     // Can't live without a script!
                     log("Warning: no script found for Train " + data.id);
                     return;
@@ -603,8 +606,7 @@ var WorldHandler = Class.extend({
         fsi.mkdirSync(path, 0777, true, function(err) {
             if (err) {
                 log("Error:" + err);
-            }
-            else {
+            } else {
                 log('Directory created');
             }
         });
@@ -617,8 +619,7 @@ var WorldHandler = Class.extend({
                 if (stats.isFile()) {
                     this.world[zone][cellX][cellZ].objects = JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 throw e;
             }
         }
@@ -668,8 +669,7 @@ var WorldHandler = Class.extend({
                     if (pos.x === loopObj.x && pos.y === loopObj.y && pos.z === loopObj.z) {
                         if (_.isEmpty(obj.metadata)) {
                             delete loopObj.metadata;
-                        }
-                        else {
+                        } else {
 
                             if (_.isUndefined(loopObj.metadata)) {
                                 loopObj.metadata = {};
@@ -702,8 +702,7 @@ var WorldHandler = Class.extend({
         fsi.mkdirSync(path, 0777, true, function(err) {
             if (err) {
                 log("Error:" + err);
-            }
-            else {
+            } else {
                 log('Directory created');
             }
         });
@@ -768,8 +767,7 @@ var WorldHandler = Class.extend({
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (z in self.world) {
                 for (cx in self.world[z]) {
                     for (cz in self.world[z][cx]) {
@@ -823,8 +821,7 @@ var WorldHandler = Class.extend({
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (z in self.world) {
                 for (cx in self.world[z]) {
                     for (cz in self.world[z][cx]) {
