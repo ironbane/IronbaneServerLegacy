@@ -4,8 +4,35 @@ IronbaneApp
         scope: true,
         templateUrl: '/game/templates/item_editor.html',
         restrict: 'EA',
-        controller: ['$scope', '$log', 'ItemTemplateSvc', function($scope, $log, ItemTemplateSvc) {
+        controller: ['$scope', '$log', 'ItemTemplateSvc', '$fileUploader', 'ITEM_TYPE_ENUM',
+            function($scope, $log, ItemTemplateSvc, $fileUploader, ITEM_TYPE_ENUM) {
+
             $scope.templates = [];
+            $scope.item = {};
+
+            $scope.item_types = _.keys(ITEM_TYPE_ENUM);
+            $scope.item_subtypes = ITEM_TYPE_ENUM[$scope.item_types[0]];
+
+            $scope.$watch('item.type', function(type) {
+                if(!type) {
+                    return;
+                }
+
+                $scope.item_subtypes = ITEM_TYPE_ENUM[type];
+            });
+
+            var uploader = $scope.uploader = $fileUploader.create({scope: $scope});
+
+            uploader.bind('afteraddingfile', function(e, item) {
+                $log.log('afteraddingfile: ', item);
+                var fr = new FileReader();
+                fr.readAsDataURL(item.file);
+                fr.onload = function() {
+                    $scope.imageUrl = fr.result;
+                    $scope.item.image = -1;
+                    $scope.$digest();
+                };
+            });
 
             ItemTemplateSvc.getAll().then(function(templates) {
                 $scope.templates = templates;
@@ -14,8 +41,7 @@ IronbaneApp
             });
 
             $scope.$watch('item.image', function(image) {
-                if(!image || !$scope.item) {
-                    $scope.imageUrl = '';
+                if(!image || !$scope.item || image < 0) {
                     return;
                 }
 

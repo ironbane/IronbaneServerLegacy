@@ -1,5 +1,11 @@
 IronbaneApp
-.constant('ItemType', ['armor', 'weapon', 'consumable'])
+.constant('ITEM_TYPE_ENUM', {
+    armor: ['head', 'body', 'feet'],
+    weapon: ['sword', 'axe', 'dagger', 'bow', 'staff'],
+    consumable: ['restorative'],
+    tool: ['', 'map', 'key', 'book'],
+    cash: ['']
+})
 .service('ItemTemplateSvc', ['$http', '$q', '$log', 'ItemTemplate', function($http, $q, $log, ItemTemplate) {
     this.getAll = function() {
         var url = "/api/item_templates";

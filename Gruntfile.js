@@ -271,6 +271,11 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'src/client/game'
                 }, {
+                    src: ['**/*.js', '**/*.map'],
+                    dest: '<%= cfg.get("buildTarget") %>game/lib/',
+                    expand: true,
+                    cwd: 'src/client/common/lib'
+                }, {
                     src: 'flash/**/*',
                     dest: '<%= cfg.get("buildTarget") %>game/',
                     expand: true,

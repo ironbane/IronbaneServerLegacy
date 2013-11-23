@@ -22,13 +22,13 @@
             <div class="control-group">
                 <label class="control-label" for="item_type">Type:</label>
                 <div class="controls">
-                    <input id="item_type" type="text" ng-model="item.type" ng-required />
+                    <select id="item_type" name="item_type" ng-model="item.type" ng-options="t for t in item_types" ng-required></select>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="item_subtype">Subtype:</label>
                 <div class="controls">
-                    <input id="item_subtype" type="text" ng-model="item.subtype" ng-required />
+                    <select id="item_subtype" name="item_subtype" ng-model="item.subtype" ng-options="s for s in item_subtypes" ng-required></select>
                 </div>
             </div>
             <div class="control-group">
@@ -47,7 +47,11 @@
                 <div class="pull-right item-image-options">
                     <button>Choose</button>
                     <br>
-                    <button>Create</button>
+                    <div class="ib-upload">
+                        <span class="label">Upload</span>
+                        <input type="file" ng-file-select />
+                    </div>
+                    <button ng-disabled="true">Create</button>
                 </div>
             </div>
             <div class="control-group">

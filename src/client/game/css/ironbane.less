@@ -236,6 +236,37 @@ input[type="color"],
             padding: 8px;
         }
         .clearfix();
+        div.ib-upload {
+            width: 61px;
+            height: 21px;
+            overflow: hidden;
+            text-align: center;
+            cursor: pointer;
+            background-color: #357768;
+            border: 3px solid #1f453c;
+            color: #37ffac;
+            text-decoration: none;
+            text-shadow: 2px 1px 0px #06452d;
+            margin: 3px;
+            &:hover {
+                background-color: #5ba997;
+                border-color: rgba(113, 236, 82, .8);
+                outline: 0;
+                outline: thin dotted \9; /* IE6-9 */
+                .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(113, 236, 82, .6)");
+            }
+            .label {
+                position: absolute;
+                margin-left: -24px;
+            }
+            input {
+                width: 61px !important;
+                height: 21px !important;
+                display: block !important;
+                opacity: 0 !important;
+                overflow: hidden !important;
+            }
+        }
     }
 }
 
