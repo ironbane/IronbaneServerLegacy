@@ -1190,7 +1190,7 @@ var HUDHandler = Class.extend({
                 //charSelect += '<button id="btnEnterChar" class="ibutton" style="width:214px">Enter Ironbane</button>';
                 charSelect += '<div style="width:220px;height:40px;float:left;text-align:center;padding-top:10px;">' + myChar.name + '</div>';
 
-                charSelect += '<button id="btnDelChar" class="ibutton" style="float:left;width:40px;position:absolute;left:276px;top:120px">&#10006;</button>';
+                charSelect += '<button id="btnDelChar" class="ibutton" style="float:left;width:40px;position:absolute;left:266px;top:120px">&#10006;</button>';
             }
         }
 
