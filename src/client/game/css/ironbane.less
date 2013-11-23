@@ -21,11 +21,17 @@
 //Strong Weapon = 2-3p dark red 591818
 //Epic Weapon = 3-5p light blue 67AEBC
 //Legendary Weapon = 5p> Ib color 0CAC53
-@rarity_weak: #636363;
-@rarity_normal: #000000;
-@rarity_strong: #B00000;
-@rarity_epic: #67aebc;
-@rarity_legendary: #0CAC53;
+@rarity_weak: #b8b8b8;
+@rarity_normal: #f7f5fa;
+@rarity_strong: #faa54e;
+@rarity_epic: #d422e4;
+@rarity_legendary: #135432;
+
+@rarity_outline_weak: #000000;
+@rarity_outline_normal: #000000;
+@rarity_outline_strong: #000000;
+@rarity_outline_epic: #000000;
+@rarity_outline_legendary: #3dff99;
 
 .OffScreen {
     position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
@@ -69,18 +75,38 @@ a {
     .item-name {
         &.weak {
             color: @rarity_weak;
+            text-shadow: 1px 1px 0px @rarity_outline_weak,
+                -1px 1px 0px @rarity_outline_weak,
+                1px -1px 0px @rarity_outline_weak,
+                -1px -1px 0px @rarity_outline_weak;
         }
         &.normal {
             color: @rarity_normal;
+            text-shadow: 1px 1px 0px @rarity_outline_normal,
+                -1px 1px 0px @rarity_outline_normal,
+                1px -1px 0px @rarity_outline_normal,
+                -1px -1px 0px @rarity_outline_normal;
         }
         &.strong {
             color: @rarity_strong;
+            text-shadow: 1px 1px 0px @rarity_outline_strong,
+                -1px 1px 0px @rarity_outline_strong,
+                1px -1px 0px @rarity_outline_strong,
+                -1px -1px 0px @rarity_outline_strong;
         }
         &.epic {
             color: @rarity_epic;
+            text-shadow: 1px 1px 0px @rarity_outline_epic,
+                -1px 1px 0px @rarity_outline_epic,
+                1px -1px 0px @rarity_outline_epic,
+                -1px -1px 0px @rarity_outline_epic;
         }
         &.legendary {
             color: @rarity_legendary;
+            text-shadow: 1px 1px 0px @rarity_outline_legendary,
+                -1px 1px 0px @rarity_outline_legendary,
+                1px -1px 0px @rarity_outline_legendary,
+                -1px -1px 0px @rarity_outline_legendary;
         }
     }
     // table of info
