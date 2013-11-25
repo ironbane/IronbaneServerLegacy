@@ -24,6 +24,7 @@ var SocketHandler = Class.extend({
         if (!Detector.webgl) return;
 
         this.loggedIn = false;
+        this.bytesReceived = 0;
 
         this.serverOnline = typeof io === 'undefined' ? false : true;
 
@@ -774,7 +775,7 @@ var SocketHandler = Class.extend({
 
         this.socket.on('snapshot', function(snapshot) {
             //if ( !socketHandler.loggedIn ) return;
-
+            socketHandler.bytesReceived += 2 * snapshot.length;
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
                 var unit = FindUnit(unitdata.id);

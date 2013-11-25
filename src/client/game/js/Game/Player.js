@@ -268,6 +268,7 @@ var Player = Fighter.extend({
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
         debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+        debug.setWatch("bytes received",socketHandler.bytesReceived);
 
 
         // Check for loot bags, chests, and vendors nearby

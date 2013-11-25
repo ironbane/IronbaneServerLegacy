@@ -218,7 +218,6 @@ var Player = Fighter.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
     var zone = this.zone;
-    var u = 0;
     // Remove the unit from the world cells
     if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
 
@@ -229,7 +228,7 @@ var Player = Fighter.extend({
     for (var x = cx - 1; x <= cx + 1; x++) {
       for (var z = cz - 1; z <= cz + 1; z++) {
         if (worldHandler.CheckWorldStructure(zone, x, z)) {
-          for (u = 0; u < worldHandler.world[zone][x][z].units.length; u++) {
+          for (var u = 0; u < worldHandler.world[zone][x][z].units.length; u++) {
             worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
           }
         }

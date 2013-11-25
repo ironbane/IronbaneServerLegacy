@@ -412,28 +412,27 @@ var Projectile = Unit.extend({
             }
 
         }
-
+        ///This code should move to the server.
         if ( this.owner == ironbane.player ) {
             if ( !this.damageDone ) {
                 if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
-                    (function(unit){
                     var list = [];
                     var unitList = [];
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
                             && u != ironbane.player
-                            && unit.inRangeOfUnit(u, 1)
+                            && this.inRangeOfUnit(u, 1)
                             && u.health > 0
-                            && (u.id < 0 || (u.isPlayer() && unit.weapon.attr1 <= 0))
+                            && (u.id < 0 || (u.isPlayer() && this.weapon.attr1 <= 0))
                             && (u.isPlayer() || !u.template.friendly) ){
                             list.push(u.id);
                             unitList.push(u);
                         }
-                    });
+                    }, this);
 
                     if ( list.length > 0 ) {
-                        socketHandler.socket.emit('hit', {w:unit.weapon.id,l:list}, function (reply) {
+                        socketHandler.socket.emit('hit', {w:this.weapon.id,l:list}, function (reply) {
 
                             if ( !_.isUndefined(reply.errmsg) ) {
                                 hudHandler.messageAlert(reply.errmsg);
@@ -442,17 +441,15 @@ var Projectile = Unit.extend({
 
                         });
 
-                        unit.damageDone = true;
+                        this.damageDone = true;
 
 //                        unit.velocity.set(0,0,0)
 //                        unit.object3D.position.copy(unitList[0].position);
 //                        unit.dynamic = false;
 //                        unit.unitStandingOn = unitList[0];
 
-                        unit.Impact();
+                        this.Impact();
                     }
-                    })(this);
-
                 }
             }
         }
@@ -460,15 +457,14 @@ var Projectile = Unit.extend({
             if ( !this.damageDone ) {
                 if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
-                    (function(unit){
                     var list = [];
 
-                    if ( unit.inRangeOfUnit(ironbane.player, 1) ) {
+                    if ( this.inRangeOfUnit(ironbane.player, 1) ) {
                         list.push(ironbane.player);
                     }
 
                     if ( list.length > 0 ) {
-                        socketHandler.socket.emit('ghit', {w:unit.weapon.id,o:unit.owner.id}, function (reply) {
+                        socketHandler.socket.emit('ghit', {w:this.weapon.id,o:this.owner.id}, function (reply) {
 
                             if ( !_.isUndefined(reply.errmsg) ) {
                                 hudHandler.messageAlert(reply.errmsg);
@@ -477,12 +473,10 @@ var Projectile = Unit.extend({
 
                         });
 
-                        unit.damageDone = true;
+                        this.damageDone = true;
 
-                        unit.Impact();
+                        this.Impact();
                     }
-                    })(this);
-
                 }
             }
         }
@@ -490,27 +484,22 @@ var Projectile = Unit.extend({
             if ( !this.damageDone ) {
                 if ( !(this.velocity.lengthSq() < 0.0001) ) {
 
-                    (function(unit){
                     var list = [];
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
                             && u != unit.owner
-                            && unit.inRangeOfUnit(u, 1)
+                            && this.inRangeOfUnit(u, 1)
                             && u.health > 0
-                            && unit.weapon.attr1 <= 0){
+                            && this.weapon.attr1 <= 0){
                             list.push(u);
                         }
-                    });
+                    }, this);
 
                     if ( list.length > 0 ) {
-                        unit.damageDone = true;
-
-                        unit.Impact();
+                        this.damageDone = true;
+                        this.Impact();
 
                     }
-
-                    })(this);
-
                 }
             }
         }
@@ -522,7 +511,7 @@ var Projectile = Unit.extend({
         if ( this.lifeTime <= 0 ) {
             if ( this.particle ) {
                 this.particle.removeNextTick = true;
-                this.particle = null;
+                //this.particle = null;
             }
 
             this.fullDestroy();
@@ -556,7 +545,7 @@ var Projectile = Unit.extend({
 
         if ( this.particle ) {
             this.particle.removeNextTick = true;
-            this.particle = null;
+            //this.particle = null;
         }
 
         if ( this.type.destroyOnImpact ) {
