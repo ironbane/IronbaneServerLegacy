@@ -172,6 +172,9 @@ var HUDHandler = Class.extend({
             $('#coinBar').hide();
             $('#debugBox').hide();
             $('#editorControls').hide();
+            if(ironbane.stats && ironbane.stats.domElement) {
+                ironbane.stats.domElement.style.visibility = "hidden";
+            }
         }
         else{
              $('#statBar').show();
@@ -179,6 +182,9 @@ var HUDHandler = Class.extend({
             $('#coinBar').show();
              $('#debugBox').show();
              $('#editorControls').show();
+             if(ironbane.stats && ironbane.stats.domElement) {
+                ironbane.stats.domElement.style.visibility = "visible";
+            }
 
         }
         var me = this;
