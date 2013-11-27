@@ -20,11 +20,10 @@ var fs = require('q-io/fs'),
     _ = require('underscore');
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
 
     var Commands = {};
 
@@ -32,7 +31,7 @@ module.exports = function(items, units, worldHandler, chatHandler) {
     fs.list(__dirname).then(function(files) {
         _.each(files, function(file) {
             if(file !== 'index.js') {
-                var cmd = require(__dirname + '/' + file)(items, units, worldHandler, chatHandler),
+                var cmd = require(__dirname + '/' + file)(units, worldHandler, chatHandler),
                     cmdName = cmd.name || path.basename(file, '.js').toLowerCase();
 
                 console.log('loading chat command: ', file, 'named: ', cmdName);

@@ -16,32 +16,33 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
-            var color = '#999999',
-		ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot'),
-		filterMessage = ironbot.filterBadwords(unit, params.join(" ")),
-            	message = '<b>* ' + unit.name + " " + filterMessage.message + ' *</b>';
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                deferred = Q.defer(),
+                color = '#999999',
+                ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot'),
+                filterMessage = ironbot.filterBadwords(unit, params.join(" ")),
+                message = '<b>* ' + unit.name + " " + filterMessage.message + ' *</b>';
 
-	    if(filterMessage.message === "") return {
-                errorMessage: errorMessage
+            if (filterMessage.message === "") {
+                deferred.reject();
+                return deferred.promise;
             }
 
-            if(target) {
+            if (target) {
                 chatHandler.announceRoom(target, message, color);
             } else {
                 chatHandler.announce(message, color);
             }
+            deferred.resolve();
 
-            return {
-                errorMessage: errorMessage
-            };
+            return deferred.promise;
         }
     };
 };

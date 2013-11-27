@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-module.exports = function(items, units, worldHandler) {
+module.exports = function(units, worldHandler) {
     var Class = require('../../../common/class'),
         sanitize = require('validator').sanitize,
         _ = require('underscore'),
@@ -23,13 +23,14 @@ module.exports = function(items, units, worldHandler) {
 
     var ChatHandler = Class.extend({
         init: function(io) {
-            this.commands = require('./commands')(items, units, worldHandler, this);
+            this.commands = require('./commands')(units, worldHandler, this);
             // needs reference to socket stuff for now
             this.io = io;
         },
         // was "Say", now /say is a command instead
         processInput: function(unit, message) {
-            var command,
+            var self = this,
+                command,
                 target,
                 commandOpener = message.substr(0, 1);
 
@@ -90,8 +91,11 @@ module.exports = function(items, units, worldHandler) {
             var color = "#01ff46";
 
             if (this.commands[command] && ((!this.commands[command].requiresEditor && !unit.editor) || unit.editor)) {
-                var result = this.commands[command].action(unit, target, realparams, errorMessage);
-                errorMessage = result.errorMessage;
+                this.commands[command].action(unit, target, realparams).then(function() {
+                    // success
+                }, function(err) {
+                    self.announcePersonally(unit, err, 'red');
+                });
             } else {
                 errorMessage = "That command does not exist!";
             }

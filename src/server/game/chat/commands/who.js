@@ -16,28 +16,28 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
-            var room = params[0],
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                deferred = Q.defer(),
+                room = params[0],
                 players = chatHandler.listPlayers(room);
 
             if(players.length === 0) {
                 // if no one is in the room, it doesn't really exist
-                errorMessage = 'No one is in this room.';
+                deferred.reject('No one is in this room.');
             } else {
                 // enhance?: get list of units instead, color names based on rank; display count; display room or "global";
                 chatHandler.announcePersonally(unit, players.join(', '), "#97FFFF");
+                deferred.resolve();
             }
 
-            return {
-                errorMessage: errorMessage
-            };
+            return deferred.promise;
         }
     };
 };

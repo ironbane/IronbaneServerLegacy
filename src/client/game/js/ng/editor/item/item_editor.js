@@ -66,6 +66,7 @@ IronbaneApp
 
             $scope.doNew = function() {
                 $scope.item = {};
+                $scope.itemEditorForm.$setPristine();
             };
 
             $scope.doDuplicate = function() {

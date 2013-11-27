@@ -233,7 +233,7 @@ function start(scripts) {
     });
 
     // Load Chat module - after worldHandler, there is a dep
-    global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.items, global.dataHandler.units, global.worldHandler);
+    global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.units, global.worldHandler);
 
     // All set! Tell WorldHandler to load
     worldHandler.LoadWorldLight();

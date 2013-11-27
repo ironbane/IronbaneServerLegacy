@@ -16,17 +16,18 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     var constants = require('../../../../common/constants');
 
     return {
         requiresEditor: true,
-        action: function(unit, target, params, errorMessage) {
-            var unfortunate = worldHandler.FindPlayerByName(params[0]);
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                unfortunate = worldHandler.FindPlayerByName(params[0]);
+
             if (unfortunate) {
                 unfortunate.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
                 chatHandler.announcePersonally(unfortunate, "You were teleported back to town.", "lightgreen");
@@ -34,9 +35,7 @@ module.exports = function(items, units, worldHandler, chatHandler) {
                 chatHandler.announcePersonally(unit, "Playername " + params[0] + " not found", "red");
             }
 
-            return {
-                errorMessage: errorMessage
-            };
+            return Q();
         }
     };
 };

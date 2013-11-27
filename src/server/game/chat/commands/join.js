@@ -16,18 +16,22 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     var _ = require('underscore');
 
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                deferred = Q.defer(),
+                errorMessage = '';
+
             if(!_.isString(params[0])) {
-                return {errorMessage: 'join target required.'};
+                deferred.reject('join target required.');
+                return deferred.promise;
             }
 
             var room = params[0].toLowerCase(),
@@ -62,11 +66,12 @@ module.exports = function(items, units, worldHandler, chatHandler) {
             // todo: instead provide feedback to return object?
             if(success) {
                 chatHandler.announcePersonally(unit, "Joined: " + room, "pink");
+                deferred.resolve();
+            } else {
+                deferred.reject(errorMessage);
             }
 
-            return {
-                errorMessage: errorMessage
-            };
+            return deferred.promise;
         }
     };
 };

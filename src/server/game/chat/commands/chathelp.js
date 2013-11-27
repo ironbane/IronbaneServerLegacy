@@ -16,20 +16,19 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
-            var message = "/join (Join/create a room)<br>/leave (Leave a room)<br>/rooms (List all rooms)<br>/who (Who is online)<br>/who roomname (Who is in this room)<br>/me (Say what you are doing)<br>/zone playername (See where your buddies hangout)<br>/dice number (Number is optional)";
+        action: function(unit, target, params) {
+            var Q = require('q'),
+            message = "/join (Join/create a room)<br>/leave (Leave a room)<br>/rooms (List all rooms)<br>/who (Who is online)<br>/who roomname (Who is in this room)<br>/me (Say what you are doing)<br>/zone playername (See where your buddies hangout)<br>/dice number (Number is optional)";
+
             chatHandler.announcePersonally(unit, message, "yellow");
 
-            return {
-                errorMessage: errorMessage
-            };
+            return Q();
         }
     };
 };

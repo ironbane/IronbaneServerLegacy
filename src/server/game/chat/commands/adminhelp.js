@@ -16,20 +16,20 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: true,
-        action: function(unit, target, params, errorMessage) {
-            var message = '/announce "message" (announce)<br>/warn player (warn)<br>/seriouswarn player (seriouswarn)<br>/kick player "reason" (kick from server)<br>/ban player hours "reason" (ban from server)<br>/unstuck player (unstuck, like /stuck)<br>/whois player (get player info)';
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                message = '/announce "message" (announce)<br>/warn player (warn)<br>/seriouswarn player (seriouswarn)<br>/kick player "reason" (kick from server)<br>/ban player hours "reason" (ban from server)<br>/unstuck player (unstuck, like /stuck)<br>/whois player (get player info)';
+
             chatHandler.announcePersonally(unit, message, "yellow");
-            return {
-                errorMessage: errorMessage
-            };
+
+            return Q();
         }
     };
 };

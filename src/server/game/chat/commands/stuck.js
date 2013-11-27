@@ -16,30 +16,27 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
 // Hell == zone 41
 
-module.exports = function(items, units, worldHandler, chatHandler) {
+module.exports = function(units, worldHandler, chatHandler) {
     var constants = require('../../../../common/constants');
 
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
-	        var player = worldHandler.FindPlayerByName(unit.name);
-		if(player) {
-			if(player.zone === 41) {
-				chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
-			} else {
-				unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
-				chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
-			}
-		}
-            return {
-                errorMessage: errorMessage
-            };
+        action: function(unit, target, params) {
+            var player = worldHandler.FindPlayerByName(unit.name);
+            if (player) {
+                if (player.zone === 41) {
+                    chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
+                } else {
+                    unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
+                    chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
+                }
+            }
+            return Q();
         }
     };
 };

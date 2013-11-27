@@ -16,7 +16,6 @@
 */
 
 // chat command API
-// items - item templates (from datahandler)
 // units - unit templates (from datahandler)
 // worldHandler - worldHandler reference
 // chatHandler - reference to general chat utils
@@ -25,8 +24,10 @@ module.exports = function(items, units, worldHandler, chatHandler) {
 
     return {
         requiresEditor: false,
-        action: function(unit, target, params, errorMessage) {
-            var rooms = chatHandler.listRooms(),
+        action: function(unit, target, params) {
+            var Q = require('q'),
+                deferred = Q.defer(),
+                rooms = chatHandler.listRooms(),
                 match;
 
             // if we're attempting to match a user or room
@@ -38,14 +39,13 @@ module.exports = function(items, units, worldHandler, chatHandler) {
             }
 
             if(target && !match) {
-                errorMessage = "No such user or room.";
+                deferred.reject("No such user or room.");
             } else {
                 chatHandler.say(unit, params.join(' '), match); // OK to pass null for match here, that's "global"
+                deferred.resolve();
             }
 
-            return {
-                errorMessage: errorMessage
-            };
+            return deferred.promise;
         }
     };
 };

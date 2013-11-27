@@ -50,6 +50,29 @@ var Service = Class.extend({
 
         return deferred.promise;
     },
+    getByName: function(templateName) {
+        var deferred = Q.defer();
+
+        var cached = _.findWhere(cache, {name: templateName});
+        if (cached) {
+            deferred.resolve(cached);
+        } else {
+            db.query('select * from ib_item_templates where name=?', [templateName], function(err, results) {
+                if (err) {
+                    return deferred.reject('template not found ' + JSON.stringify(err));
+                }
+
+                if (results.length === 0) {
+                    return deferred.reject('template not found');
+                }
+
+                cache[results[0].id] = new ItemTemplate(results[0]);
+                deferred.resolve(cache[results[0].id]);
+            });
+        }
+
+        return deferred.promise;
+    },
     getAll: function(refresh) {
         var deferred = Q.defer();
 
@@ -73,6 +96,15 @@ var Service = Class.extend({
         }
 
         return deferred.promise;
+    },
+    getAllByType: function(type) {
+        return this.getAll().then(function(templates) {
+            return _.filter(templates, function(template) {
+                return template.type === type;
+            });
+        }, function(err) {
+            return Q.reject(err);
+        });
     },
     getItemsUsingTemplate: function(templateId) {
         var deferred = Q.defer();
