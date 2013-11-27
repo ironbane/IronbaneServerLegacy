@@ -386,6 +386,7 @@ var EditorGUI = function() {
     this.itemEditor = function() {
         $('#ItemEditor').scope().$apply(function(scope) {
             scope.showItemEditor = true;
+            window.disableGameControls = true;
         });
     };
 

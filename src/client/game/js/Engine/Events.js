@@ -17,9 +17,9 @@
 
 // Disable right-click
 $(function() {
-  $(this).bind('contextmenu', function(e) {
-    e.preventDefault();
-  });
+    $(this).bind('contextmenu', function(e) {
+        e.preventDefault();
+    });
 });
 
 var isHoveringHud = false;
@@ -44,125 +44,120 @@ $('#statBar,#coinBar,#itemBar,#lootBag,#bankBar,#editorControls,div[id^="li"],di
 );
 
 $(window).resize(function() {
-  //alert('resize');
-  hudHandler.ResizeFrame();
+    //alert('resize');
+    hudHandler.ResizeFrame();
 
-  // notify the renderer of the size change
-  ironbane.renderer.setSize( window.innerWidth, window.innerHeight );
-  // update the camera
-  ironbane.camera.aspect  = window.innerWidth / window.innerHeight;
-  ironbane.camera.updateProjectionMatrix();
+    // notify the renderer of the size change
+    ironbane.renderer.setSize(window.innerWidth, window.innerHeight);
+    // update the camera
+    ironbane.camera.aspect = window.innerWidth / window.innerHeight;
+    ironbane.camera.updateProjectionMatrix();
 });
 
 var noDisconnectTrigger = false;
 
-$(document).keydown(function(event){
+$(document).keydown(function(event) {
 
-  if ( !socketHandler.inGame ) return;
-
-    if (window.hasChatFocus === true) {
-        //console.log('hasChatFocus!');
+    if (window.hasChatFocus === true || window.disableGameControls === true || !socketHandler.inGame) {
         return;
     }
 
-  keyTracker[event.keyCode] = true;
+    keyTracker[event.keyCode] = true;
 
 
 
+    if (event.keyCode === 27) {
 
-  if ( event.keyCode === 27 ) {
+        if (!cinema.IsPlaying()) {
+            hudHandler.messageAlert("Back to the Main Menu?", "question", function() {
+                socketHandler.readyToReceiveUnits = false;
+                socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
+                    if (!_.isUndefined(reply.errmsg)) {
+                        hudHandler.messageAlert(reply.errmsg);
+                        return;
+                    }
 
-    if (!cinema.IsPlaying()) {
-      hudHandler.messageAlert("Back to the Main Menu?", "question", function() {
-        socketHandler.readyToReceiveUnits = false;
-        socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
-          if (!_.isUndefined(reply.errmsg)) {
-            hudHandler.messageAlert(reply.errmsg);
-            return;
-          }
+                    $('#gameFrame').animate({
+                        opacity: 0.00
+                    }, 1000, function() {
 
-          $('#gameFrame').animate({
-            opacity: 0.00
-          }, 1000, function() {
+                        setTimeout(function() {
+                            ironbane.showingGame = false;
+                        }, 100);
 
-            setTimeout(function() {
-              ironbane.showingGame = false;
-            }, 100);
+                        socketHandler.inGame = false;
 
-            socketHandler.inGame = false;
+                        socketHandler.readyToReceiveUnits = false;
 
-            socketHandler.readyToReceiveUnits = false;
+                        for (var u = 0; u < ironbane.unitList.length; u++) {
+                            ironbane.unitList[u].Destroy();
+                        }
 
-            for (var u = 0; u < ironbane.unitList.length; u++) {
-              ironbane.unitList[u].Destroy();
-            }
+                        ironbane.unitList = [];
 
-            ironbane.unitList = [];
+                        terrainHandler.Destroy();
 
-            terrainHandler.Destroy();
+                        terrainHandler.status = terrainHandlerStatusEnum.INIT;
 
-            terrainHandler.status = terrainHandlerStatusEnum.INIT;
+                        ironbane.player.Destroy();
 
-            ironbane.player.Destroy();
+                        ironbane.player = null;
 
-            ironbane.player = null;
+                        socketHandler.loggedIn = false;
 
-            socketHandler.loggedIn = false;
+                        $('div[id^="li"]').remove();
+                        $('div[id^="ii"]').remove();
 
-            $('div[id^="li"]').remove();
-            $('div[id^="ii"]').remove();
+                        // is startdata right here? check session user instead?
+                        $.get('/api/user/' + startdata.user + '/characters')
+                            .done(function(data) {
+                                window.chars = data;
+                                window.charCount = window.chars.length;
 
-            // is startdata right here? check session user instead?
-            $.get('/api/user/' + startdata.user + '/characters')
-                .done(function(data) {
-                    window.chars = data;
-                    window.charCount = window.chars.length;
+                                startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
 
-                    startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
-
-                    hudHandler.ShowMenuScreen();
-                    hudHandler.MakeCharSelectionScreen();
-                })
-                .fail(function(err) {
-                    console.error('error getting chars...', err);
+                                hudHandler.ShowMenuScreen();
+                                hudHandler.MakeCharSelectionScreen();
+                            })
+                            .fail(function(err) {
+                                console.error('error getting chars...', err);
+                            });
+                    });
                 });
-          });
-        });
-      }, function() {
+            }, function() {
 
-      });
+            });
 
+        } else {
+            hudHandler.messageAlert("Skip Cutscene?", "question", function() {
+                ironbane.player.canMove = true;
+                cinema.Clear();
+            }, function() {});
+        }
     }
-    else {
-      hudHandler.messageAlert("Skip Cutscene?", "question", function() {
-        ironbane.player.canMove = true;
-        cinema.Clear();
-      }, function() {});
-    }
-  }
 
 
 });
 
 // Disable text selection
-(function($){
+(function($) {
 
-  $.fn.disableSelection = function() {
-    return this.each(function() {
-      $(this).attr('unselectable', 'on')
-      .css({
-        '-moz-user-select':'none',
-        '-webkit-user-select':'none',
-        'user-select':'none',
-        '-ms-user-select':'none'
-      })
-      .each(function() {
-        this.onselectstart = function() {
-          return false;
-        };
-      });
-    });
-  };
+    $.fn.disableSelection = function() {
+        return this.each(function() {
+            $(this).attr('unselectable', 'on')
+                .css({
+                    '-moz-user-select': 'none',
+                    '-webkit-user-select': 'none',
+                    'user-select': 'none',
+                    '-ms-user-select': 'none'
+                })
+                .each(function() {
+                    this.onselectstart = function() {
+                        return false;
+                    };
+                });
+        });
+    };
 
 })(jQuery);
 
@@ -179,35 +174,33 @@ var eClientY = 0;
 $(document).mousedown(function(event) {
 
 
-  var id = event.target.id;
-  if (event.target == ironbane.renderer.domElement || $.inArray(id, ['chatContent','debugBox']) != -1 ) {
-    event.preventDefault();
+    var id = event.target.id;
+    if (event.target == ironbane.renderer.domElement || $.inArray(id, ['chatContent', 'debugBox']) != -1) {
+        event.preventDefault();
 
-    mouseClickFunction(event);
+        mouseClickFunction(event);
 
-    if ( mouseCheckHoldInterval ) clearInterval(mouseCheckHoldInterval);
-    mouseCheckHoldInterval = setInterval(function(){
-      mouseIntervalFunction(event);
-    }, 100);
+        if (mouseCheckHoldInterval) clearInterval(mouseCheckHoldInterval);
+        mouseCheckHoldInterval = setInterval(function() {
+            mouseIntervalFunction(event);
+        }, 100);
 
-  }
+    }
 
 
-//return false;
-}
-);
+    //return false;
+});
 $(document).mouseup(function(event) {
-  clearInterval(mouseCheckHoldInterval);
+    clearInterval(mouseCheckHoldInterval);
 
-  if ( event.button === 0 ) {
+    if (event.button === 0) {
 
-  }
-  else {
-    ironbane.player.isLookingAround = false;
-    ironbane.player.thirdPersonReference
-      .copy(ironbane.player.originalThirdPersonReference);
-  }
-//return false;
+    } else {
+        ironbane.player.isLookingAround = false;
+        ironbane.player.thirdPersonReference
+            .copy(ironbane.player.originalThirdPersonReference);
+    }
+    //return false;
 });
 
 var lastMouseToWorldData = null;
@@ -215,138 +208,130 @@ var currentMouseToWorldData = null;
 
 $(document).mousemove(function(event) {
 
-  // lastMouse = mouse.clone();
-  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // lastMouse = mouse.clone();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
 
 
 });
 
 var mouseClickFunction = function(event) {
-  if ( showEditor && levelEditor.editorGUI.globalEnable ) {
-    if (currentMouseToWorldData) {
+    if (showEditor && levelEditor.editorGUI.globalEnable) {
+        if (currentMouseToWorldData) {
 
-      if ( levelEditor.editorGUI.enableNPCEditor ) {
+            if (levelEditor.editorGUI.enableNPCEditor) {
 
-        var position = currentMouseToWorldData.point;
+                var position = currentMouseToWorldData.point;
 
-        // Find an object near that position which could be a waypoint
-        var npc = null;
+                // Find an object near that position which could be a waypoint
+                var npc = null;
 
-        _.each(ironbane.unitList, function(obj) {
-
-
-          if ( obj.InRangeOfPosition(position, 1)
-            && ((obj instanceof Unit) && obj.id < 0) ) {
-            npc = obj;
-          }
+                _.each(ironbane.unitList, function(obj) {
 
 
-        });
+                    if (obj.InRangeOfPosition(position, 1) && ((obj instanceof Unit) && obj.id < 0)) {
+                        npc = obj;
+                    }
 
-        if ( npc ) {
-          socketHandler.socket.emit('deleteNPC', npc.id);
-        }
-        else {
-          _.each(ironbane.unitList, function(unit) {
 
-            if ( unit.id < 0 ) {
+                });
 
-            if ( currentMouseToWorldData.object == unit.mesh ) {
-              if ( levelEditor.editorGUI.neDeleteMode ) {
-                socketHandler.socket.emit('deleteNPC', unit.id);
-              }
+                if (npc) {
+                    socketHandler.socket.emit('deleteNPC', npc.id);
+                } else {
+                    _.each(ironbane.unitList, function(unit) {
 
+                        if (unit.id < 0) {
+
+                            if (currentMouseToWorldData.object == unit.mesh) {
+                                if (levelEditor.editorGUI.neDeleteMode) {
+                                    socketHandler.socket.emit('deleteNPC', unit.id);
+                                }
+
+                            }
+                        }
+                    });
+                }
             }
-              }
-          });
+
+
         }
-      }
-
-
     }
-      }
 }
 
-var mouseIntervalFunction = function(event){
+var mouseIntervalFunction = function(event) {
 
 
-  // relativeMouse = mouse.clone().sub(lastMouse);
+    // relativeMouse = mouse.clone().sub(lastMouse);
 
-  // sw("relativeMouse", ConvertVector3(relativeMouse));
+    // sw("relativeMouse", ConvertVector3(relativeMouse));
 
-  document.getSelection().removeAllRanges();
-
-
-
+    document.getSelection().removeAllRanges();
 
 
 
-  if ( ironbane.player && !le("globalEnable") ) {
+    if (ironbane.player && !le("globalEnable")) {
 
-    if ( ironbane.player.dead ) return;
+        if (ironbane.player.dead) return;
 
-    if ( event.button === 0 ) {
-      if (currentMouseToWorldData) {
-        var position = currentMouseToWorldData.point;
-        ironbane.player.attemptAttack(position);
-      }
-    }
-    else {
-      // Todo: rotate around camera
-       //ironbane.player.thirdPersonReference.y = 0;
+        if (event.button === 0) {
+            if (currentMouseToWorldData) {
+                var position = currentMouseToWorldData.point;
+                ironbane.player.attemptAttack(position);
+            }
+        } else {
+            // Todo: rotate around camera
+            //ironbane.player.thirdPersonReference.y = 0;
 
-       ironbane.player.isLookingAround = true;
+            ironbane.player.isLookingAround = true;
 
-       var factorX = relativeMouse.x*20;
-       if ( factorX > 0 ) {
-        factorX = Math.min(1, factorX);
-       }
-       else if ( factorX < 0 ) {
-        factorX = Math.max(-1, factorX);
-       }
+            var factorX = relativeMouse.x * 20;
+            if (factorX > 0) {
+                factorX = Math.min(1, factorX);
+            } else if (factorX < 0) {
+                factorX = Math.max(-1, factorX);
+            }
 
-       var factorY = relativeMouse.y*40;
-       if ( factorY > 0 ) {
-        factorY = Math.min(1, factorY);
-       }
-       else if ( factorY < 0 ) {
-        factorY = Math.max(-1, factorY);
-       }
+            var factorY = relativeMouse.y * 40;
+            if (factorY > 0) {
+                factorY = Math.min(1, factorY);
+            } else if (factorY < 0) {
+                factorY = Math.max(-1, factorY);
+            }
 
 
-      var rotationMatrix = new THREE.Matrix4()
-        .makeRotationAxis( new THREE.Vector3(0, 1, 0), factorX );
+            var rotationMatrix = new THREE.Matrix4()
+                .makeRotationAxis(new THREE.Vector3(0, 1, 0), factorX);
 
-      var side = ironbane.camera.lookAtPosition.clone()
-        .sub(ironbane.camera.position).normalize()
-        .cross(new THREE.Vector3(0, 1, 0)).normalize();
+            var side = ironbane.camera.lookAtPosition.clone()
+                .sub(ironbane.camera.position).normalize()
+                .cross(new THREE.Vector3(0, 1, 0)).normalize();
 
-      var newTPR = ironbane.player.thirdPersonReference.clone();
+            var newTPR = ironbane.player.thirdPersonReference.clone();
 
-      newTPR.applyMatrix4(rotationMatrix);
+            newTPR.applyMatrix4(rotationMatrix);
 
-      ironbane.player.thirdPersonReference.copy(newTPR);
+            ironbane.player.thirdPersonReference.copy(newTPR);
 
-      var matrix = new THREE.Matrix4().makeRotationAxis( side, -factorY );
+            var matrix = new THREE.Matrix4().makeRotationAxis(side, -factorY);
 
-      var newTPR = ironbane.player.thirdPersonReference.clone();
+            var newTPR = ironbane.player.thirdPersonReference.clone();
 
-      newTPR.applyMatrix4(matrix);
+            newTPR.applyMatrix4(matrix);
 
-      if ( newTPR.y > 0 && newTPR.y < 4 && false ) {
-          ironbane.player.thirdPersonReference.copy(newTPR);
+            if (newTPR.y > 0 && newTPR.y < 4 && false) {
+                ironbane.player.thirdPersonReference.copy(newTPR);
+            }
+
+
+            ironbane.player.thirdPersonReference.normalize().multiplyScalar(ironbane.player.originalThirdPersonReference.length());
+
+            ironbane.player.thirdPersonReference.y += factorY;
+
         }
 
 
-      ironbane.player.thirdPersonReference.normalize().multiplyScalar(ironbane.player.originalThirdPersonReference.length());
-
-      ironbane.player.thirdPersonReference.y += factorY;
-
     }
-
-
-  }
 
 };

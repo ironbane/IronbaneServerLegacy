@@ -4,8 +4,8 @@ IronbaneApp
         scope: true,
         templateUrl: '/game/templates/item_editor.html',
         restrict: 'EA',
-        controller: ['$scope', '$log', 'ItemTemplateSvc', '$fileUploader', 'ITEM_TYPE_ENUM',
-            function($scope, $log, ItemTemplateSvc, $fileUploader, ITEM_TYPE_ENUM) {
+        controller: ['$scope', '$log', 'ItemTemplateSvc', '$fileUploader', 'ITEM_TYPE_ENUM', '$window',
+            function($scope, $log, ItemTemplateSvc, $fileUploader, ITEM_TYPE_ENUM, $window) {
 
             $scope.templates = [];
             $scope.item = {};
@@ -56,8 +56,8 @@ IronbaneApp
                 if($scope.item.id) {
                     // update?
                 } else {
-                    ItemTemplateSvc.create($scope.item).then(function() {
-                        // notify success?
+                    ItemTemplateSvc.create($scope.item).then(function(item) {
+                        $scope.templates.push(item);
                     }, function(err) {
                         hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
                     });
@@ -99,6 +99,17 @@ IronbaneApp
                 }, function(err) {
                     hudHandler.messageAlert('Error' + err);
                 });
+            };
+
+            $scope.closeDialog = function() {
+                $window.disableGameControls = false; // TODO: have a dialog service manage this
+                $scope.showItemEditor=false;
+            };
+
+            $scope.doDelete = function() {
+                // show confirm modal?
+                // warn about usage?
+                // maybe best to not have this? (or enable soft delete)
             };
         }],
         link: function(scope, el, attrs) {

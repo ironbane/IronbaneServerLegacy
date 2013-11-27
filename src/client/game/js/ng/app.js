@@ -1,5 +1,5 @@
 // app.js - interim angular app
-var IronbaneApp = angular.module('Ironbane', ['ngSanitize', 'ui.router', 'User', 'Friends', 'IBCommon', 'angularFileUpload']);
+var IronbaneApp = angular.module('Ironbane', ['ngSanitize', 'ui.router', 'User', 'Friends', 'IBCommon', 'angularFileUpload', 'ui.bootstrap']);
 
 IronbaneApp
     .constant('GAME_HOST', window.ironbane_hostname) // todo: fill these in using server/grunt instead?
