@@ -178,7 +178,7 @@ var Service = Class.extend({
     },
     update: function(template) {
         var deferred = Q.defer(),
-            templateId = template.id,
+            templateId = parseInt(template.id, 10),
             // create new update obj to not pollute it with possible other in memory items
             data = {
                 name: template.name,
@@ -188,12 +188,12 @@ var Service = Class.extend({
                 attr1: template.attr1,
                 delay: template.delay,
                 particle: template.particle,
-                basevalue: template.baseValue // use the camelcase?
+                basevalue: template.basevalue || template.baseValue || 0
             };
 
         db.query('UPDATE ib_item_templates SET ? WHERE id = ?', [data, templateId], function(err, results) {
             if(err) {
-                return deferred.reject('db error: ', err);
+                return deferred.reject('db error: ' + JSON.stringify(err));
             }
 
             // should just keep the reference instead??

@@ -12,6 +12,8 @@ IronbaneApp
 
             $scope.item_types = _.keys(ITEM_TYPE_ENUM);
             $scope.item_subtypes = ITEM_TYPE_ENUM[$scope.item_types[0]];
+            // since these are the only choices
+            $scope.particle_types = _.keys($window.ParticleTypeEnum);
 
             $scope.$watch('item.type', function(type) {
                 if(!type) {
@@ -54,7 +56,12 @@ IronbaneApp
 
             $scope.doSave = function() {
                 if($scope.item.id) {
-                    // update?
+                    ItemTemplateSvc.update($scope.item).then(function(item) {
+                        // also make sure the global items db is updated (todo: change that from global)
+                        $window.items[$scope.item.id] = $scope.item;
+                    }, function(err) {
+                        hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
+                    });
                 } else {
                     ItemTemplateSvc.create($scope.item).then(function(item) {
                         $scope.templates.push(item);

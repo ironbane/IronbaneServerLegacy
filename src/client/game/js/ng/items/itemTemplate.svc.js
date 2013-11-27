@@ -52,4 +52,24 @@ IronbaneApp
             return $q.reject(err);
         });
     };
+
+    this.update = function(item) {
+        // send only what the request requires
+        var data = {
+            name: item.name,
+            image: item.image,
+            type: item.type,
+            subtype: item.subtype,
+            attr1: item.attr1,
+            delay: item.delay,
+            particle: item.particle,
+            basevalue: item.baseValue
+        };
+
+        return $http.put('/api/item_templates/' + item.id, data).then(function(response) {
+            return item;
+        }, function(err) {
+            return $q.reject(err);
+        });
+    };
 }]);

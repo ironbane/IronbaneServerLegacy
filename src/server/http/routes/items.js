@@ -40,4 +40,15 @@ module.exports = function(app, db) {
         });
     });
 
+    app.put('/api/item_templates/:templateId', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
+        var data = req.body;
+        data.id = req.params.templateId;
+
+        ItemTemplateService.update(data).then(function(template) {
+            res.send(template);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
 };
