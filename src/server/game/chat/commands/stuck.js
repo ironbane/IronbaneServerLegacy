@@ -27,7 +27,9 @@ module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params) {
-            var player = worldHandler.FindPlayerByName(unit.name);
+            var Q = require('q'),
+            player = worldHandler.FindPlayerByName(unit.name);
+
             if (player) {
                 if (player.zone === 41) {
                     chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
@@ -36,6 +38,7 @@ module.exports = function(units, worldHandler, chatHandler) {
                     chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
                 }
             }
+
             return Q();
         }
     };
