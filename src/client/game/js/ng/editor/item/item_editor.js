@@ -58,6 +58,8 @@ IronbaneApp
                 } else {
                     ItemTemplateSvc.create($scope.item).then(function(item) {
                         $scope.templates.push(item);
+                        // also make sure the global items db is updated (todo: change that from global)
+                        $window.items[item.id] = item;
                     }, function(err) {
                         hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
                     });

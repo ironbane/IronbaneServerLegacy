@@ -71,7 +71,7 @@ module.exports = function(app, db) {
             return templates;
         }, function(err) { return Q.reject(err); }));
 
-        tasks.push(ItemTemplateService.getAll(true).then(function(templates) {
+        tasks.push(ItemTemplateService.getAll().then(function(templates) {
             // front end is expecting a map
             // there's prolly an underscore method for this
             _.each(templates, function(t) {
@@ -98,16 +98,6 @@ module.exports = function(app, db) {
         return Q.all(tasks);
     };
 
-    // now we do this immediately
-    var gameModelPromise = getGameModel().then(function(results) {
-        //console.log('gameModel Promise success: ', results);
-
-        return results; // pass thru
-    }, function(err) {
-        console.error('gameModel Promise error: ', err);
-        return Q.reject(err);
-    });
-
     // templates for game (HUD)
     app.get('/game/templates/*', function(req, res) {
         var path = require('path');
@@ -116,7 +106,7 @@ module.exports = function(app, db) {
     });
 
     var gameCallBack = function(req, res) {
-        gameModelPromise.then(function(stuff) {
+        getGameModel().then(function(stuff) {
             // add in all of the stuff that was from game.php
             res.locals = {
                 zones: JSON.stringify(gameModel.zones),
