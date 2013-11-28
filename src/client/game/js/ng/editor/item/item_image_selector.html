@@ -1,0 +1,13 @@
+<div class="dialog editorDialog item-image-selector">
+    <header>
+        <button class="dialog-close" ng-click="dismiss('cancelled')">x</button>
+        <div class="inner">
+            <strong>Item Image Selector: {{ type }} {{ subtype }}</strong>
+        </div>
+    </header>
+    <div class="body">
+        <ul class="thumbnails">
+            <li ng-repeat="image in images"><a ng-click="close(image)" href="javascript://" class="thumbnail"><img ng-src="{{ image.url }}" /></a></li>
+        </ul>
+    </div>
+</div>

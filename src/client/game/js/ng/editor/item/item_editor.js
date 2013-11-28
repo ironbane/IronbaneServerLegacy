@@ -4,8 +4,8 @@ IronbaneApp
         scope: true,
         templateUrl: '/game/templates/item_editor.html',
         restrict: 'EA',
-        controller: ['$scope', '$log', 'ItemTemplateSvc', '$fileUploader', 'ITEM_TYPE_ENUM', '$window',
-            function($scope, $log, ItemTemplateSvc, $fileUploader, ITEM_TYPE_ENUM, $window) {
+        controller: ['$scope', '$log', 'ItemTemplateSvc', '$fileUploader', 'ITEM_TYPE_ENUM', '$window', '$modal',
+            function($scope, $log, ItemTemplateSvc, $fileUploader, ITEM_TYPE_ENUM, $window, $modal) {
 
             $scope.templates = [];
             $scope.item = {};
@@ -60,7 +60,7 @@ IronbaneApp
                         // also make sure the global items db is updated (todo: change that from global)
                         $window.items[$scope.item.id] = $scope.item;
                     }, function(err) {
-                        hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
+                        $window.hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
                     });
                 } else {
                     ItemTemplateSvc.create($scope.item).then(function(item) {
@@ -68,7 +68,7 @@ IronbaneApp
                         // also make sure the global items db is updated (todo: change that from global)
                         $window.items[item.id] = item;
                     }, function(err) {
-                        hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
+                        $window.hudHandler.messageAlert('Error saving! ' + JSON.stringify(err.data));
                     });
                 }
             };
@@ -90,7 +90,7 @@ IronbaneApp
                 }
 
                 // todo: wrap this in a service!
-                socketHandler.socket.emit('chatMessage', {
+                $window.socketHandler.socket.emit('chatMessage', {
                   message: '/giveitem ' + $scope.item.id
                 });
             };
@@ -105,9 +105,9 @@ IronbaneApp
                     var report = "This item is found " + result.items + " times in inventories.<br>";
                     report += "It is in the loot of " + result.loots + " units.";
 
-                    hudHandler.messageAlert(report);
+                    $window.hudHandler.messageAlert(report);
                 }, function(err) {
-                    hudHandler.messageAlert('Error' + err);
+                    $window.hudHandler.messageAlert('Error' + err);
                 });
             };
 
@@ -121,9 +121,77 @@ IronbaneApp
                 // warn about usage?
                 // maybe best to not have this? (or enable soft delete)
             };
-        }],
-        link: function(scope, el, attrs) {
 
-        }
+            var imageSelectorModal;
+
+            $scope.chooseImage = function() {
+                // no double modals
+                if(imageSelectorModal) {
+                    return;
+                }
+
+                imageSelectorModal = $modal.open({
+                    templateUrl: '/game/templates/item_image_selector.html',
+                    backdrop: false,
+                    resolve: {
+                        images: ['$http', function($http) {
+                            var imageIds;
+
+                            if($scope.item.type !== 'armor') {
+                                return $http.get('/game/images/items').then(function(response) {
+                                    imageIds = response.data;
+                                    return _.map(imageIds, function(i) {
+                                        return {id: i, url: 'images/items/' + i + '/80/80'};
+                                    });
+                                }, function(err) {
+                                    $log.error('error getting images list', err);
+                                    return err;
+                                });
+                            } else {
+                                var subtype = $scope.item.subtype;
+                                if(subtype !== 'body' && subtype !== 'feet' && subtype !== 'head') {
+                                    subtype = 'body';
+                                }
+
+                                return $http.get('/game/images/armor/' + subtype).then(function(response) {
+                                    imageIds = response.data;
+                                    return _.map(imageIds, function(i) {
+                                        return {id: i, url: 'images/characters/base/' + subtype + '/' + i + '/80/80'};
+                                    });
+                                }, function(err) {
+                                    $log.error('error getting images list', err);
+                                    return err;
+                                });
+                            }
+                        }],
+                        type: function() {
+                            return $scope.item.type;
+                        },
+                        subtype: function() {
+                            return $scope.item.subtype;
+                        }
+                    },
+                    controller: ['$modalInstance', '$scope', 'type', 'subtype', 'images', function($modalInstance, $scope, type, subtype, images) {
+                        $scope.images = images;
+                        $scope.type = type;
+                        $scope.subtype = subtype;
+                        $scope.close = function(item) {
+                            $modalInstance.close(item);
+                        };
+                        $scope.dismiss = function(reason) {
+                            $modalInstance.dismiss(reason);
+                        };
+                    }]
+                });
+
+                // result success means something was chosen
+                imageSelectorModal.result.then(function(image) {
+                    $scope.item.image = image.id;
+                    imageSelectorModal = null;
+                }, function() {
+                    imageSelectorModal = null;
+                });
+            };
+        }]
     };
 }]);

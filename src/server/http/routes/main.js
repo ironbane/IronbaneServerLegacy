@@ -40,7 +40,8 @@ module.exports = function(app, db) {
             path = require('path');
 
         fs.listTree(gamePath + 'images/items', function(file) {
-            return path.extname(file) === '.png';
+            // don't return the cached images (with the _size)
+            return path.extname(file) === '.png' && file.indexOf('_') < 0;
         }).then(function(files) {
             var names = _.map(files, function(file) {
                 return path.basename(file, '.png');
@@ -57,7 +58,7 @@ module.exports = function(app, db) {
             path = require('path');
 
         fs.listTree(gamePath + 'images/characters/base/' + req.params.subtype, function(file) {
-            return path.extname(file) === '.png';
+            return path.extname(file) === '.png' && file.indexOf('_') < 0;
         }).then(function(files) {
             var names = _.map(files, function(file) {
                 return path.basename(file, '.png');

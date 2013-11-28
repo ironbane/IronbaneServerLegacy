@@ -92,7 +92,6 @@ module.exports = function(grunt) {
 
                     "<%= gameScriptPath %>/ng/editor/npc/npc_editor.js",
                     "<%= gameScriptPath %>/ng/editor/item/item_editor.js",
-
                     "<%= gameScriptPath %>/ng/help/help_dialog.js",
 
                     // Shared between client and server
@@ -105,7 +104,6 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/External/Init.js",
                     "<%= gameScriptPath %>/External/Stats.js",
                     "<%= gameScriptPath %>/External/SteeringBehaviourLight.js",
-
 
                     "<%= gameScriptPath %>/Engine/Debug.js",
                     "<%= gameScriptPath %>/Engine/Events.js",
@@ -380,8 +378,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-docular');
+    //grunt.loadNpmTasks('grunt-contrib-jasmine');
+    //grunt.loadNpmTasks('grunt-docular');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');

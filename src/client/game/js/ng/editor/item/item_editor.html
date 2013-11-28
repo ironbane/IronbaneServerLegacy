@@ -45,7 +45,7 @@
                     <img ng-show="item.image" id="item_image" ng-src="{{ imageUrl }}" />
                 </div>
                 <div class="pull-right item-image-options">
-                    <button>Choose</button>
+                    <button ng-click="chooseImage()" ng-disabled="!item.type">Choose</button>
                     <br>
                     <button ng-disabled="true">Create</button>
                 </div>
@@ -73,10 +73,10 @@
     <footer>
         <button ng-click="doSave()" ng-disabled="itemEditorForm.$pristine || itemEditorForm.$invalid">Save</button>
         <button ng-click="doNew()">New</button>
-        <button ng-click="doDuplicate()">Duplicate</button>
+        <button ng-click="doDuplicate()" ng-disabled="!item.id">Duplicate</button>
         <button ng-click="doDelete()" ng-disabled="!item.id">Delete</button>
         <button ng-click="giveItem()" ng-disabled="!item.id">Give Item</button>
-        <button ng-click="showScripts()">Script</button>
+        <button ng-click="showScripts()" ng-disabled="true">Script</button>
         <button ng-click="showAnalysis()" ng-disabled="!item.id">Analysis</button>
     </footer>
 </div>
