@@ -149,7 +149,7 @@ var Service = Class.extend({
 
         db.query('INSERT INTO ib_item_templates SET ?', config, function(err, result) {
             if(err) {
-                return deferred.reject('db error', err);
+                return deferred.reject('db error: ' + JSON.stringify(err));
             }
 
             config.id = result.insertId;
