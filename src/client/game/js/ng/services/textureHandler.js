@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 IronbaneApp
-    .factory('textureHandler', ['$log', 'socket', function($log, socket) {
+    .factory('TextureHandler', [function() {
 
         var TextureHandler = function(){
             this.textures = [];

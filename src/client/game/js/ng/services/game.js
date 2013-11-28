@@ -1,6 +1,6 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'textureHandler', function($log, $window, $http, $timeout, $filter, TextureHandler) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler', function($log, $window, $http, $timeout, $filter, TextureHandler) { // using $window to reveal the globals
         // make this private so that it can't be called directly
         
 
