@@ -1,30 +1,14 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', function($log, $window, $http, $timeout, $filter) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'textureHandler', function($log, $window, $http, $timeout, $filter, TextureHandler) { // using $window to reveal the globals
         // make this private so that it can't be called directly
-        var loop = function(game) {
-            if(!game.isRunning) {
-                return;
-            }
-
-            var currTime = window.performance.now();
-            var delta = (currTime - game._lastFrameTime) / 1000;
-            var frameTime = Math.min(delta, game._maxFrameTime);
-
-            requestAnimationFrame(function() { loop(game); });
-
-            game.tick(frameTime);
-            game.render(frameTime);
-
-            game._elapsedTime += delta;
-            game._lastFrameTime = currTime;
-
-            $window.TWEEN.update();
-        };
+        
 
         var Game = function() {
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
+
+            this.textureHandler = new TextureHandler();
 
             // adjustable framerate
             this._lastFrameTime = 0;
@@ -141,6 +125,26 @@ IronbaneApp
                 charUrl = '/api/user/' + $window.startdata.user + '/characters';
             }
 
+            var loop = function() {
+                if(!game.isRunning) {
+                    return;
+                }
+
+                var currTime = window.performance.now();
+                var delta = (currTime - game._lastFrameTime) / 1000;
+                var frameTime = Math.min(delta, game._maxFrameTime);
+
+                requestAnimationFrame(loop);
+
+                game.tick(frameTime);
+                game.render(frameTime);
+
+                game._elapsedTime += delta;
+                game._lastFrameTime = currTime;
+
+                $window.TWEEN.update();
+            };
+
             // todo: character service
             $http.get(charUrl)
                 .then(function(response) {
@@ -164,7 +168,7 @@ IronbaneApp
                     game.startTime = window.performance.now(); // shimmed!
                     game._lastFrameTime = game.startTime;
 
-                    loop(game);
+                    loop();
                 });
 
             this.renderer.setClearColor($window.ColorEnum.LIGHTBLUE, 1);
@@ -303,12 +307,6 @@ IronbaneApp
                     $("#loadingBarMessage").text(game.currentLoadingMessage);
                 }
             }
-
-            // hacky hack, dunno what's blocking it!
-            /*if(game.showingGame) {
-                $('#chatContent').show();
-            }
-*/
             $window.relativeMouse = $window.mouse.clone().sub($window.lastMouse);
             $window.lastMouse = $window.mouse.clone();
         };

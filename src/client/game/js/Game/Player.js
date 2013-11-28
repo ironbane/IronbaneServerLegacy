@@ -642,7 +642,7 @@ var Player = Fighter.extend({
 
             if (this.aimTexture !== "") {
                 this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-                    textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
+                    ironbane.textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
                         transparent: true,
                         alphaTest: 0.1
                     }));

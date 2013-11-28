@@ -55,7 +55,7 @@ var Skybox = PhysicsObject.extend({
 
     // Add a sun
     geometry = new THREE.PlaneGeometry(600, 600, 1, 1);
-    this.sunMesh = new THREE.Mesh(geometry, textureHandler.getTexture('images/misc/sun.png', false, {
+    this.sunMesh = new THREE.Mesh(geometry, ironbane.textureHandler.getTexture('images/misc/sun.png', false, {
       transparent:true,
       alphaTest:0.01
     }));

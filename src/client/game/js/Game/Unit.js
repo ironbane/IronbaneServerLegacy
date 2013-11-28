@@ -237,7 +237,7 @@ var Unit = PhysicsObject.extend({
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
-        textureHandler.getTexture(TEXTURE_SHADOW, false, {
+        ironbane.textureHandler.getTexture(TEXTURE_SHADOW, false, {
           transparent:true,
           alphaTest:0.1
         }));

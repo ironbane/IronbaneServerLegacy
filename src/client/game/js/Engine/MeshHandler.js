@@ -144,7 +144,7 @@ var MeshHandler = Class.extend({
       //   }));
       // }
       // else {
-        materials.push(textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
+        materials.push(ironbane.textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
           transparent:meshData["transparent"] && meshData["transparent"] === 1,
           alphaTest:0.1,
           useLighting:true

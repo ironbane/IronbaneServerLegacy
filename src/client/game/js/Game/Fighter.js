@@ -161,7 +161,7 @@ var Fighter = Unit.extend({
             },
             texture1: {
                 type: 't',
-                value: textureHandler.GetFreshTexture(texture, true)
+                value: ironbane.textureHandler.GetFreshTexture(texture, true)
             }
         };
 
@@ -231,7 +231,7 @@ var Fighter = Unit.extend({
             },
             texture1: {
                 type: 't',
-                value: textureHandler.getTexture(texture, true)
+                value: ironbane.textureHandler.getTexture(texture, true)
             }
         };
 

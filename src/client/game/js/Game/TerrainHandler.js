@@ -110,13 +110,13 @@ var TerrainHandler = Class.extend({
 
 
 
-    var texture = textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTexture')+'.png', true);
+    var texture = ironbane.textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTexture')+'.png', true);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.x = 1000;
     texture.repeat.y = 1000;
 
-    var texture2 = textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTextureGlow')+'.png', true);
+    var texture2 = ironbane.textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTextureGlow')+'.png', true);
     texture2.wrapS = THREE.RepeatWrapping;
     texture2.wrapT = THREE.RepeatWrapping;
     texture2.repeat.x = 1000;

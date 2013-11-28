@@ -74,6 +74,8 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/services/timer.js",
                     "<%= gameScriptPath %>/ng/services/news.js",
                     "<%= gameScriptPath %>/ng/services/alerts.js",
+
+                    "<%= gameScriptPath %>/ng/services/TextureHandler.js",
                     "<%= gameScriptPath %>/ng/controllers/charSelect.js",
                     "<%= gameScriptPath %>/ng/directives/chat.js",
                     "<%= gameScriptPath %>/ng/directives/alertBox.js",
@@ -110,7 +112,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/Input.js",
                     "<%= gameScriptPath %>/Engine/SocketHandler.js",
                     "<%= gameScriptPath %>/Engine/SoundHandler.js",
-                    "<%= gameScriptPath %>/Engine/TextureHandler.js",
+                    //"<%= gameScriptPath %>/Engine/TextureHandler.js",
                     "<%= gameScriptPath %>/Engine/MeshHandler.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
                     "<%= gameScriptPath %>/Game/Hud.js",
