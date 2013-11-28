@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+IronbaneApp.factory('MeshHandler', function(){
 var MeshHandler = Class.extend({
   Init: function() {
 
@@ -25,12 +25,12 @@ var MeshHandler = Class.extend({
 
   },
   Load: function(model, readyFunc, clone) {
-
+    var me = this;
     if ( this.geometries[model] ) {
       setTimeout(function() {
-        var val = meshHandler.geometries[model].geometry;
+        var val = me.geometries[model].geometry;
         if ( clone ) val = val.clone();
-        readyFunc(val, meshHandler.geometries[model].jsonMaterials);
+        readyFunc(val, me.geometries[model].jsonMaterials);
       }, 1);
       return;
     }
@@ -42,13 +42,13 @@ var MeshHandler = Class.extend({
     // TODO are the jsonMaterials allowed to be copied over here?
     // Do they also need to be cached?
     jsonLoader.load( model, function( geometry, jsonMaterials ) {
-      meshHandler.geometries[model] = {
+      me.geometries[model] = {
         geometry: geometry,
         jsonMaterials: jsonMaterials
       };
-      var val = meshHandler.geometries[model].geometry;
+      var val = me.geometries[model].geometry;
       if ( clone ) val = val.clone();
-      readyFunc(val, meshHandler.geometries[model].jsonMaterials);
+      readyFunc(val, me.geometries[model].jsonMaterials);
       // readyFunc(geometry);
     }, null);
 
@@ -170,6 +170,5 @@ var MeshHandler = Class.extend({
 
   }
 });
-
-
-var meshHandler = new MeshHandler();
+return MeshHandler;
+});

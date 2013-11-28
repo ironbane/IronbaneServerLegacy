@@ -1,6 +1,7 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler', function($log, $window, $http, $timeout, $filter, TextureHandler) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 
+    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler) { // using $window to reveal the globals
         // make this private so that it can't be called directly
         
 
@@ -9,6 +10,7 @@ IronbaneApp
             this.mouthwash = $filter('mouthwash');
 
             this.textureHandler = new TextureHandler();
+            this.meshHandler = new MeshHandler();
 
             // adjustable framerate
             this._lastFrameTime = 0;

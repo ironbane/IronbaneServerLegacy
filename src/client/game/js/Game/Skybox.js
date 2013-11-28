@@ -96,7 +96,7 @@ var Skybox = PhysicsObject.extend({
   },
   BuildMesh: function(geometry, jsonMaterials) {
 
-    var result = meshHandler.ProcessMesh({
+    var result = ironbane.meshHandler.ProcessMesh({
       geometry: geometry,
       jsonMaterials: jsonMaterials
     });

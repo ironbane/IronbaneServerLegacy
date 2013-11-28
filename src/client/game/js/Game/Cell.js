@@ -279,13 +279,13 @@ var Cell = Class.extend({
                 var model = meshPath + filename;
 
                 (function(cell, pos, rotation, metadata, meshData, param){
-                meshHandler.Load(model, function(geometry, jsonMaterials) {
+                ironbane.meshHandler.Load(model, function(geometry, jsonMaterials) {
 
                         // Geometry cannot be instanced here as me modify it directly,
                         // so it must be cloned! We therefore pass true to the third param of
                         // meshHandler.Load()
 
-                        var result = meshHandler.ProcessMesh({
+                        var result = ironbane.meshHandler.ProcessMesh({
                             geometry: geometry,
                             jsonMaterials: jsonMaterials,
                             rotation: rotation,
