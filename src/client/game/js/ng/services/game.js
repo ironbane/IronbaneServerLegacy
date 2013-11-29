@@ -1,16 +1,13 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 
-    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter','HUDHandler','TerrainHandler','SocketHandler','MeshHandler',
+    function($log, $window, $http, $timeout, $filter, hudHandler, terrainHandler, socketHandler, meshHandler) { // using $window to reveal the globals
         // make this private so that it can't be called directly
         
 
         var Game = function() {
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
-
-            this.textureHandler = new TextureHandler();
-            this.meshHandler = new MeshHandler();
 
             // adjustable framerate
             this._lastFrameTime = 0;
@@ -69,7 +66,7 @@ IronbaneApp
             var game = this;
 
             if (!$window.Detector.webgl) {
-                $window.hudHandler.ResizeFrame();
+                game.hudHandler.ResizeFrame();
                 return;
             }
 
@@ -118,7 +115,7 @@ IronbaneApp
                 $('#gameFrame').append(this.stats.domElement);
             }
 
-            $window.hudHandler.ResizeFrame();
+            hudHandler.ResizeFrame();
 
             var charUrl = '';
             if ($window.startdata.user === 0) {
@@ -161,10 +158,10 @@ IronbaneApp
                 })
                 .then(function() {
 
-                    $window.startdata.characterUsed = $window.hudHandler.GetLastCharacterPlayed();
+                    $window.startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
 
-                    $window.hudHandler.MakeCharSelectionScreen();
-                    $window.terrainHandler.tick(0.1);
+                    hudHandler.MakeCharSelectionScreen();
+                    terrainHandler.tick(0.1);
 
                     game.isRunning = true;
                     game.startTime = window.performance.now(); // shimmed!
@@ -205,7 +202,7 @@ IronbaneApp
                 $window.levelEditor.tick(dTime);
             }
 
-            $window.hudHandler.tick(dTime);
+            hudHandler.tick(dTime);
 
             if (!$window.socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
                 game.camera.position.x = $window.previewLocation.x + (Math.cos(new Date().getTime() / 20000) * $window.previewDistance) - 0;
@@ -214,15 +211,15 @@ IronbaneApp
                 game.camera.lookAt($window.previewLocation);
             }
 
-            $window.terrainHandler.tick(dTime);
+            terrainHandler.tick(dTime);
 
-            if ($window.socketHandler.loggedIn) {
+            if (socketHandler.loggedIn) {
                 // Add the player once we have terrain we can walk on
 
-                if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
-                    !$window.terrainHandler.IsLoadingCells()) {
+                if (terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
+                    !terrainHandler.IsLoadingCells()) {
                     if (!game.player) {
-                        game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
+                        game.player = new $window.Player(socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
                     }
                 }
             }
@@ -256,22 +253,22 @@ IronbaneApp
 
             if ( !$window.isProduction ) game.currentLoadingMessage = "All set";
 
-            if ( $window.terrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
+            if (terrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
                 doneLoading = false;
                 if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Terrain";
             }
-            else if ( $window.terrainHandler.IsLoadingCells() ) {
+            else if (terrainHandler.IsLoadingCells() ) {
                 doneLoading = false;
                 if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Cells";
             }
-            else if ( !$window.soundHandler.loadedMainMenuMusic ) {
+            else if ( !soundHandler.loadedMainMenuMusic ) {
                 doneLoading = false;
                 if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Music";
             }
 
             if ( !game.showingGame && doneLoading ) {
-                if (!$window.socketHandler.inGame) {
-                    $window.hudHandler.MakeSoundButton();
+                if (!socketHandler.inGame) {
+                    hudHandler.MakeSoundButton();
                 }
 
                 game.showingGame = true;

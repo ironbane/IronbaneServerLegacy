@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 IronbaneApp
-    .factory('socketHandler', ['$log', 'socket', function($log, socket) {
+    .factory('SocketHandler', ['$log', 'socket', '$window', function($log, socket, $window) {
         // this factory function should be a singleton, the returned object however wouldn't be
         socket.on('chatMessage', function(data) {
             hudHandler.AddChatMessage(data);
@@ -442,7 +442,7 @@ IronbaneApp
         });
 
         // here is where we actually send the class
-        var SocketHandler = function() {
+        function SocketHandler(){
             this.serverOnline = false;
             this.loggedIn = false;
             this.spawnLocation = null;
@@ -451,53 +451,53 @@ IronbaneApp
             this.readyToReceiveUnits = false;
             this.inGame = false;
         };
-
         SocketHandler.prototype.connect = function() {
-            socket.connect();
+                socket.connect();
+                console.log("connected");
 
-            socket.emit('getStartData', {}, function(reply) {
-                numberOfPlayersOnline = reply.numberOfPlayersOnline;
-            });
-        };
+                socket.emit('getStartData', {}, function(reply) {
+                    numberOfPlayersOnline = reply.numberOfPlayersOnline;
+                });
+            };
+            SocketHandler.prototype.joinGame = function() {
+                var self = this,
+                    data = {
+                        id: startdata.user,
+                        characterID: startdata.characterUsed,
+                        guest: startdata.user === 0
+                    };
 
-        SocketHandler.prototype.joinGame = function() {
-            var self = this,
-                data = {
-                    id: startdata.user,
-                    characterID: startdata.characterUsed,
-                    guest: startdata.user === 0
-                };
+                // used to be "connectServer"
+                socket.emit('game:join', data, function(reply) {
+                    if(reply.errmsg) {
+                        // handle error
+                        return;
+                    }
 
-            // used to be "connectServer"
-            socket.emit('game:join', data, function(reply) {
-                if(reply.errmsg) {
-                    // handle error
-                    return;
-                }
+                    self.loggedIn = true;
+                    // Get a spawn from the server
+                    self.spawnLocation = ConvertVector3(reply.position);
+                    self.spawnRotation = reply.rotY;
 
-                self.loggedIn = true;
-                // Get a spawn from the server
-                self.spawnLocation = ConvertVector3(reply.position);
-                self.spawnRotation = reply.rotY;
+                    self.playerData = reply;
 
-                self.playerData = reply;
+                    setTimeout(function() {
+                        ironbane.showingGame = false;
+                    }, 100);
 
-                setTimeout(function() {
-                    ironbane.showingGame = false;
-                }, 100);
+                    terrainHandler.ChangeZone(reply.zone);
 
-                terrainHandler.ChangeZone(reply.zone);
+                    self.inGame = true;
 
-                self.inGame = true;
+                    if (reply.editor) {
+                        showEditor = true;
+                        levelEditor.Start();
+                    }
 
-                if (reply.editor) {
-                    showEditor = true;
-                    levelEditor.Start();
-                }
-
-                hudHandler.MakeSlotItems(false);
-            });
-        };
-
-        return SocketHandler;
+                    hudHandler.MakeSlotItems(false);
+                });
+            };
+            var socketHandler = new SocketHandler();
+            $window.socketHandler = socketHandler;
+        return socketHandler;
     }]);

@@ -13,8 +13,8 @@ IronbaneApp
                 });
         }
     ])
-    .run(['$log', '$window', 'Game', 'FeatureDetection', '$rootScope',
-        function($log, $window, Game, Features, $rootScope) {
+    .run(['$log', '$window', 'Game', 'FeatureDetection', '$rootScope','SocketHandler',
+        function($log, $window, Game, Features, $rootScope, socketHandler) {
             if(!Features.webgl) {
                 // display webgl solutions
                 $log.error('no webgl support!', Features);

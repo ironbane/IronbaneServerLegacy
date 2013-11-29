@@ -45,7 +45,7 @@ var selectedHair = 1;
 
 
 var messageFadeTime = 0.2;
-
+IronbaneApp.factory('BigMessage', function(){
 var BigMessage = Class.extend({
     Init: function(message, duration) {
         this.message = message;
@@ -70,14 +70,15 @@ var BigMessage = Class.extend({
         this.opacity = opac;
     }
 });
-
-var HUDHandler = Class.extend({
-    bigMessages: [],
-    alertBoxActive: false,
-    screenshotMode: false,
-    Init: function() {
+return BigMessage;
+});
+IronbaneApp.factory('HUDHandler', ['SocketHandler','$window',function(socketHandler, $window){
+    
+    function HUDHandler() {
         var HUD = this;
-
+        this.bigMessages= [];
+        this.alertBoxActive= false;
+        this.screenshotMode= false;
         this.allowSound = !_.isUndefined(localStorage.allowSound) ? (localStorage.allowSound === 'true') : true;
 
         if (Detector.webgl) {
@@ -86,7 +87,7 @@ var HUDHandler = Class.extend({
                 $('#chatContent').hide().trigger('hide');
             } else {
                 setTimeout(function() {
-                    hudHandler.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
+                    HUD.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
                 }, 1000);
             }
         } else {
@@ -163,8 +164,8 @@ var HUDHandler = Class.extend({
         setTimeout(function() {
             handleClick(true);
         }, 1000);
-    },
-    toggleScreenShotMode: function(){
+    };
+    HUDHandler.prototype.toggleScreenShotMode = function(){
         this.screenshotMode = !this.screenshotMode;
         if(this.screenshotMode === true){
             $('#statBar').hide();
@@ -191,8 +192,8 @@ var HUDHandler = Class.extend({
         $('#chatContent').scope().$apply(function(scope) {
             scope.showChatWindow = !me.screenshotMode;
         });
-    },
-    MakeSoundButton: function() {
+    }
+    HUDHandler.prototype.MakeSoundButton = function() {
         var checkSoundToggle = function(value) {
 
             if (!gotFlashInstalled) {
@@ -223,11 +224,11 @@ var HUDHandler = Class.extend({
         $("#btnToggleSound").click(function() {
             checkSoundToggle(!hudHandler.allowSound);
         });
-    },
-    ShowMainMenuHUD: function() {
+    };
+    HUDHandler.prototype.ShowMainMenuHUD= function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
-    },
-    makeInventorySlots: function(num) {
+    };
+    HUDHandler.prototype.makeInventorySlots = function(num) {
         var HUD = this,
             container = $('#itemBar'),
             spaces = num;
@@ -261,8 +262,8 @@ var HUDHandler = Class.extend({
                 }
             });
         }
-    },
-    fillInvSlot: function(item) {
+    };
+    HUDHandler.prototype.fillInvSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -292,11 +293,11 @@ var HUDHandler = Class.extend({
                 ui.helper.data('item', item);
             }
         });
-    },
-    clearInvSlot: function(slotNum) {
+    };
+    HUDHandler.prototype.clearInvSlot = function(slotNum) {
         $('#is' + slotNum).empty().removeClass('occupied equipped used').droppable({accept: '*'});
-    },
-    updateInvSlotStatus: function(slotNum, status) {
+    };
+    HUDHandler.prototype.updateInvSlotStatus = function(slotNum, status) {
         var $slot = $('#is' + slotNum);
 
         if (status === 'equipped') {
@@ -312,8 +313,8 @@ var HUDHandler = Class.extend({
                 $slot.removeClass('used');
             }, 500);
         }
-    },
-    showInv: function(data) {
+    };
+    HUDHandler.prototype.showInv = function(data) {
         var HUD = this;
         HUD.makeInventorySlots(data.slots);
         $('#itemBar').show();
@@ -324,11 +325,11 @@ var HUDHandler = Class.extend({
 
         // any time we show the inventory, we should update the gold
         HUD.makeCoinBar();
-    },
-    hideInv: function() {
+    };
+    HUDHandler.prototype.hideInv = function() {
         $('#itemBar').removeData().empty().hide();
-    },
-    onInvSlotDrop: function(e, ui, HUD) {
+    };
+    HUDHandler.prototype.onInvSlotDrop = function(e, ui, HUD) {
         // we can drop onto inventory from a vendor, loot, or bank (currently) OR itself
         var slot = $(e.target),
             dropped = $(e.toElement),
@@ -505,8 +506,8 @@ var HUDHandler = Class.extend({
                 // otherwise we're successful and we dont care
             });
         }
-    },
-    makeLootSlots: function(num) {
+    };
+    HUDHandler.prototype.makeLootSlots = function(num) {
         var HUD = this,
             container = $('#lootBar'),
             spaces = num;
@@ -522,8 +523,8 @@ var HUDHandler = Class.extend({
                 console.log($(this).attr('id') + " clicked!");
             });
         }
-    },
-    fillLootSlot: function(item) {
+    };
+    HUDHandler.prototype.fillLootSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -538,12 +539,12 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    clearLootSlot: function(slotNum) {
+    };
+    HUDHandler.prototype.clearLootSlot= function(slotNum) {
         $('#ls' + slotNum).empty();
-    },
+    };
     // this happens when someone else nearby loots an item from something you might have open
-    updateLoot: function(data) {
+    HUDHandler.prototype.updateLoot = function(data) {
         var HUD = this,
             bag = $('#lootBar').data('bag');
 
@@ -554,8 +555,8 @@ var HUDHandler = Class.extend({
         if (ironbane.player.canLoot) {
             ironbane.player.lootItems = data.loot;
         }
-    },
-    showLoot: function(data) {
+    }
+    HUDHandler.prototype.showLoot = function(data) {
         //console.log('showLoot', data);
         var HUD = this;
         HUD.makeLootSlots(data.slots);
@@ -566,11 +567,11 @@ var HUDHandler = Class.extend({
             invItem.slot = index;
             HUD.fillLootSlot(invItem);
         });
-    },
-    hideLoot: function() {
+    };
+    HUDHandler.prototype.hideLoot = function() {
         $('#lootBar').removeData().empty().hide();
-    },
-    makeVendorSlots: function(num) {
+    };
+   HUDHandler.prototype.makeVendorSlots = function(num) {
         var HUD = this,
             container = $('#vendorBar'),
             spaces = num;
@@ -594,8 +595,8 @@ var HUDHandler = Class.extend({
                 console.log($(this).attr('id') + " clicked!");
             });
         }
-    },
-    fillVendorSlot: function(item) {
+    };
+    HUDHandler.prototype.fillVendorSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -610,8 +611,8 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    showVendor: function(data) {
+    };
+    HUDHandler.prototype.showVendor = function(data) {
         var HUD = this;
         HUD.makeVendorSlots(data.slots);
         $('#vendorBar').data('vendor', data).show();
@@ -619,14 +620,14 @@ var HUDHandler = Class.extend({
         _.each(data.items, function(item) {
             HUD.fillVendorSlot(item);
         });
-    },
-    hideVendor: function() {
+    };
+    HUDHandler.prototype.hideVendor = function() {
         $('#vendorBar').removeData().empty().hide();
-    },
-    clearVendorSlot: function(slotNum) {
+    };
+    HUDHandler.prototype.clearVendorSlot = function(slotNum) {
         $('#vs' + slotNum).empty().droppable('enable');
-    },
-    updateVendor: function(data) {
+    };
+    HUDHandler.prototype.updateVendor = function(data) {
         var HUD = this,
             vendor = $('#vendorBar').data('vendor');
 
@@ -642,8 +643,8 @@ var HUDHandler = Class.extend({
         if(ironbane.player.canLoot) {
             ironbane.player.lootItems = data.loot;
         }
-    },
-    onVendorSlotDrop: function(e, ui, HUD) {
+    };
+    HUDHandler.prototype.onVendorSlotDrop = function(e, ui, HUD) {
         // this should be when we are trying to sell something only
         var slot = $(e.target),
             dropped = $(e.toElement),
@@ -697,8 +698,8 @@ var HUDHandler = Class.extend({
                 HUD.makeCoinBar(true);
             }
         });
-    },
-    makeBankSlots: function(num) {
+    };
+    HUDHandler.prototype.makeBankSlots =  function(num) {
         var HUD = this,
             container = $('#bankBar'),
             spaces = num;
@@ -721,8 +722,8 @@ var HUDHandler = Class.extend({
                 console.log($(this).attr('id') + " clicked!");
             });
         }
-    },
-    fillBankSlot: function(item) {
+    };
+    HUDHandler.prototype.fillBankSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -737,8 +738,8 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    showBank: function(data) {
+    };
+    HUDHandler.prototype.showBank = function(data) {
         var HUD = this;
         HUD.makeBankSlots(data.slots);
         $('#bankBar').data('bank', data).show();
@@ -746,14 +747,14 @@ var HUDHandler = Class.extend({
         _.each(data.items, function(vaultItem) {
             HUD.fillBankSlot(vaultItem);
         });
-    },
-    hideBank: function() {
+    };
+    HUDHandler.prototype.hideBank = function() {
         $('#bankBar').removeData().empty().hide();
-    },
-    clearBankSlot: function(slotNum) {
+    };
+    HUDHandler.prototype.clearBankSlot = function(slotNum) {
         $('#bs' + slotNum).empty().droppable('enable');
-    },
-    onBankSlotDrop: function(e, ui, HUD) {
+    };
+    HUDHandler.prototype.onBankSlotDrop = function(e, ui, HUD) {
         var slot = $(e.target),
             dropped = $(e.toElement),
             item = dropped.data('item'),
@@ -785,9 +786,9 @@ var HUDHandler = Class.extend({
                 }
             }
         });
-    },
+    };
     // when you drop an item on the ground / gameFrame
-    onDropItem: function(e, ui, HUD) {
+    HUDHandler.prototype.onDropItem = function(e, ui, HUD) {
         var dropped = $(e.toElement),
             item = dropped.data('item');
 
@@ -805,8 +806,8 @@ var HUDHandler = Class.extend({
         if(item.type === 'cash') {
             HUD.makeCoinBar(true);
         }
-    },
-    makeItemHover: function(targetEl, item) {
+    };
+    HUDHandler.prototype.makeItemHover = function(targetEl, item) {
         var template = items[item.template],
             content = '',
             itemUrl = getImageUrlForItem(item, 24, 24),
@@ -884,8 +885,8 @@ var HUDHandler = Class.extend({
             .on('mouseleave', function(e) {
                 $("#tooltip").hide();
             });
-    },
-    ResizeFrame: function() {
+    };
+    HUDHandler.prototype.ResizeFrame = function() {
         frameWidth = $(window).width();
         frameHeight = $(window).height();
         $('#gameFrame').css('width', frameWidth);
@@ -896,8 +897,8 @@ var HUDHandler = Class.extend({
         if (ironbane.stats && ironbane.stats.domElement) {
             ironbane.stats.domElement.style.top = ($(window).height() - 55) + 'px';
         }
-    },
-    PositionHud: function() {
+    };
+    HUDHandler.prototype.PositionHud = function() {
         var halfWidth = frameWidth * 0.5,
             halfHeight = frameHeight * 0.5;
 
@@ -944,8 +945,8 @@ var HUDHandler = Class.extend({
 
         $('#devNews').css('left', (halfWidth + 200) + 'px');
         $('#devNews').css('top', (halfHeight - 57) + 'px');
-    },
-    GetStatContent: function(amount, prefix, fullStat, onlyFull, noMarginSpace) {
+    };
+    HUDHandler.prototype.GetStatContent = function(amount, prefix, fullStat, onlyFull, noMarginSpace) {
         var content = '',
             x = 0;
 
@@ -985,8 +986,8 @@ var HUDHandler = Class.extend({
         }
 
         return content;
-    },
-    makeCoinBar: function(flash) {
+    };
+    HUDHandler.prototype.makeCoinBar = function(flash) {
         var self = this,
             el = $('#coinBar'),
             coins = ironbane.player.getTotalCoins(),
@@ -1008,8 +1009,8 @@ var HUDHandler = Class.extend({
                 self.makeCoinBar(false);
             }, 50);
         }
-    },
-    makeHealthBar: function(doFlash) {
+    };
+    HUDHandler.prototype.makeHealthBar = function(doFlash) {
         var HUD = this;
         doFlash = doFlash || false;
         var content = this.GetStatContent(ironbane.player.health, doFlash ? 'misc/heart_medium_flash' : 'misc/heart_medium', ironbane.player.healthMax);
@@ -1020,8 +1021,8 @@ var HUDHandler = Class.extend({
                 HUD.makeHealthBar();
             }, 50);
         }
-    },
-    makeArmorBar: function(doFlash) {
+    };
+    HUDHandler.prototype.makeArmorBar = function(doFlash) {
         var HUD = this;
 
         doFlash = doFlash || false;
@@ -1032,8 +1033,8 @@ var HUDHandler = Class.extend({
                 HUD.makeArmorBar();
             }, 50);
         }
-    },
-    hideAlert: function() {
+    };
+    HUDHandler.prototype.hideAlert = function() {
         var HUD = this;
         $('#alertBox').hide();
         HUD.alertBoxActive = false;
@@ -1044,8 +1045,8 @@ var HUDHandler = Class.extend({
         if (!_.isUndefined(HUD.doNo)) {
             HUD.doNo = undefined;
         }
-    },
-    messageAlert: function(message, options, doYes, doNo) {
+    };
+    HUDHandler.prototype.messageAlert = function(message, options, doYes, doNo) {
 
         var options = options || null;
 
@@ -1099,14 +1100,14 @@ var HUDHandler = Class.extend({
 
             hudHandler.doNo = undefined;
         });
-    },
-    DisableButtons: function(buttons) {
+    };
+    HUDHandler.prototype.DisableButtons = function(buttons) {
         for (var b = 0; b < buttons.length; b++) {
             this.oldButtonClasses[buttons[b]] = $('#' + buttons[b]).attr('class');
             $('#' + buttons[b]).attr('class', 'ibutton_disabled');
         }
-    },
-    EnableButtons: function(buttons) {
+    };
+    HUDHandler.prototype.EnableButtons = function(buttons) {
         for (var b = 0; b < buttons.length; b++) {
             if (!_.isUndefined(this.oldButtonClasses[buttons[b]])) {
                 $('#' + buttons[b]).attr('class', this.oldButtonClasses[buttons[b]]);
@@ -1114,14 +1115,14 @@ var HUDHandler = Class.extend({
                 $('#' + buttons[b]).attr('class', 'ibutton');
             }
         }
-    },
-    hideHUD: function() {
+    };
+    HUDHandler.prototype.hideHUD =  function() {
         this.hideInv();
 
         $("#coinBar").hide();
         $("#statBar").hide();
-    },
-    ShowHUD: function() {
+    };
+    HUDHandler.prototype.ShowHUD =  function() {
         this.showInv({
             slots: 10,
             items: socketHandler.playerData.items
@@ -1130,18 +1131,18 @@ var HUDHandler = Class.extend({
         $("#coinBar").show();
         $("#statBar").show();
         $('#chatContent').show().trigger('show');
-    },
-    HideMenuScreen: function() {
+    };
+    HUDHandler.prototype.HideMenuScreen = function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
         soundHandler.FadeOut("music/maintheme", 5000);
-    },
-    ShowMenuScreen: function() {
+    };
+    HUDHandler.prototype.ShowMenuScreen = function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('.dragon-bar, #coinBar, #statBar').hide();
         $('#chatContent').hide().trigger('hide');
         soundHandler.FadeIn("music/maintheme", 5000);
-    },
-    GetLastCharacterPlayed: function() {
+    };
+    HUDHandler.prototype.GetLastCharacterPlayed = function() {
         var lastChar = 0;
         var lastTimeFound = 0;
         _.each(chars, function(char) {
@@ -1151,8 +1152,8 @@ var HUDHandler = Class.extend({
             }
         });
         return lastChar;
-    },
-    MakeCharSelectionScreen: function() {
+    };
+    HUDHandler.prototype.MakeCharSelectionScreen = function() {
         var slotsLeft = slotsAvailable - charCount;
 
         var text = '';
@@ -1765,8 +1766,8 @@ var HUDHandler = Class.extend({
                 hudHandler.MakeCharSelectionScreen();
             });
         });
-    },
-    tick: function(dTime) {
+    };
+    HUDHandler.prototype.tick =function(dTime) {
         var output = '';
 
         for (var m = 0; m < this.bigMessages.length; m++) {
@@ -1782,18 +1783,18 @@ var HUDHandler = Class.extend({
         }
 
         $('#bigMessagesBox').html(output);
-    },
-    AddBigMessage: function(msg, duration) {
+    };
+    HUDHandler.prototype.AddBigMessage = function(msg, duration) {
         this.bigMessages.push(new BigMessage(msg, duration));
-    },
-    showMap: function() {
+    };
+    HUDHandler.prototype.showMap = function() {
         $("#map").css("background-image", "url(data/" + terrainHandler.zone + "/map.png" + (isEditor ? "?" + (new Date()).getTime() : "") + ")");
         $("#map").show();
-    },
-    hideMap: function() {
+    };
+    HUDHandler.prototype.hideMap = function() {
         $("#map").hide();
-    },
-    showBook: function(text, page) {
+    };
+    HUDHandler.prototype.showBook  = function(text, page) {
 
         //<button id="bookPrevPage" class="ibutton_book" style="width:150px">Previous Page</button>
         //<button id="bookNextPage" class="ibutton_book" style="width:150px">Next Page</button>
@@ -1832,11 +1833,11 @@ var HUDHandler = Class.extend({
         } else {
             $("#bookFooterRight").empty();
         }
-    },
-    hideBook: function() {
+    };
+    HUDHandler.prototype.hideBook =function() {
         $("#book").hide();
-    },
-    AddChatMessage: function(msg) {
+    };
+    HUDHandler.prototype.AddChatMessage = function(msg) {
         if (typeof msg === 'string') {
             // wrap it in an object for the template
             msg = {
@@ -1844,11 +1845,8 @@ var HUDHandler = Class.extend({
             };
         }
         $('#chatContent').trigger('onMessage', msg);
-    }
-});
-
-
-
-//setTimeout(function(){hudHandler.ShowBook('Saturn is the sixth planet from the Sun and the second largest planet in the Solar System, after Jupiter. Named after the Roman god Saturn, its astronomical symbol (?) represents the god\'s sickle.|Saturn is a gas giant with an average radius about nine times that of Earth.[12][13] While only one-eighth the average density of Earth, with its larger volume Saturn is just over 95 times as massive as Earth.[14][15][16] Saturn\'s interior is probably composed of a core of iron, nickel and rock (silicon and oxygen compounds), surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium and an outer gaseous layer.[17]| The planet exhibits a pale yellow hue due to ammonia crystals in its upper atmosphere. Electrical current within the metallic hydrogen layer is thought to give rise to Saturn\'s planetary magnetic field, which is slightly weaker than Earth\'s and around one-twentieth the strength of Jupiter\'s.[18]| The outer atmosphere is generally bland and lacking in contrast, although long-lived features can appear. Wind speeds on Saturn can reach 1,800 km/h (1,100 mph), faster than on Jupiter, but not as fast as those on Neptune.[19] Saturn has a prominent ring system that consists of nine continuous main rings and three discontinuous arcs, composed mostly of ice particles with a smaller amount of rocky debris and dust. |Sixty-two[20] known moons orbit the planet; fifty-three are officially named. This does not include the hundreds of "moonlets" within the rings.| Titan, Saturn\'s largest and the Solar System\'s second largest moon, is larger than the planet Mercury and is the only moon in the Solar System to retain a substantial atmosphere.[21]')}, 1000);
-
-var hudHandler = new HUDHandler();
+    };
+    var hudHandler = new HUDHandler();
+    $window.hudHandler = hudHandler;
+    return hudHandler;
+}]);

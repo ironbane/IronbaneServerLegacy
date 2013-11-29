@@ -75,8 +75,11 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/services/news.js",
                     "<%= gameScriptPath %>/ng/services/alerts.js",
 
+                    "<%= gameScriptPath %>/ng/services/engine/socketHandler.js",
                     "<%= gameScriptPath %>/ng/services/engine/textureHandler.js",
                     "<%= gameScriptPath %>/ng/services/engine/meshHandler.js",
+                    "<%= gameScriptPath %>/ng/services/engine/terrainHandler.js",
+                    "<%= gameScriptPath %>/ng/services/hud.js",
                     "<%= gameScriptPath %>/ng/controllers/charSelect.js",
                     "<%= gameScriptPath %>/ng/directives/chat.js",
                     "<%= gameScriptPath %>/ng/directives/alertBox.js",
@@ -111,7 +114,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/Debug.js",
                     "<%= gameScriptPath %>/Engine/Events.js",
                     "<%= gameScriptPath %>/Engine/Input.js",
-                    "<%= gameScriptPath %>/Engine/SocketHandler.js",
+                    //"<%= gameScriptPath %>/Engine/SocketHandler.js",
                     "<%= gameScriptPath %>/Engine/SoundHandler.js",
                     //"<%= gameScriptPath %>/Engine/TextureHandler.js",
                     //"<%= gameScriptPath %>/Engine/MeshHandler.js",
@@ -146,7 +149,7 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Game/Projectile.js",
                     "<%= gameScriptPath %>/Game/ParticleEmitter.js",
                     "<%= gameScriptPath %>/Game/ParticleHandler.js",
-                    "<%= gameScriptPath %>/Game/TerrainHandler.js",
+                   // "<%= gameScriptPath %>/Game/TerrainHandler.js",
                     "<%= gameScriptPath %>/Game/LevelEditor.js"
                 ],
                 dest: '<%= cfg.get("buildTarget") %>game/js/<%= pkg.name %>-<%= pkg.version %>.js'

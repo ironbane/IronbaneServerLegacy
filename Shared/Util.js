@@ -1,7 +1,7 @@
 
 if ( !SERVER ) {
 
-  function loadTexture( path, textureOnly, options) {
+  /*function loadTexture( path, textureOnly, options) {
 
 
 
@@ -119,7 +119,7 @@ if ( !SERVER ) {
     });
 
   }
-
+*/
   var cachedCharacters = {};
 
   function getCharacterTexture(options) {
@@ -394,13 +394,7 @@ if ( !SERVER ) {
     return http.status!=404;
   }
 
-  function getZoneConfig(string) {
-    if ( _.isUndefined(zoneTypeConfig[zones[terrainHandler.zone]['type']][string]) ) {
-      bm('Error: \''+string+'\' not defined for zone '+zones[terrainHandler.zone].name+'!');
-      return 0;
-    }
-    return zoneTypeConfig[zones[terrainHandler.zone]['type']][string];
-  }
+  
 
   function ba(msg) {
     hudHandler.MessageAlert(msg);

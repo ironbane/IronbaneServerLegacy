@@ -45,7 +45,7 @@ $('#statBar,#coinBar,#itemBar,#lootBag,#bankBar,#editorControls,div[id^="li"],di
 
 $(window).resize(function() {
     //alert('resize');
-    hudHandler.ResizeFrame();
+    //hudHandler.ResizeFrame();
 
     // notify the renderer of the size change
     ironbane.renderer.setSize(window.innerWidth, window.innerHeight);

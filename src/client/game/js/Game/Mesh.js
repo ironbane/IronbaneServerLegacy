@@ -263,7 +263,7 @@ var Mesh = Unit.extend({
 
     var me = this;
 
-    ironbane.meshHandler.Load(model, function(geometry, jsonMaterials) {
+    meshHandler.Load(model, function(geometry, jsonMaterials) {
       me.BuildMesh( geometry, jsonMaterials );
     }, true);
 
@@ -279,7 +279,7 @@ var Mesh = Unit.extend({
   },
   BuildMesh: function(geometry, jsonMaterials) {
 
-    var result = ironbane.meshHandler.ProcessMesh({
+    var result = meshHandler.ProcessMesh({
       geometry: geometry,
       jsonMaterials: jsonMaterials,
       // No rotaion passed here! We do things manually to circumvent the raycast bug

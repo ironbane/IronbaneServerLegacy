@@ -38,35 +38,38 @@ var transitionStateEnum = {
   MIDDLE: 1,
   END: 2
 };
+
+var previewZone = 1;
 // Init:
 //  First, make sure that all cells in range of the player are loaded
 //  Send a Destroy signal to cells that are out of range
 //
 //
-
-var TerrainHandler = Class.extend({
-  Init: function() {
+IronbaneApp.factory('TerrainHandler', ['SocketHandler','TextureHandler', '$window', function(socketHandler, textureHandler, $window){
+function TerrainHandler(){ 
     // Multidimensional array per x/z cell
+    console.log("creating terrainhandler");
+
     this.cells = {};
 
-    this.previewZone = 1;
-    this.zone = this.previewZone;
+    this.zone= previewZone;
 
-    this.waterMesh = null;
-    this.skybox = null;
+    this.waterMesh=null;
+    this.skybox=null;
 
-    this.status = terrainHandlerStatusEnum.INIT;
+    this.status=terrainHandlerStatusEnum.INIT;
 
-    this.lastOctreeBuildPosition = new THREE.Vector3(0, 1000000000, 0);
+    this.lastOctreeBuildPosition=new THREE.Vector3(0, 1000000000, 0);
 
-    this.currentMusic = "";
-    this.targetMusic = "";
+    this.currentMusic="";
+    this.targetMusic="";
 
     // Used to freeze the player between teleports, so they don't fall down
     // because of gravity inside a terrain/mesh between teleports
-    this.transitionState = transitionStateEnum.END;
-  },
-  Destroy: function() {
+    this.transitionState= transitionStateEnum.END;
+  };
+
+  TerrainHandler.prototype.Destroy = function() {
     _.each(this.cells, function(cell) {
       cell.Destroy();
     });
@@ -84,13 +87,13 @@ var TerrainHandler = Class.extend({
     particleHandler.RemoveAll();
 
     this.terrainHandlerStatusEnum = this.DESTROYED;
-  },
-  Awake: function() {
+  };
+  TerrainHandler.prototype.Awake = function() {
     // Called after everything is loaded
 
     this.BuildWaterMesh();
 
-    if ( getZoneConfig("enableClouds") ) {
+    if ( this.getZoneConfig("enableClouds") ) {
       particleHandler.Add(ParticleTypeEnum.CLOUD, {});
     }
 
@@ -98,25 +101,22 @@ var TerrainHandler = Class.extend({
     this.skybox = new Skybox(function() {
       me.status = terrainHandlerStatusEnum.LOADED;
     });
-
-
-  },
-  BuildWaterMesh: function() {
+  };
+  TerrainHandler.prototype.BuildWaterMesh = function() {
     if ( this.waterMesh ) {
       ironbane.scene.remove(this.waterMesh);
     }
 
-    if ( !getZoneConfig('enableFluid') ) return;
+    if ( !this.getZoneConfig('enableFluid') ) return;
 
 
-
-    var texture = ironbane.textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTexture')+'.png', true);
+    var texture = textureHandler.getTexture( 'images/tiles/'+this.getZoneConfig('fluidTexture')+'.png', true);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.x = 1000;
     texture.repeat.y = 1000;
 
-    var texture2 = ironbane.textureHandler.getTexture( 'images/tiles/'+getZoneConfig('fluidTextureGlow')+'.png', true);
+    var texture2 = textureHandler.getTexture( 'images/tiles/'+this.getZoneConfig('fluidTextureGlow')+'.png', true);
     texture2.wrapS = THREE.RepeatWrapping;
     texture2.wrapT = THREE.RepeatWrapping;
     texture2.repeat.x = 1000;
@@ -160,9 +160,9 @@ var TerrainHandler = Class.extend({
 
     var shaderMaterial = new THREE.ShaderMaterial({
       uniforms : uniforms,
-      vertexShader : $('#vertex_'+getZoneConfig("fluidType")).text(),
-      fragmentShader : $('#fragment_'+getZoneConfig("fluidType")).text(),
-      transparent: getZoneConfig("fluidType") === "lava" ? false : true
+      vertexShader : $('#vertex_'+this.getZoneConfig("fluidType")).text(),
+      fragmentShader : $('#fragment_'+this.getZoneConfig("fluidType")).text(),
+      transparent: this.getZoneConfig("fluidType") === "lava" ? false : true
     //alphaTest: 0.5
     });
 
@@ -170,17 +170,17 @@ var TerrainHandler = Class.extend({
 
     this.waterMesh = new THREE.Mesh(planeGeo, shaderMaterial);
     this.waterMesh.rotation.x = -Math.PI/2;
-    this.waterMesh.position.y = getZoneConfig('fluidLevel');
+    this.waterMesh.position.y = this.getZoneConfig('fluidLevel');
     this.waterMesh.geometry.dynamic = true;
 
     ironbane.scene.add(this.waterMesh);
-  },
-  GetCellByWorldPosition: function(position) {
+  };
+  TerrainHandler.prototype.GetCellByWorldPosition = function(position) {
     var cp = WorldToCellCoordinates(position.x, position.z, cellSize);
 
     return this.GetCellByGridPosition(cp.x, cp.z);
-  },
-  GetCellByGridPosition: function(x, z) {
+  };
+  TerrainHandler.prototype.GetCellByGridPosition = function(x, z) {
     var id = x+'-'+z;
 
     if ( typeof this.cells[id] == 'undefined' ) {
@@ -193,11 +193,11 @@ var TerrainHandler = Class.extend({
     }
 
     return this.cells[id];
-  },
-  GetReferenceLocation: function() {
+  };
+  TerrainHandler.prototype.GetReferenceLocation = function() {
     return this.GetReferenceLocationNoClone().clone();
-  },
-  GetReferenceLocationNoClone: function() {
+  };
+  TerrainHandler.prototype.GetReferenceLocationNoClone = function() {
     var p;
 
     if ( le("globalEnable") ) {
@@ -214,8 +214,8 @@ var TerrainHandler = Class.extend({
     }
 
     return p;
-  },
-  ChangeZone: function(newZone) {
+  };
+  TerrainHandler.prototype.ChangeZone = function(newZone) {
 
     if ( this.zone != newZone ) {
       this.Destroy();
@@ -230,16 +230,25 @@ var TerrainHandler = Class.extend({
 
 
     if ( socketHandler.loggedIn ) {
-      this.targetMusic = ChooseRandom(getZoneConfig("music"));
+      this.targetMusic = ChooseRandom(this.getZoneConfig("music"));
     }
 
-  },
-  ReloadCells: function() {
+  };
+  TerrainHandler.prototype.ReloadCells = function() {
     _.each(this.cells, function(cell) {
       cell.Reload();
     });
-  },
-  rayTest: function(ray, options) {
+  };
+
+  TerrainHandler.prototype.getZoneConfig = function(string) {
+    
+    if ( _.isUndefined(zoneTypeConfig[zones[this.zone].type][string]) ) {
+      bm('Error: \''+string+'\' not defined for zone '+zones[this.zone].name+'!');
+      return 0;
+    }
+    return zoneTypeConfig[zones[this.zone].type][string];
+  };
+  TerrainHandler.prototype.rayTest = function(ray, options) {
 
     options = options || {};
 
@@ -383,8 +392,8 @@ var TerrainHandler = Class.extend({
     });
 
     return intersects;
-  },
-  RebuildOctree: function() {
+  };
+  TerrainHandler.prototype.RebuildOctree = function() {
     this.lastOctreeBuildPosition = terrainHandler.GetReferenceLocation();
     this.octreeResults = terrainHandler.skybox.terrainOctree
                             .search(this.lastOctreeBuildPosition, 15, true);
@@ -393,8 +402,8 @@ var TerrainHandler = Class.extend({
       this.octreeResults = this.octreeResults
         .concat(cell.octree.search(this.lastOctreeBuildPosition, 15, true));
     }, this);
-  },
-  tick: function(dTime) {
+  };
+  TerrainHandler.prototype.tick = function(dTime) {
 
     var p = this.GetReferenceLocation();
 
@@ -402,7 +411,7 @@ var TerrainHandler = Class.extend({
       this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
       if ( this.skybox ) {
-        if ( getZoneConfig("fluidType") === "lava" ) {
+        if ( this.getZoneConfig("fluidType") === "lava" ) {
           this.waterMesh.material.uniforms.vSun.value.set(0,1,0);
         }
         else {
@@ -508,13 +517,15 @@ var TerrainHandler = Class.extend({
 
       this.currentMusic = this.targetMusic;
     }
-  },
-  IsLoadingCells: function() {
+  };
+
+  TerrainHandler.prototype.IsLoadingCells = function() {
     return _.every(this.cells, function(cell) {
       return cell.status === cellStatusEnum.LOADING;
     });
-  }
-});
-
-
+  };
 var terrainHandler = new TerrainHandler();
+//global hack for non angularjs classes
+$window.terrainHandler = terrainHandler;
+return terrainHandler;
+}]);

@@ -15,16 +15,11 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-IronbaneApp.factory('MeshHandler', function(){
-var MeshHandler = Class.extend({
-  Init: function() {
-
-
-    this.geometries = {};
-
-
-  },
-  Load: function(model, readyFunc, clone) {
+IronbaneApp.factory('MeshHandler', ['TerrainHandler', 'TextureHandler', '$window', function(terrainHandler, textureHandler, $window){
+function MeshHandler(){
+      this.geometries = {};
+  };
+  MeshHandler.prototype.Load = function(model, readyFunc, clone) {
     var me = this;
     if ( this.geometries[model] ) {
       setTimeout(function() {
@@ -54,8 +49,8 @@ var MeshHandler = Class.extend({
 
 
 
-  },
-  ProcessMesh: function(options) {
+  };
+  MeshHandler.prototype.ProcessMesh = function(options) {
 
     var geometry = options.geometry;
     var jsonMaterials = options.jsonMaterials;
@@ -144,7 +139,7 @@ var MeshHandler = Class.extend({
       //   }));
       // }
       // else {
-        materials.push(ironbane.textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
+        materials.push(textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
           transparent:meshData["transparent"] && meshData["transparent"] === 1,
           alphaTest:0.1,
           useLighting:true
@@ -159,16 +154,17 @@ var MeshHandler = Class.extend({
       geometry: geometry,
       materials: materials
     };
-  },
-  BuildMesh: function(geometry, meshData) {
+  };
+  MeshHandler.prototype.BuildMesh= function(geometry, meshData) {
 
 
-  },
-  tick: function(dTime) {
+  };
+  MeshHandler.prototype.tick = function(dTime) {
 
 
 
   }
-});
-return MeshHandler;
-});
+var meshHandler = new MeshHandler();
+$window.meshHandler = meshHandler;
+return meshHandler
+}]);
