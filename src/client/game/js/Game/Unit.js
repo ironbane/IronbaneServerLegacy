@@ -237,7 +237,7 @@ var Unit = PhysicsObject.extend({
     if ( this.enableShadow ) {
 
       this.shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(this.size, this.size, 1, 1),
-        ironbane.textureHandler.getTexture(TEXTURE_SHADOW, false, {
+        textureHandler.getTexture(TEXTURE_SHADOW, false, {
           transparent:true,
           alphaTest:0.1
         }));
@@ -384,7 +384,7 @@ var Unit = PhysicsObject.extend({
 
         var grav = gravity.clone();
 
-        if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel')-0.5 ) {
+        if (terrainHandler.getZoneConfig("enableFluid") && this.position.y <terrainHandler.getZoneConfig('fluidLevel')-0.5 ) {
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
@@ -395,18 +395,18 @@ var Unit = PhysicsObject.extend({
             }
           }
         }
-        if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel') ) {
+        if (terrainHandler.getZoneConfig("enableFluid") && this.position.y <terrainHandler.getZoneConfig('fluidLevel') ) {
           if ( this.timers.waterSplashTimeout >= 0 ) this.timers.waterSplashTimeout -= dTime;
           else {
             this.waterSplashTimeout = 0.1;
-            particleHandler.Add(getZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
+            particleHandler.Add(terrainHandler.getZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
               position:this.position.clone()
             });
           }
         }
 
-        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < getZoneConfig('fluidLevel')) ) {
-          if ( !getZoneConfig("enableFluid") || this.position.y < getZoneConfig('fluidLevel')-0.6 || this.position.y > getZoneConfig('fluidLevel')-0.4 ) {
+        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y <terrainHandler.getZoneConfig('fluidLevel')) ) {
+          if ( !terrainHandler.getZoneConfig("enableFluid") || this.position.y <terrainHandler.getZoneConfig('fluidLevel')-0.6 || this.position.y >terrainHandler.getZoneConfig('fluidLevel')-0.4 ) {
             this.velocity.add(grav.clone().multiplyScalar(dTime));
           }
           else {
@@ -550,7 +550,7 @@ var Unit = PhysicsObject.extend({
           // A failsafe mechanism would be welcome, but due to the nature of our octree coll search mechanism
           // the raycastGroundPosition sometimes returns null even though there is actually terrain below
           // if ( (this instanceof Player) &&
-          //   getZoneConfig("enableFluid") && this.position.y <= getZoneConfig('fluidLevel') ) {
+          //  terrainHandler.getZoneConfig("enableFluid") && this.position.y <=terrainHandler.getZoneConfig('fluidLevel') ) {
           //   if ( !raycastGroundPosition ) {
           //     // We didn't find anything for our shadow
           //     // Reverse a raycast

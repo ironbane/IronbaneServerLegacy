@@ -161,7 +161,7 @@ var Fighter = Unit.extend({
             },
             texture1: {
                 type: 't',
-                value: ironbane.textureHandler.GetFreshTexture(texture, true)
+                value: textureHandler.GetFreshTexture(texture, true)
             }
         };
 
@@ -231,7 +231,7 @@ var Fighter = Unit.extend({
             },
             texture1: {
                 type: 't',
-                value: ironbane.textureHandler.getTexture(texture, true)
+                value: textureHandler.getTexture(texture, true)
             }
         };
 
@@ -738,10 +738,10 @@ var Fighter = Unit.extend({
 
     },
     jump: function() {
-        if (this.terrainAngle > 45 && this.position.y > getZoneConfig('fluidLevel')) return;
+        if (this.terrainAngle > 45 && this.position.y > terrainHandler.getZoneConfig('fluidLevel')) return;
 
         this.velocity.y = 5;
-        if (this.position.y < getZoneConfig('fluidLevel')) {
+        if (this.position.y < terrainHandler.getZoneConfig('fluidLevel')) {
             this.velocity.y = 2;
         }
 

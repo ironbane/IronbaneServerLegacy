@@ -428,7 +428,7 @@ var Player = Fighter.extend({
 
         var additionalCanMove = true;
 
-        if (this.terrainAngle > 45 && this.position.y > getZoneConfig('fluidLevel')) additionalCanMove = false;
+        if (this.terrainAngle > 45 && this.position.y >terrainHandler.getZoneConfig('fluidLevel')) additionalCanMove = false;
 
 
         var inputVelocity = new THREE.Vector3();
@@ -463,10 +463,10 @@ var Player = Fighter.extend({
                     this.object3D.position.y += dTime * 5;
                 } else if (this.timers.lastJumpTimer <= 0 &&
                     (this.isTouchingGround ||
-                        (this.position.y < getZoneConfig('fluidLevel') && this.position.y > getZoneConfig('fluidLevel') - 0.5))) {
+                        (this.position.y <terrainHandler.getZoneConfig('fluidLevel') && this.position.y >terrainHandler.getZoneConfig('fluidLevel') - 0.5))) {
 
-                    if (this.position.y < getZoneConfig('fluidLevel')) {
-                        //this.position.y = getZoneConfig('fluidLevel');
+                    if (this.position.y <terrainHandler.getZoneConfig('fluidLevel')) {
+                        //this.position.y =terrainHandler.getZoneConfig('fluidLevel');
 
                         this.timers.lastJumpTimer = 1.0;
                     }
@@ -510,9 +510,9 @@ var Player = Fighter.extend({
 
 
         //if ( zones[terrainHandler.zone]['enableFluid'] ) {
-        if (getZoneConfig('enableFluid')) {
+        if (terrainHandler.getZoneConfig('enableFluid')) {
             // Make some water splashes when we're moving under the fluidLevel
-            if (this.position.y < getZoneConfig('fluidLevel')) {
+            if (this.position.y <terrainHandler.getZoneConfig('fluidLevel')) {
                 var waterFrictionVector = this.velocity.clone().normalize().multiplyScalar(dTime * 10);
                 this.velocity.sub(waterFrictionVector);
                 maxSpeed -= (getZoneConfig('fluidLevel') - this.position.y) * 4;
@@ -642,7 +642,7 @@ var Player = Fighter.extend({
 
             if (this.aimTexture !== "") {
                 this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
-                    ironbane.textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
+                    textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
                         transparent: true,
                         alphaTest: 0.1
                     }));

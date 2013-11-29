@@ -1339,7 +1339,7 @@ IronbaneApp.factory('HUDHandler', ['SocketHandler','$window',function(socketHand
                 hudHandler.HideMenuScreen();
 
                 var tryConnect = function() {
-                    socketHandler.Connect(abortConnect);
+                    socketHandler.connect(abortConnect);
                 };
                 $('#chatContent').show();
                 if (startdata.loggedIn) {

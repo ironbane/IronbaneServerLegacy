@@ -104,9 +104,7 @@ IronbaneApp
 
             // this.renderer.sortObjects = false;
             this.renderer.setSize($window.innerWidth, $window.innerHeight);
-
-
-
+            
             $('#gameFrame').append(this.renderer.domElement);
 
             if (isEditor) {
