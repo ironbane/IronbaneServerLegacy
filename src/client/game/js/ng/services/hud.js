@@ -72,7 +72,7 @@ var BigMessage = Class.extend({
 });
 return BigMessage;
 });
-IronbaneApp.factory('HUDHandler', ['SocketHandler','$window',function(socketHandler, $window){
+IronbaneApp.factory('HUDHandler', ['SocketHandler','$window','BigMessage',function(socketHandler, $window, BigMessage){
     
     function HUDHandler() {
         var HUD = this;
