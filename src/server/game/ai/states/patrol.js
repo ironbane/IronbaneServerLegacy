@@ -16,8 +16,7 @@
 */
 var State = require('../state');
 var _ = require('underscore');
-var THREE = require('../../../../common/three');
-var VectorDistance = THREE.VectorDistance;
+var THREE = require(global.APP_ROOT_PATH + '/src/client/game/lib/three/three.js');
 
 // Requires nodes!
 var Patrol = State.extend({
@@ -46,7 +45,7 @@ var Patrol = State.extend({
         }
     },
     execute: function(unit, dTime) {
-        if (VectorDistance(unit.position, this.targetPosition) < 1.0 * unit.mass && !this.sentTimeout) {
+        if ( unit.position.distanceToSquared(this.targetPosition) < Math.pow(1.0 * unit.mass, 2) && !this.sentTimeout) {
             if (this.options.navMode === "line") {
                 if (this.forward) {
                     this.waypointIndex++;

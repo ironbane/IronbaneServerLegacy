@@ -14,13 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 var State = require('../state'),
     _ = require('underscore'),
     Constants = require('../../../../common/constants'),
     WeaponRanges = Constants.WeaponRanges,
-    THREE = require('../../../../common/three'),
-    VectorDistance = THREE.VectorDistance,
-    DistanceSq = THREE.DistanceSq;
+    THREE = require(global.APP_ROOT_PATH + '/src/client/game/lib/three/three.js');
 
 // some shortcuts for readable code
 var isDead = function(unit) {
@@ -62,7 +61,7 @@ var ChaseEnemy = State.extend({
             this.attackTimeout -= dTime;
         }
 
-        var distance = DistanceSq(this.enemy.position, unit.position);
+        var distance = this.enemy.position.distanceToSquared(unit.position);
         var direction;
 
         if (isInvalidPlayer(this.enemy) || isDead(this.enemy) || outsideSpawnGuardRadius(unit) && this.minimumChaseTime <= 0) {
@@ -85,7 +84,7 @@ var ChaseEnemy = State.extend({
 
             direction = unit.position.clone().sub(this.enemy.position).normalize();
             var target = this.enemy.position.clone().add(direction);
-            var distanceToTarget = DistanceSq(target, unit.position);
+            var distanceToTarget = target.distanceToSquared(unit.position);
 
             unit.heading.copy(direction.clone().multiplyScalar(-1));
 

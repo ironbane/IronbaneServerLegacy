@@ -16,9 +16,7 @@
 */
 var State = require('../state'),
     _ = require('underscore'),
-    THREE = require('../../../../common/three'),
-    ConvertVector3 = THREE.ConvertVector3,
-    VectorDistance = THREE.VectorDistance,
+    THREE = require(global.APP_ROOT_PATH + '/src/client/game/lib/three/three.js'),
     Wander = require('./wander'),
     ChaseEnemy = require('./chaseEnemy');
 
