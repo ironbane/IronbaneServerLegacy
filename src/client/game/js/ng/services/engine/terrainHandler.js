@@ -45,7 +45,7 @@ var previewZone = 1;
 //  Send a Destroy signal to cells that are out of range
 //
 //
-IronbaneApp.factory('TerrainHandler', ['SocketHandler','TextureHandler', '$window', function(socketHandler, textureHandler, $window){
+IronbaneApp.factory('TerrainHandler', ['Cell','Skybox','SocketHandler','TextureHandler', '$window', function(Cell, Skybox, socketHandler, textureHandler, $window){
 function TerrainHandler(){ 
     // Multidimensional array per x/z cell
     console.log("creating terrainhandler");

@@ -1,5 +1,5 @@
 IronbaneApp
-.factory('Unit', ['$log', function($log) {
+.factory('editUnit', ['$log', function($log) {
     var Unit = function(config) {
         angular.copy(config || {}, this);
 

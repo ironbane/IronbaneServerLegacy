@@ -515,7 +515,7 @@ var Player = Fighter.extend({
             if (this.position.y <terrainHandler.getZoneConfig('fluidLevel')) {
                 var waterFrictionVector = this.velocity.clone().normalize().multiplyScalar(dTime * 10);
                 this.velocity.sub(waterFrictionVector);
-                maxSpeed -= (getZoneConfig('fluidLevel') - this.position.y) * 4;
+                maxSpeed -= (terrainHandler.getZoneConfig('fluidLevel') - this.position.y) * 4;
                 maxSpeed = Math.max(2, maxSpeed);
 
             }

@@ -20,7 +20,7 @@ IronbaneApp
 
         // here is where we actually send the class
         function SocketHandler(){
-            
+            //this.socket = socket;
             this.serverOnline = typeof io === 'undefined' ? false : true;
             this.loggedIn = false;
             this.spawnLocation = null;
@@ -33,13 +33,10 @@ IronbaneApp
 
         SocketHandler.prototype.initConnection = function(){
         if (this.serverOnline) {
-            console.log('http://' + ironbane_hostname + ':' + ironbane_port + '/');
+            socket.connect();
+            
+            socket.emit('getStartData', {}, function(reply) {
 
-            this.socket = io.connect('http://' + ironbane_hostname + ':' + ironbane_port + '/', {
-                reconnect: false
-            });
-
-            this.socket.emit('getStartData', {}, function(reply) {
                 numberOfPlayersOnline = reply.numberOfPlayersOnline;
 
                 socketHandler.Setup();
@@ -47,26 +44,26 @@ IronbaneApp
             });
 
             // Socket behaviour
-            this.socket.on('chatMessage', function(data) {
+            socket.on('chatMessage', function(data) {
                 hudHandler.AddChatMessage(data);
             });
 
-            this.socket.on('bigMessage', function(data) {
+            socket.on('bigMessage', function(data) {
                 bm(data.message);
             });
 
-            this.socket.on('cutscene', function(id) {
+            socket.on('cutscene', function(id) {
                 cinema.PlayCutscene(id);
             });
 
-            this.socket.on('say', function(data) {
+            socket.on('say', function(data) {
                 var unit = FindUnit(data.id);
 
                 if (unit) {
                     ironbane.unitList.push(new ChatBubble(unit, data['message']));
                 }
             });
-            this.socket.on('disconnect', function() {
+            socket.on('disconnect', function() {
                 socketHandler.socket.disconnect();
                 for (var u = 0; u < ironbane.unitList.length; u++) ironbane.unitList[u].Destroy();
 
@@ -120,7 +117,7 @@ IronbaneApp
         $('#bogusButton').select();
         $('#gameFrame').focus();
 
-        this.socket.emit('connectServer', data, function(reply) {
+        socket.emit('connectServer', data, function(reply) {
             if (!_.isUndefined(reply.errmsg)) {
                 hudHandler.messageAlert(reply.errmsg);
                 abortConnect();
@@ -154,7 +151,7 @@ IronbaneApp
     };
     SocketHandler.prototype.Setup = function() {
         console.log("setting up socket");
-        this.socket.on('addUnit', function(data) {
+        socket.on('addUnit', function(data) {
             var unit = null;
             var template = null;
             if ( data.id < 0 ) {
@@ -262,7 +259,7 @@ IronbaneApp
                 ironbane.unitList.push(unit);
             }
         });
-        this.socket.on('doJump', function(data) {
+        socket.on('doJump', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
             var unit = FindUnit(data.id);
@@ -272,7 +269,7 @@ IronbaneApp
 
         });
 
-        this.socket.on('toggle', function(data) {
+        socket.on('toggle', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
             var unit = FindUnit(data.id);
@@ -282,7 +279,7 @@ IronbaneApp
             }
         });
 
-        this.socket.on('addParticle', function(data) {
+        socket.on('addParticle', function(data) {
             if (!_.isUndefined(data.fu)) {
                 var unit = FindUnit(data.fu);
                 particleHandler.Add(ParticleTypeEnum[data.p], {
@@ -300,7 +297,7 @@ IronbaneApp
             }
         });
 
-        this.socket.on('addProjectile', function(data) {
+        socket.on('addProjectile', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
             var unit = FindUnit(data['o']);
@@ -330,7 +327,7 @@ IronbaneApp
             ironbane.unitList.push(particle);
         });
 
-        this.socket.on('updateClothes', function(data) {
+        socket.on('updateClothes', function(data) {
             var unit = FindUnit(data.id);
 
             unit.appearance.head = data.head;
@@ -340,13 +337,13 @@ IronbaneApp
             unit.updateClothes();
         });
 
-        this.socket.on('updateWeapon', function(data) {
+        socket.on('updateWeapon', function(data) {
             var unit = FindUnit(data.id);
             unit.updateWeapon(data.weapon);
         });
 
         // comes from GiveItem and addItem on server
-        this.socket.on('receiveItem', function(item) {
+        socket.on('receiveItem', function(item) {
             socketHandler.playerData.items.push(item);
             hudHandler.fillInvSlot(item);
 
@@ -356,35 +353,35 @@ IronbaneApp
         });
 
         // replace player inv with server inv
-        this.socket.on('updateInventory', function(data) {
+        socket.on('updateInventory', function(data) {
             socketHandler.playerData.items = data.items;
             hudHandler.showInv({slots: 10, items: data.items});
         });
 
         // BANKING V1
-        this.socket.on('openBank', function(data) {
+        socket.on('openBank', function(data) {
             //console.log('openBank!', data);
             hudHandler.showBank(data);
         });
 
-        this.socket.on('closeBank', function(data) {
+        socket.on('closeBank', function(data) {
             //console.log('closeBank!', data);
             hudHandler.hideBank();
         });
         // BANKING...
 
-        this.socket.on('lootFromBag', function(data) {
+        socket.on('lootFromBag', function(data) {
             // occurs when someone nearby loots from a bag
             // refresh the bag
             hudHandler.updateLoot(data);
         });
 
         // someone nearby has purchased something, or perhaps on restock
-        this.socket.on('updateVendor', function(data) {
+        socket.on('updateVendor', function(data) {
             hudHandler.updateVendor(data);
         });
 
-        this.socket.on('respawn', function(data) {
+        socket.on('respawn', function(data) {
             var unit = FindUnit(data.id);
 
             if (unit) {
@@ -423,7 +420,7 @@ IronbaneApp
                 unit.Respawn();
             }
         });
-        this.socket.on('setStat', function(data) {
+        socket.on('setStat', function(data) {
             var unit = FindUnit(data.id);
 
             if (unit) {
@@ -456,7 +453,7 @@ IronbaneApp
             }
         });
 
-        this.socket.on('teleport', function(data) {
+        socket.on('teleport', function(data) {
 
             this.transitionState = transitionStateEnum.START;
 
@@ -489,7 +486,7 @@ IronbaneApp
         });
 
 
-        this.socket.on('getMeleeHit', function(data) {
+        socket.on('getMeleeHit', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
             var victim = FindUnit(data['victim']);
@@ -508,7 +505,7 @@ IronbaneApp
 
         });
 
-        this.socket.on('removeUnit', function(data) {
+        socket.on('removeUnit', function(data) {
 
             // Remove the unit from the list
             var unit = _.find(ironbane.unitList, function(unit) {
@@ -522,7 +519,7 @@ IronbaneApp
 
         });
 
-        this.socket.on('addModel', function(data) {
+        socket.on('addModel', function(data) {
 
             levelEditor.PlaceModel(ConvertVector3(data.position),
                 data.rX,
@@ -532,7 +529,7 @@ IronbaneApp
 
         });
 
-        this.socket.on('paintModel', function(data) {
+        socket.on('paintModel', function(data) {
 
             // Find the model at this position, and reload it
 
@@ -602,7 +599,7 @@ IronbaneApp
             }
         });
 
-        this.socket.on('deleteModel', function(pos) {
+        socket.on('deleteModel', function(pos) {
 
             pos = ConvertVector3(pos).Round(2);
 
@@ -658,26 +655,26 @@ IronbaneApp
 
 
         // Pathfinding
-        this.socket.on('ppAddNode', function(data) {
+        socket.on('ppAddNode', function(data) {
             if (!showEditor) return;
 
             nodeHandler.AddNode(0, data.id, ConvertVector3(data.pos));
         });
 
-        this.socket.on('ppAddEdge', function(data) {
+        socket.on('ppAddEdge', function(data) {
             if (!showEditor) return;
 
             nodeHandler.AddEdge(0, data.from, data.to, data.twoway);
         });
 
-        this.socket.on('ppDeleteNode', function(data) {
+        socket.on('ppDeleteNode', function(data) {
             if (!showEditor) return;
 
             nodeHandler.DeleteNode(0, data.id);
         });
 
 
-        this.socket.on('snapshot', function(snapshot) {
+        socket.on('snapshot', function(snapshot) {
             //if ( !socketHandler.loggedIn ) return;
             socketHandler.bytesReceived += 2 * snapshot.length;
             for (var x = 0; x < snapshot.length; x++) {
