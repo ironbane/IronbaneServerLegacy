@@ -16,8 +16,7 @@
 */
 var State = require('../state'),
     _ = require('underscore'),
-    THREE = require('../../../../common/three'),
-    VectorDistance = THREE.VectorDistance;
+    THREE = require(global.APP_ROOT_PATH + '/src/client/game/lib/three/three.js');
 
 var pathFinder = require(APP_ROOT_PATH+ '/src/server/game/pathFinder.js');
 
@@ -37,7 +36,7 @@ var Wander = State.extend({
             return;
         }
 
-        if (VectorDistance(unit.position, this.targetPosition) < 1.0 && !this.hasReachedWaypoint) {
+        if ( unit.position.distanceToSquared(this.targetPosition) < 1.0 && !this.hasReachedWaypoint) {
             this.hasReachedWaypoint = true;
             // Get a random waypoint nearby and travel to it
 
