@@ -34,7 +34,7 @@ var Billboard = Unit.extend({
     },
     Add: function() {
         var texture = this.customPath ? 'images/' + this.param + '.png' : billboardSpritePath + '' + this.param + '.png';
-        this.texture = textureHandler.getTexture(texture, true);
+        this.texture = ironbane.textureHandler.getTexture(texture, true);
 
         this.TryToBuildMesh();
 
