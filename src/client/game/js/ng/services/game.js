@@ -12,6 +12,10 @@ IronbaneApp
             this.textureHandler = new TextureHandler();
             this.meshHandler = new MeshHandler();
 
+            //temporary global fix, will remove tonight
+            $window.textureHandler = this.textureHandler;
+            $window.meshHandler = this.meshHandler;
+
             // adjustable framerate
             this._lastFrameTime = 0;
             this._maxFrameTime = 0.03;
