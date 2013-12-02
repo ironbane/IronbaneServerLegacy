@@ -1,15 +1,16 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler',
     function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler) { // using $window to reveal the globals
         // make this private so that it can't be called directly
-        
+
 
         var Game = function() {
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
 
-            this.textureHandler = new TextureHandler();
+            // hacked in until injection day
+            this.textureHandler = TextureHandler;
             this.meshHandler = new MeshHandler();
 
             //temporary global fix, will remove tonight

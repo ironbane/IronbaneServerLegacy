@@ -57,7 +57,7 @@ var LootBag = Billboard.extend({
         var texture = itemSpritePath + ''+image+'.png';
 
 
-        this.texture = textureHandler.getTexture( texture, true);
+        this.texture = ironbane.textureHandler.getTexture( texture, true);
 
 
         this.TryToBuildMesh();
