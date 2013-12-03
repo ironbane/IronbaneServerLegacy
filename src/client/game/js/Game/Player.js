@@ -93,6 +93,9 @@ var Player = Fighter.extend({
 
         this.lookAtPosition = new THREE.Vector3();
 
+        this.isUnderneathAnObstacle = false;
+        this.isUnderneathAnObstacleTimer = 0.0;
+
     },
     getTotalCoins: function() {
         //console.log('getTotalCoins', socketHandler.playerData.items);
@@ -661,6 +664,26 @@ var Player = Fighter.extend({
             this.aimMeshPosition.lerp(point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05)), dTime * 20);
             this.aimMesh.position.copy(this.aimMeshPosition);
             this.aimMesh.LookFlatAt(currentMouseToWorldData.face.normalWithRotations.clone().add(this.aimMesh.position));
+        }
+
+
+        // Periodically check if we are underneath something
+        if ( this.isUnderneathAnObstacleTimer > 0 ) this.isUnderneathAnObstacleTimer -= dTime;
+        if ( this.isUnderneathAnObstacleTimer <= 0 ) {
+            this.isUnderneathAnObstacle = false;
+            this.isUnderneathAnObstacleTimer = 1.0;
+
+            ray = new THREE.Raycaster(this.position, new THREE.Vector3(0, 1, 0));
+
+            var intersects = terrainHandler.rayTest(ray, {
+                testMeshesNearPosition: this.position,
+                unitReference: this,
+                unitRayName: "underneathanobstacle"
+            });
+
+            if ((intersects.length > 0)) {
+                this.isUnderneathAnObstacle = true;
+            }
         }
 
 
