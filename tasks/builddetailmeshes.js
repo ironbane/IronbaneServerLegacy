@@ -52,6 +52,8 @@ module.exports = function(grunt) {
         var saveToObj = function(file, geometry) {
             var s = '';
 
+            geometry.mergeVertices();
+
             _.each(geometry.vertices, function(v) {
                 s += 'v ';
                 s += v.x + ' ';
@@ -115,7 +117,11 @@ module.exports = function(grunt) {
                                 var rawfile = JSON.parse(fs.readFileSync(r, 'utf8'));
 
                                 _.each(rawfile, function(mesh) {
-                                    //console.log(allMeshes[mesh.p]);
+
+                                    if ( !allMeshes[mesh.p] ) {
+                                        console.log("Mesh with id "+mesh.p+" does not exist!");
+                                        return;
+                                    }
 
                                     var rawfile = JSON.parse(fs.readFileSync(options.assetDir + "images/meshes/" +
                                         allMeshes[mesh.p].replace(".obj", "") + ".js", 'utf8'));

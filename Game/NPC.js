@@ -151,9 +151,9 @@ var NPC = Fighter.extend({
         // console.log(distance);
         var targetPositionDistance = DistanceSq(this.position, targetPosition);
         // debugger;
-        if ( distance < 0.5 || this.calculateNewPathTimeout <= 0) {
-        // if ( distance < 0.5 ) {
-            this.calculateNewPathTimeout = 2.0;
+        // if ( distance < 0.5 || this.calculateNewPathTimeout <= 0) {
+        if ( distance < 0.5 ) {
+            // this.calculateNewPathTimeout = 2.0;
 
             if ( targetPositionDistance > 1 ) {
                 // console.log("[TravelToPosition] Calculating new path to ", targetPosition);
