@@ -673,7 +673,7 @@ var Player = Fighter.extend({
             this.isUnderneathAnObstacle = false;
             this.isUnderneathAnObstacleTimer = 1.0;
 
-            ray = new THREE.Raycaster(this.position, new THREE.Vector3(0, 1, 0));
+            ray = new THREE.Raycaster(this.position.clone().add(new THREE.Vector3(0,0.5,0)), new THREE.Vector3(0, 1, 0));
 
             var intersects = terrainHandler.rayTest(ray, {
                 testMeshesNearPosition: this.position,
