@@ -487,7 +487,7 @@ var Projectile = Unit.extend({
                     var list = [];
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
-                            && u != unit.owner
+                            && u != this.owner
                             && this.inRangeOfUnit(u, 1)
                             && u.health > 0
                             && this.weapon.attr1 <= 0){
