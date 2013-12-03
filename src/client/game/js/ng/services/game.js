@@ -1,13 +1,21 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter','HUDHandler','TerrainHandler','SocketHandler','MeshHandler',
-    function($log, $window, $http, $timeout, $filter, hudHandler, terrainHandler, socketHandler, meshHandler) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 'Snow',
+    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, Snow) { // using $window to reveal the globals
         // make this private so that it can't be called directly
-        
+
 
         var Game = function() {
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
+
+            // hacked in until injection day
+            this.textureHandler = TextureHandler;
+            this.meshHandler = new MeshHandler();
+
+            //temporary global fix, will remove tonight
+            $window.textureHandler = this.textureHandler;
+            $window.meshHandler = this.meshHandler;
 
             // adjustable framerate
             this._lastFrameTime = 0;
@@ -100,11 +108,13 @@ IronbaneApp
             this.shadowLight.shadowCameraNear   = 5.1;
             this.shadowLight.castShadow   = true;
             this.shadowLight.shadowDarkness   = 0.3;
-            ironbane.scene.add( this.shadowLight );
 
             // this.renderer.sortObjects = false;
             this.renderer.setSize($window.innerWidth, $window.innerHeight);
-            
+
+            // temp hack for xmas 2013
+            this.snow = new Snow(this.scene);
+
             $('#gameFrame').append(this.renderer.domElement);
 
             if (isEditor) {
@@ -201,6 +211,8 @@ IronbaneApp
             }
 
             hudHandler.tick(dTime);
+
+            this.snow.tick(this._elapsedTime);
 
             if (!$window.socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
                 game.camera.position.x = $window.previewLocation.x + (Math.cos(new Date().getTime() / 20000) * $window.previewDistance) - 0;

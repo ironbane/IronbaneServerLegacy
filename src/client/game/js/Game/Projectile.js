@@ -107,7 +107,7 @@ var ProjectileTypeEnum = {
         parabolic: true,
         meshType: ProjectileMeshTypeEnum.BONE,
         rotationSpeed: new THREE.Vector3(10, 0, 0),
-        texture: {FULL: 'images/projectiles/bone.png', BONEHEAD:  'images/projectiles/bonehead.png'} 
+        texture: {FULL: 'images/projectiles/bone.png', BONEHEAD:  'images/projectiles/bonehead.png'}
     }
 };
 
@@ -251,7 +251,7 @@ var Projectile = Unit.extend({
         this.mesh.add(this.meshChild);
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.ARROW ) {
-            var mat = textureHandler.getTexture(ProjectileTypeEnum.ARROW.texture.FULL , false, {transparent:true, doubleSided:true});
+            var mat = ironbane.textureHandler.getTexture(ProjectileTypeEnum.ARROW.texture.FULL , false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -272,7 +272,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI/2;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.BACK, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, ironbane.textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.BACK, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -281,7 +281,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.HEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, ironbane.textureHandler.getTexture( ProjectileTypeEnum.ARROW.texture.HEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -293,7 +293,7 @@ var Projectile = Unit.extend({
         }
 
         if ( this.type.meshType == ProjectileMeshTypeEnum.BONE ) {
-            var mat = textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.FULL, false, {transparent:true, doubleSided:true});
+            var mat = ironbane.textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.FULL, false, {transparent:true, doubleSided:true});
 
 
             var mesh;
@@ -315,7 +315,7 @@ var Projectile = Unit.extend({
             this.meshChild.add(mesh);
 
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, ironbane.textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z -= 0.4;
@@ -324,7 +324,7 @@ var Projectile = Unit.extend({
             mesh.rotation.z = Math.PI;
             this.meshChild.add(mesh);
 
-            var mesh = new THREE.Mesh(planeGeo, textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
+            var mesh = new THREE.Mesh(planeGeo, ironbane.textureHandler.getTexture( ProjectileTypeEnum.BONE.texture.BONEHEAD, false, {transparent:true}));
             mesh.scale.x = 0.25;
             mesh.scale.y = 0.25;
             mesh.position.z += 0.3;
@@ -341,7 +341,7 @@ var Projectile = Unit.extend({
 
             var texture = 'images/items/'+weaponImage+'.png';
 
-            var mat = textureHandler.getTexture(texture, false, {transparent:true, doubleSided:true});
+            var mat = ironbane.textureHandler.getTexture(texture, false, {transparent:true, doubleSided:true});
 
             var planeGeo = new THREE.PlaneGeometry(1,1, 1, 1);
 
@@ -487,7 +487,7 @@ var Projectile = Unit.extend({
                     var list = [];
                     _.each(ironbane.unitList, function(u){
                         if ( u instanceof Fighter
-                            && u != unit.owner
+                            && u != this.owner
                             && this.inRangeOfUnit(u, 1)
                             && u.health > 0
                             && this.weapon.attr1 <= 0){

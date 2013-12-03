@@ -15,147 +15,123 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 IronbaneApp
-    .factory('TextureHandler', ['$window',function($window) {
+    .service('TextureHandler', ['$log', '$window',
+        function($log, $window) {
+            var _textureCache = {};
 
-        function loadTexture( path, textureOnly, options) {
-          textureOnly = textureOnly || false;
-          options = options || {};
+            function loadTexture(path, textureOnly, options) {
+                textureOnly = !! textureOnly;
+                options = options || {};
 
-          options.seeThrough = options.seeThrough === undefined ? false : options.seeThrough;
-          options.opacity = options.opacity === undefined ? 0.5 : options.opacity;
-          options.vertexShader = options.vertexShader === undefined ? "vertex" : options.vertexShader;
-          options.uvScaleX = options.uvScaleX === undefined ? 1 : options.uvScaleX;
-          options.uvScaleY = options.uvScaleY === undefined ? 1 : options.uvScaleY;
-          options.transparent = options.transparent === undefined ? false : options.transparent;
-          options.alphaTest = options.alphaTest === undefined ? 0.5 : options.alphaTest;
-          options.doubleSided = options.doubleSided === undefined ? false : options.doubleSided;
-          options.useLighting = options.useLighting === undefined ? false : options.useLighting;
-          options.spriteMaterial = options.spriteMaterial === undefined ? false : options.spriteMaterial;
+                options.seeThrough = options.seeThrough === undefined ? false : options.seeThrough;
+                options.opacity = options.opacity === undefined ? 0.5 : options.opacity;
+                options.vertexShader = options.vertexShader === undefined ? 'vertex' : options.vertexShader;
+                options.uvScaleX = options.uvScaleX === undefined ? 1 : options.uvScaleX;
+                options.uvScaleY = options.uvScaleY === undefined ? 1 : options.uvScaleY;
+                options.transparent = options.transparent === undefined ? false : options.transparent;
+                options.alphaTest = options.alphaTest === undefined ? 0.5 : options.alphaTest;
+                options.doubleSided = options.doubleSided === undefined ? false : options.doubleSided;
+                options.useLighting = options.useLighting === undefined ? false : options.useLighting;
+                options.spriteMaterial = options.spriteMaterial === undefined ? false : options.spriteMaterial;
 
+                var image = new $window.Image();
+                image.src = path;
 
-          var image = new Image();
+                // todo: wrap three in angular module
+                var texture = new $window.THREE.Texture(image,
+                    new $window.THREE.UVMapping(),
+                    $window.THREE.RepeatWrapping,
+                    $window.THREE.RepeatWrapping,
+                    $window.THREE.NearestFilter,
+                    $window.THREE.NearestMipMapLinearFilter);
 
+                image.onload = function() {
+                    texture.needsUpdate = true;
+                };
 
+                if (textureOnly) {
+                    return texture;
+                }
 
-          image.src = path;
+                var mat;
 
+                if (options.useLighting) {
+                    var config = {
+                        map: texture
+                    };
 
+                    if (options.transparent) {
+                        config.transparent = options.transparent;
+                    }
 
-          var texture  = new THREE.Texture( image,
-            new THREE.UVMapping(),
-            THREE.RepeatWrapping,
-            THREE.RepeatWrapping,
-            THREE.NearestFilter,
-            THREE.NearestMipMapLinearFilter );
+                    mat = new $window.THREE.MeshLambertMaterial(config);
 
+                    return mat;
+                }
 
-          image.onload = function () {
-            texture.needsUpdate = true;
-          };
+                if (options.spriteMaterial) {
+                    mat = new $window.THREE.SpriteMaterial({
+                        color: $window.ColorEnum.WHITE,
+                        map: texture,
+                        useScreenCoordinates: false,
+                        transparent: true
+                        //alphaTest: 0.5
+                    });
 
+                    return mat;
+                }
 
-          if ( textureOnly ) return texture;
+                var uniforms = {
+                    uvScale: {
+                        type: 'v2',
+                        value: new $window.THREE.Vector2(options.uvScaleX, options.uvScaleY)
+                    },
+                    texture1: {
+                        type: 't',
+                        value: texture
+                    }
+                };
 
-          //return new THREE.MeshBasicMaterial({color:Math.random() * 0xffffff});
+                if (options.seeThrough) {
+                    uniforms.opacity = {
+                        type: 'f',
+                        value: options.opacity
+                    };
+                }
 
+                if (options.vertexShader === 'vertex_world') {
+                    uniforms.camPos = {
+                        type: 'v3',
+                        value: ironbane.camera.position.clone()
+                    };
+                }
 
-          if ( options.useLighting ) {
-
-            var config = {
-              map : texture
-            };
-
-            if ( options.transparent ) config.transparent = options.transparent;
-
-            // var mat = new THREE.MeshPhongMaterial( config );
-            // mat.perPixel = true;
-            var mat = new THREE.MeshLambertMaterial( config );
-
-            return mat;
-
-          }
-
-          if ( options.spriteMaterial ) {
-
-            var mat = new THREE.SpriteMaterial({
-                  color: ColorEnum.WHITE,
-                  map: texture,
-                  useScreenCoordinates: false,
-                  transparent: true
-                  //alphaTest: 0.5
-              });
-
-            return mat;
-
-          }
-
-          //        return new THREE.MeshLambertMaterial( {
-          //            map: texture,
-          //            ambient: 0xffffff
-          //        } );
-
-          var uniforms = {
-            uvScale : {
-              type: 'v2',
-              value: new THREE.Vector2(options.uvScaleX,options.uvScaleY)
-            },
-            texture1 : {
-              type: 't',
-              //                value: 0,
-              //                texture:texture
-              // r50->r51
-              value:texture
+                return new $window.THREE.ShaderMaterial({
+                    uniforms: uniforms,
+                    vertexShader: $('#' + options.vertexShader).text(),
+                    fragmentShader: $('#' + (options.seeThrough ? 'fragment_opacity' : 'fragment_fullbright')).text(),
+                    transparent: options.transparent,
+                    alphaTest: options.alphaTest,
+                    side: options.doubleSided ? $window.THREE.DoubleSide : $window.THREE.FrontSide
+                });
             }
-          };
 
-          if ( options.seeThrough ) {
-            uniforms.opacity = {
-              type: 'f',
-              value: options.opacity
+            this.getTexture = function(path, textureOnly, options) {
+                var key = path;
+                key += ',' + textureOnly;
+                for (var o in options) {
+                    key += ',' + options[o];
+                }
+
+                if (!_textureCache[key]) {
+                    _textureCache[key] = loadTexture(path, textureOnly, options);
+                }
+
+                return _textureCache[key];
             };
-          }
 
-          if ( options.vertexShader == "vertex_world" ) {
-            uniforms.camPos = {
-              type: 'v3',
-              value: ironbane.camera.position.clone()
+            this.GetFreshTexture = function(path, textureOnly, options) {
+                return loadTexture(path, textureOnly, options);
             };
-          }
-
-          return new THREE.ShaderMaterial({
-            uniforms : uniforms,
-            vertexShader : $('#'+options.vertexShader).text(),
-            fragmentShader : $("#"+(options.seeThrough ? 'fragment_opacity' : 'fragment_fullbright')).text(),
-            transparent:options.transparent,
-            alphaTest: options.alphaTest,
-            side: options.doubleSided ? THREE.DoubleSide : THREE.FrontSide
-          });
-
         }
-
-        function TextureHandler(){
-          this.textures = {};
-          console.log("making texturehandler");
-          
-        };
-
-        TextureHandler.prototype.getTexture = function (path, textureOnly, options) {
-              var key = path;
-              key += ","+textureOnly;
-              for(var o in options) key += ","+options[o];
-
-              if ( !this.textures[key] ) {
-                  this.textures[key] = loadTexture(path, textureOnly, options);
-              }
-
-              return this.textures[key];
-          };
-          TextureHandler.prototype.GetFreshTexture = function (path, textureOnly, options) {
-              return loadTexture(path, textureOnly, options);
-          };
-
-        var textureHandler =  new TextureHandler();
-        //global hack for non angular classes
-        $window.textureHandler = textureHandler;
-        return textureHandler;
-    }]);
+    ]);
