@@ -77,6 +77,8 @@ module.exports = function(grunt) {
 
                     "<%= gameScriptPath %>/ng/services/engine/textureHandler.js",
                     "<%= gameScriptPath %>/ng/services/engine/meshHandler.js",
+                    "<%= gameScriptPath %>/ng/services/engine/snow.js",
+
                     "<%= gameScriptPath %>/ng/controllers/charSelect.js",
                     "<%= gameScriptPath %>/ng/directives/chat.js",
                     "<%= gameScriptPath %>/ng/directives/alertBox.js",
