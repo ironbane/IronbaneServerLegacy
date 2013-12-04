@@ -109,11 +109,16 @@ angular.module('Ironbane')
                 this.particleSystem.position.x = Math.round(this.particleSystem.position.x/100)*100;
                 this.particleSystem.position.z = Math.round(this.particleSystem.position.z/100)*100;
 
-                if ( ironbane.player ) {
-                    this.particleSystem.visible = !ironbane.player.isUnderneathAnObstacle;
+                if ( getZoneConfig("skyboxShader") === "world" ) {
+                    if ( ironbane.player ) {
+                        this.particleSystem.visible = !ironbane.player.isUnderneathAnObstacle;
+                    }
+                    else {
+                        this.particleSystem.visible = true;
+                    }
                 }
                 else {
-                    this.particleSystem.visible = true;
+                    this.particleSystem.visible = false;
                 }
 
             };
