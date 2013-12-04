@@ -1,7 +1,7 @@
 /*global angular, THREE */
 angular.module('Ironbane')
-    .factory('Snow', ['TextureHandler',
-        function(TextureHandler) {
+    .factory('Snow', ['TextureHandler','TerrainHandler',
+        function(TextureHandler, terrainHandler) {
             function rand(v) {
                 return (v * (Math.random() - 0.5));
             }
@@ -109,7 +109,7 @@ angular.module('Ironbane')
                 this.particleSystem.position.x = Math.round(this.particleSystem.position.x/100)*100;
                 this.particleSystem.position.z = Math.round(this.particleSystem.position.z/100)*100;
 
-                if ( getZoneConfig("skyboxShader") === "world" ) {
+                if ( terrainHandler.getZoneConfig("skyboxShader") === "world" ) {
                     if ( ironbane.player ) {
                         this.particleSystem.visible = !ironbane.player.isUnderneathAnObstacle;
                     }

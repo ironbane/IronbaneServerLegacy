@@ -15,11 +15,11 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-IronbaneApp.factory('MeshHandler', ['TerrainHandler', 'TextureHandler', '$window', function(terrainHandler, textureHandler, $window){
-function MeshHandler(){
+IronbaneApp.service('MeshHandler', ['TextureHandler', '$window', function(textureHandler, $window){
+
       this.geometries = {};
-  };
-  MeshHandler.prototype.Load = function(model, readyFunc, clone) {
+ 
+  this.Load = function(model, readyFunc, clone) {
     var me = this;
     if ( this.geometries[model] ) {
       setTimeout(function() {
@@ -50,7 +50,7 @@ function MeshHandler(){
 
 
   };
-  MeshHandler.prototype.ProcessMesh = function(options) {
+  this.ProcessMesh = function(options) {
 
     var geometry = options.geometry;
     var jsonMaterials = options.jsonMaterials;
@@ -155,16 +155,13 @@ function MeshHandler(){
       materials: materials
     };
   };
-  MeshHandler.prototype.BuildMesh= function(geometry, meshData) {
+  this.BuildMesh= function(geometry, meshData) {
 
 
   };
-  MeshHandler.prototype.tick = function(dTime) {
+  this.tick = function(dTime) {
 
 
 
   }
-var meshHandler = new MeshHandler();
-$window.meshHandler = meshHandler;
-return meshHandler
 }]);

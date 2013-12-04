@@ -23,7 +23,7 @@ var meshPath = 'images/meshes/';
 var LIGHT_VISIBILITY_DISTANCE_THRESHOLD = 2500;
 
 var scaleModifierRightBeforeJSONLoader = 0;
-IronbaneApp.factory('Mesh',['Unit', function(Unit){
+IronbaneApp.factory('Mesh',['Unit', 'MeshHandler', '$injector', function(Unit, meshHandler, $injector){
 var Mesh = Unit.extend({
   Init: function(position, rotation, id, param, metadata) {
 
@@ -187,7 +187,7 @@ var Mesh = Unit.extend({
 
   },
   UpdateLighting: function() {
-      var cell = terrainHandler.GetCellByWorldPosition(this.position);
+      var cell = ironbane.terrainHandler.GetCellByWorldPosition(this.position);
 
       setTimeout(function() {
 
@@ -220,7 +220,7 @@ var Mesh = Unit.extend({
 
 
 
-          _.each(terrainHandler.skybox.terrainMesh.material.materials, function(material) {
+          _.each(ironbane.terrainHandler.skybox.terrainMesh.material.materials, function(material) {
             material.needsUpdate = true;
           });
 
@@ -289,7 +289,7 @@ var Mesh = Unit.extend({
 
     this.mesh = new THREE.Mesh( result.geometry, new THREE.MeshFaceMaterial(result.materials) );
     this.mesh.unit = this;
-
+    var DynamicMesh = $injector.get('DynamicMesh');
     if ( !(this instanceof DynamicMesh) ) {
       this.mesh.castShadow = true;
     }
@@ -392,7 +392,7 @@ var Mesh = Unit.extend({
         break;
     }
 
-    var p = terrainHandler.GetReferenceLocationNoClone();
+    var p = ironbane.terrainHandler.GetReferenceLocationNoClone();
 
     // Disable lights if they are too far
     _.each(this.lightsToMaintain, function(light) {
@@ -408,11 +408,11 @@ var Mesh = Unit.extend({
     }, this);
 
 
-    if ( terrainHandler.skybox ) {
+    if ( ironbane.terrainHandler.skybox ) {
       // Adjust to the time of the day
       _.each(this.lightsToMaintain, function(light) {
 
-        var factor = (terrainHandler.skybox.sunVector.y.clamp(-0.2, 0.2) + 0.2) * 0.5;
+        var factor = (ironbane.terrainHandler.skybox.sunVector.y.clamp(-0.2, 0.2) + 0.2) * 0.5;
 
         factor *= 5;
 

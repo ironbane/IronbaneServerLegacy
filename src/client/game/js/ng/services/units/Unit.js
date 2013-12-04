@@ -25,7 +25,7 @@ var TEXTURE_SHADOW = 'images/misc/shadow.png';
 
 var sizeScalingSpeed = 2;
 
-IronbaneApp.factory('Unit',['PhysicsObject', function(PhysicsObject){
+IronbaneApp.factory('Unit',['PhysicsObject', '$injector', function(PhysicsObject, $injector){
 var Unit = PhysicsObject.extend({
   Init: function(position, rotation, id, name, param, size) {
     this._super(position);

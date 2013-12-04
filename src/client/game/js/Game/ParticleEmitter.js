@@ -111,7 +111,7 @@ var ParticleEmitter = Class.extend({
             }
         }
 
-        var texture = textureHandler.getTexture('images/' + texture + '.png', true);
+        var texture = ironbane.textureHandler.getTexture('images/' + texture + '.png', true);
 
         var spriteMaterial = new THREE.SpriteMaterial({
             color: ColorEnum.WHITE,

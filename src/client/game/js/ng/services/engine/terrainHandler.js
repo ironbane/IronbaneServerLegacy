@@ -45,19 +45,18 @@ var previewZone = 1;
 //  Send a Destroy signal to cells that are out of range
 //
 //
-IronbaneApp.factory('TerrainHandler', ['Cell','Skybox','SocketHandler','TextureHandler', '$window', function(Cell, Skybox, socketHandler, textureHandler, $window){
-function TerrainHandler(){ 
+IronbaneApp.service('TerrainHandler', ['Cell','Skybox','SocketHandler','TextureHandler', '$window', function(Cell, Skybox, socketHandler, textureHandler, $window){
+this.cells = {};
     // Multidimensional array per x/z cell
     console.log("creating terrainhandler");
 
-    this.cells = {};
 
-    this.zone= previewZone;
+    this.zone = previewZone;
 
-    this.waterMesh=null;
-    this.skybox=null;
+    this.waterMesh = null;
+    this.skybox = null;
 
-    this.status=terrainHandlerStatusEnum.INIT;
+    this.status = terrainHandlerStatusEnum.INIT;
 
     this.lastOctreeBuildPosition=new THREE.Vector3(0, 1000000000, 0);
 
@@ -67,18 +66,18 @@ function TerrainHandler(){
     // Used to freeze the player between teleports, so they don't fall down
     // because of gravity inside a terrain/mesh between teleports
     this.transitionState= transitionStateEnum.END;
-  };
 
-  TerrainHandler.prototype.Destroy = function() {
+
+  this.Destroy = function() {
     _.each(this.cells, function(cell) {
       cell.Destroy();
     });
 
     this.cells = {};
 
-    this.cellOctrees = {};
+    cellOctrees = {};
 
-    this.zone = this.previewZone;
+    this.zone = previewZone;
 
     if ( this.skybox ) this.skybox.Destroy();
 
@@ -86,30 +85,33 @@ function TerrainHandler(){
 
     particleHandler.RemoveAll();
 
-    this.terrainHandlerStatusEnum = this.DESTROYED;
+    this.status = terrainHandlerStatusEnum.DESTROYED;
   };
-  TerrainHandler.prototype.Awake = function() {
+  this.Awake = function() {
     // Called after everything is loaded
-
+    console.log("awakening terrainhandler");
     this.BuildWaterMesh();
 
     if ( this.getZoneConfig("enableClouds") ) {
       particleHandler.Add(ParticleTypeEnum.CLOUD, {});
     }
-
     var me = this;
     this.skybox = new Skybox(function() {
       me.status = terrainHandlerStatusEnum.LOADED;
     });
   };
-  TerrainHandler.prototype.BuildWaterMesh = function() {
+  this.BuildWaterMesh = function() {
+    console.log("building waterMesh");
     if ( this.waterMesh ) {
       ironbane.scene.remove(this.waterMesh);
     }
 
-    if ( !this.getZoneConfig('enableFluid') ) return;
+    if ( !this.getZoneConfig('enableFluid') ){
+      console.log('enableFluid not set for terrain');
+      return;
+    } 
 
-
+console.log(textureHandler);
     var texture = textureHandler.getTexture( 'images/tiles/'+this.getZoneConfig('fluidTexture')+'.png', true);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -157,12 +159,12 @@ function TerrainHandler(){
         value: 0.0
       }
     };
-
+    var me = this;
     var shaderMaterial = new THREE.ShaderMaterial({
       uniforms : uniforms,
-      vertexShader : $('#vertex_'+this.getZoneConfig("fluidType")).text(),
-      fragmentShader : $('#fragment_'+this.getZoneConfig("fluidType")).text(),
-      transparent: this.getZoneConfig("fluidType") === "lava" ? false : true
+      vertexShader : $('#vertex_'+me.getZoneConfig("fluidType")).text(),
+      fragmentShader : $('#fragment_'+me.getZoneConfig("fluidType")).text(),
+      transparent: me.getZoneConfig("fluidType") === "lava" ? false : true
     //alphaTest: 0.5
     });
 
@@ -175,12 +177,12 @@ function TerrainHandler(){
 
     ironbane.scene.add(this.waterMesh);
   };
-  TerrainHandler.prototype.GetCellByWorldPosition = function(position) {
+  this.GetCellByWorldPosition = function(position) {
     var cp = WorldToCellCoordinates(position.x, position.z, cellSize);
 
     return this.GetCellByGridPosition(cp.x, cp.z);
   };
-  TerrainHandler.prototype.GetCellByGridPosition = function(x, z) {
+  this.GetCellByGridPosition = function(x, z) {
     var id = x+'-'+z;
 
     if ( typeof this.cells[id] == 'undefined' ) {
@@ -194,10 +196,10 @@ function TerrainHandler(){
 
     return this.cells[id];
   };
-  TerrainHandler.prototype.GetReferenceLocation = function() {
+  this.GetReferenceLocation = function() {
     return this.GetReferenceLocationNoClone().clone();
   };
-  TerrainHandler.prototype.GetReferenceLocationNoClone = function() {
+  this.GetReferenceLocationNoClone = function() {
     var p;
 
     if ( le("globalEnable") ) {
@@ -215,11 +217,11 @@ function TerrainHandler(){
 
     return p;
   };
-  TerrainHandler.prototype.ChangeZone = function(newZone) {
+  this.ChangeZone = function(newZone) {
 
     if ( this.zone != newZone ) {
       this.Destroy();
-      this.zone = newZone;
+     this.zone = newZone;
       this.status = terrainHandlerStatusEnum.INIT;
       bm(zones[this.zone].name);
     }
@@ -230,17 +232,17 @@ function TerrainHandler(){
 
 
     if ( socketHandler.loggedIn ) {
-      this.targetMusic = ChooseRandom(this.getZoneConfig("music"));
+      targetMusic = ChooseRandom(this.getZoneConfig("music"));
     }
 
   };
-  TerrainHandler.prototype.ReloadCells = function() {
+  this.ReloadCells = function() {
     _.each(this.cells, function(cell) {
       cell.Reload();
     });
   };
 
-  TerrainHandler.prototype.getZoneConfig = function(string) {
+  this.getZoneConfig = function(string) {
     
     if ( _.isUndefined(zoneTypeConfig[zones[this.zone].type][string]) ) {
       bm('Error: \''+string+'\' not defined for zone '+zones[this.zone].name+'!');
@@ -248,7 +250,7 @@ function TerrainHandler(){
     }
     return zoneTypeConfig[zones[this.zone].type][string];
   };
-  TerrainHandler.prototype.rayTest = function(ray, options) {
+  this.rayTest = function(ray, options) {
 
     options = options || {};
 
@@ -351,11 +353,11 @@ function TerrainHandler(){
       //30-6-2013 - Ingmar : check on existence of ironbane.player, during load of the game, the terrainhandler is loading first and then the player.
       // player does not have yet to exist here, so wait a few cycles
       if(ironbane.player) {
-        if ( DistanceSq(this.lastOctreeBuildPosition, ironbane.player.position) > REBUILD_OCTREE_THRESHOLD ) {
-            this.RebuildOctree();
+        if ( DistanceSq(lastOctreeBuildPosition, ironbane.player.position) > REBUILD_OCTREE_THRESHOLD ) {
+            RebuildOctree();
         }
 
-        var subIntersects = ray.intersectOctreeObjects( this.octreeResults );
+        var subIntersects = ray.intersectOctreeObjects( octreeResults );
         intersects = intersects.concat(subIntersects);
       }
     }
@@ -393,20 +395,16 @@ function TerrainHandler(){
 
     return intersects;
   };
-  TerrainHandler.prototype.RebuildOctree = function() {
-    this.lastOctreeBuildPosition = terrainHandler.GetReferenceLocation();
-    this.octreeResults = terrainHandler.skybox.terrainOctree
-                            .search(this.lastOctreeBuildPosition, 15, true);
+  this.RebuildOctree = function() {
+    lastOctreeBuildPosition = this.GetReferenceLocation();
+    octreeResults = this.skybox.terrainOctree.search(lastOctreeBuildPosition, 15, true);
 
-    _.each(terrainHandler.cells, function(cell) {
-      this.octreeResults = this.octreeResults
-        .concat(cell.octree.search(this.lastOctreeBuildPosition, 15, true));
-    }, this);
+    _.each(this.cells, function(cell) {
+      octreeResults = octreeResults.concat(cell.octree.search(lastOctreeBuildPosition, 15, true));
+    });
   };
-  TerrainHandler.prototype.tick = function(dTime) {
-
+  this.tick = function(dTime) {
     var p = this.GetReferenceLocation();
-
     if ( this.waterMesh ) {
       this.waterMesh.material.uniforms.time.value = (window.performance.now() - ironbane.startTime)/1000.0;
 
@@ -424,17 +422,18 @@ function TerrainHandler(){
 
       //var id = worldPos.x+'-'+worldPos.z;
 
-      terrainHandler.waterMesh.position.x = worldPos.x;
-      terrainHandler.waterMesh.position.z = worldPos.z;
+      this.waterMesh.position.x = worldPos.x;
+      this.waterMesh.position.z = worldPos.z;
 
     }
 
     if ( this.transitionState === transitionStateEnum.MIDDLE && this.status === terrainHandlerStatusEnum.LOADED &&
-      !this.IsLoadingCells() ) {
+      !IsLoadingCells() ) {
 
-        terrainHandler.transitionState = -1;
+        this.transitionState = -1;
+      var me = this;
         setTimeout(function(){
-            terrainHandler.transitionState = transitionStateEnum.END;
+            me.transitionState = transitionStateEnum.END;
         }, 100);
     }
 
@@ -466,6 +465,7 @@ function TerrainHandler(){
     switch(this.status) {
       case terrainHandlerStatusEnum.INIT:
         this.Awake();
+        console.log('loading world');
         this.status = terrainHandlerStatusEnum.LOADING;
         break;
       case terrainHandlerStatusEnum.LOADING:
@@ -519,13 +519,10 @@ function TerrainHandler(){
     }
   };
 
-  TerrainHandler.prototype.IsLoadingCells = function() {
+  this.IsLoadingCells = function() {
     return _.every(this.cells, function(cell) {
       return cell.status === cellStatusEnum.LOADING;
     });
   };
-var terrainHandler = new TerrainHandler();
-//global hack for non angularjs classes
-$window.terrainHandler = terrainHandler;
-return terrainHandler;
+
 }]);

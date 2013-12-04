@@ -59,10 +59,8 @@ var Skybox = PhysicsObject.extend({
       transparent:true,
       alphaTest:0.01
     }));
-    this.sunMesh.material.side = THREE.DoubleSide
-    ;
+    this.sunMesh.material.side = THREE.DoubleSide;
     ironbane.scene.add(this.sunMesh);
-
     if ( zones[terrainHandler.zone].type == ZoneTypeEnum.DUNGEON ) {
       this.sunMesh.visible = false;
     }

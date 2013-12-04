@@ -30,7 +30,7 @@ var AimTextures = {
     TARGET_AIM_TEXTURE_AIM_EDITOR: "aim_editor",
     BLANK: "blank"
 };
-
+IronbaneApp.factory('Player', ['Fighter',function(Fighter){
 var Player = Fighter.extend({
     Init: function(position, rotation, id, name) {
 
@@ -267,7 +267,8 @@ var Player = Fighter.extend({
     },
     tick: function(dTime) {
         var player = this;
-
+        //move this to Player.js
+    
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
         debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
@@ -1007,3 +1008,5 @@ var Player = Fighter.extend({
         $(".ib-tutorial").removeClass("tut" + id);
     }
 });
+return Fighter;
+}]);

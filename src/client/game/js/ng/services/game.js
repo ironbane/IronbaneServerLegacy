@@ -1,7 +1,7 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 'Snow',
-    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, Snow) { // using $window to reveal the globals
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TerrainHandler', 'HUDHandler', 'TextureHandler','MeshHandler', 'Snow', 'Player',
+    function($log, $window, $http, $timeout, $filter, terrainHandler, hudHandler, textureHandler, MeshHandler, Snow, Player) { // using $window to reveal the globals
         // make this private so that it can't be called directly
 
 
@@ -10,12 +10,14 @@ IronbaneApp
             this.mouthwash = $filter('mouthwash');
 
             // hacked in until injection day
-            this.textureHandler = TextureHandler;
-            this.meshHandler = new MeshHandler();
+            this.textureHandler = textureHandler;
+            console.log(this.textureHandler)
+            this.meshHandler = MeshHandler;
+            this.terrainHandler = terrainHandler;
 
-            //temporary global fix, will remove tonight
-            $window.textureHandler = this.textureHandler;
-            $window.meshHandler = this.meshHandler;
+            $window.terrainHandler = terrainHandler;
+
+            $window.textureHandler = textureHandler;
 
             // adjustable framerate
             this._lastFrameTime = 0;
@@ -209,7 +211,6 @@ IronbaneApp
             if ($window.showEditor) {
                 $window.levelEditor.tick(dTime);
             }
-
             hudHandler.tick(dTime);
 
             this.snow.tick(this._elapsedTime);
@@ -229,7 +230,7 @@ IronbaneApp
                 if (terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
                     !terrainHandler.IsLoadingCells()) {
                     if (!game.player) {
-                        game.player = new $window.Player(socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
+                        game.player = new Player(socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
                     }
                 }
             }

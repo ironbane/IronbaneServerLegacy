@@ -16,12 +16,13 @@
 */
 
 var skyboxPath = 'images/skybox/';
-IronbaneApp.factory('Skybox', ['PhysicsObject', function(PhysicsObject){
+IronbaneApp.factory('Skybox', ['PhysicsObject', 'TextureHandler','MeshHandler', function(PhysicsObject, textureHandler, meshHandler){
 var Skybox = PhysicsObject.extend({
   Init: function(onReady) {
-
-    var p = terrainHandler.GetReferenceLocation();
-
+    console.log("making skybox");
+    var p = ironbane.terrainHandler.GetReferenceLocation();
+    console.log("ref loc: ");
+    console.log( p);
     this._super(p);
 
     this.onReady = onReady;
@@ -38,12 +39,12 @@ var Skybox = PhysicsObject.extend({
         value: this.sunVector
       }
     };
-
     var material = new THREE.ShaderMaterial({
       uniforms : uniforms,
       vertexShader : $('#vertex_skybox').text(),
-      fragmentShader : $('#fragment_skybox_'+terrainHandler.getZoneConfig("skyboxShader")).text()
+      fragmentShader : $('#fragment_skybox_'+ironbane.terrainHandler.getZoneConfig("skyboxShader")).text()
     });
+
 
     material.side = THREE.BackSide;
 
@@ -59,11 +60,9 @@ var Skybox = PhysicsObject.extend({
       transparent:true,
       alphaTest:0.01
     }));
-    this.sunMesh.material.side = THREE.DoubleSide
-    ;
+    this.sunMesh.material.side = THREE.DoubleSide;
     ironbane.scene.add(this.sunMesh);
-
-    if ( zones[terrainHandler.zone].type == ZoneTypeEnum.DUNGEON ) {
+    if ( zones[ironbane.terrainHandler.zone].type == ZoneTypeEnum.DUNGEON ) {
       this.sunMesh.visible = false;
     }
 
@@ -78,7 +77,7 @@ var Skybox = PhysicsObject.extend({
     ironbane.scene.add( this.moonLight );
     // Add terrain
     //if ( zones[terrainHandler.zone]['type'] == ZoneTypeEnum.WORLD ) {
-      var model = skyboxPath + terrainHandler.zone+".js";
+      var model = skyboxPath + ironbane.terrainHandler.zone+".js";
       //this.texture = textureHandler.getTexture( texture, true);
 
       var jsonLoader = new THREE.JSONLoader();
@@ -112,7 +111,7 @@ var Skybox = PhysicsObject.extend({
 
     if ( this.onReady ) this.onReady();
 
-    terrainHandler.RebuildOctree();
+    ironbane.terrainHandler.RebuildOctree();
 
   },
   Destroy: function() {
@@ -128,7 +127,7 @@ var Skybox = PhysicsObject.extend({
       this.terrainOctree.remove( this.terrainMesh );
       ironbane.scene.remove(this.terrainMesh);
       releaseMesh(this.terrainMesh);
-      terrainHandler.RebuildOctree();
+      ironbane.terrainHandler.RebuildOctree();
     }
     if ( this.ambientLight ) {
       ironbane.scene.remove(this.ambientLight);
@@ -148,7 +147,7 @@ var Skybox = PhysicsObject.extend({
   },
   tick: function(dTime) {
 
-    var p = terrainHandler.GetReferenceLocationNoClone();
+    var p = ironbane.terrainHandler.GetReferenceLocationNoClone();
 
     this.skyboxMesh.position.copy(p);
     this.skyboxMesh.position.y = 0;
@@ -175,12 +174,12 @@ var Skybox = PhysicsObject.extend({
 
 
       if ( (showEditor && levelEditor.editorGUI.chForceDay)
-        || terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DAYONLY ) {
+        || ironbane.terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DAYONLY ) {
         this.sunVector.set(0,1,0);
       }
       else if ( (showEditor && levelEditor.editorGUI.chForceNight)
-        || terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY
-        || terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
+        || ironbane.terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.NIGHTONLY
+        || ironbane.terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
         this.sunVector.set(0,-1,0);
       }
       else {
@@ -224,7 +223,7 @@ var Skybox = PhysicsObject.extend({
 
 
 
-      if ( terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
+      if ( ironbane.terrainHandler.getZoneConfig("lightSystem") === LightSystemEnum.DUNGEON ) {
         this.ambientLight.color.setRGB(0.2, 0.2, 0.3);
         this.sunLight.color.setRGB( 0.0, 0.0, 0.0 );
         this.moonLight.color.setRGB(0.2, 0.2, 0.3);

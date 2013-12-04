@@ -263,6 +263,7 @@ var Fighter = Unit.extend({
 
     },
     tick: function(dTime) {
+        var me = this;
         // Update speed (used for walking animations
         if ( this.dynamic || !this.initialStaticUpdateDone ) {
 this.position.getPositionFromMatrix(this.object3D.matrixWorld);

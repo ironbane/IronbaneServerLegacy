@@ -21,7 +21,7 @@ var cellStatusEnum = {
     LOADED: 2,
     DESTROYED: 3
 };
-IronbaneApp.factory('Cell', ['Mesh',function(Mesh){
+IronbaneApp.factory('Cell', ['Mesh','MeshHandler',function(Mesh, meshHandler){
 var Cell = Class.extend({
     Init: function(cellX, cellZ) {
 
@@ -71,13 +71,13 @@ var Cell = Class.extend({
     },
     Load: function() {
         var me = this;
-
+        
         this.totalMaterials = [];
 
         // Todo: switch to promises
         this.filesToLoad++;
         // Make the request, and when the request is in, build the mesh
-        var objectsFile = 'data/'+terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/objects.json?'+(new Date()).getTime();
+        var objectsFile = 'data/'+ironbane.terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/objects.json?'+(new Date()).getTime();
         $.getJSON(objectsFile, function(data) {
           me.filesToLoad--;
           me.objectData = data;
@@ -93,7 +93,7 @@ var Cell = Class.extend({
 
         if ( isEditor ) {
           this.filesToLoad++;
-          var graphFile = 'data/'+terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/graph.json?'+(new Date()).getTime();
+          var graphFile = 'data/'+ironbane.terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/graph.json?'+(new Date()).getTime();
           $.getJSON(graphFile, function(data) {
             me.filesToLoad--;
             me.graphData = data;
@@ -147,7 +147,7 @@ var Cell = Class.extend({
 
         this.status = cellStatusEnum.LOADED;
 
-        terrainHandler.RebuildOctree();
+        ironbane.terrainHandler.RebuildOctree();
     },
     Destroy: function() {
 

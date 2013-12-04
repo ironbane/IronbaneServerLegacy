@@ -17,7 +17,7 @@
 IronbaneApp
     .service('TextureHandler', ['$log', '$window',
         function($log, $window) {
-            var _textureCache = {};
+            this._textureCache = {};
 
             function loadTexture(path, textureOnly, options) {
                 textureOnly = !! textureOnly;
@@ -123,11 +123,11 @@ IronbaneApp
                     key += ',' + options[o];
                 }
 
-                if (!_textureCache[key]) {
-                    _textureCache[key] = loadTexture(path, textureOnly, options);
+                if (!this._textureCache[key]) {
+                    this._textureCache[key] = loadTexture(path, textureOnly, options);
                 }
 
-                return _textureCache[key];
+                return this._textureCache[key];
             };
 
             this.GetFreshTexture = function(path, textureOnly, options) {
