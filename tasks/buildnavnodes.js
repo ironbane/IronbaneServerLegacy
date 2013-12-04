@@ -1,7 +1,6 @@
 var shell = require('shelljs');
 var fs = require('fs');
 var path = require('path');
-var Q = require('q');
 var _ = require('underscore');
 var THREE = require('../src/client/game/lib/three/three.js');
 var util = require('../Engine/util.js');
@@ -258,6 +257,10 @@ module.exports = function(grunt) {
             var polygons = navigationMesh.polygons;
             var vertices = navigationMesh.vertices;
 
+            bar = new ProgressBar('Building polygon groups[:bar] :percent', _.extend(barConfig, {
+                total: polygons.length
+            }));
+
             var polygonGroups = [];
             var groupCount = 0;
 
@@ -270,7 +273,9 @@ module.exports = function(grunt) {
                 });
             };
 
-            _.each(polygons, function(polygon) {
+            _.each(polygons, function(polygon, i) {
+
+                bar.tick();
 
                 if (_.isUndefined(polygon.group)) {
                     polygon.group = groupCount++;
@@ -278,24 +283,9 @@ module.exports = function(grunt) {
                     spreadGroupId(polygon);
                 }
 
-
-                // Check if the polygon is already part of a group
-                // var contained = false;
-                // _.each(polygonGroups, function(pg) {
-                //     if ( _.contains(pg, polygon) ) {
-                //         contained = true;
-                //     }
-                // });
-
-                // if ( !contained ) {
-                //     // Where do we add it to?
-
-                // }
-
                 if (!polygonGroups[polygon.group]) polygonGroups[polygon.group] = [];
 
                 polygonGroups[polygon.group].push(polygon);
-
             });
 
 
@@ -313,7 +303,7 @@ module.exports = function(grunt) {
             // });
 
 
-            // console.log("Groups built: ", polygonGroups.length);
+            console.log("Groups built: ", polygonGroups.length);
 
             return polygonGroups;
         };
@@ -361,7 +351,11 @@ module.exports = function(grunt) {
             for (var i = 0, len = navigationMesh.polygons.length; i < len; i++) {
                 if (polygon === navigationMesh.polygons[i]) continue;
 
+                // Don't check polygons that are too far, since the intersection tests take a long time
+                if (polygon.centroid.distanceToSquared(navigationMesh.polygons[i].centroid) > 100 * 100) continue;
+
                 var matches = array_intersect(polygon.vertexIds, navigationMesh.polygons[i].vertexIds);
+                // var matches = _.intersection(polygon.vertexIds, navigationMesh.polygons[i].vertexIds);
 
                 if (matches.length >= 2) {
                     polygon.neighbours.push(navigationMesh.polygons[i]);
@@ -370,9 +364,11 @@ module.exports = function(grunt) {
         };
 
         var buildPolygonsFromGeometry = function(geometry) {
-            // geometry.mergeVertices();
 
+            geometry.mergeVertices();
             THREE.GeometryUtils.triangulateQuads(geometry);
+
+            console.log("Vertices:", geometry.vertices.length, "polygons:", geometry.faces.length);
 
             var polygons = [];
             var vertices = geometry.vertices;
@@ -410,8 +406,6 @@ module.exports = function(grunt) {
                 buildPolygonNeighbours(polygon, navigationMesh);
             });
 
-
-
             return navigationMesh;
         };
 
@@ -437,11 +431,7 @@ module.exports = function(grunt) {
 
             var newPolygons = [];
 
-            // console.log(polygons);
-
             _.each(polygons, function(polygon) {
-
-                // console.log("polygon loop");
 
                 if (polygon.toBeDeleted) return;
 
@@ -449,8 +439,6 @@ module.exports = function(grunt) {
 
                 while (keepLooking) {
                     keepLooking = false;
-
-                    // console.log("Got " + polygon.neighbours.length + " neighbours!");
 
                     _.each(polygon.neighbours, function(otherPolygon) {
 
@@ -556,7 +544,7 @@ module.exports = function(grunt) {
 
         var buildNavigationMesh = function(geometry) {
 
-            console.log("Vertices:", geometry.vertices.length, "polygons:", geometry.faces.length);
+            // console.log("vertices:", geometry.vertices.length, "polygons:", geometry.faces.length);
 
             var navigationMesh = buildPolygonsFromGeometry(geometry);
 
@@ -609,6 +597,8 @@ module.exports = function(grunt) {
         };
 
         var saveToJs = function(file, navigationMesh) {
+
+            console.log("Saving to JSON");
 
             var saveObj = {};
 
@@ -681,7 +671,6 @@ module.exports = function(grunt) {
 
 
         var buildNodes = function(file) {
-            var deferred = Q.defer();
 
             var zone = path.basename(file, ".nav.js");
 
@@ -697,26 +686,18 @@ module.exports = function(grunt) {
             saveToJs(options.assetDir + "data/" + zone + "/navnodes.json", navigationMesh);
             // saveToJs(options.assetDir+"test.obj", navigationMesh);
 
-
-            deferred.resolve();
-
-            return deferred.promise;
         };
 
 
-        var promises = [];
 
         task.filesSrc.forEach(function(file) {
-            promises.push(function() {
-                return buildNodes(file);
-            });
-
+            buildNodes(file);
         });
 
-        promises.reduce(Q.when, Q()).then(function() {
-            grunt.log.writeln("All done!");
-            taskDone(true);
-        });
+
+        grunt.log.writeln("All done!");
+        taskDone(true);
+
 
     });
 

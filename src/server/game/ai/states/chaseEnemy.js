@@ -93,7 +93,10 @@ var ChaseEnemy = State.extend({
             // this is the actual chase behavior
             // log("[ChaseEnemy] Within aggro range, moving closer...");
             direction = unit.position.clone().sub(this.enemy.position).normalize().multiplyScalar(0.5);
-            unit.TravelToPosition(this.enemy.position, true);
+            unit.TravelToPosition(this.enemy.position, {
+                useSeek: true,
+                dynamicTarget: true
+            });
         }
     },
     handleMessage: function(unit, message, data) {

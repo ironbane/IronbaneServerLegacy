@@ -139,21 +139,23 @@ var NPC = Fighter.extend({
         this.jumpTimeout = 2.0;
     },
     // Return an array of nodes or positions that we can follow in order to reach our destination
-    TravelToPosition: function(targetPosition, useSeek, deceleration) {
+    TravelToPosition: function(targetPosition, options) {
+
+        var options = options || {};
+        options.useSeek = options.useSeek || false;
+        options.deceleration = options.deceleration || Deceleration.FAST;
+        options.dynamicTarget = options.dynamicTarget || false;
+
         var distance = DistanceSq(this.position, this.targetNodePosition);
-
-        useSeek = useSeek || false;
-
-        deceleration = deceleration || Deceleration.FAST;
 
 
         // log("TravelToPosition dist:");
         // console.log(distance);
         var targetPositionDistance = DistanceSq(this.position, targetPosition);
         // debugger;
-        if ( distance < 0.5 || this.calculateNewPathTimeout <= 0) {
+        if ( distance < 0.5 || (this.calculateNewPathTimeout <= 0 && options.dynamicTarget)) {
         // if ( distance < 0.5 ) {
-            this.calculateNewPathTimeout = 2.0;
+            this.calculateNewPathTimeout = 1.0;
 
             if ( targetPositionDistance > 1 ) {
                 // console.log("[TravelToPosition] Calculating new path to ", targetPosition);
@@ -163,11 +165,11 @@ var NPC = Fighter.extend({
             }
         }
 
-        if ( targetPositionDistance > 4 || useSeek ) {
+        if ( targetPositionDistance > 4 || options.useSeek ) {
             this.steeringForce = this.steeringBehaviour.Seek(this.targetNodePosition);
         }
         else {
-            this.steeringForce = this.steeringBehaviour.Arrive(this.targetNodePosition, deceleration);
+            this.steeringForce = this.steeringBehaviour.Arrive(this.targetNodePosition, options.deceleration);
         }
     }
 });

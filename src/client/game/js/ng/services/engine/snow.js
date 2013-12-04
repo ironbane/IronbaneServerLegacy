@@ -9,7 +9,7 @@ angular.module('Ironbane')
             var Snow = function(scene) {
                 var particleSystemHeight = 100;
 
-                var sprite1 = TextureHandler.getTexture('images/textures/snowflake2.png', true);
+                var sprite1 = TextureHandler.getTexture('images/textures/snowflake.png', true);
 
                 var numParticles = 5000,
                     width = 200,
@@ -92,16 +92,35 @@ angular.module('Ironbane')
                 }
 
                 this.particleSystem = new THREE.ParticleSystem(systemGeometry, systemMaterial);
-                this.particleSystem.position.y = -height / 2;
+                // this.particleSystem.position.y = -height / 2;
 
                 scene.add(this.particleSystem);
             };
 
             Snow.prototype.tick = function(elapsedTime) {
+
+                var refPos = terrainHandler.GetReferenceLocationNoClone();
+
                 this.particleSystem.material.uniforms.elapsedTime.value = elapsedTime * 10;
-                this.particleSystem.position.x = ironbane.camera.position.x;
-                this.particleSystem.position.z = ironbane.camera.position.z;
-                this.particleSystem.position.y = ironbane.camera.position.y - 50;
+                this.particleSystem.position.x = refPos.x;
+                this.particleSystem.position.z = refPos.z;
+                this.particleSystem.position.y = refPos.y - (ironbane.player ? 5 : 20);
+
+                this.particleSystem.position.x = Math.round(this.particleSystem.position.x/100)*100;
+                this.particleSystem.position.z = Math.round(this.particleSystem.position.z/100)*100;
+
+                if ( getZoneConfig("skyboxShader") === "world" ) {
+                    if ( ironbane.player ) {
+                        this.particleSystem.visible = !ironbane.player.isUnderneathAnObstacle;
+                    }
+                    else {
+                        this.particleSystem.visible = true;
+                    }
+                }
+                else {
+                    this.particleSystem.visible = false;
+                }
+
             };
 
             return Snow;

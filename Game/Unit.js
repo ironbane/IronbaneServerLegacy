@@ -523,7 +523,7 @@ var Unit = Class.extend({
   },
   CalculatePath: function(targetPosition) {
 
-    if (this.navigationMeshGroup) {
+    if (this.navigationMeshGroup !== null) {
       var paths = pathFinder.findPath(this.position,
         targetPosition,
         this.zone,
@@ -536,16 +536,19 @@ var Unit = Class.extend({
       }
 
       if (paths && paths[0]) {
+        // console.log("[CalculatePath] Path found! Going to", paths[0]);
         this.targetNodePosition.copy(paths[0]);
       }
       else {
         // No match found! Let our state machine know that we can't reach the target
+        // console.log("[CalculatePath] targetUnreachable!");
         this.handleMessage("targetUnreachable");
         this.targetNodePosition.copy(this.position);
       }
     }
     else {
       // With no navigation data, stay here!
+      // console.log("[CalculatePath] no navigation data! Group: "+this.navigationMeshGroup);
       this.targetNodePosition.copy(this.position);
     }
 

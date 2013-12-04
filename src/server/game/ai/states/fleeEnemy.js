@@ -46,7 +46,10 @@ var FleeEnemy = State.extend({
                 this.RefreshFleePosition(unit);
             }
 
-            unit.TravelToPosition(this.fleePosition, true);
+            unit.TravelToPosition(this.fleePosition, {
+                useSeek: true,
+                dynamicTarget: true
+            });
         }
     }
 });
