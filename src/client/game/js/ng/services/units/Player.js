@@ -20,19 +20,26 @@ var CameraStatusEnum = {
     ThirdPersonToFirstPersonTransition: "ThirdPersonToFirstPersonTransition",
     FirstPerson: "FirstPerson"
 };
-
+var AimTextures = {
+    TARGET_AIM_TEXTURE_BOW: "aim_bow",
+    TARGET_AIM_TEXTURE_BOW_FIRE: "aim_bow_fire",
+    TARGET_AIM_TEXTURE_FORBIDDEN: "aim_forbidden",
+    TARGET_AIM_TEXTURE_CLOSE: "aim_close",
+    TARGET_AIM_TEXTURE_CLOSE_FIRE: "aim_close_fire",
+    TARGET_AIM_TEXTURE_RED_GLOW: "redglow",
+    TARGET_AIM_TEXTURE_AIM_EDITOR: "aim_editor",
+    BLANK: "blank"
+};
+IronbaneApp.factory('Player', ['Fighter',function(Fighter){
 var Player = Fighter.extend({
     Init: function(position, rotation, id, name) {
-        //this.addComponent(new Position(position));
-        //this.addComponent(new Rotation(rotation));
+
         // Add a small offset
         position.y += 1;
 
         this._super(position, rotation, id, name, 0,
             socketHandler.playerData.size, socketHandler.playerData.health, socketHandler.playerData.armor,
             socketHandler.playerData.healthMax, socketHandler.playerData.armorMax);
-
-        this.addComponent(new AimMesh());
         this.template = {};
         this.template.type = UnitTypeEnum.PLAYER;
 
@@ -58,7 +65,17 @@ var Player = Fighter.extend({
 
         this.checkForItemsBeforeMakingImage();
 
-        
+        // Reddish glow that follows the mouse
+        this.aimTexture = "";
+        this.targetAimTexture = "";
+        this.aimMesh = null;
+        this.aimMeshPosition = new THREE.Vector3();
+
+        // Secondary helper
+        this.aimHelperTexture = "";
+        // this.targetAimHelperTexture = "";
+        this.aimHelperMesh = null;
+        this.aimHelperMeshPosition = new THREE.Vector3();
 
         this.currentZoneMusic = null;
 
@@ -107,13 +124,29 @@ var Player = Fighter.extend({
     },
     Destroy: function() {
         //$('#loadingBar').show();
-        this.getComponent('AimMesh').destroy();
-        this.getComponent('AimMesh').destroyAimHelperMesh();
+        this.destroyAimMesh();
+        this.destroyAimHelperMesh();
 
         this._super();
     },
-    
-    
+    destroyAimMesh: function() {
+        if (this.aimMesh) {
+            releaseMesh(this.aimMesh, {
+                removeMaterials: false
+            });
+
+            ironbane.scene.remove(this.aimMesh);
+        }
+    },
+    destroyAimHelperMesh: function() {
+        if (this.aimHelperMesh) {
+            releaseMesh(this.aimHelperMesh, {
+                removeMaterials: false
+            });
+
+            ironbane.scene.remove(this.aimHelperMesh);
+        }
+    },
     onChangeZone: function(newZone) {
         // Hack for Ironbane's Chamber "spooky cam"
         if (newZone === 7) {
@@ -234,13 +267,14 @@ var Player = Fighter.extend({
     },
     tick: function(dTime) {
         var player = this;
-
+        //move this to Player.js
+    
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
         debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
         debug.setWatch("bytes received",socketHandler.bytesReceived);
+        debug.setWatch("entity ID: " Entity._id);
 
-        debug.setWatch("entity ID: " + Entity._id);
 
         // Check for loot bags, chests, and vendors nearby
         var found = player.checkForLoot();
@@ -399,7 +433,7 @@ var Player = Fighter.extend({
 
         var additionalCanMove = true;
 
-        if (this.terrainAngle > 45 && this.position.y > getZoneConfig('fluidLevel')) additionalCanMove = false;
+        if (this.terrainAngle > 45 && this.position.y >terrainHandler.getZoneConfig('fluidLevel')) additionalCanMove = false;
 
 
         var inputVelocity = new THREE.Vector3();
@@ -434,10 +468,10 @@ var Player = Fighter.extend({
                     this.object3D.position.y += dTime * 5;
                 } else if (this.timers.lastJumpTimer <= 0 &&
                     (this.isTouchingGround ||
-                        (this.position.y < getZoneConfig('fluidLevel') && this.position.y > getZoneConfig('fluidLevel') - 0.5))) {
+                        (this.position.y <terrainHandler.getZoneConfig('fluidLevel') && this.position.y >terrainHandler.getZoneConfig('fluidLevel') - 0.5))) {
 
-                    if (this.position.y < getZoneConfig('fluidLevel')) {
-                        //this.position.y = getZoneConfig('fluidLevel');
+                    if (this.position.y <terrainHandler.getZoneConfig('fluidLevel')) {
+                        //this.position.y =terrainHandler.getZoneConfig('fluidLevel');
 
                         this.timers.lastJumpTimer = 1.0;
                     }
@@ -481,12 +515,12 @@ var Player = Fighter.extend({
 
 
         //if ( zones[terrainHandler.zone]['enableFluid'] ) {
-        if (getZoneConfig('enableFluid')) {
+        if (terrainHandler.getZoneConfig('enableFluid')) {
             // Make some water splashes when we're moving under the fluidLevel
-            if (this.position.y < getZoneConfig('fluidLevel')) {
+            if (this.position.y <terrainHandler.getZoneConfig('fluidLevel')) {
                 var waterFrictionVector = this.velocity.clone().normalize().multiplyScalar(dTime * 10);
                 this.velocity.sub(waterFrictionVector);
-                maxSpeed -= (getZoneConfig('fluidLevel') - this.position.y) * 4;
+                maxSpeed -= (terrainHandler.getZoneConfig('fluidLevel') - this.position.y) * 4;
                 maxSpeed = Math.max(2, maxSpeed);
 
             }
@@ -538,10 +572,9 @@ var Player = Fighter.extend({
 
         // Move the reddish aim mesh
         if (currentMouseToWorldData) {
-            this.getComponent('AimMesh').tick(dTime);
 
             var point = ConvertVector3(currentMouseToWorldData.point);
-            this.getComponent('AimMesh').pointer = point;
+
 
             // Check the aim range
             var weapon = this.getEquippedWeapon();
@@ -551,9 +584,9 @@ var Player = Fighter.extend({
                 var playerToPoint = point.clone().sub(this.position);
                 if (template.type == 'weapon') {
                     if (template.subtype == 'bow' || template.subtype == 'staff') {
-                        this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_BOW);
+                        this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_BOW;
                     } else {
-                        this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_BOW);
+                        this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_BOW;
                     }
                 }
                 var inFOV = this.heading.dot(playerToPoint.clone().normalize()) > -0.5;
@@ -561,21 +594,22 @@ var Player = Fighter.extend({
                 if (!(inFOV && range * range > playerToPoint.lengthSq())) {
                     // Forbidden, but add a helper nevertheless
                     if (inFOV) {
-                        // this.targetAimHelperTexture = this.setTargetAimTexture;
-                        this.getComponent('AimMesh').aimHelperMeshPosition = this.position.clone()
+                        // this.targetAimHelperTexture = this.targetAimTexture;
+                        this.aimHelperMeshPosition = this.position.clone()
                             .add(playerToPoint.normalize().multiplyScalar(range));
-                        this.getComponent('AimMesh').aimHelperMeshPosition.setY(this.getComponent('AimMesh').aimHelperMeshPosition.y + 0.1);
+                        this.aimHelperMeshPosition.setY(this.aimHelperMeshPosition.y + 0.1);
 
 
                     }
-                    this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN);
+                    this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN;
                 } else {
+
                     _.each(ironbane.unitList, function(u) {
                         if (u instanceof Fighter && u != ironbane.player && u.InRangeOfPosition(point, 1) && u.id < 0 && !u.template.friendly && u.health > 0) {
-                            this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_CLOSE);
+                            ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
 
                         }
-                    }, this);
+                    });
 
                 }
 
@@ -586,27 +620,54 @@ var Player = Fighter.extend({
                     // if ( this.targetAimHelperTexture === "aim_bow" ) {
                     //   this.targetAimHelperTexture = "aim_bow_fire";
                     // }
-                    if (this.getComponent('AimMesh').targetAimTexture === AimTextures.TARGET_AIM_TEXTURE_CLOSE) {
-                        this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_CLOSE_FIRE);
+                    if (this.targetAimTexture === AimTextures.TARGET_AIM_TEXTURE_CLOSE) {
+                        this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE_FIRE;
                     }
-                    if (this.getComponent('AimMesh').targetAimTexture === AimTextures.TARGET_AIM_TEXTURE_BOW) {
-                        this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_BOW_FIRE);
+                    if (this.targetAimTexture === AimTextures.TARGET_AIM_TEXTURE_BOW) {
+                        this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_BOW_FIRE;
                     }
                 }
 
             } else {
-                this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_RED_GLOW);
+                this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_RED_GLOW;
             }
 
             if (le("globalEnable")) {
-                this.getComponent('AimMesh').setTargetAimTexture(AimTextures.TARGET_AIM_TEXTURE_AIM_EDITOR);
+                this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_AIM_EDITOR;
             }
         }
 
-        if (isHoveringHud || this.health <= 0) this.getComponent('AimMesh').setTargetAimTexture(AimTextures.BLANK);
+        if (isHoveringHud || this.health <= 0) this.targetAimTexture = AimTextures.BLANK;
 
-        
-       
+        if (this.aimTexture != this.targetAimTexture) {
+
+            this.destroyAimMesh();
+
+            this.aimTexture = this.targetAimTexture;
+
+            if (this.aimTexture !== "") {
+                this.aimMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
+                    textureHandler.getTexture('images/misc/' + this.aimTexture + '.png', false, {
+                        transparent: true,
+                        alphaTest: 0.1
+                    }));
+                //this.shadowMesh.geometry.dynamic = true;
+
+                this.aimMesh.rotation.x = -Math.PI / 2;
+
+                this.aimMesh.position.copy(this.aimMeshPosition);
+
+                ironbane.scene.add(this.aimMesh);
+            }
+        }
+
+        if (this.aimMesh && currentMouseToWorldData) {
+            //this.aimMesh.position = point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
+            this.aimMeshPosition.lerp(point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05)), dTime * 20);
+            this.aimMesh.position.copy(this.aimMeshPosition);
+            this.aimMesh.LookFlatAt(currentMouseToWorldData.face.normalWithRotations.clone().add(this.aimMesh.position));
+        }
+
 
         // Periodically check if we are underneath something
         if ( this.isUnderneathAnObstacleTimer > 0 ) this.isUnderneathAnObstacleTimer -= dTime;
@@ -626,6 +687,39 @@ var Player = Fighter.extend({
                 this.isUnderneathAnObstacle = true;
             }
         }
+
+
+
+        // Helper
+        // if ( this.aimHelperTexture != this.targetAimHelperTexture ) {
+
+        //   this.destroyAimHelperMesh();
+
+        //   this.aimHelperTexture = this.targetAimHelperTexture;
+
+        //   if ( this.aimHelperTexture !== "" ) {
+        //     this.aimHelperMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1),
+        //       textureHandler.getTexture('images/misc/'+this.aimHelperTexture+'.png', false, {
+        //         transparent:true,
+        //         alphaTest:0.1
+        //       }));
+        //     //this.shadowMesh.geometry.dynamic = true;
+
+        //     this.aimHelperMesh.rotation.x = -Math.PI/2;
+
+        //     this.aimHelperMesh.position.copy(this.aimHelperMeshPosition);
+
+        //     ironbane.scene.add(this.aimHelperMesh);
+        //   }
+        // }
+
+        if (this.aimHelperMesh && currentMouseToWorldData) {
+            //this.aimHelperMesh.position = point.add(currentMouseToWorldData.face.normal.clone().normalize().multiplyScalar(0.05));
+            this.aimHelperMesh.position.copy(this.aimHelperMeshPosition);
+            //this.aimHelperMesh.LookFlatAt(new THREE.Vector3(0,1,0));
+        }
+
+
         if (showEditor && levelEditor.editorGUI.chFlyMode) {
             this.allowRaycastGround = false;
         }
@@ -851,8 +945,7 @@ var Player = Fighter.extend({
         });
     },
     updateAppearance: function() {
-        var player = this,
-            special;
+        var player = this;
 
         player.appearance.skin = socketHandler.playerData.skin;
         player.appearance.eyes = socketHandler.playerData.eyes;
@@ -863,11 +956,6 @@ var Player = Fighter.extend({
 
         _.each(player.getItems(), function(item) {
             if (item.equipped) {
-                // override for magical items like ghost cloak or snowman tophat
-                // if there is more than one item that provides this, you'll end up with the last one
-                if(item.data && item.data.specialSkin) {
-                    special = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
-                }
                 if (item.type === 'armor') {
                     if (item.subtype === 'head') {
                         player.appearance.head = item.$template.image;
@@ -882,7 +970,7 @@ var Player = Fighter.extend({
             }
         });
 
-        player.updateClothes(special);
+        player.updateClothes();
     },
     updateMouseProjectedPosition: function() {
         if (!ironbane.player) return;
@@ -921,3 +1009,5 @@ var Player = Fighter.extend({
         $(".ib-tutorial").removeClass("tut" + id);
     }
 });
+return Fighter;
+}]);

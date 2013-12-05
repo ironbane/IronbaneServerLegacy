@@ -22,7 +22,7 @@ var gravity = new THREE.Vector3(0, -9.81, 0);
 
 var tempMatrix = new THREE.Matrix4();
 
-var PhysicsObject = Class.extend({
+var PhysicsObject = Entity.extend({
     Init: function(position, rotation, scale, velocity) {
 
        this.enableGravity = true;
@@ -92,6 +92,7 @@ var PhysicsObject = Class.extend({
 
         this.lastUnitStandingOn = null;
         this.unitStandingOn = null;
+        this._super();
 
 
     },

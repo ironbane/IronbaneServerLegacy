@@ -119,6 +119,11 @@ module.exports = function(grunt) {
                     //"<%= gameScriptPath %>/Engine/MeshHandler.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
                     "<%= gameScriptPath %>/Game/Hud.js",
+
+                    "<%= gameScriptPath %>/Game/CES/Entity.js",
+                    "<%= gameScriptPath %>/Game/CES/Component.js",
+                    "<%= gameScriptPath %>/Game/CES/AimMesh.js",
+                    
                     "<%= gameScriptPath %>/Game/PhysicsObject.js",
                     "<%= gameScriptPath %>/Game/Unit.js",
                     "<%= gameScriptPath %>/Game/NewLevelEditor.js",
