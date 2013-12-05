@@ -1144,10 +1144,10 @@ var HUDHandler = Class.extend({
     GetLastCharacterPlayed: function() {
         var lastChar = 0;
         var lastTimeFound = 0;
-        _.each(chars, function(char) {
-            if (char.lastplayed > lastTimeFound) {
-                lastTimeFound = char.lastplayed;
-                lastChar = char.id;
+        _.each(chars, function(character) {
+            if (character.lastplayed > lastTimeFound) {
+                lastTimeFound = character.lastplayed;
+                lastChar = character.id;
             }
         });
         return lastChar;
