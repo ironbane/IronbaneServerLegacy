@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var dataPath = assetDir + 'data';
+var dataPath = clientDir + 'data';
 
 var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
 pathFinder.setPath(dataPath);
@@ -103,7 +103,7 @@ var WorldHandler = Class.extend({
                             ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
                             ud.template.type !== UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)) {
                             var id = ud.id;
-                            var packet = _.find(snapshotCache, function(thePacket){ 
+                            var packet = _.find(snapshotCache, function(thePacket){
                                 return thePacket.id === ud.id;
                             }) || {};
                             if (_.isEmpty(packet)) {
