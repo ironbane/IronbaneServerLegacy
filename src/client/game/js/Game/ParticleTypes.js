@@ -370,6 +370,24 @@ var ParticleTypeEnum = {
         particleStartScale: new THREE.Vector2(1.5,1.5),
         particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.1, 0.9);}
     },
+    SNOWBALL: {
+        texture: 'projectiles/snowball',
+        delay: 0,
+        // The amount of particles to spawn
+        // -1 = infinite (default)
+        count: 1,
+        // The amount of time to spawn particles
+        // -1 = infinite (default)
+        particleStartPosition: function(){return new THREE.Vector3(0, 0.5, 0)},
+        particleRotationSpeed: function(p) {
+            return getRandomFloat(-5.0, 5.0);
+        },
+        particleStartRotation: function(p) { return (getRandomInt(-359,359)).ToRadians() },
+        lifeTime: -1,
+        particleLifeTime: 1.0,
+        particleStartScale: new THREE.Vector2(1.5,1.5),
+        particleOpacity: function(p){return ParticleFunctions.OpacityLifeTime(p, 0.1, 0.9);}
+    },
     SLIMEBALL: {
         texture: 'projectiles/acidball',
         delay: 0,
