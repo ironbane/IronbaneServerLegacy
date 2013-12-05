@@ -901,5 +901,29 @@ var ParticleTypeEnum = {
         particleOpacity: function(p) {
             return ParticleFunctions.OpacityLifeTime(p, 0.3, 0.7);
         }
-    }
+    },
+    POWERBALL: {
+        texture: 'projectiles/powerball',
+        delay: 0,
+        // The amount of particles to spawn
+        // -1 = infinite (default)
+        count: 1,
+        // The amount of time to spawn particles
+        // -1 = infinite (default)
+        particleStartPosition: function() {
+            return new THREE.Vector3(0, 0.5, 0)
+        },
+        particleRotationSpeed: function(p) {
+            return getRandomFloat(-5.0, 5.0);
+        },
+        particleStartRotation: function(p) {
+            return (getRandomInt(-359, 359)).ToRadians()
+        },
+        lifeTime: -1,
+        particleLifeTime: 1.0,
+        particleStartScale: new THREE.Vector2(2.0, 2.0),
+        particleOpacity: function(p) {
+            return ParticleFunctions.OpacityLifeTime(p, 0.1, 0.9);
+        }
+    },
 };

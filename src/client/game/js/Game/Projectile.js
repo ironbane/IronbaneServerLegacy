@@ -133,6 +133,14 @@ var ProjectileTypeEnum = {
             FULL: 'images/projectiles/bone.png',
             BONEHEAD: 'images/projectiles/bonehead.png'
         }
+    },
+    POWERBALL: {
+        speed: 15,
+        lifeTime: 1,
+        has8Textures: false,
+        parabolic: false,
+        destroyOnImpact: true,
+        particle: ParticleTypeEnum.POWERBALL
     }
 };
 
