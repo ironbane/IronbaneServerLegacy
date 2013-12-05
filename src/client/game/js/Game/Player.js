@@ -943,7 +943,8 @@ var Player = Fighter.extend({
         });
     },
     updateAppearance: function() {
-        var player = this;
+        var player = this,
+            special;
 
         player.appearance.skin = socketHandler.playerData.skin;
         player.appearance.eyes = socketHandler.playerData.eyes;
@@ -954,6 +955,11 @@ var Player = Fighter.extend({
 
         _.each(player.getItems(), function(item) {
             if (item.equipped) {
+                // override for magical items like ghost cloak or snowman tophat
+                // if there is more than one item that provides this, you'll end up with the last one
+                if(item.data && item.data.specialSkin) {
+                    special = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
+                }
                 if (item.type === 'armor') {
                     if (item.subtype === 'head') {
                         player.appearance.head = item.$template.image;
@@ -968,7 +974,7 @@ var Player = Fighter.extend({
             }
         });
 
-        player.updateClothes();
+        player.updateClothes(special);
     },
     updateMouseProjectedPosition: function() {
         if (!ironbane.player) return;

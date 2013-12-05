@@ -182,6 +182,8 @@ var Unit = Class.extend({
 
   },
   AddOtherUnit: function(unit) {
+    var specialAppearance;
+
     // Auto send AddUnit if we're a player
     this.otherUnits.push(unit);
 
@@ -206,12 +208,30 @@ var Unit = Class.extend({
 
         packet.size = unit.size;
 
-        packet.skin = unit.skin;
-        packet.eyes = unit.eyes;
-        packet.hair = unit.hair;
-        packet.head = unit.head;
-        packet.body = unit.body;
-        packet.feet = unit.feet;
+        // special appearance items check (TODO: consolidate into method somewhere?)
+        _.each(unit.items, function(item) {
+            if(item.equipped) {
+                if(item.data && item.data.specialSkin) {
+                    specialAppearance = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
+                }
+            }
+        });
+
+        if(specialAppearance) {
+            packet.skin = specialAppearance.skin;
+            packet.eyes = specialAppearance.eyes;
+            packet.hair = specialAppearance.hair;
+            packet.head = specialAppearance.head;
+            packet.body = specialAppearance.body;
+            packet.feet = specialAppearance.feet;
+        } else {
+            packet.skin = unit.skin;
+            packet.eyes = unit.eyes;
+            packet.hair = unit.hair;
+            packet.head = unit.head;
+            packet.body = unit.body;
+            packet.feet = unit.feet;
+        }
 
         if (unit.isPlayer()) {
           // Add additional data to the packet

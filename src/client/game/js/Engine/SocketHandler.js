@@ -404,11 +404,17 @@ var SocketHandler = Class.extend({
         this.socket.on('updateClothes', function(data) {
             var unit = FindUnit(data.id);
 
+            console.log('updateClothes!', data);
+
+            unit.appearance.skin = data.skin;
+            unit.appearance.eyes = data.eyes;
+            unit.appearance.hair = data.hair;
             unit.appearance.head = data.head;
             unit.appearance.body = data.body;
             unit.appearance.feet = data.feet;
 
-            unit.updateClothes();
+            // if special is provided, then use that as override
+            unit.updateClothes(data.special);
         });
 
         this.socket.on('updateWeapon', function(data) {

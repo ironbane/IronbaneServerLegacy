@@ -499,27 +499,33 @@ var Fighter = Actor.extend({
         return true;
     },
     UpdateAppearance: function(sendChanges) {
-        var self = this;
+        var self = this,
+            special;
 
         if (self.id > 0) {
-            this.head = 0;
-            this.body = 0;
-            this.feet = 0;
+            self.head = 0;
+            self.body = 0;
+            self.feet = 0;
 
-            for (var i = 0; i < this.items.length; i++) {
-                var item = this.items[i];
+            for (var i = 0; i < self.items.length; i++) {
+                var item = self.items[i];
 
                 if (item.equipped) {
+                    // override for magical items like ghost cloak or snowman tophat
+                    // if there is more than one item that provides self, you'll end up with the last one
+                    if(item.data && item.data.specialSkin) {
+                        special = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
+                    }
                     if (item.getType() === "armor") {
                         switch (item.getSubType()) {
                             case "head":
-                                this.head = item.getImage();
+                                self.head = item.getImage();
                                 break;
                             case "body":
-                                this.body = item.getImage();
+                                self.body = item.getImage();
                                 break;
                             case "feet":
-                                this.feet = item.getImage();
+                                self.feet = item.getImage();
                                 break;
                         }
                     }
@@ -527,11 +533,16 @@ var Fighter = Actor.extend({
             }
 
             if (sendChanges) {
-                this.EmitNearby("updateClothes", {
-                    id: this.id,
-                    head: this.head,
-                    body: this.body,
-                    feet: this.feet
+                // TODO: change this to updateAppearance all the way down?
+                self.EmitNearby("updateClothes", {
+                    id: self.id,
+                    skin: self.skin,
+                    eyes: self.eyes,
+                    hair: self.hair,
+                    head: self.head,
+                    body: self.body,
+                    feet: self.feet,
+                    special: special
                 });
             }
         }

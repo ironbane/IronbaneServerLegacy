@@ -119,11 +119,12 @@ var Fighter = Unit.extend({
         }
         this._super();
     },
-    updateClothes: function() {
-        var me = this;
+    updateClothes: function(appearanceOverride) {
+        var me = this,
+            appearance = _.isObject(appearanceOverride) ? appearanceOverride : me.appearance,
+            texture = getCharacterTexture(appearance),
+            directionSpriteIndex = me.getDirectionSpriteIndex();
 
-        var texture = getCharacterTexture(me.appearance);
-        var directionSpriteIndex = me.getDirectionSpriteIndex();
         if (me.mesh) {
             ironbane.scene.remove(me.mesh);
             me.mesh = null;
