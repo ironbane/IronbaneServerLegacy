@@ -68,10 +68,10 @@ var Skybox = PhysicsObject.extend({
     }
 
     // Add an ambient light
-    this.ambientLight = new THREE.AmbientLight( 0x444444 );
+    this.ambientLight = new THREE.AmbientLight( 0x333333 );
     ironbane.scene.add( this.ambientLight );
 
-    this.sunLight = new THREE.DirectionalLight( 0xcccccc );
+    this.sunLight = new THREE.DirectionalLight( 0xaaaaaa );
     ironbane.scene.add( this.sunLight );
 
     this.moonLight = new THREE.DirectionalLight( 0xcccccc );
