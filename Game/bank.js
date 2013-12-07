@@ -99,7 +99,6 @@ var Bank = Trigger.extend({
             return item; // todo: dont send _persistID
         } else {
             // player doesn't have the item?
-            return 'item not in player inventory!';
         }
     },
     takeItem: function(itemId, player, slot) {
