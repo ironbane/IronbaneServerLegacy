@@ -85,7 +85,9 @@ var SocketHandler = Class.extend({
                 socketHandler.socket.disconnect();
 
 
-                for (var u = 0; u < ironbane.unitList.length; u++) ironbane.unitList[u].Destroy();
+                for (var u = 0; u < ironbane.unitList.length; u++){
+                  ironbane.unitList[u].Destroy();  
+                } 
 
                 ironbane.unitList = [];
 

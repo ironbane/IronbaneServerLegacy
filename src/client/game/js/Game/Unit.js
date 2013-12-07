@@ -446,7 +446,9 @@ var Unit = PhysicsObject.extend({
             raycastNormal = intersects[0].face.normal;
             raycastGroundPosition = intersects[0].point;
 
-            if ( this instanceof Projectile ) this.Impact(true);
+            if ( this instanceof Projectile ){
+             this.Impact(true);
+           }
 
             var distanceInside = 0.5-intersects[0].distance;
 

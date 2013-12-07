@@ -354,7 +354,7 @@ var SoundHandler = Class.extend({
             //console.log("sound " + s + " not found");
             return;
         }
-        var sound = ChooseRandom(sounds);
+        var sound = _.sample(sounds);
         var distance = 0;
 
         if (position) {

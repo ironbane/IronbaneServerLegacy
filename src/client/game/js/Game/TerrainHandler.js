@@ -183,7 +183,7 @@ var TerrainHandler = Class.extend({
   GetCellByGridPosition: function(x, z) {
     var id = x+'-'+z;
 
-    if ( typeof this.cells[id] == 'undefined' ) {
+    if ( _.isUndefined(this.cells[id])) {
       this.cells[id] = new Cell(x, z);
     }
 
@@ -230,7 +230,7 @@ var TerrainHandler = Class.extend({
 
 
     if ( socketHandler.loggedIn ) {
-      this.targetMusic = ChooseRandom(getZoneConfig("music"));
+      this.targetMusic = _.sample(getZoneConfig("music"));
     }
 
   },
