@@ -197,7 +197,7 @@ var EditorGUI = function() {
         switchNumber: parseInt(levelEditor.editorGUI.eplSwitchNumber, 10)
       }
     });
-  }
+  };
 
   this.ephpAdd = function() {
     socketHandler.socket.emit('addNPC', {
@@ -296,7 +296,7 @@ var EditorGUI = function() {
         range: levelEditor.editorGUI.epmpRange
       }
     });
-  }
+  };
 
 
   // NPC editor mode
@@ -428,16 +428,16 @@ var EditorGUI = function() {
   };
 
 
-
-
-  // Disable the input keys on the editor dropdowns
-  setTimeout(function(){
-    var ar = new Array(37, 38, 39, 40);
-    var disableArrowKeys = function(e) {
+    var ar = [37, 38, 39, 40];
+var disableArrowKeys = function(e) {
       if ($.inArray(e.keyCode, ar)>=0) {
         e.preventDefault();
       }
-    }
+    };
+
+  // Disable the input keys on the editor dropdowns
+  setTimeout(function(){
+    
     $(":input").focus(function(){
       $(document).keydown(disableArrowKeys);
     });
@@ -463,28 +463,15 @@ var LevelEditor = Class.extend({
 
     this.terrainMode = true;
 
-    this.cats = [];
-
-    this.cats.push({
-      title: "Tiles",
-      tilelist: (function() {
-        var tiles = [];
-        for (var i = 0; i < 100; i++) {
-          tiles.push(i);
-        }
-        return tiles;
-      })()
-    },
-    {
-      title: "Items",
-      tilelist: (function() {
-        var tiles = [];
-        for (var i = 0; i < 100; i++) {
-          tiles.push("item_"+i);
-        }
-        return tiles;
-      })()
-    });
+    this.cats = {};
+    var me = this;
+    $.get('/game/images/tiles', function(data){
+          me.cats.Tiles = { tilelist:data};
+        });
+    $.get('/game/images/items', function(data){
+          me.cats.Items = { tilelist:data};
+        });
+    
 
     this.ready = false;
 
@@ -593,7 +580,7 @@ var LevelEditor = Class.extend({
   },
   PaddingTileIDs: function() {
     this.isPaddingTileIDs = !this.isPaddingTileIDs;
-    this.LoadCat(this.currentcat);
+    this.LoadCat(this.currentCat);
   },
   ShowTileIDs: function() {
     this.isShowingTileIDs = !this.isShowingTileIDs;
@@ -604,10 +591,15 @@ var LevelEditor = Class.extend({
       $('.tileid').hide();
     }
   },
-  LoadCat: function(cat) {
-    this.currentCat = cat;
-
-    var cat = this.cats[cat];
+  LoadCat: function(theCat) {
+    if(theCat === 0){
+      this.currentCat = "Tiles";
+    }
+    else {
+      this.currentCat = theCat;
+    }
+    console.log("loading category " + this.currentCat);
+    var cat = this.cats[this.currentCat];    
 
     this.UpdateCatLinks();
 
@@ -615,24 +607,20 @@ var LevelEditor = Class.extend({
     var first;
 
     var amountoftilesperline = 10;
-
+    var width = 0;
     if ( this.isPaddingTileIDs ) {
-      var width = ((amountoftilesperline * 33) + 40);
+      width = ((amountoftilesperline * 33) + 40);
     }
     else {
-      var width = ((amountoftilesperline * 32) + 40);
+      width = ((amountoftilesperline * 32) + 40);
     }
 
     $('#tileSelectBox').css('width', width+'px');
 
     for (var i = 0; i < cat.tilelist.length; i++) {
-
       var tile = cat.tilelist[i];
 
-      var uid = tile;
-      if ( i == 0 ) first = uid;
-
-      result += '<div id="tiletype'+uid+'" class=tile onclick="levelEditor.SetTile(\''+uid+'\')"><div class=tileid style=display:none>'+uid+'</div></div>';
+      result += '<div id="tiletype'+tile+'" class=tile onclick="levelEditor.SetTile(\''+tile+'\')"><div class=tileid style=display:none>'+tile+'</div></div>';
 
     }
 
@@ -651,11 +639,11 @@ var LevelEditor = Class.extend({
 
 
 
-      if ( !_.isNaN(parseInt(uid,10)) ) {
-        $('#tiletype'+uid).css('background-image', 'url('+tilesPath+'medium.php?i='+uid+')');
+      if (this.currentCat == "Tiles") {
+        $('#tiletype'+uid).css('background-image', 'url('+tilesPath+'medium.php?i='+tile+')');
       }
       else {
-        $('#tiletype'+uid).css('background-image', 'url('+texturesPath+'medium.php?i='+uid+')');
+        $('#tiletype'+uid).css('background-image', 'url('+itemsPath+'medium.php?i='+tile+')');
       }
 
 
@@ -675,8 +663,7 @@ var LevelEditor = Class.extend({
 
   },
   SetTile: function(tile) {
-
-    var tileList = this.cats[this.currentCat].tilelist;
+    var tileList = this.cats[this.currentCat].tilelist;    
 
     for (var j = 0; j < tileList.length; j++) {
       $('#tiletype'+tileList[j]).css('outline-style', 'none');
@@ -689,17 +676,18 @@ var LevelEditor = Class.extend({
 
     $('#selectRange').html('');
     $('#selectRange').append('Choose a category:<br>');
-
-    for(var i=0;i<this.cats.length;i++){
-
-      if ( i == this.currentCat ) {
-        $('#selectRange').append('[<b>'+this.cats[i].title+'</b>] ');
+    console.log(this.cats);
+    _.each(_.keys(this.cats), function(title){
+      console.log(title);
+      console.log(this.currentCat);
+      if ( title == this.currentCat ) {
+        $('#selectRange').append('[<b>'+title+'</b>] ');
       }
       else {
-        $('#selectRange').append('<a href=# onclick="levelEditor.LoadCat('+i+');return false;">'+this.cats[i].title+'</a> ');
+        $('#selectRange').append('<span onclick="levelEditor.LoadCat(\''+title+'\');return false;">'+title+'</span> ');
       }
 
-    }
+    }, this);
     $('#selectRange').append('<hr>');
 
   },

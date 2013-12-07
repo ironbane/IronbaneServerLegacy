@@ -52,6 +52,24 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get('/game/images/tiles', function(req, res) {
+        var fs = require('q-io/fs'),
+            _ = require('underscore'),
+            path = require('path');
+
+        fs.listTree(gamePath + 'images/tiles', function(file) {
+            // don't return the cached images (with the _size)
+            return path.extname(file) === '.png' && file.indexOf('_') < 0;
+        }).then(function(files) {
+            var names = _.map(files, function(file) {
+                return path.basename(file, '.png');
+            });
+            res.send(names);
+        }, function(err) {
+            res.send(500, err);
+        });
+    });
+
     app.get('/game/images/armor/:subtype', function(req, res) {
         var fs = require('q-io/fs'),
             _ = require('underscore'),

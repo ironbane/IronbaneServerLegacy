@@ -14,6 +14,7 @@ var showEditor = false;
 var slotsAvailable = 4;
 
 var tileSize = 32;
+var itemsPath = 'images/items/';
 var texturesPath = 'images/textures/';
 var tilesPath = 'images/tiles/';
 var tilesBigPath = 'images/tiles_big/';
