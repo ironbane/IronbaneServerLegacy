@@ -33,6 +33,8 @@ var buildItemFromData = function(itemData) {
             itemData.data = JSON.parse(itemData.data);
         } catch (e) {
             // invalid json? prolly safe to ignore...
+            console.log('warning: invalid JSON data for itemData ', itemdata.id);
+            itemData.data = {};
         }
     }
 

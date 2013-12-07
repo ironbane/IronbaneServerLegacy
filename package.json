@@ -1,6 +1,6 @@
 {
   "name": "ironbane",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Ironbane, the open source browser MMO.",
   "main": "main.js",
   "scripts": {
