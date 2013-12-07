@@ -28,7 +28,7 @@ var ParticleFunctions = {
 var ParticleTypeEnum = {
     TEST: {
         texture: function() {
-            return ChooseRandom(['misc/heart_full', 'misc/heart_empty', 'misc/heart_half'])
+            return ChooseRandom(['misc/heart_full', 'misc/heart_empty', 'misc/heart_half']);
         },
         delay: 0.0,
 
@@ -44,7 +44,7 @@ var ParticleTypeEnum = {
         particleLifeTime: 5.0,
         particleStartPosition: new THREE.Vector3(),
         particleStartVelocity: function() {
-            return new THREE.Vector3(getRandomFloat(-1, 1), 0, getRandomFloat(-1, 1))
+            return new THREE.Vector3(getRandomFloat(-1, 1), 0, getRandomFloat(-1, 1));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartRotation: 0.0,
@@ -68,7 +68,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -89,7 +89,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -110,7 +110,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -131,7 +131,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -152,7 +152,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -173,7 +173,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -194,7 +194,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -215,7 +215,7 @@ var ParticleTypeEnum = {
         // -1 = infinite (default)
         lifeTime: -1,
         particleStartPosition: function() {
-            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3))
+            return new THREE.Vector3(getRandomFloat(-0.3, 0.3), 0.5, getRandomFloat(-0.3, 0.3));
         },
         particleSteeringForce: new THREE.Vector3(0, 1, 0),
         particleStartVelocity: new THREE.Vector3(0, 2, 0),
@@ -311,7 +311,7 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 1.5, 0)
+            return new THREE.Vector3(0, 1.5, 0);
         },
         lifeTime: -1,
         particleLifeTime: 3.0,
@@ -329,7 +329,7 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 1.5, 0)
+            return new THREE.Vector3(0, 1.5, 0);
         },
         lifeTime: -1,
         particleLifeTime: 3.0,
@@ -340,7 +340,7 @@ var ParticleTypeEnum = {
     },
     SPLASH: {
         texture: function() {
-            return ChooseRandom(['particles/splash1', 'particles/splash2', 'particles/splash3'])
+            return ChooseRandom(['particles/splash1', 'particles/splash2', 'particles/splash3']);
         },
         delay: 0,
         // The amount of particles to spawn
@@ -349,11 +349,11 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 1) * Math.PI * 2;
-            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(0, 1), getRandomFloat(0, 2), Math.sin(angle) * getRandomFloat(0, 1))
+            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(0, 1), getRandomFloat(0, 2), Math.sin(angle) * getRandomFloat(0, 1));
         },
         particleEnableGravity: true,
         lifeTime: -1,
@@ -365,14 +365,14 @@ var ParticleTypeEnum = {
     },
     FOUNTAINSIDE: {
         texture: function() {
-            return ChooseRandom(['particles/splash1', 'particles/splash2', 'particles/splash3'])
+            return ChooseRandom(['particles/splash1', 'particles/splash2', 'particles/splash3']);
         },
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0, 0)
+            return new THREE.Vector3(0, 0, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 0) * Math.PI * 2;
-            return new THREE.Vector3(0, -1, 0)
+            return new THREE.Vector3(0, -1, 0);
         },
         particleEnableGravity: true,
         lifeTime: -1,
@@ -385,7 +385,7 @@ var ParticleTypeEnum = {
     },
     LAVABURN: {
         texture: function() {
-            return ChooseRandom(['particles/flame1', 'particles/flame2', 'particles/flame3'])
+            return ChooseRandom(['particles/flame1', 'particles/flame2', 'particles/flame3']);
         },
         delay: 0,
         // The amount of particles to spawn
@@ -394,11 +394,11 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 1) * Math.PI * 2;
-            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(0, 1), getRandomFloat(0, 2), Math.sin(angle) * getRandomFloat(0, 1))
+            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(0, 1), getRandomFloat(0, 2), Math.sin(angle) * getRandomFloat(0, 1));
         },
         particleEnableGravity: true,
         lifeTime: -1,
@@ -417,13 +417,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 1.0,
@@ -441,13 +441,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-1.0, 1.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         particleStartScale: new THREE.Vector2(2.5, 2.5),
         particleLifeTime: 12.0
@@ -461,13 +461,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 2.0,
@@ -485,13 +485,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 2.0,
@@ -509,13 +509,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 1.0,
@@ -537,7 +537,7 @@ var ParticleTypeEnum = {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: 1.0,
         particleLifeTime: 0.1,
@@ -549,7 +549,7 @@ var ParticleTypeEnum = {
     },
     GREENBLOBIMPACT: {
         texture: function() {
-            return ChooseRandom(['particles/greenBlob1', 'particles/greenBlob2', 'particles/greenBlob3'])
+            return ChooseRandom(['particles/greenBlob1', 'particles/greenBlob2', 'particles/greenBlob3']);
         },
         delay: 0,
         // The amount of particles to spawn
@@ -558,17 +558,17 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 1) * Math.PI * 2;
-            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2))
+            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2));
         },
         particleRotationSpeed: function(p) {
             return p.lifeTimer * 5 * (p.rotation > 0 ? 1 : -1);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         particleDelay: 0.01,
         particleEnableGravity: true,
@@ -588,13 +588,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 2.0,
@@ -605,7 +605,7 @@ var ParticleTypeEnum = {
     },
     ROCKSHATTER: {
         texture: function() {
-            return ChooseRandom(['particles/rocksplatter1', 'particles/rocksplatter2', 'particles/rocksplatter3'])
+            return ChooseRandom(['particles/rocksplatter1', 'particles/rocksplatter2', 'particles/rocksplatter3']);
         },
         delay: 0,
         // The amount of particles to spawn
@@ -614,17 +614,17 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 1) * Math.PI * 2;
-            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2))
+            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2));
         },
         particleRotationSpeed: function(p) {
             return p.lifeTimer * 5 * (p.rotation > 0 ? 1 : -1);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         particleDelay: 0.01,
         particleEnableGravity: true,
@@ -644,13 +644,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 2.0,
@@ -661,7 +661,7 @@ var ParticleTypeEnum = {
     },
     SNOWBALLSPLATTER: {
         texture: function() {
-            return ChooseRandom(['particles/snowballsplatter1', 'particles/snowballsplatter2', 'particles/snowballsplatter3'])
+            return ChooseRandom(['particles/snowballsplatter1', 'particles/snowballsplatter2', 'particles/snowballsplatter3']);
         },
         delay: 0,
         // The amount of particles to spawn
@@ -670,17 +670,17 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleStartVelocity: function() {
             var angle = getRandomFloat(0, 1) * Math.PI * 2;
-            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2))
+            return new THREE.Vector3(Math.cos(angle) * getRandomFloat(1, 2), getRandomFloat(-1, 2), Math.sin(angle) * getRandomFloat(1, 2));
         },
         particleRotationSpeed: function(p) {
             return p.lifeTimer * 5 * (p.rotation > 0 ? 1 : -1);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         particleDelay: 0.01,
         particleEnableGravity: true,
@@ -712,7 +712,7 @@ var ParticleTypeEnum = {
     },
     CLOUD: {
         texture: function() {
-            return ChooseRandom(['misc/cloud1', 'misc/cloud2', 'misc/cloud3'])
+            return ChooseRandom(['misc/cloud1', 'misc/cloud2', 'misc/cloud3']);
         },
         delay: 0,
         particleStartPosition: function() {
@@ -728,7 +728,7 @@ var ParticleTypeEnum = {
             return pos;
         },
         particleStartVelocity: function() {
-            return new THREE.Vector3(getRandomFloat(-1.0, 1.0), 0, getRandomFloat(-1.0, 1.0))
+            return new THREE.Vector3(getRandomFloat(-1.0, 1.0), 0, getRandomFloat(-1.0, 1.0));
         },
         lifeTime: -1,
         particleLifeTime: 30.0,
@@ -746,7 +746,7 @@ var ParticleTypeEnum = {
     },
     TELEPORTENTRANCE: {
         texture: function() {
-            return ChooseRandom(['particles/spark1', 'particles/spark2', 'particles/spark3'])
+            return ChooseRandom(['particles/spark1', 'particles/spark2', 'particles/spark3']);
         },
         delay: 0,
         particleSpawnOffset: new THREE.Vector3(0, 0.5, 0),
@@ -766,7 +766,7 @@ var ParticleTypeEnum = {
     },
     TELEPORTEXIT: {
         texture: function() {
-            return ChooseRandom(['particles/spark1', 'particles/spark2', 'particles/spark3'])
+            return ChooseRandom(['particles/spark1', 'particles/spark2', 'particles/spark3']);
         },
         delay: 0,
         particleSpawnOffset: new THREE.Vector3(0, 0.5, 0),
@@ -911,13 +911,13 @@ var ParticleTypeEnum = {
         // The amount of time to spawn particles
         // -1 = infinite (default)
         particleStartPosition: function() {
-            return new THREE.Vector3(0, 0.5, 0)
+            return new THREE.Vector3(0, 0.5, 0);
         },
         particleRotationSpeed: function(p) {
             return getRandomFloat(-5.0, 5.0);
         },
         particleStartRotation: function(p) {
-            return (getRandomInt(-359, 359)).ToRadians()
+            return (getRandomInt(-359, 359)).ToRadians();
         },
         lifeTime: -1,
         particleLifeTime: 1.0,
