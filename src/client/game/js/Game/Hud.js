@@ -43,6 +43,13 @@ var selectedSkin = 1;
 var selectedEyes = 1;
 var selectedHair = 1;
 
+var SAFARI_TEXT = 'You seem to be using <b>Safari</b>.<br>Don\'t worry, there is a solution for you!';
+var SAFARI_SOLUTION = 'In Safari, open the <b>Safari menu</b> and select <b>Preferences</b>.<br><br>' +
+                 'Then, click the <b>Advanced</b> tab in the Preferences window.<br><br>' +
+                 'Then, at the bottom of the window, check the <b>Show Develop menu in menu bar</b> checkbox.<br><br>' +
+                 'Then, open the <b>Develop</b> menu in the menu bar and select <b>Enable WebGL</b>.';
+
+
 
 var messageFadeTime = 0.2;
 
@@ -102,16 +109,8 @@ var HUDHandler = Class.extend({
                     window.open('http://iewebgl.com/', 'iewebgl');
                     //window.open('http://www.khronos.org/webgl/wiki_1_15/index.php/Getting_a_WebGL_Implementation','bs')
                 });
-            } else if (startdata.using_safari) {
-
-                var sol = '';
-
-                sol += 'In Safari, open the <b>Safari menu</b> and select <b>Preferences</b>.<br><br>';
-                sol += 'Then, click the <b>Advanced</b> tab in the Preferences window.<br><br>';
-                sol += 'Then, at the bottom of the window, check the <b>Show Develop menu in menu bar</b> checkbox.<br><br>';
-                sol += 'Then, open the <b>Develop</b> menu in the menu bar and select <b>Enable WebGL</b>.';
-
-                $('#webglsolution').html('You seem to be using <b>Safari</b>.<br>Don\'t worry, there is a solution for you!<div class="spacersmall"></div><div class="insideInfo" style="width:280px;">' + sol + '</div>');
+            } else if (startdata.using_safari) {                  
+                $('#webglsolution').html(SAFARI_TEXT+'<div class="spacersmall"></div><div class="insideInfo" style="width:280px;">' + SAFARI_SOLUTION + '</div>');
 
                 $('#getiewebgl').click(function() {
                     window.open('http://iewebgl.com/', 'iewebgl');
@@ -232,20 +231,10 @@ var HUDHandler = Class.extend({
             container = $('#itemBar'),
             spaces = num;
 
-        container.empty();
-        for (var x = 0; x < spaces; x++) {
-            var slot = $('<div id="is' + x + '" class="dragon-slot itemBarSlot"></div>');
-            slot.data('slot', x);
-            container.append(slot);
-            slot.droppable({
-                drop: function(e, ui) {
+        var dropFunction = function(e, ui) {
                     _.partial(HUD.onInvSlotDrop, e, ui, HUD)();
-                },
-                greedy: true,
-                tolerance: 'pointer',
-                hoverClass: 'dragon-hover'
-            });
-            slot.click(function(e) {
+                };
+        var clickFunction = function(e) {
                 var $slot = $(this),
                     $item = $slot.children().data('item'); // there should only ever be 1 or 0 (null)
 
@@ -259,7 +248,20 @@ var HUDHandler = Class.extend({
                         ironbane.player.useItem($item.slot);
                     }
                 }
+            };
+
+        container.empty();
+        for (var x = 0; x < spaces; x++) {
+            var slot = $('<div id="is' + x + '" class="dragon-slot itemBarSlot"></div>');
+            slot.data('slot', x);
+            container.append(slot);
+            slot.droppable({
+                drop: dropFunction,
+                greedy: true,
+                tolerance: 'pointer',
+                hoverClass: 'dragon-hover'
             });
+            slot.click(clickFunction);
         }
     },
     fillInvSlot: function(item) {
@@ -510,17 +512,17 @@ var HUDHandler = Class.extend({
         var HUD = this,
             container = $('#lootBar'),
             spaces = num;
-
+        var clickFunction = function() {
+                // handle use based on child data
+                console.log($(this).attr('id') + " clicked!");
+            };
         container.empty();
         for (var x = 0; x < spaces; x++) {
             var slot = $('<div id="ls' + x + '" class="dragon-slot lootBarSlot"></div>');
             slot.data('slot', x);
             container.append(slot);
             // loot is NOT droppable! you may only take it
-            slot.click(function() {
-                // handle use based on child data
-                console.log($(this).attr('id') + " clicked!");
-            });
+            slot.click(clickFunction);
         }
     },
     fillLootSlot: function(item) {
@@ -574,25 +576,26 @@ var HUDHandler = Class.extend({
         var HUD = this,
             container = $('#vendorBar'),
             spaces = num;
-
+        var dropFunction = function(e, ui) {
+                    _.partial(HUD.onVendorSlotDrop, e, ui, HUD)();
+                };
+        var dblClickFunction = function() {
+                // handle use based on child data
+                console.log($(this).attr('id') + " clicked!");
+            };
         container.empty();
         for (var x = 0; x < spaces; x++) {
             var slot = $('<div id="vs' + x + '" class="dragon-slot vendorBarSlot"></div>');
             slot.data('slot', x);
             container.append(slot);
             slot.droppable({
-                drop: function(e, ui) {
-                    _.partial(HUD.onVendorSlotDrop, e, ui, HUD)();
-                },
+                drop: dropFunction,
                 greedy: true,
                 hoverClass: 'dragon-hover',
                 tolerance: 'pointer',
                 accept: '.invSlotItem' // only allow inv for sales, no vendor rearranging
             });
-            slot.on('dblclick', function() {
-                // handle use based on child data
-                console.log($(this).attr('id') + " clicked!");
-            });
+            slot.on('dblclick', dblClickFunction);
         }
     },
     fillVendorSlot: function(item) {
@@ -704,22 +707,24 @@ var HUDHandler = Class.extend({
             spaces = num;
 
         container.empty();
+        var bankDropFunction = function(e, ui) {
+                    _.partial(HUD.onBankSlotDrop, e, ui, HUD)();
+                };
+        var slotClickFunction = function() {
+                console.log($(this).attr('id') + " clicked!");
+            };
         for (var x = 0; x < spaces; x++) {
             var slot = $('<div id="bs' + x + '" class="dragon-slot bankBarSlot"></div>');
             slot.data('slot', x);
             container.append(slot);
             slot.droppable({
-                drop: function(e, ui) {
-                    _.partial(HUD.onBankSlotDrop, e, ui, HUD)();
-                },
+                drop: bankDropFunction,
                 greedy: true,
                 accept: '.invSlotItem', // only accept items from the item bar
                 tolerance: 'pointer',
                 hoverClass: 'dragon-hover'
             });
-            slot.click(function() {
-                console.log($(this).attr('id') + " clicked!");
-            });
+            slot.click(slotClickFunction);
         }
     },
     fillBankSlot: function(item) {
@@ -1176,13 +1181,9 @@ var HUDHandler = Class.extend({
             //charSelect += '<div class="spacersmall"></div>';
         }
 
-        var myChar = null;
-        for (var c = 0; c < chars.length; c++) {
-            if (chars[c].id === startdata.characterUsed) {
-                myChar = chars[c];
-                break;
-            }
-        }
+        var myChar = _.find(chars, function(_char){
+            return _char.id === startdata.characterUsed;
+        });
 
         if (startdata.loggedIn) {
             charSelect += '<button id="btnPrevChar" class="ibutton' + (charCount === 0 ? '_disabled' : '') + '" style="float:left;width:40px">←</button>';
@@ -1217,20 +1218,21 @@ var HUDHandler = Class.extend({
                     var charItems = myChar.equipment.split(',');
                     for (var i = 0; i < charItems.length; i++) {
                         var item = items[charItems[i]];
-                        if (item.type === 'armor') {
+                        if(!_.isUndefined(item)){
+                            if (item.type === 'armor') {
 
-                            switch (item.subtype) {
-                                case 'head':
-                                    head = item.image;
-                                    break;
-                                case 'body':
-                                    body = item.image;
-                                    break;
-                                case 'feet':
-                                    feet = item.image;
-                                    break;
+                                switch (item.subtype) {
+                                    case 'head':
+                                        head = item.image;
+                                        break;
+                                    case 'body':
+                                        body = item.image;
+                                        break;
+                                    case 'feet':
+                                        feet = item.image;
+                                        break;
+                                }
                             }
-
                         }
                     }
                 }
