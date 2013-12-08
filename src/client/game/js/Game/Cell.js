@@ -78,32 +78,31 @@ var Cell = Class.extend({
         this.filesToLoad++;
         // Make the request, and when the request is in, build the mesh
         var objectsFile = 'data/'+terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/objects.json?'+(new Date()).getTime();
-        $.getJSON(objectsFile, function(data) {
-          me.filesToLoad--;
+        $.getJSON(objectsFile).done(function(data) {
           me.objectData = data;
           console.log('Loaded: '+objectsFile);
-          me.FinishLoad();
-        }).error(function() {
-          me.filesToLoad--;
+         }).error(function() {
           me.objectData = [];
           console.warn('Not found: '+objectsFile);
-          me.FinishLoad();
+          }).always(function(){
+           me.filesToLoad--;
+           me.FinishLoad();
+       
         });
 
 
         if ( isEditor ) {
           this.filesToLoad++;
           var graphFile = 'data/'+terrainHandler.zone+'/'+this.cellX+'/'+this.cellZ+'/graph.json?'+(new Date()).getTime();
-          $.getJSON(graphFile, function(data) {
-            me.filesToLoad--;
+          $.getJSON(graphFile).done(function(data) {
             me.graphData = data;
             console.log('Loaded graph: '+graphFile);
-            me.FinishLoad();
           }).error(function() {
-            me.filesToLoad--;
             me.graphData = {};
             console.warn('No graph found: '+graphFile);
-            me.FinishLoad();
+            }).always(function(){
+            me.filesToLoad--;
+             me.FinishLoad();         
           });
         }
 
