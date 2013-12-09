@@ -23,6 +23,7 @@ var Class = require('../../common/class'),
 
 var buildItemFromData = function(itemData) {
     var deferred = Q.defer();
+    console.log("building data for " + JSON.stringify(itemData));
 
     // move db id to separate property, db id doesn't really matter for anything other than db indexing
     itemData._persistID = itemData.id;
@@ -73,6 +74,11 @@ var ItemService = Class.extend({
             });
 
             Q.all(promises).then(function() {
+                console.log("all items retrieved");
+                deferred.resolve(items);
+            }, function(error){
+                console.log("all: an error occurred: " + error);
+                console.log("items length: " + items.length);
                 deferred.resolve(items);
             });
         });
