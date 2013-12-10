@@ -88,7 +88,7 @@ var io,
 
 // setup REPL for console server mgmt
 var startREPL = function() {
-    var repl = require('repl'); // native node
+    var repl = require('repl');
 
     // Not game stuff, this is for the server executable
     process.stdin.setEncoding('utf8');
@@ -108,6 +108,20 @@ var startREPL = function() {
     // context variables get attached to "global" of this instance
     serverREPL.context.version = pkg.version;
     serverREPL.context.httpServer = httpServer;
+
+	// Add UNIX socket to REPL for awesome realtime debugging
+	// We take the sweetest auto-complete with colors available module
+	var repl = require('net-repl');
+
+	var options = {
+	    prompt: 'ironbane> ', 
+	    deleteSocketOnStart: true,
+	    useGlobal: true,
+	    useColors: true
+	}
+
+	var socketPath = "/tmp/ibs-" + config.get('mysql_database');
+	var srv = repl.createServer(options).listen(socketPath);
 };
 
 // Necessary to prevent 'Mysql has gone away' errors
