@@ -186,4 +186,48 @@ program
         console.log('No such command, type -help for options.');
     });
 
+program
+    .command('validate')
+    .description('validates the database')
+    .action(function(){
+        console.log("validating");
+        var db = require('mysql').createConnection({
+            host: config.get('mysql_host'),
+            user: config.get('mysql_user'),
+            password: config.get('mysql_password'),
+            database: config.get('mysql_database')
+        });
+        db.query("Select count(id) as cCount from ib_characters", function(err, results){
+            console.log("There are " +results[0].cCount+ " characters");
+        });
+        db.query("Select count(id) as cCount from ib_characters where user = 0", function(err, results){
+            console.log("There are " +results[0].cCount+ " guest characters");
+        });
+        db.query("Select count(id) as cCount from ib_characters where user = 0 and lastplayed < ?",[(new Date().getTime() / 1000) - 60*60*24*14], function(err, results){
+            console.log("There are " +results[0].cCount +" guest characters older than 2 weeks");
+        });
+        db.query("Select name from ib_characters where zone = 41", function(err, results){
+            console.log("There are " + results.length + " characters in hell: " + _.pluck(results, 'name'));
+        });
+        db.query("Select id, owner from ib_items where template not in (select id from ib_item_templates)", function(err, results){
+            if(results.length>0){
+                console.log("There " + (results.length ===1 ? " is " : " are ") + results.length + " item" + (results.length===1 ? "" : "s") + " with an invalid item template:");
+                _.each(results,function(result){
+                    console.log("item id: " +result.id);
+                    console.log("owner id: " +result.owner);
+                    if(result.owner < 0){
+                       db.query("Select name from ib_unit_templates INNER JOIN ib_units on ib_units.template = ib_unit_templates.id WHERE ib_units.id = ?", Math.abs(result.owner), function(err, results2){
+                        console.log("Owner name: "+results2[0].name);
+                       });
+                    }
+                    if(result.owner > 0){
+                       db.query("Select name from ib_characters where id = ?",[result.owner], function(err, results2){
+                            console.log("Owner name: "+results2[0].name);
+                       });
+                    }
+                    
+                });
+            }
+        });
+    });
 program.parse(process.argv);
