@@ -207,7 +207,9 @@ program
             console.log("There are " +results[0].cCount +" guest characters older than 2 weeks");
         });
         db.query("Select name from ib_characters where zone = 41", function(err, results){
-            console.log("There are " + results.length + " characters in hell: " + _.pluck(results, 'name'));
+            if(results.length>0){
+                console.log("There are " + results.length + " characters in hell: " + _.pluck(results, 'name'));
+            }
         });
         db.query("Select id, owner from ib_items where template not in (select id from ib_item_templates)", function(err, results){
             if(results.length>0){
