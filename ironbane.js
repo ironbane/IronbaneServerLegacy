@@ -198,21 +198,42 @@ program
             database: config.get('mysql_database')
         });
         db.query("Select count(id) as cCount from ib_characters", function(err, results){
-            console.log("There are " +results[0].cCount+ " characters");
+            if(err){
+                console.log(err);
+            }
+            else if(results.length>0){
+                console.log("There are " +results[0].cCount+ " characters");
+            }
         });
         db.query("Select count(id) as cCount from ib_characters where user = 0", function(err, results){
-            console.log("There are " +results[0].cCount+ " guest characters");
+            if(err){
+                console.log(err);
+            }
+            else if(results.length>0){
+                console.log("There are " +results[0].cCount+ " guest characters");
+            }
         });
         db.query("Select count(id) as cCount from ib_characters where user = 0 and lastplayed < ?",[(new Date().getTime() / 1000) - 60*60*24*14], function(err, results){
-            console.log("There are " +results[0].cCount +" guest characters older than 2 weeks");
+            if(err){
+                console.log(err);
+            }
+            else if(results.length>0){
+                console.log("There are " +results[0].cCount +" guest characters older than 2 weeks");
+            }
         });
         db.query("Select name from ib_characters where zone = 41", function(err, results){
-            if(results.length>0){
+            if(err){
+                console.log(err);
+            }
+            else if(results.length>0){
                 console.log("There are " + results.length + " characters in hell: " + _.pluck(results, 'name'));
             }
         });
         db.query("Select id, owner from ib_items where template not in (select id from ib_item_templates)", function(err, results){
-            if(results.length>0){
+            if(err){
+                console.log(err);
+            }
+            else if(results.length>0){
                 console.log("There " + (results.length ===1 ? " is " : " are ") + results.length + " item" + (results.length===1 ? "" : "s") + " with an invalid item template:");
                 _.each(results,function(result){
                     console.log("item id: " +result.id);
