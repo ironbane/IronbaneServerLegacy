@@ -88,40 +88,43 @@ var io,
 
 // setup REPL for console server mgmt
 var startREPL = function() {
-    var repl = require('repl');
+    if(config.get('use_repl') === true){ 
+        var repl = require('repl');
+   
+        // Not game stuff, this is for the server executable
+        process.stdin.setEncoding('utf8');
 
-    // Not game stuff, this is for the server executable
-    process.stdin.setEncoding('utf8');
+        // startup a full node repl for javascript awesomeness
+        var serverREPL = repl.start({
+           prompt: "ironbane> ",
+           input: process.stdin,
+           output: process.stdout
+        });
 
-    // startup a full node repl for javascript awesomeness
-    var serverREPL = repl.start({
-        prompt: "ironbane> ",
-        input: process.stdin,
-        output: process.stdout
-    });
+        serverREPL.on('exit', function() {
+           // todo: other shutdown stuff, like stop db, etc.
+           process.exit();
+        });
 
-    serverREPL.on('exit', function() {
-        // todo: other shutdown stuff, like stop db, etc.
-        process.exit();
-    });
+        // context variables get attached to "global" of this instance
+        serverREPL.context.version = pkg.version;
+        serverREPL.context.httpServer = httpServer;
+    }
+    if(config.get('use_netrepl') === true){ 
+    	// Add UNIX socket to REPL for awesome realtime debugging
+    	// We take the sweetest auto-complete with colors available module
+    	var repl = require('net-repl');
 
-    // context variables get attached to "global" of this instance
-    serverREPL.context.version = pkg.version;
-    serverREPL.context.httpServer = httpServer;
+    	var options = {
+    	    prompt: 'ironbane> ', 
+    	    deleteSocketOnStart: true,
+    	    useGlobal: true,
+    	    useColors: true
+    	}
 
-	// Add UNIX socket to REPL for awesome realtime debugging
-	// We take the sweetest auto-complete with colors available module
-	var repl = require('net-repl');
-
-	var options = {
-	    prompt: 'ironbane> ', 
-	    deleteSocketOnStart: true,
-	    useGlobal: true,
-	    useColors: true
-	}
-
-	var socketPath = "/tmp/ibs-" + config.get('mysql_database');
-	var srv = repl.createServer(options).listen(socketPath);
+    	var socketPath = "/tmp/ibs-" + config.get('mysql_database');
+    	var srv = repl.createServer(options).listen(socketPath);
+    }
 };
 
 // Necessary to prevent 'Mysql has gone away' errors

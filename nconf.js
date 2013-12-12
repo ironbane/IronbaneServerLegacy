@@ -31,6 +31,8 @@ nconf.defaults({
         accountKey: '1234FOO',
         appName: 'Ironbane MMO'
     },
+    use_repl: true,
+    use_netrepl: false,
     server_port: 8080,
     session_secret: 'horsehead bookends',
     // game settings
