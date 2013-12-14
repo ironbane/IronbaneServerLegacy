@@ -1144,6 +1144,9 @@ var HUDHandler = Class.extend({
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('.dragon-bar, #coinBar, #statBar').hide();
         $('#chatContent').hide().trigger('hide');
+        $('#chatContent').scope().$apply(function(scope) {
+            scope.messages = [];
+        });
         soundHandler.FadeIn("music/maintheme", 5000);
     },
     GetLastCharacterPlayed: function() {
