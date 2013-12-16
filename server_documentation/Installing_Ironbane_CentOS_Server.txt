@@ -9,7 +9,7 @@ Login to the server as root
 ( Get minimal packages for installing )
 yum install wget vim
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+yum localinstall epel-release-6-8.noarch.rpm
 
 ( Download nodejs-ansi because its broken in EPEL )
 wget http://kojipkgs.fedoraproject.org//packages/nodejs-ansi/0.1.2/7.el6.1/noarch/nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
