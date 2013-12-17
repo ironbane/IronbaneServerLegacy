@@ -20,6 +20,9 @@ var dataPath = clientDir + 'data';
 var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
 pathFinder.setPath(dataPath);
 
+var async = require('async'),
+    Parallel = require('paralleljs');
+
 var WorldHandler = Class.extend({
     Init: function() {
         // World structure
@@ -29,8 +32,6 @@ var WorldHandler = Class.extend({
         this.switches = {};
         this.awake = false;
         this.hasLoadedWorld = false;
-
-
 
     },
     Awake: function() {
@@ -48,9 +49,16 @@ var WorldHandler = Class.extend({
         self.awake = true;
 
     },
-    Tick: function(dTime) {
+    /** 
+     * @method Tick
+     *
+     * @param {Number} elapsed
+     * @param {Function} callback - Callback to execute when finished.
+     **/
+    Tick: function(elapsed, callback) {
 
         if (!this.hasLoadedWorld) {
+            callback();
             return;
         }
 
@@ -66,11 +74,14 @@ var WorldHandler = Class.extend({
             if (hasLoadedUnits) {
                 this.Awake();
             }
+
+            callback();
             return;
         }
 
-        this.updateUnits(dTime);
-        this.sendoutSnapshots();
+        
+        this.updateUnits(elapsed);
+        this.sendoutSnapshots(callback);
 
     },
     updateUnits: function(dTime) {
@@ -89,68 +100,144 @@ var WorldHandler = Class.extend({
         // console.log(unitCount + " active units, " + players + " logged in players");
 
     },
-    sendoutSnapshots: function() {
-        var snapshotCache = [];
-        var cacheCount = 0;
-        var calculatedCount = 0;
-        this.LoopUnits(function(unit) {
-            if (unit instanceof Player) {
-                var snapshot = [];
-                var otherUnits = unit.otherUnits;
-                _.each(otherUnits, function(ud) {
-                    if (ud.id !== unit.id) {
-                        if ((ud.template &&
-                            ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
-                            ud.template.type !== UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)) {
-                            var id = ud.id;
-                            var packet = _.find(snapshotCache, function(thePacket){
-                                return thePacket.id === ud.id;
-                            }) || {};
-                            if (_.isEmpty(packet)) {
-                                calculatedCount++;
-                                var pos = ud.position;
-                                packet.id = id;
-                                packet.p = pos.Round(2);
+    
+    /** 
+     * @method sendoutSnapshots
+     *
+     * @param {Function} next - Call next when done.
+     **/
+    sendoutSnapshots: function(done) {
 
-                                if (ud.standingOnUnitId) {
-                                    packet.u = ud.standingOnUnitId;
-                                    packet.p = ud.localPosition.Round(2);
-                                }
+        var iterator = function(unit, callback) { 
+            sendSnapshot(unit);
+            callback(null);
+        };
 
-                                if (!(ud instanceof Player) && (ud instanceof Fighter)) {
-                                    // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
-                                    ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
+        async.each(this.getPlayers(), iterator, done);
+ 
+        function sendSnapshot(unit) { 
 
-                                    if (ud.rotation.y < 0) {ud.rotation.y += (Math.PI * 2);}
-                                    ud.rotation.y = (Math.PI * 2) - ud.rotation.y;
 
-                                }
+            _.chain(unit.otherUnits)
+               .filter(function(ud) {
+                   return ud.id !== unit.id;
+               })
+               .filter(function(ud) {
+                   return (ud.template.type && 
+                           ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
+                           ud.template.type !== UnitTypeEnum.ToggleableObstacle) ||
+                       _.isUndefined(ud.template);
+               })
+               .map(function(ud) {
+                 
+                   if (!(ud instanceof Player) && (ud instanceof Fighter)) {
 
-                                if (ud.sendRotationPacketX) {
-                                    packet.rx = ud.rotation.x.Round(2);
-                                }
-                                if (ud.sendRotationPacketY) {
-                                    packet.ry = ud.rotation.y.Round(2);
-                                }
-                                if (ud.sendRotationPacketZ) {
-                                    packet.rz = ud.rotation.z.Round(2);
-                                }
-                                snapshotCache.push(packet);
-                            } else {
-                                cacheCount++;
-                                //packet = snapshotCache.id;
-                            }
+                        // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
+                        ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
 
-                            snapshot.push(packet);
+                        if (ud.rotation.y < 0) {
+                           ud.rotation.y += (Math.PI * 2);
                         }
+
+                        ud.rotation.y = (Math.PI * 2) - ud.rotation.y;
+
                     }
-                });
-                if (snapshot.length > 0) {
-                    //console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
-                    unit.socket.emit("snapshot", snapshot);
-                }
-            }
+
+                   return ud;
+
+               })
+               .map(function(ud) { 
+              
+                   function Round2(i) { return Math.round(i * 100) / 100; }
+
+                   var id = ud.id;
+                   var packet = {}; 
+               
+                   var pos = ud.position.Round(2);
+
+                   packet.id = id;
+                   
+                   packet.p = pos;
+
+                   if (ud.standingOnUnitId) {
+                      packet.u = ud.standingOnUnitId;
+                      packet.p = ud.localPosition.Round(2);
+                   }
+
+
+                   if (ud.sendRotationPacketX) {
+
+                      packet.rx = ud.rotation.x.Round(2);
+
+                   }
+
+                   if (ud.sendRotationPacketY) {
+                       packet.ry = ud.rotation.y.Round(2);
+                   }
+
+                   if (ud.sendRotationPacketZ) {
+                       packet.rz = ud.rotation.z.Round(2);
+                   }
+
+                   
+                   return packet;
+
+
+            }).tap(function(snapshot) { 
+
+              if (snapshot.length > 0) {
+
+                 unit.socket.emit('snapshot', snapshot);
+
+              }
+
+            });
+
+        } 
+                   
+    },
+    /**
+     * @method getUnits
+     * @return {Array} All of the units
+     * handled by all cells in the world handler.
+     **/
+    getUnits : function() { 
+       
+       var allUnits = [];
+
+       _.each(this.allCells, function(cell) {
+           if (!_.isUndefined(cell.units)) {
+
+               allUnits = allUnits.concat(cell.units);
+
+          }
         });
+        return allUnits;
+    },
+    /** 
+     * @method getPlayers
+     * @return {Array} - All of the units 
+     * that are an instance of player.
+     **/
+    getPlayers : function() {
+      
+       return _.filter(this.getUnits(), function(unit) { 
+          return (unit instanceof Player);
+       });
+
+    },
+    /** 
+     * @method autoSave
+     * Auto-save all players currently managed by the world handler.
+     **/
+    autoSave : function() { 
+
+       log("Auto-saving all players...");
+            
+       this.getPlayers().forEach(function(player) {
+           player.Save();
+       });
+
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
 
@@ -224,13 +311,24 @@ var WorldHandler = Class.extend({
 
 
     },
+
+    /** 
+     * @method buildCellsArray
+     * Modifies allCells, which stores 
+     * the data contained for each cell in 
+     * the world handler. Doing so reduces 
+     * the complexity of tasks that loop
+     * over the cells in the world handler.
+     **/
     buildCellsArray: function() {
-        // TODO actually use these for ticking
+
         var me = this;
         me.allCells = [];
-        this.LoopCells(function(cell) {
+        
+        this.LoopCells(function(cell) { 
             me.allCells.push(cell);
         });
+
     },
     LoadNavigationNodes: function() {
 
@@ -362,15 +460,20 @@ var WorldHandler = Class.extend({
 
         });
     },
-    // all of these loop methods are like forEach
-    LoopUnits: function(fn) {
-        this.LoopCells(function(cell) {
-            if (!_.isUndefined(cell.units)) {
-                _.each(cell.units, function(unit) {
-                    fn(unit);
-                });
-            }
-        });
+
+    /** 
+     * @method LoopUnits
+     * Applies fn to each unit in the 
+     * world handler.
+     **/
+    LoopUnits : function(fn) {
+       this.LoopCells(function(cell) { 
+           if (!_.isUndefined(cell.units)) {
+               _.each(cell.units, function(unit) { 
+                   fn(unit);
+               });
+           }
+       }); 
     },
     LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
         this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
@@ -381,14 +484,18 @@ var WorldHandler = Class.extend({
             }
         }, offset);
     },
+    /**
+     * @method LoopCells
+     * Applieds fn to each cell in the world handler.
+     **/
     LoopCells: function(fn) {
         _.each(this.world, function(zone) {
-            _.each(zone, function(cellX) {
-                _.each(cellX, function(cellZ) {
-                    fn(cellZ);
-                });
-            });
-        });
+               _.each(zone, function(cellX) {
+                   _.each(cellX, function(cellZ) {
+                        fn(cellZ);
+                   });
+               });
+        }); 
     },
     LoopCellsNear: function(zone, cellX, cellZ, fn, offset) {
 

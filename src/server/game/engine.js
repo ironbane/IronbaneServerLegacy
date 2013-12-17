@@ -39,17 +39,7 @@ function timeSince(date) {
 
 // make this private so that it can't be called directly
 var loop = function(server) {
-    if(!server.isRunning) {
-        return;
-    }
-
-    var currTime = Date.now();
-    var delta = Math.min(0.1, (currTime - server.lastTime) / 1000);
-    server.tick(delta);
-    server.lastTime = currTime;
-
-    server._loopId = setTimeout(function() { loop(server); }, 100);
-};
+   };
 
 var GameEngine = Class.extend({
     autoBackup: true,
@@ -96,7 +86,6 @@ var GameEngine = Class.extend({
 
         this.isRunning = true;
         this.startTime = Date.now();
-        loop(this);
 
         this.emit('start');
     },
@@ -113,8 +102,19 @@ var GameEngine = Class.extend({
         this.isRunning = false;
         this.emit('stop');
     },
-    tick: function(elapsedTime) {
-        this.emit('tick', elapsedTime);
+    tick: function() {
+
+        if(!this.isRunning) {
+           return;
+        }
+
+        var currTime = Date.now();
+        var delta = Math.min(0.1, (currTime - this.lastTime) / 1000);
+      
+        this.lastTime = currTime;
+
+        this.emit('tick', delta);
+
     }
 });
 

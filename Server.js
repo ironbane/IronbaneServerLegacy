@@ -50,7 +50,7 @@ var Server = Class.extend({
         this.npcIDCount++;
         return -this.npcIDCount;
     },
-    Tick: function(dTime) {
+    Tick: function(dTime, callback) {
 
 
         if ( this.versionWarningTimer > 0 ) {
@@ -79,8 +79,8 @@ var Server = Class.extend({
                 chatHandler.announce(msg);
             }
         }
-        worldHandler.Tick(dTime);
-    }
+        worldHandler.Tick(dTime, callback);
+    } 
 });
 
 var server = new Server();
