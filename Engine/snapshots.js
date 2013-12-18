@@ -17,7 +17,7 @@
 
 /**
   * @module snapshots
- **/
+**/
 
 var Q = require('q'),
     async = require('async'),
@@ -25,12 +25,19 @@ var Q = require('q'),
 
 /**
   * @class Snapshots
+  * Hosts a collection of static methods, 
+  * faciliating the broadcasting of snapshots once per 
+  * server tick. 
 **/ 
-
 var Snapshots = (function() { 
 
+    /** 
+     * @method send
+     * Builds and sends a snapshot to one player.
+     * @param {Function} cached - The memoized, toPacket function, for snapshot caching.
+     * @param {Player} player - The player to send the snapshot to.
+     **/
     function send(cached, unit) { 
-
 
         _.chain(unit.otherUnits)
            .filter(function(ud) {
@@ -73,6 +80,14 @@ var Snapshots = (function() {
 
     };
 
+    /** 
+     * @method toPacket
+     * Transform a unit into an element 
+     * for a collection of packets, a snapshot,
+     * to be sent to a player.
+     * @param {Unit} ud - The unit to transform.
+     * @return {Object} - The packet. 
+     **/
     function toPacket(ud) { 
 
        var id = ud.id;
@@ -109,14 +124,37 @@ var Snapshots = (function() {
 
    };
 
+   /** 
+    * @method hash 
+    * The hash function to lookup an
+    * already computed result for one of 
+    * a snapshot's packets.
+    * @param {Unit} - A unit to create a bucket for. 
+    * @return {Number} - The unit's unique id.
+    **/ 
    function hash(ud) { 
       return ud.id;
    };
 
+   /** 
+    * @method cache 
+    * Makes a new cache function, to be used once per tick
+    * when snapshots are broadcasted to player. 
+    * Use the cache function as toPacket normally would 
+    * be used. Increases the performance of computing 
+    * snapshot packets.
+    * @return {Function} 
+    **/
    function cache() {
       return _.memoize(toPacket, hash);
    };
 
+   /** 
+    * @method broadcast 
+    * @param {Array} players - All players to broadcast
+    * snapshots to once per tick.
+    * @param {Object} - A promise. 
+    **/
    function broadcast(players) {
 
       var deferred = Q.defer();
