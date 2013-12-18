@@ -260,7 +260,7 @@ var Cell = Class.extend({
                 unit.canSelectWithEditor = true;
 
                 if ( unit ) {
-                    ironbane.unitList.push(unit);
+                    ironbane.getUnitList().push(unit);
                     this.objects.push(unit);
                 }
 

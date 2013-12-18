@@ -205,16 +205,7 @@ if ( !SERVER ) {
     return new THREE.Vector3(x,y,z);
   }
 
-  function FindUnit(id) {
-    if ( !id ) return null;
-
-    if ( ironbane.player && ironbane.player.id == id ) return ironbane.player;
-
-    for (var i = 0; i < ironbane.unitList.length; i++) {
-      if ( ironbane.unitList[i].id == id ) return ironbane.unitList[i];
-    }
-    return null;
-  }
+  
 
   function preload(arrayOfImages) {
     $(arrayOfImages).each(function(){

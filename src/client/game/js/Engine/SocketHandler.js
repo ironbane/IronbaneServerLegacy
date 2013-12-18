@@ -73,7 +73,7 @@ var SocketHandler = Class.extend({
                 var unit = FindUnit(data.id);
 
                 if (unit) {
-                    ironbane.unitList.push(new ChatBubble(unit, data['message']));
+                    ironbane.getUnitList().push(new ChatBubble(unit, data['message']));
                 }
             });
 
@@ -84,12 +84,12 @@ var SocketHandler = Class.extend({
 
                 socketHandler.socket.disconnect();
 
-
-                for (var u = 0; u < ironbane.unitList.length; u++){
-                  ironbane.unitList[u].Destroy();  
+                var units = ironbane.getUnitList();
+                for (var u = 0; u < units.length; u++){
+                  ironbane.units[u].Destroy();  
                 } 
 
-                ironbane.unitList = [];
+                ironbane.clearUnits();
 
                 terrainHandler.Destroy();
 
@@ -304,7 +304,7 @@ var SocketHandler = Class.extend({
                     }
                 }
 
-                ironbane.unitList.push(unit);
+                ironbane.getUnitList().push(unit);
             }
         });
         this.socket.on('doJump', function(data) {
@@ -400,11 +400,11 @@ var SocketHandler = Class.extend({
 
 
 
-            ironbane.unitList.push(particle);
+            ironbane.getUnitList().push(particle);
         });
 
         this.socket.on('updateClothes', function(data) {
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
 
             console.log('updateClothes!', data);
 
@@ -420,7 +420,7 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('updateWeapon', function(data) {
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
             unit.updateWeapon(data.weapon);
         });
 
@@ -464,7 +464,7 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('respawn', function(data) {
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
 
             if (unit) {
                 unit.health = data['h'];
@@ -528,7 +528,7 @@ var SocketHandler = Class.extend({
         // });
 
         this.socket.on('setStat', function(data) {
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
 
             if (unit) {
                 if (data['s'] == 'h') {
@@ -596,8 +596,8 @@ var SocketHandler = Class.extend({
         this.socket.on('getMeleeHit', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var victim = FindUnit(data['victim']);
-            var attacker = FindUnit(data['attacker']);
+            var victim = ironbane.findUnit(data['victim']);
+            var attacker = ironbane.findUnit(data['attacker']);
 
             victim.setHealth(data['h']);
 
@@ -615,13 +615,13 @@ var SocketHandler = Class.extend({
         this.socket.on('removeUnit', function(data) {
 
             // Remove the unit from the list
-            var unit = _.find(ironbane.unitList, function(unit) {
+            var unit = _.find(ironbane.getUnitList(), function(unit) {
                 return unit.id === data.id;
             });
 
             if ( unit ) {
                 unit.Destroy();
-                ironbane.unitList = _.without(ironbane.unitList, unit);
+                ironbane.removeUnit(unit);
             }
 
         });
@@ -737,7 +737,7 @@ var SocketHandler = Class.extend({
 
                         obj.Destroy();
 
-                        ironbane.unitList = _.without(ironbane.unitList, obj);
+                        ironbane.removeUnit(obj);
 
                     }
                 });
@@ -786,7 +786,7 @@ var SocketHandler = Class.extend({
             socketHandler.bytesReceived += 2 * snapshot.length;
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
-                var unit = FindUnit(unitdata.id);
+                var unit = ironbane.findUnit(unitdata.id);
                 if (unit) {
                     if (unit != ironbane.player) {
 
@@ -806,7 +806,7 @@ var SocketHandler = Class.extend({
                         if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
 
                         if (!_.isUndefined(unitdata.u)) {
-                            unit.unitStandingOn = FindUnit(unitdata.u);
+                            unit.unitStandingOn = ironbane.findUnit(unitdata.u);
                         } else {
                             unit.unitStandingOn = null;
                         }

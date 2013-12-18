@@ -255,7 +255,7 @@ var Player = Fighter.extend({
     checkForLoot: function() {
         var player = this;
 
-        return _.find(ironbane.unitList, function(unit) {
+        return _.find(ironbane.getUnitList, function(unit) {
             if (unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
                 if (player.inRangeOfUnit(unit, range)) {
@@ -270,7 +270,7 @@ var Player = Fighter.extend({
 
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
-        debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+        debug.setWatch("unitlist size", ironbane.getUnitList() ? ironbane.getUnitList().length : 0);
         debug.setWatch("bytes received",socketHandler.bytesReceived);
 
 
@@ -602,7 +602,7 @@ var Player = Fighter.extend({
                     this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN;
                 } else {
 
-                    _.each(ironbane.unitList, function(u) {
+                    _.each(ironbane.getUnitList(), function(u) {
                         if (u instanceof Fighter && u != ironbane.player && u.InRangeOfPosition(point, 1) && u.id < 0 && !u.template.friendly && u.health > 0) {
                             ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
 
@@ -793,7 +793,7 @@ var Player = Fighter.extend({
                         var particle = template.particle;
                         var proj = new Projectile(player.position.clone().add(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
                         proj.velocity.add(player.velocity);
-                        ironbane.unitList.push(proj);
+                        ironbane.addUnit(proj);
                         player.swingWeapon(null, template);
                     }
 
