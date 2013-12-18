@@ -73,6 +73,9 @@ var Bank = Trigger.extend({
 
         var item = player.getItemById(itemId);
         if(item) {
+            // first get this out of the player's array
+            player.removeItem(item);
+
             item.owner = bank.id;
             item.equipped = 0;
             item.slot = slot;
@@ -82,16 +85,6 @@ var Bank = Trigger.extend({
             item.data.actualOwner = player.id;
 
             bank.vault.push(item);
-
-            // remove player's item!
-            player.removeItemById(itemId);
-
-            /*
-            player.socket.emit('syncBank', {
-                id: bank.id,
-                slots: bank.slots,
-                vault: bank.getItemsForPlayer(player.id)
-            });*/
 
             // save to DB
             itemService.persist(item);
@@ -124,13 +117,6 @@ var Bank = Trigger.extend({
 
             bank.vault = _.without(bank.vault, item);
 
-            /*
-            player.socket.emit('syncBank', {
-                id: bank.id,
-                slots: bank.slots,
-                vault: bank.getItemsForPlayer(player.id)
-            });*/
-
             // save the item to db
             itemService.persist(item);
 
@@ -162,12 +148,10 @@ var Bank = Trigger.extend({
     onExit: function(unit) {
         var bank = this;
 
-        if(!unit.isPlayer()) {
-            return;
-        }
-
         if(!unit.socket) {
-            console.warn('player like unit with no socket!!!', unit.id);
+            if(unit.isPlayer()) {
+                console.warn('player like unit with no socket!!!', unit.id);
+            }
         } else {
             unit.socket.emit('closeBank', {
                 id: bank.id
@@ -175,8 +159,7 @@ var Bank = Trigger.extend({
         }
     },
     onTick: function(unit) {
-        if(!unit.isPlayer()) {
-            return;
-        }
+        // do nothing, but we still need to override the trigger's method
+        return;
     }
 });

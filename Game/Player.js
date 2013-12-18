@@ -209,32 +209,31 @@ var Player = Fighter.extend({
             });
         });
     },
-  LeaveGame: function() {
+    LeaveGame: function() {
+        var player = this;
 
-    this.Save();
+        player.Save();
 
-    chatHandler.announceLoginStatus(this, 'leave');
+        chatHandler.announceLoginStatus(player, 'leave');
 
-    var cx = this.cellX;
-    var cz = this.cellZ;
-    var zone = this.zone;
-    // Remove the unit from the world cells
-    if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
+        var cx = player.cellX;
+        var cz = player.cellZ;
+        var zone = player.zone;
 
-      worldHandler.world[zone][cx][cz].units = _.without(worldHandler.world[zone][cx][cz].units, this);
-    }
-
-    // Update all players that are nearby
-    for (var x = cx - 1; x <= cx + 1; x++) {
-      for (var z = cz - 1; z <= cz + 1; z++) {
-        if (worldHandler.CheckWorldStructure(zone, x, z)) {
-          for (var u = 0; u < worldHandler.world[zone][x][z].units.length; u++) {
-            worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
-          }
+        // Remove the unit from the world cells
+        if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
+            worldHandler.world[zone][cx][cz].units = _.without(worldHandler.world[zone][cx][cz].units, player);
         }
-      }
+
+        // Update all players that are nearby
+        for (var x = cx - 1; x <= cx + 1; x++) {
+            for (var z = cz - 1; z <= cz + 1; z++) {
+                if (worldHandler.CheckWorldStructure(zone, x, z)) {
+                    for (var u = 0; u < worldHandler.world[zone][x][z].units.length; u++) {
+                        worldHandler.world[zone][x][z].units[u].UpdateOtherUnitsList();
+                    }
+                }
+            }
+        }
     }
-
-
-  }
 });
