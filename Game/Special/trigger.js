@@ -41,14 +41,17 @@ var Trigger = Unit.extend({
 
         // check guests to see if still present
         _.each(trigger.guests, function(unit) {
-            if(!unit.InRangeOfUnit(trigger, trigger.range)) {
-                quitters.push(unit);
-                trigger.onExit(unit);
-            } else {
+            // make sure we are still in the world and near the chest
+            // TODO: faster / better than FindUnit??
+            if(worldHandler.FindUnit(unit.id) && unit.InRangeOfUnit(trigger, trigger.range)) {
                 // still in range, maybe get a pulse
                 if(trigger.triggerTimeout <= 0) {
                     trigger.onTick(unit);
                 }
+            } else {
+                console.log('quitter!', unit.id);
+                quitters.push(unit);
+                trigger.onExit(unit);
             }
         });
 
@@ -63,12 +66,17 @@ var Trigger = Unit.extend({
         // check area for new guests
         worldHandler.LoopUnitsNear(trigger.zone, trigger.cellX, trigger.cellZ, function(unit) {
             if(unit.id !== trigger.id && unit.InRangeOfUnit(trigger, trigger.range)) {
-                if(_.findWhere(trigger.guests, {id: unit.id}) === undefined) {
-                    trigger.guests.push(unit);
-                    trigger.onEnter(unit);
-                }
+                trigger.addGuest(unit);
             }
         });
+    },
+    addGuest: function(unit) {
+        var current = _.pluck(this.guests, 'id');
+        //console.log('trigger add guest: ', unit.id);
+        if(!_.contains(current, unit.id)) {
+            this.guests.push(_.clone(unit));
+            this.onEnter(unit);
+        }
     },
     onEnter: function(unit) {
         //console.log(this.id, ' :: trigger onEnter :: ', unit.id, ' ', unit.name);
