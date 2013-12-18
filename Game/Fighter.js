@@ -653,8 +653,41 @@ var Fighter = Actor.extend({
 
         return true;
     },
+    removeItem: function(item, emit) {
+        if(emit !== false) {
+            emit = true;
+        }
+
+        var self = this;
+        self.items = _.without(self.items, item);
+
+        // update client!
+        if (item.equipped) {
+            // todo: get this logic cleaner somehow
+            if (item.getType() === 'armor') {
+                self.UpdateAppearance(emit);
+                self.CalculateMaxHealth(emit);
+                self.CalculateMaxArmor(emit);
+            } else {
+                if(emit) {
+                    self.EmitNearby("updateWeapon", {
+                        id: self.id,
+                        // should weapon really be template id?
+                        weapon: 0
+                    });
+                }
+            }
+        }
+
+        // let the client know
+        if(emit) {
+            self.socket.emit('updateInventory', {
+                items: self.items
+            });
+        }
+    },
     // remove a specific item
-    removeItemById: function(id) {
+    removeItemById: function(id, emit) {
         var self = this;
         var item = _.find(self.items, function(i) {
             return i.id === id;
@@ -665,28 +698,7 @@ var Fighter = Actor.extend({
             return false;
         }
 
-        self.items = _.without(self.items, item);
-
-        // update client!
-        if (item.equipped) {
-            // todo: get this logic cleaner somehow
-            if (item.getType() === 'armor') {
-                self.UpdateAppearance(true);
-                self.CalculateMaxHealth(true);
-                self.CalculateMaxArmor(true);
-            } else {
-                self.EmitNearby("updateWeapon", {
-                    id: self.id,
-                    // should weapon really be template id?
-                    weapon: 0
-                });
-            }
-        }
-
-        // let the client know
-        self.socket.emit('updateInventory', {
-            items: self.items
-        });
+        self.removeItem(item, emit);
 
         return true;
     },
