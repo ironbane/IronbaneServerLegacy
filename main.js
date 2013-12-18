@@ -18,7 +18,8 @@
 var path = require('path'),
     config = require('./nconf'),
     pkg = require('./package.json'),
-    log = require('util').log;
+    log = require('util').log,
+    Q = require('q');
 
 // track root path of this file, so no matter where the game is launched from we have the base for require
 global.APP_ROOT_PATH = __dirname;
@@ -265,9 +266,7 @@ function start(scripts) {
     // this replaces MainLoop, must go here since server hasn't been defined earlier...
     engine.on('tick', function(elapsed) {
         // eventually we wouldn't be accessing the global var here...
-        server.Tick(elapsed, function() { 
-           setTimeout(function() { engine.tick(); }, 100);
-        });
+        server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
     });
 
     engine.start();
@@ -302,6 +301,7 @@ var includes = [
     '/Engine/ConsoleHandler.js',
     '/Engine/Switch.js',
     '/Engine/SocketHandler.js',
+    '/Engine/snapshots.js',
     '/Engine/WorldHandler.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',

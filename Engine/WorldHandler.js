@@ -20,9 +20,6 @@ var dataPath = clientDir + 'data';
 var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
 pathFinder.setPath(dataPath);
 
-var async = require('async'),
-    Parallel = require('paralleljs');
-
 var WorldHandler = Class.extend({
     Init: function() {
         // World structure
@@ -50,38 +47,46 @@ var WorldHandler = Class.extend({
 
     },
     /** 
-     * @method Tick
+     * @method tick
      *
      * @param {Number} elapsed
-     * @param {Function} callback - Callback to execute when finished.
-     **/
-    Tick: function(elapsed, callback) {
+     * @return {Object} - A promise.
+     */
+    tick: function(elapsed) {
 
-        if (!this.hasLoadedWorld) {
-            callback();
-            return;
-        }
+        var deferred = Q.defer();
 
-        if (!this.awake) {
-            var hasLoadedUnits = true;
+        if (this.hasLoadedWorld) {
+    
+            if (!this.awake) {
 
-            this.LoopCells(function(cell) {
-                if (!cell.hasLoadedUnits) {
-                    hasLoadedUnits = false;
+                var hasLoadedUnits = true;
+
+                this.LoopCells(function(cell) {
+                    if (!cell.hasLoadedUnits) {
+                        hasLoadedUnits = false;
+                    }
+                });
+
+                if (hasLoadedUnits) {
+                    this.Awake();
                 }
-            });
 
-            if (hasLoadedUnits) {
-                this.Awake();
+                deferred.resolve();
+
+            } else { 
+
+               this.updateUnits(elapsed);
+
+               Snapshots.broadcast(this.getPlayers())
+                  .then(deferred.resolve.bind(deferred));
             }
 
-            callback();
-            return;
+        } else {
+          deferred.resolve();
         }
 
-        
-        this.updateUnits(elapsed);
-        this.sendoutSnapshots(callback);
+        return deferred.promise; 
 
     },
     updateUnits: function(dTime) {
@@ -101,101 +106,6 @@ var WorldHandler = Class.extend({
 
     },
     
-    /** 
-     * @method sendoutSnapshots
-     *
-     * @param {Function} next - Call next when done.
-     **/
-    sendoutSnapshots: function(done) {
-
-        var iterator = function(unit, callback) { 
-            sendSnapshot(unit);
-            callback(null);
-        };
-
-        async.each(this.getPlayers(), iterator, done);
- 
-        function sendSnapshot(unit) { 
-
-
-            _.chain(unit.otherUnits)
-               .filter(function(ud) {
-                   return ud.id !== unit.id;
-               })
-               .filter(function(ud) {
-                   return (ud.template.type && 
-                           ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
-                           ud.template.type !== UnitTypeEnum.ToggleableObstacle) ||
-                       _.isUndefined(ud.template);
-               })
-               .map(function(ud) {
-                 
-                   if (!(ud instanceof Player) && (ud instanceof Fighter)) {
-
-                        // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
-                        ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
-
-                        if (ud.rotation.y < 0) {
-                           ud.rotation.y += (Math.PI * 2);
-                        }
-
-                        ud.rotation.y = (Math.PI * 2) - ud.rotation.y;
-
-                    }
-
-                   return ud;
-
-               })
-               .map(function(ud) { 
-              
-                   function Round2(i) { return Math.round(i * 100) / 100; }
-
-                   var id = ud.id;
-                   var packet = {}; 
-               
-                   var pos = ud.position.Round(2);
-
-                   packet.id = id;
-                   
-                   packet.p = pos;
-
-                   if (ud.standingOnUnitId) {
-                      packet.u = ud.standingOnUnitId;
-                      packet.p = ud.localPosition.Round(2);
-                   }
-
-
-                   if (ud.sendRotationPacketX) {
-
-                      packet.rx = ud.rotation.x.Round(2);
-
-                   }
-
-                   if (ud.sendRotationPacketY) {
-                       packet.ry = ud.rotation.y.Round(2);
-                   }
-
-                   if (ud.sendRotationPacketZ) {
-                       packet.rz = ud.rotation.z.Round(2);
-                   }
-
-                   
-                   return packet;
-
-
-            }).tap(function(snapshot) { 
-
-              if (snapshot.length > 0) {
-
-                 unit.socket.emit('snapshot', snapshot);
-
-              }
-
-            });
-
-        } 
-                   
-    },
     /**
      * @method getUnits
      * @return {Array} All of the units
@@ -974,8 +884,6 @@ var WorldHandler = Class.extend({
     },
     // Only for players!!!!
     FindPlayerByName: function(name) {
-
-
 
         for (var z in worldHandler.world) {
             for (var cx in worldHandler.world[z]) {

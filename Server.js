@@ -15,6 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var Q = require('q');
+
 
 var Server = Class.extend({
     Init: function() {
@@ -50,8 +52,14 @@ var Server = Class.extend({
         this.npcIDCount++;
         return -this.npcIDCount;
     },
-    Tick: function(dTime, callback) {
-
+    /**
+     * @method tick
+     * @return {Object} - A promise 
+     * that for when the tick finishes.
+     **/ 
+    tick: function(dTime) {
+        
+        var deferred = Q.defer();
 
         if ( this.versionWarningTimer > 0 ) {
             this.versionWarningTimer -= dTime;
@@ -79,7 +87,9 @@ var Server = Class.extend({
                 chatHandler.announce(msg);
             }
         }
-        worldHandler.Tick(dTime, callback);
+        worldHandler.tick(dTime).then(deferred.resolve.bind(deferred));
+
+        return deferred.promise;
     } 
 });
 
