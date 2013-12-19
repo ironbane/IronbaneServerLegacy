@@ -86,7 +86,7 @@ var SocketHandler = Class.extend({
 
                 var units = ironbane.getUnitList();
                 for (var u = 0; u < units.length; u++){
-                  ironbane.units[u].Destroy();  
+                  units[u].Destroy();  
                 } 
 
                 ironbane.clearUnits();
