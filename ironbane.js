@@ -43,9 +43,9 @@ var setupWizard = function() {
 
     var db = {
         properties: {
-            mysql_username: {
+            mysql_user: {
                 type: 'string',
-                "default": config.get('mysql_username')
+                "default": config.get('mysql_user')
             },
             mysql_password: {
                 type: 'string',
