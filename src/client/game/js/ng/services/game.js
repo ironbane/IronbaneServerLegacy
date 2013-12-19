@@ -136,7 +136,7 @@ IronbaneApp
                 this.renderer.setSize($window.innerWidth, $window.innerHeight);
 
                 // temp hack for xmas 2013
-                this.snow = new Snow(this.scene);
+                //this.snow = new Snow(this.scene);
 
                 $('#gameFrame').append(this.renderer.domElement);
 
@@ -235,7 +235,7 @@ IronbaneApp
 
                 $window.hudHandler.tick(dTime);
 
-                this.snow.tick(this._elapsedTime);
+                //this.snow.tick(this._elapsedTime);
 
                 if (!$window.socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
                     game.camera.position.x = $window.previewLocation.x + (Math.cos(new Date().getTime() / 20000) * $window.previewDistance) - 0;
@@ -252,7 +252,7 @@ IronbaneApp
                     if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
                         !$window.terrainHandler.IsLoadingCells()) {
                         if (!game.player) {
-                            game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.playerData.id, $window.socketHandler.playerData.name);
+                            game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.getPlayerData().id, $window.socketHandler.getPlayerData().name);
                         }
                     }
                 }

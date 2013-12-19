@@ -31,18 +31,17 @@ var SocketHandler = Class.extend({
         this.spawnLocation = null;
         this.spawnRotation = 0;
 
-        this.playerData = null;
+        var playerData = null;
+        this.getPlayerData = function(){
+            return playerData;
+        };
 
         this.readyToReceiveUnits = false;
 
         this.inGame = false;
 
 
-        this.InitConnection();
-
-    },
-    InitConnection: function() {
-
+        
         if (this.serverOnline) {
 
             this.socket = io.connect('http://' + ironbane_hostname + ':' + ironbane_port + '/', {
@@ -73,7 +72,7 @@ var SocketHandler = Class.extend({
                 var unit = FindUnit(data.id);
 
                 if (unit) {
-                    ironbane.getUnitList().push(new ChatBubble(unit, data['message']));
+                    ironbane.getUnitList().push(new ChatBubble(unit, data.message));
                 }
             });
 
@@ -118,11 +117,7 @@ var SocketHandler = Class.extend({
             });
 
 
-
-        }
-
-    },
-    Connect: function(abortConnect) {
+    this.Connect = function(abortConnect) {
         if (!this.serverOnline) return;
 
         if (_.isUndefined(startdata.characterUsed)) return;
@@ -165,7 +160,7 @@ var SocketHandler = Class.extend({
             socketHandler.spawnLocation = ConvertVector3(reply.position);
             socketHandler.spawnRotation = reply.rotY;
 
-            socketHandler.playerData = reply;
+            playerData = reply;
 
             setTimeout(function() {
                 ironbane.showingGame = false;
@@ -184,8 +179,8 @@ var SocketHandler = Class.extend({
 
 
         });
-    },
-    Setup: function() {
+    };
+    this.Setup = function() {
 
         this.socket.on('addUnit', function(data) {
             //if ( !socketHandler.loggedIn ) return;
@@ -261,7 +256,7 @@ var SocketHandler = Class.extend({
                     break;
                 default:
                     // return;
-                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, unitname, data.param, data['size'], data['health'], data['armor'], data['healthMax'], data['armorMax']);
+                    unit = new Fighter(ConvertVector3(data.position), new THREE.Euler(0, data.rotY, 0), data.id, unitname, data.param, data.size, data.health, data.armor, data.healthMax, data.armorMax);
                     break;
             }
 
@@ -272,12 +267,12 @@ var SocketHandler = Class.extend({
 
             if (unit instanceof Fighter) {
                 // Update clothing
-                unit.appearance.hair = data['hair'];
-                unit.appearance.skin = data['skin'];
-                unit.appearance.eyes = data['eyes'];
-                unit.appearance.body = data['body'];
-                unit.appearance.head = data['head'];
-                unit.appearance.feet = data['feet'];
+                unit.appearance.hair = data.hair;
+                unit.appearance.skin = data.skin;
+                unit.appearance.eyes = data.eyes;
+                unit.appearance.body = data.body;
+                unit.appearance.head = data.head;
+                unit.appearance.feet = data.feet;
 
                 if (template.type == UnitTypeEnum.TURRET) {
                     // if (!showEditor || !levelEditor.editorGUI.opShowDebug) {
@@ -299,8 +294,8 @@ var SocketHandler = Class.extend({
                 if (unit instanceof Fighter) {
                     unit.updateClothes();
 
-                    if (!_.isUndefined(data['weapon'])) {
-                        unit.updateWeapon(data['weapon']);
+                    if (!_.isUndefined(data.weapon)) {
+                        unit.updateWeapon(data.weapon);
                     }
                 }
 
@@ -341,7 +336,7 @@ var SocketHandler = Class.extend({
             var unit = FindUnit(data.id);
 
             if (unit && unit instanceof ToggleableObstacle) {
-                unit.Toggle(data['on']);
+                unit.Toggle(data.on);
             }
 
 
@@ -352,19 +347,19 @@ var SocketHandler = Class.extend({
 
 
 
-            if (!_.isUndefined(data['fu'])) {
-                var unit = FindUnit(data['fu']);
-                particleHandler.Add(ParticleTypeEnum[data['p']], {
+            if (!_.isUndefined(data.fu)) {
+                var unit = ironbane.findUnit(data.fu);
+                particleHandler.Add(ParticleTypeEnum[data.p], {
                     followUnit: unit
                 });
-            } else if (!_.isUndefined(data['pfu'])) {
-                var unit = FindUnit(data['pfu']);
-                particleHandler.Add(ParticleTypeEnum[data['p']], {
+            } else if (!_.isUndefined(data.pfu)) {
+                var unit = ironbane.findUnit(data.pfu);
+                particleHandler.Add(ParticleTypeEnum[data.p], {
                     particleFollowUnit: unit
                 });
-            } else if (!_.isUndefined(data['pos'])) {
-                particleHandler.Add(ParticleTypeEnum[data['p']], {
-                    position: ConvertVector3(data['pos'])
+            } else if (!_.isUndefined(data.pos)) {
+                particleHandler.Add(ParticleTypeEnum[data.p], {
+                    position: ConvertVector3(data.p)
                 });
             }
 
@@ -374,13 +369,13 @@ var SocketHandler = Class.extend({
         this.socket.on('addProjectile', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = FindUnit(data['o']);
+            var unit = FindUnit(data.o);
 
             // if ( !data['p'] || _.isUndefined(ProjectileTypeEnum[data['p']]) ) ba('Bad projectile type');
 
             if (unit) {
                 // Alter the start position to cope with lag
-                data['s'] = unit.position.clone();
+                data.s = unit.position.clone();
 
                 // Take into account the size
                 data.s.y += unit.size * 0.5;
@@ -388,13 +383,13 @@ var SocketHandler = Class.extend({
 
             var weapon = !_.isUndefined(data.w) ? items[data.w] : null;
 
-            var target = ConvertVector3(data['t']);
+            var target = ConvertVector3(data.t);
 
             if (data.sw) {
                 unit.swingWeapon(target, weapon);
             }
 
-            var particle = new Projectile(ConvertVector3(data['s']), target, unit, data['w']);
+            var particle = new Projectile(ConvertVector3(data.s), target, unit, data.w);
 
             particle.velocity.add(unit.fakeVelocity);
 
@@ -426,7 +421,7 @@ var SocketHandler = Class.extend({
 
         // comes from GiveItem and addItem on server
         this.socket.on('receiveItem', function(item) {
-            socketHandler.playerData.items.push(item);
+            playerData.items.push(item);
             hudHandler.fillInvSlot(item);
 
             if(item.type === 'cash') {
@@ -436,7 +431,7 @@ var SocketHandler = Class.extend({
 
         // replace player inv with server inv
         this.socket.on('updateInventory', function(data) {
-            socketHandler.playerData.items = data.items;
+            playerData.items = data.items;
             hudHandler.showInv({slots: 10, items: data.items});
         });
 
@@ -467,8 +462,8 @@ var SocketHandler = Class.extend({
             var unit = ironbane.findUnit(data.id);
 
             if (unit) {
-                unit.health = data['h'];
-                unit.object3D.position.copy(ConvertVector3(data['p']));
+                unit.health = data.h;
+                unit.object3D.position.copy(ConvertVector3(data.p));
 
                 if (unit === ironbane.player) {
                     terrainHandler.transitionState = transitionStateEnum.START;
@@ -492,7 +487,7 @@ var SocketHandler = Class.extend({
                         hudHandler.ShowHUD();
 
 
-                        hudHandler.showInv({slots: 10, items: socketHandler.playerData.items});
+                        hudHandler.showInv({slots: 10, items: playerData.items});
                     });
                 }
 
@@ -531,28 +526,28 @@ var SocketHandler = Class.extend({
             var unit = ironbane.findUnit(data.id);
 
             if (unit) {
-                if (data['s'] == 'h') {
+                if (data.s == 'h') {
                     //unit.health = data['h'];
-                    unit.setHealth(data['h'], data['np']);
+                    unit.setHealth(data.h, data.np);
                     if (unit == ironbane.player) {
                         hudHandler.makeHealthBar(true);
                     }
                 }
-                if (data['s'] == 'a') {
+                if (data.s == 'a') {
                     //unit.armor = data['a'];
-                    unit.setArmor(data['a'], data['np']);
+                    unit.setArmor(data.a, data.np);
                     if (unit == ironbane.player) {
                         hudHandler.makeArmorBar(true);
                     }
                 }
-                if (data['s'] == 'hm') {
-                    unit.healthMax = data['hm'];
+                if (data.s == 'hm') {
+                    unit.healthMax = data.hm;
                     if (unit == ironbane.player) {
                         hudHandler.makeHealthBar(true);
                     }
                 }
-                if (data['s'] == 'am') {
-                    unit.armorMax = data['am'];
+                if (data.s == 'am') {
+                    unit.armorMax = data.am;
                     if (unit == ironbane.player) {
                         hudHandler.makeArmorBar(true);
                     }
@@ -596,14 +591,14 @@ var SocketHandler = Class.extend({
         this.socket.on('getMeleeHit', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var victim = ironbane.findUnit(data['victim']);
-            var attacker = ironbane.findUnit(data['attacker']);
+            var victim = ironbane.findUnit(data.victim);
+            var attacker = ironbane.findUnit(data.attacker);
 
-            victim.setHealth(data['h']);
+            victim.setHealth(data.h);
 
 
 
-            victim.setArmor(data['a']);
+            victim.setArmor(data.a);
 
 
 
@@ -765,13 +760,13 @@ var SocketHandler = Class.extend({
         this.socket.on('ppAddNode', function(data) {
             if (!showEditor) return;
 
-            nodeHandler.AddNode(0, data.id, ConvertVector3(data['pos']));
+            nodeHandler.AddNode(0, data.id, ConvertVector3(data.pos));
         });
 
         this.socket.on('ppAddEdge', function(data) {
             if (!showEditor) return;
 
-            nodeHandler.AddEdge(0, data['from'], data['to'], data['twoway']);
+            nodeHandler.AddEdge(0, data.from, data.to, data.twoway);
         });
 
         this.socket.on('ppDeleteNode', function(data) {
@@ -815,12 +810,14 @@ var SocketHandler = Class.extend({
                         if ( unit instanceof Fighter ) {
                             if (Math.abs(unit.object3D.position.y - unitdata.p.y) > 1) unit.object3D.position.y = unitdata.p.y;
                         }
-
-
                     }
                 }
             }
         });
+    
+
+    };
+}
 
     }
 });

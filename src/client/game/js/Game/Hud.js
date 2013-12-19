@@ -373,10 +373,10 @@ var HUDHandler = Class.extend({
                         HUD.clearInvSlot(occupied.slot);
                         HUD.fillInvSlot(response.item); // item should be updated with new "stacked" amount
                         // update playerData (todo: make class methods, like player.getLoot)
-                        socketHandler.playerData.items = _.filter(socketHandler.playerData.items, function(i) {
+                        socketHandler.getPlayerData().items = _.filter(socketHandler.getPlayerData().items, function(i) {
                             return i.slot !== occupied.slot;
                         });
-                        socketHandler.playerData.items.push(response.item);
+                        socketHandler.getPlayerData().items.push(response.item);
                         HUD.makeCoinBar(true);
 
                         if (response.loot) {
@@ -399,7 +399,7 @@ var HUDHandler = Class.extend({
                     }
 
                     if (reply.items) {
-                        socketHandler.playerData.items = reply.items;
+                        socketHandler.getPlayerData().items = reply.items;
                     }
 
                     if (reply.loot) {
@@ -460,7 +460,7 @@ var HUDHandler = Class.extend({
                 }
 
                 // success! - all items sent because gold bags will get auto adjusted
-                socketHandler.playerData.items = response.items; // todo: factor elsewhere
+                socketHandler.getPlayerData().items = response.items; // todo: factor elsewhere
                 HUD.showInv({slots: 10, items: response.items});
                 // vendor should be updated
                 HUD.clearVendorSlot(item.slot);
@@ -696,7 +696,7 @@ var HUDHandler = Class.extend({
 
                 // success! - all items sent because gold bags will get auto adjusted
                 HUD.showInv({slots: 10, items: response.items});
-                socketHandler.playerData.items = response.items;
+                socketHandler.getPlayerData().items = response.items;
                 HUD.makeCoinBar(true);
             }
         });
@@ -1129,7 +1129,7 @@ var HUDHandler = Class.extend({
     ShowHUD: function() {
         this.showInv({
             slots: 10,
-            items: socketHandler.playerData.items
+            items: socketHandler.getPlayerData().items
         });
         hudHandler.makeHealthBar(true);
         $("#coinBar").show();
