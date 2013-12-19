@@ -30,8 +30,6 @@ var WorldHandler = Class.extend({
         this.awake = false;
         this.hasLoadedWorld = false;
 
-
-
     },
     Awake: function() {
 
@@ -48,29 +46,47 @@ var WorldHandler = Class.extend({
         self.awake = true;
 
     },
-    Tick: function(dTime) {
+    /** 
+     * @method tick
+     *
+     * @param {Number} elapsed
+     * @return {Object} - A promise.
+     */
+    tick: function(elapsed) {
 
-        if (!this.hasLoadedWorld) {
-            return;
-        }
+        var deferred = Q.defer();
 
-        if (!this.awake) {
-            var hasLoadedUnits = true;
+        if (this.hasLoadedWorld) {
+    
+            if (!this.awake) {
 
-            this.LoopCells(function(cell) {
-                if (!cell.hasLoadedUnits) {
-                    hasLoadedUnits = false;
+                var hasLoadedUnits = true;
+
+                this.LoopCells(function(cell) {
+                    if (!cell.hasLoadedUnits) {
+                        hasLoadedUnits = false;
+                    }
+                });
+
+                if (hasLoadedUnits) {
+                    this.Awake();
                 }
-            });
 
-            if (hasLoadedUnits) {
-                this.Awake();
+                deferred.resolve();
+
+            } else { 
+
+               this.updateUnits(elapsed);
+
+               Snapshots.broadcast(this.getPlayers())
+                  .then(deferred.resolve.bind(deferred));
             }
-            return;
+
+        } else {
+          deferred.resolve();
         }
 
-        this.updateUnits(dTime);
-        this.sendoutSnapshots();
+        return deferred.promise; 
 
     },
     updateUnits: function(dTime) {
@@ -89,68 +105,49 @@ var WorldHandler = Class.extend({
         // console.log(unitCount + " active units, " + players + " logged in players");
 
     },
-    sendoutSnapshots: function() {
-        var snapshotCache = [];
-        var cacheCount = 0;
-        var calculatedCount = 0;
-        this.LoopUnits(function(unit) {
-            if (unit instanceof Player) {
-                var snapshot = [];
-                var otherUnits = unit.otherUnits;
-                _.each(otherUnits, function(ud) {
-                    if (ud.id !== unit.id) {
-                        if ((ud.template &&
-                            ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
-                            ud.template.type !== UnitTypeEnum.TOGGLEABLEOBSTACLE) || _.isUndefined(ud.template)) {
-                            var id = ud.id;
-                            var packet = _.find(snapshotCache, function(thePacket){
-                                return thePacket.id === ud.id;
-                            }) || {};
-                            if (_.isEmpty(packet)) {
-                                calculatedCount++;
-                                var pos = ud.position;
-                                packet.id = id;
-                                packet.p = pos.Round(2);
+    
+    /**
+     * @method getUnits
+     * @return {Array} All of the units
+     * handled by all cells in the world handler.
+     **/
+    getUnits : function() { 
+       
+       var allUnits = [];
 
-                                if (ud.standingOnUnitId) {
-                                    packet.u = ud.standingOnUnitId;
-                                    packet.p = ud.localPosition.Round(2);
-                                }
+       _.each(this.allCells, function(cell) {
+           if (!_.isUndefined(cell.units)) {
 
-                                if (!(ud instanceof Player) && (ud instanceof Fighter)) {
-                                    // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
-                                    ud.rotation.y = Math.atan2(ud.heading.z, ud.heading.x);
+               allUnits = allUnits.concat(cell.units);
 
-                                    if (ud.rotation.y < 0) {ud.rotation.y += (Math.PI * 2);}
-                                    ud.rotation.y = (Math.PI * 2) - ud.rotation.y;
-
-                                }
-
-                                if (ud.sendRotationPacketX) {
-                                    packet.rx = ud.rotation.x.Round(2);
-                                }
-                                if (ud.sendRotationPacketY) {
-                                    packet.ry = ud.rotation.y.Round(2);
-                                }
-                                if (ud.sendRotationPacketZ) {
-                                    packet.rz = ud.rotation.z.Round(2);
-                                }
-                                snapshotCache.push(packet);
-                            } else {
-                                cacheCount++;
-                                //packet = snapshotCache.id;
-                            }
-
-                            snapshot.push(packet);
-                        }
-                    }
-                });
-                if (snapshot.length > 0) {
-                    //console.log(cacheCount + " from cache, " + calculatedCount + " calculated");
-                    unit.socket.emit("snapshot", snapshot);
-                }
-            }
+          }
         });
+        return allUnits;
+    },
+    /** 
+     * @method getPlayers
+     * @return {Array} - All of the units 
+     * that are an instance of player.
+     **/
+    getPlayers : function() {
+      
+       return _.filter(this.getUnits(), function(unit) { 
+          return (unit instanceof Player);
+       });
+
+    },
+    /** 
+     * @method autoSave
+     * Auto-save all players currently managed by the world handler.
+     **/
+    autoSave : function() { 
+
+       log("Auto-saving all players...");
+            
+       this.getPlayers().forEach(function(player) {
+           player.Save();
+       });
+
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
 
@@ -224,13 +221,24 @@ var WorldHandler = Class.extend({
 
 
     },
+
+    /** 
+     * @method buildCellsArray
+     * Modifies allCells, which stores 
+     * the data contained for each cell in 
+     * the world handler. Doing so reduces 
+     * the complexity of tasks that loop
+     * over the cells in the world handler.
+     **/
     buildCellsArray: function() {
-        // TODO actually use these for ticking
+
         var me = this;
         me.allCells = [];
-        this.LoopCells(function(cell) {
+        
+        this.LoopCells(function(cell) { 
             me.allCells.push(cell);
         });
+
     },
     LoadNavigationNodes: function() {
 
@@ -362,15 +370,20 @@ var WorldHandler = Class.extend({
 
         });
     },
-    // all of these loop methods are like forEach
-    LoopUnits: function(fn) {
-        this.LoopCells(function(cell) {
-            if (!_.isUndefined(cell.units)) {
-                _.each(cell.units, function(unit) {
-                    fn(unit);
-                });
-            }
-        });
+
+    /** 
+     * @method LoopUnits
+     * Applies fn to each unit in the 
+     * world handler.
+     **/
+    LoopUnits : function(fn) {
+       this.LoopCells(function(cell) { 
+           if (!_.isUndefined(cell.units)) {
+               _.each(cell.units, function(unit) { 
+                   fn(unit);
+               });
+           }
+       }); 
     },
     LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
         this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
@@ -381,14 +394,18 @@ var WorldHandler = Class.extend({
             }
         }, offset);
     },
+    /**
+     * @method LoopCells
+     * Applieds fn to each cell in the world handler.
+     **/
     LoopCells: function(fn) {
         _.each(this.world, function(zone) {
-            _.each(zone, function(cellX) {
-                _.each(cellX, function(cellZ) {
-                    fn(cellZ);
-                });
-            });
-        });
+               _.each(zone, function(cellX) {
+                   _.each(cellX, function(cellZ) {
+                        fn(cellZ);
+                   });
+               });
+        }); 
     },
     LoopCellsNear: function(zone, cellX, cellZ, fn, offset) {
 
@@ -867,8 +884,6 @@ var WorldHandler = Class.extend({
     },
     // Only for players!!!!
     FindPlayerByName: function(name) {
-
-
 
         for (var z in worldHandler.world) {
             for (var cx in worldHandler.world[z]) {

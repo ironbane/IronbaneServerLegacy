@@ -18,7 +18,8 @@
 var path = require('path'),
     config = require('./nconf'),
     pkg = require('./package.json'),
-    log = require('util').log;
+    log = require('util').log,
+    Q = require('q');
 
 // track root path of this file, so no matter where the game is launched from we have the base for require
 global.APP_ROOT_PATH = __dirname;
@@ -75,8 +76,10 @@ var THREE = require('./src/client/game/lib/three/three.js');
 // Start MySQL - has to be here for global access below...
 var mysql = require('./src/server/db');
 
+var GameEngine = require('./src/server/game/engine');
+
 // create game server, do it first so that the other 2 "servers" can query it
-var IronbaneGame;
+var engine;
 
 // create express.io server
 var HttpServer,
@@ -199,9 +202,7 @@ var LoadActorScripts = function() {
 };
 
 function start(scripts) {
-    // create game server, do it first so that the other 2 "servers" can query it
-    IronbaneGame = require('./src/server/game');
-
+  
     // create express.io server
     HttpServer = require('./src/server/http/server').Server;
     httpServer = new HttpServer({
@@ -255,24 +256,29 @@ function start(scripts) {
     // All set! Tell WorldHandler to load
     worldHandler.LoadWorldLight();
 
-    // this replaces MainLoop, must go here since server hasn't been defined earlier...
-    IronbaneGame.on('tick', function(elapsed) {
-        // eventually we wouldn't be accessing the global var here...
-        server.Tick(elapsed);
+    // create game server, do it first so that the other 2 "servers" can query it
+    engine = new GameEngine();
+
+    engine.on('start', function() { 
+       engine.tick();
     });
+
+    // this replaces MainLoop, must go here since server hasn't been defined earlier...
+    engine.on('tick', function(elapsed) {
+        // eventually we wouldn't be accessing the global var here...
+        server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
+    });
+
+    engine.start();
+
 
     // start it up, todo: only per config?
     startREPL();
 
     setInterval(keepAlive, 10000);
 
-    setInterval(function autoSave() {
-        log("Auto-saving all players...");
-        worldHandler.LoopUnits(function(unit) {
-            if (unit instanceof Player) {
-                unit.Save();
-            }
-        });
+    setInterval(function() { 
+        worldHandler.autoSave();
     }, 60 * 1 * 1000);
 
     // Schedule an auto-restart to prevent EM readfile errors
@@ -295,6 +301,7 @@ var includes = [
     '/Engine/ConsoleHandler.js',
     '/Engine/Switch.js',
     '/Engine/SocketHandler.js',
+    '/Engine/snapshots.js',
     '/Engine/WorldHandler.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',
