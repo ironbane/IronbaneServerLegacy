@@ -69,7 +69,7 @@ var SocketHandler = Class.extend({
             });
 
             this.socket.on('say', function(data) {
-                var unit = FindUnit(data.id);
+                var unit = ironbane.findUnit(data.id);
 
                 if (unit) {
                     ironbane.getUnitList().push(new ChatBubble(unit, data.message));
@@ -305,7 +305,7 @@ var SocketHandler = Class.extend({
         this.socket.on('doJump', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
 
             unit.jump();
 
@@ -333,7 +333,7 @@ var SocketHandler = Class.extend({
         this.socket.on('toggle', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = FindUnit(data.id);
+            var unit = ironbane.findUnit(data.id);
 
             if (unit && unit instanceof ToggleableObstacle) {
                 unit.Toggle(data.on);
@@ -369,7 +369,7 @@ var SocketHandler = Class.extend({
         this.socket.on('addProjectile', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = FindUnit(data.o);
+            var unit = ironbane.findUnit(data.o);
 
             // if ( !data['p'] || _.isUndefined(ProjectileTypeEnum[data['p']]) ) ba('Bad projectile type');
 
