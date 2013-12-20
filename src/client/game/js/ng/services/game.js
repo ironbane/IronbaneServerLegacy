@@ -46,7 +46,7 @@ IronbaneApp
                 if ( this.player && this.player.id == id ) return player;
 
                 return _.find(this.getUnitList(), function(unit){
-                  return unit.id == id 
+                  return unit.id === id 
                 });
               
             };

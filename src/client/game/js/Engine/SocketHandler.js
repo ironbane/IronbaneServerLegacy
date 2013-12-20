@@ -359,7 +359,7 @@ var SocketHandler = Class.extend({
                 });
             } else if (!_.isUndefined(data.pos)) {
                 particleHandler.Add(ParticleTypeEnum[data.p], {
-                    position: ConvertVector3(data.p)
+                    position: ConvertVector3(data.pos)
                 });
             }
 
