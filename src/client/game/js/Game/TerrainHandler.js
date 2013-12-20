@@ -65,43 +65,42 @@ var TerrainHandler = Class.extend({
     // Used to freeze the player between teleports, so they don't fall down
     // because of gravity inside a terrain/mesh between teleports
     this.transitionState = transitionStateEnum.END;
-  },
-  Destroy: function() {
-    _.each(this.cells, function(cell) {
-      cell.Destroy();
-    });
+    this.Destroy = function() {
+      _.each(this.cells, function(cell) {
+        cell.Destroy();
+      });
 
-    this.cells = {};
+      this.cells = {};
 
-    this.cellOctrees = {};
+      this.cellOctrees = {};
 
-    this.zone = this.previewZone;
+      this.zone = this.previewZone;
 
-    if ( this.skybox ) this.skybox.Destroy();
+      if ( this.skybox ) this.skybox.Destroy();
 
-    this.skybox = null;
+      this.skybox = null;
 
-    particleHandler.RemoveAll();
+      particleHandler.RemoveAll();
 
-    this.terrainHandlerStatusEnum = this.DESTROYED;
-  },
-  Awake: function() {
-    // Called after everything is loaded
+      this.terrainHandlerStatusEnum = this.DESTROYED;
+    };
+    this.Awake= function() {
+      // Called after everything is loaded
 
-    this.BuildWaterMesh();
+      BuildWaterMesh();
 
-    if ( getZoneConfig("enableClouds") ) {
-      particleHandler.Add(ParticleTypeEnum.CLOUD, {});
-    }
+      if ( getZoneConfig("enableClouds") ) {
+        particleHandler.Add(ParticleTypeEnum.CLOUD, {});
+      }
 
-    var me = this;
-    this.skybox = new Skybox(function() {
-      me.status = terrainHandlerStatusEnum.LOADED;
-    });
+      var me = this;
+      this.skybox = new Skybox(function() {
+        me.status = terrainHandlerStatusEnum.LOADED;
+      });
 
 
-  },
-  BuildWaterMesh: function() {
+    };
+  var BuildWaterMesh = function() {
     if ( this.waterMesh ) {
       ironbane.scene.remove(this.waterMesh);
     }
@@ -174,13 +173,13 @@ var TerrainHandler = Class.extend({
     this.waterMesh.geometry.dynamic = true;
 
     ironbane.scene.add(this.waterMesh);
-  },
-  GetCellByWorldPosition: function(position) {
+  };
+  this.GetCellByWorldPosition = function(position) {
     var cp = WorldToCellCoordinates(position.x, position.z, cellSize);
 
     return this.GetCellByGridPosition(cp.x, cp.z);
-  },
-  GetCellByGridPosition: function(x, z) {
+  };
+  this.GetCellByGridPosition = function(x, z) {
     var id = x+'-'+z;
 
     if ( _.isUndefined(this.cells[id])) {
@@ -193,11 +192,11 @@ var TerrainHandler = Class.extend({
     }
 
     return this.cells[id];
-  },
-  GetReferenceLocation: function() {
+  };
+  this.GetReferenceLocation = function() {
     return this.GetReferenceLocationNoClone().clone();
-  },
-  GetReferenceLocationNoClone: function() {
+  };
+  this.GetReferenceLocationNoClone = function() {
     var p;
 
     if ( le("globalEnable") ) {
@@ -214,8 +213,8 @@ var TerrainHandler = Class.extend({
     }
 
     return p;
-  },
-  ChangeZone: function(newZone) {
+  };
+  this.ChangeZone = function(newZone) {
 
     if ( this.zone != newZone ) {
       this.Destroy();
@@ -233,13 +232,13 @@ var TerrainHandler = Class.extend({
       this.targetMusic = _.sample(getZoneConfig("music"));
     }
 
-  },
-  ReloadCells: function() {
+  };
+  this.ReloadCells = function() {
     _.each(this.cells, function(cell) {
       cell.Reload();
     });
-  },
-  rayTest: function(ray, options) {
+  };
+  this.rayTest= function(ray, options) {
 
     options = options || {};
 
@@ -297,8 +296,9 @@ var TerrainHandler = Class.extend({
     var billboardList = [];
 
     if ( !noMeshes ) {
-      for(var u=0;u<ironbane.unitList.length;u++) {
-        var unit = ironbane.unitList[u];
+      var units = ironbane.getUnitList();
+      for(var u=0;u<units.length;u++) {
+        var unit = units[u];
 
         if ( unit instanceof Mesh  ) {
           if ( !unit.boundingSphere ) continue;
@@ -383,8 +383,8 @@ var TerrainHandler = Class.extend({
     });
 
     return intersects;
-  },
-  RebuildOctree: function() {
+  };
+  this.RebuildOctree = function() {
     this.lastOctreeBuildPosition = terrainHandler.GetReferenceLocation();
     this.octreeResults = terrainHandler.skybox.terrainOctree
                             .search(this.lastOctreeBuildPosition, 15, true);
@@ -393,8 +393,8 @@ var TerrainHandler = Class.extend({
       this.octreeResults = this.octreeResults
         .concat(cell.octree.search(this.lastOctreeBuildPosition, 15, true));
     }, this);
-  },
-  tick: function(dTime) {
+  };
+  this.tick = function(dTime) {
 
     var p = this.GetReferenceLocation();
 
@@ -508,12 +508,13 @@ var TerrainHandler = Class.extend({
 
       this.currentMusic = this.targetMusic;
     }
-  },
-  IsLoadingCells: function() {
+  };
+  this.IsLoadingCells =  function() {
     return _.every(this.cells, function(cell) {
       return cell.status === cellStatusEnum.LOADING;
     });
-  }
+  };
+}
 });
 
 

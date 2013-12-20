@@ -38,8 +38,8 @@ var Player = Fighter.extend({
         position.y += 1;
 
         this._super(position, rotation, id, name, 0,
-            socketHandler.playerData.size, socketHandler.playerData.health, socketHandler.playerData.armor,
-            socketHandler.playerData.healthMax, socketHandler.playerData.armorMax);
+            socketHandler.getPlayerData().size, socketHandler.getPlayerData().health, socketHandler.getPlayerData().armor,
+            socketHandler.getPlayerData().healthMax, socketHandler.getPlayerData().armorMax);
         this.template = {};
         this.template.type = UnitTypeEnum.PLAYER;
 
@@ -47,7 +47,7 @@ var Player = Fighter.extend({
         this.originalThirdPersonReference = new THREE.Vector3(0, 2.5, -4);
         ironbane.camera.position.copy(position.clone().add(new THREE.Vector3(0, 1, 0)));
         this.thirdPersonReference = this.originalThirdPersonReference.clone();
-        this.targetSize = socketHandler.playerData.size;
+        this.targetSize = socketHandler.getPlayerData().size;
         this.timers.sendDataTimeout = 0.0;
         this.canMove = true;
         this.canLoot = false;
@@ -101,14 +101,14 @@ var Player = Fighter.extend({
         //console.log('getTotalCoins', socketHandler.playerData.items);
 
         // sum value of cash items in inventory
-        return _.reduce(_.pluck(_.where(socketHandler.playerData.items, {
+        return _.reduce(_.pluck(_.where(socketHandler.getPlayerData().items, {
             type: 'cash'
         }), 'value'), function(memo, num) {
             return memo + num;
         }, 0);
     },
     checkForItemsBeforeMakingImage: function() {
-        if (socketHandler.playerData.items === null) {
+        if (socketHandler.getPlayerData().items === null) {
             setTimeout(function() {
                 ironbane.player.checkForItemsBeforeMakingImage();
             }, 1000);
@@ -255,7 +255,7 @@ var Player = Fighter.extend({
     checkForLoot: function() {
         var player = this;
 
-        return _.find(ironbane.unitList, function(unit) {
+        return _.find(ironbane.getUnitList, function(unit) {
             if (unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
                 if (player.inRangeOfUnit(unit, range)) {
@@ -270,8 +270,9 @@ var Player = Fighter.extend({
 
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
-        debug.setWatch("unitlist size", ironbane.unitList ? ironbane.unitList.length : 0);
+        debug.setWatch("unitlist size", ironbane.getUnitList() ? ironbane.getUnitList().length : 0);
         debug.setWatch("bytes received",socketHandler.bytesReceived);
+
 
 
         // Check for loot bags, chests, and vendors nearby
@@ -602,7 +603,7 @@ var Player = Fighter.extend({
                     this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN;
                 } else {
 
-                    _.each(ironbane.unitList, function(u) {
+                    _.each(ironbane.getUnitList(), function(u) {
                         if (u instanceof Fighter && u != ironbane.player && u.InRangeOfPosition(point, 1) && u.id < 0 && !u.template.friendly && u.health > 0) {
                             ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
 
@@ -793,7 +794,7 @@ var Player = Fighter.extend({
                         var particle = template.particle;
                         var proj = new Projectile(player.position.clone().add(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
                         proj.velocity.add(player.velocity);
-                        ironbane.unitList.push(proj);
+                        ironbane.addUnit(proj);
                         player.swingWeapon(null, template);
                     }
 
@@ -805,10 +806,10 @@ var Player = Fighter.extend({
     },
     getItems: function() {
         // helper because my items are located in socketHandler for some reason
-        return socketHandler.playerData.items;
+        return socketHandler.getPlayerData().items;
     },
     removeItem: function(item) {
-        socketHandler.playerData.items = _.without(socketHandler.playerData.items, item);
+        socketHandler.getPlayerData().items = _.without(socketHandler.getPlayerData().items, item);
         hudHandler.clearInvSlot(item.slot);
     },
     // drop item on the ground
@@ -946,9 +947,9 @@ var Player = Fighter.extend({
         var player = this,
             special;
 
-        player.appearance.skin = socketHandler.playerData.skin;
-        player.appearance.eyes = socketHandler.playerData.eyes;
-        player.appearance.hair = socketHandler.playerData.hair;
+        player.appearance.skin = socketHandler.getPlayerData().skin;
+        player.appearance.eyes = socketHandler.getPlayerData().eyes;
+        player.appearance.hair = socketHandler.getPlayerData().hair;
         player.appearance.head = 0;
         player.appearance.body = 0;
         player.appearance.feet = 0;

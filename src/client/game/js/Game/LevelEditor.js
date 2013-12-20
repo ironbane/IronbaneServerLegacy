@@ -327,7 +327,7 @@ var EditorGUI = function() {
   this.npcParam = 0;
 
 
-  this.tpPlayerName = socketHandler.playerData.name;
+  this.tpPlayerName = socketHandler.getPlayerData().name;
   this.tpZone = terrainHandler.zone;
   this.tpTargetPosX = 0;
   this.tpTargetPosY = 0;
