@@ -29,27 +29,15 @@ IronbaneApp
             this.projector = null;
             this.player = null;
             this.newLevelEditor = null;
-            var unitList = [];
+            var unitList = new UnitList();
             this.getUnitList = function(){
                 return unitList;
             };
-            this.removeUnit = function(unit){
-                unitList = _.without(unitList, unit);
-            };
+            
             this.addUnit = function(unit){
                 unitList.push(unit);
             };
-            this.findUnit = function(id){
-
-                if ( !id ) return null;
-
-                if ( this.player && this.player.id == id ) return player;
-
-                return _.find(this.getUnitList(), function(unit){
-                  return unit.id === id 
-                });
-              
-            };
+            
             this.clearUnits = function(){
                 unitList = [];
             };

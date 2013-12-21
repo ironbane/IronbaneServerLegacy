@@ -166,7 +166,7 @@ var Cell = Class.extend({
         _.each(this.objects, function(object) {
             object.Destroy();
             // Remove from unitList
-            ironbane.unitList = _.without(ironbane.unitList, object);
+            ironbane.getUnitList().removeUnit(object);
         });
 
         this.objects = [];
@@ -178,7 +178,7 @@ var Cell = Class.extend({
             if ( object instanceof Waypoint) {
                 object.Destroy();
                 // Remove from unitList
-                ironbane.unitList = _.without(ironbane.unitList, object);
+                ironbane.getUnitList().removeUnit(object);
                 this.objects = _.without(this.objects, object);
             }
         }, this);
@@ -193,7 +193,7 @@ var Cell = Class.extend({
             this.objects[o].Destroy();
             // Remove from unitList
         }
-        ironbane.unitList = _.difference(ironbane.unitList, this.objects);
+        ironbane.getUnitList().removeUnits(this.objects);
 
         this.ClearWaypoints();
 
@@ -260,7 +260,7 @@ var Cell = Class.extend({
                 unit.canSelectWithEditor = true;
 
                 if ( unit ) {
-                    ironbane.getUnitList().push(unit);
+                    ironbane.getUnitList().addUnit(unit);
                     this.objects.push(unit);
                 }
 
