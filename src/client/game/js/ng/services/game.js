@@ -34,13 +34,7 @@ IronbaneApp
                 return unitList;
             };
             
-            this.addUnit = function(unit){
-                unitList.push(unit);
-            };
             
-            this.clearUnits = function(){
-                unitList = [];
-            };
             this.showingGame = false;
 
             this.loadingMessages = _.shuffle([
