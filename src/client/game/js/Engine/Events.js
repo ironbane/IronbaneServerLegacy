@@ -89,11 +89,9 @@ $(document).keydown(function(event) {
 
                         socketHandler.readyToReceiveUnits = false;
 
-                        for (var u = 0; u < ironbane.unitList.length; u++) {
-                            ironbane.unitList[u].Destroy();
-                        }
+                        ironbane.getUnitList().destroy();
 
-                        ironbane.unitList = [];
+                        ironbane.getUnitList().clear();
 
                         terrainHandler.Destroy();
 
@@ -225,22 +223,16 @@ var mouseClickFunction = function(event) {
                 var position = currentMouseToWorldData.point;
 
                 // Find an object near that position which could be a waypoint
-                var npc = null;
-
-                _.each(ironbane.unitList, function(obj) {
-
-
+                var npc = ironbane.getUnitList().findUnit(function(obj) {
                     if (obj.InRangeOfPosition(position, 1) && ((obj instanceof Unit) && obj.id < 0)) {
-                        npc = obj;
+                        return obj;
                     }
-
-
                 });
 
                 if (npc) {
                     socketHandler.socket.emit('deleteNPC', npc.id);
                 } else {
-                    _.each(ironbane.unitList, function(unit) {
+                    ironbane.getUnitList().iterate(function(unit) {
 
                         if (unit.id < 0) {
 
@@ -258,7 +250,7 @@ var mouseClickFunction = function(event) {
 
         }
     }
-}
+};
 
 var mouseIntervalFunction = function(event) {
 

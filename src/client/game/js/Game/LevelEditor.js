@@ -1085,7 +1085,7 @@ var LevelEditor = Class.extend({
     unit.dynamic = true;
 
     if ( unit ) {
-      ironbane.unitList.push(unit);
+      ironbane.getUnitList().addUnit(unit);
       terrainHandler.GetCellByWorldPosition(position).objects.push(unit);
     }
     else {

@@ -83,10 +83,7 @@ var SocketHandler = Class.extend({
 
                 socketHandler.socket.disconnect();
 
-                var units = ironbane.getUnitList();
-                for (var u = 0; u < units.length; u++){
-                  units[u].Destroy();  
-                } 
+                ironbane.getUnitList().destroy();
 
                 ironbane.getUnitList().clear();
 
@@ -299,7 +296,7 @@ var SocketHandler = Class.extend({
                     }
                 }
 
-                ironbane.getUnitList().push(unit);
+                ironbane.getUnitList().addUnit(unit);
             }
         });
         this.socket.on('doJump', function(data) {
@@ -741,6 +738,7 @@ var SocketHandler = Class.extend({
             });
 
             if (!le("globalEnable")) {
+                console.log("deleting model");
                 terrainHandler.GetCellByWorldPosition(pos).Reload();
             }
 

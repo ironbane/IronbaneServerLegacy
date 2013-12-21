@@ -398,7 +398,7 @@ IronbaneApp
         socket.on('snapshot', function(snapshot) {
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
-                var unit = FindUnit(unitdata.id);
+                var unit = ironbane.getUnitList.findUnit(unitdata.id);
                 if (unit) {
                     if (unit !== ironbane.player) {
                         if (angular.isDefined(unitdata.p)) {

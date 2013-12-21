@@ -42,7 +42,8 @@ var Sign = Mesh.extend({
 
   },
   BuildMesh: function(geometry, jsonMaterials) {
-
+    console.log("building mesh for sign ");
+    console.log(this);
     this._super(geometry, jsonMaterials);
 
 

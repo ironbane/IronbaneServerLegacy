@@ -27,6 +27,7 @@ var Cell = Class.extend({
 
         this.cellX = cellX;
         this.cellZ = cellZ;
+        console.log("making: " + cellX + "," + cellZ);
 
         var tempVec = CellToWorldCoordinates(this.cellX, this.cellZ, cellSize);
         this.worldPosition = new THREE.Vector3(tempVec.x, 0, tempVec.z);

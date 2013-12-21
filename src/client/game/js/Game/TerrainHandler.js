@@ -175,6 +175,7 @@ var TerrainHandler = Class.extend({
     ironbane.scene.add(this.waterMesh);
   };
   this.GetCellByWorldPosition = function(position) {
+    console.log(position);
     var cp = WorldToCellCoordinates(position.x, position.z, cellSize);
 
     return this.GetCellByGridPosition(cp.x, cp.z);
@@ -183,6 +184,8 @@ var TerrainHandler = Class.extend({
     var id = x+'-'+z;
 
     if ( _.isUndefined(this.cells[id])) {
+      console.log(this.cells);
+      console.log(x + ","+z);
       this.cells[id] = new Cell(x, z);
     }
 
@@ -296,28 +299,24 @@ var TerrainHandler = Class.extend({
     var billboardList = [];
 
     if ( !noMeshes ) {
-      var units = ironbane.getUnitList();
-      for(var u=0;u<units.length;u++) {
-        var unit = units[u];
-
+      ironbane.getUnitList().iterate(function(unit){
+      
         if ( unit instanceof Mesh  ) {
-          if ( !unit.boundingSphere ) continue;
-
-          if ( unit.InRangeOfPosition(testMeshesNearPosition, unit.boundingSphere.radius+extraRange) ) {
-            meshList.push(unit);
+          if ( unit.boundingSphere ){
+            if ( unit.InRangeOfPosition(testMeshesNearPosition, unit.boundingSphere.radius+extraRange) ) {
+              meshList.push(unit);
+            }
           }
         }
 
         if ( allowBillboards ) {
           if ( unit instanceof Billboard || unit instanceof Fighter  ) {
-
-            if ( unit instanceof Fighter && unit.health <= 0 ) continue;
-
-            billboardList.push(unit.mesh);
+            if (!( unit instanceof Fighter && unit.health <= 0 )){
+              billboardList.push(unit.mesh);
+            }
           }
         }
-
-      }
+      });
     }
 
 

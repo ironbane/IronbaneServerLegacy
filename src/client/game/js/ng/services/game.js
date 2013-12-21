@@ -241,9 +241,7 @@ IronbaneApp
 
                 $window.particleHandler.tick(dTime);
 
-                for (var x = 0; x < unitList.length; x++) {
-                    unitList[x].tick(dTime);
-                }
+                this.getUnitList().tick(dTime);
 
                 if ( game.player ) {
                     if ( le("globalEnable") && game.newLevelEditor ) {

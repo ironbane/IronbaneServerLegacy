@@ -468,12 +468,13 @@ var Projectile = Unit.extend({
 
                     var list = [];
                     var unitList = [];
-                    _.each(ironbane.unitList, function(u) {
-                        if (u instanceof Fighter && u != ironbane.player && this.inRangeOfUnit(u, 1) && u.health > 0 && (u.id < 0 || (u.isPlayer() && this.weapon.attr1 <= 0)) && (u.isPlayer() || !u.template.friendly)) {
+                    var me = this;
+                    ironbane.getUnitList().iterate(function(u) {
+                        if (u instanceof Fighter && u != ironbane.player && me.inRangeOfUnit(u, 1) && u.health > 0 && (u.id < 0 || (u.isPlayer() && me.weapon.attr1 <= 0)) && (u.isPlayer() || !u.template.friendly)) {
                             list.push(u.id);
-                            unitList.push(u);
+                            //unitList.push(u);
                         }
-                    }, this);
+                    });
 
                     if (list.length > 0) {
                         socketHandler.socket.emit('hit', {
