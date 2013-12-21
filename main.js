@@ -302,6 +302,7 @@ var includes = [
     '/Engine/Switch.js',
     '/Engine/SocketHandler.js',
     '/Engine/snapshots.js',
+    '/Engine/zones.js',
     '/Engine/WorldHandler.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',

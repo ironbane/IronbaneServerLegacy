@@ -374,6 +374,7 @@ var Unit = Class.extend({
     return spawn;
   },
   ChangeCell: function(newCellX, newCellZ) {
+
     // Make sure we generate adjacent cells if they don't exist
     var cx = this.cellX;
     var cz = this.cellZ;
@@ -384,6 +385,7 @@ var Unit = Class.extend({
       x: newCellX,
       z: newCellZ
     };
+
     if (cellPos.x != this.cellX || cellPos.z != this.cellZ) {
 
 
@@ -417,6 +419,7 @@ var Unit = Class.extend({
       }
 
       var cellsToRecalculate = [];
+
       // Build two lists, and recalculate all units inside that are not in both lists at the same time
       var firstList = [];
       var secondList = [];
@@ -466,6 +469,8 @@ var Unit = Class.extend({
           }
         }
       });
+
+
       this.cellX = cellPos.x;
       this.cellZ = cellPos.z;
 
