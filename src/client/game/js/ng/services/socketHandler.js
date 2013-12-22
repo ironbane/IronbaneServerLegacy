@@ -33,16 +33,14 @@ IronbaneApp
             var unit = FindUnit(data.id);
 
             if (unit) {
-                ironbane.unitList.push(new ChatBubble(unit, data.message));
+                ironbane.getUnitList().addUnit(new ChatBubble(unit, data.message));
             }
         });
 
         socket.on('disconnect', function() {
             //socketHandler.socket.disconnect();
-            for (var u = 0; u < ironbane.unitList.length; u++) {
-                ironbane.unitList[u].Destroy();
-            }
-            ironbane.unitList = [];
+            
+            ironbane.getUnitList().destroy();
             terrainHandler.Destroy();
             ironbane.player = null;
             //socketHandler.loggedIn = false;
@@ -106,7 +104,7 @@ IronbaneApp
             var particle = new Projectile(ConvertVector3(data.s), target, unit, data.w);
             particle.velocity.add(unit.fakeVelocity);
 
-            ironbane.unitList.push(particle);
+            ironbane.getUnitList().addUnit(particle);
         });
 
         socket.on('updateClothes', function(data) {
@@ -263,14 +261,8 @@ IronbaneApp
         });
 
         socket.on('removeUnit', function(data) {
-            // Remove the unit from the list
-            for (var i = 0; i < ironbane.unitList.length; i++) {
-                if (ironbane.unitList[i].id === data.id) {
-                    ironbane.unitList[i].Destroy();
-                    ironbane.unitList.splice(i, 1);
-                    break;
-                }
-            }
+            
+            ironbane.getUnitList().removeUnit({id:data.id});
         });
 
         socket.on('addModel', function(data) {
@@ -327,7 +319,7 @@ IronbaneApp
 
                             setTimeout(function() {
                                 var unit = new Mesh(ConvertVector3(data.pos), rotation, 0, param, data.metadata);
-                                ironbane.unitList.push(unit);
+                                ironbane.getUnitList().addUnit(unit);
                                 cell.objects.push(unit);
                             }, 1);
                         }
@@ -406,7 +398,7 @@ IronbaneApp
         socket.on('snapshot', function(snapshot) {
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
-                var unit = FindUnit(unitdata.id);
+                var unit = ironbane.getUnitList.findUnit(unitdata.id);
                 if (unit) {
                     if (unit !== ironbane.player) {
                         if (angular.isDefined(unitdata.p)) {

@@ -29,30 +29,12 @@ IronbaneApp
             this.projector = null;
             this.player = null;
             this.newLevelEditor = null;
-            var unitList = [];
+            var unitList = new UnitList();
             this.getUnitList = function(){
                 return unitList;
             };
-            this.removeUnit = function(unit){
-                unitList = _.without(unitList, unit);
-            };
-            this.addUnit = function(unit){
-                unitList.push(unit);
-            };
-            this.findUnit = function(id){
-
-                if ( !id ) return null;
-
-                if ( this.player && this.player.id == id ) return this.player;
-
-                return _.find(this.getUnitList(), function(unit){
-                  return unit.id === id 
-                });
-              
-            };
-            this.clearUnits = function(){
-                unitList = [];
-            };
+            
+            
             this.showingGame = false;
 
             this.loadingMessages = _.shuffle([
@@ -259,9 +241,7 @@ IronbaneApp
 
                 $window.particleHandler.tick(dTime);
 
-                for (var x = 0; x < unitList.length; x++) {
-                    unitList[x].tick(dTime);
-                }
+                this.getUnitList().tick(dTime);
 
                 if ( game.player ) {
                     if ( le("globalEnable") && game.newLevelEditor ) {

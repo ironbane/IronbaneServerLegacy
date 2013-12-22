@@ -35,19 +35,6 @@ var ChatBubble = PhysicsObject.extend({
 
         this.size = 1.0;
 
-
-        // Check and set lifetime of older bubbles
-//        var count = 0;
-//        for(var x=ironbane.unitList.length;x>=0;x--){
-//            var unit = ironbane.unitList[x];
-//
-//            if ( !(unit instanceof ChatBubble) ) continue;
-//            if ( unit == this ) break;
-//
-//            if ( unit.unit == this.unit ) { count++; }
-//
-//        }
-
     },
     MakeTextMesh: function(text) {
 
@@ -107,7 +94,7 @@ var ChatBubble = PhysicsObject.extend({
     },
     Destroy: function() {
 
-        ironbane.unitList = _.without(ironbane.unitList, this);
+        ironbane.getUnitList().removeUnit(this);
 
         if ( this.textMesh ) {
             ironbane.scene.remove(this.textMesh);
@@ -116,17 +103,12 @@ var ChatBubble = PhysicsObject.extend({
     },
     tick: function(dTime) {
         // Count the amount of bubbles that are on top of the player
-        var count = 0;
-        for(var x=ironbane.unitList.length;x>=0;x--){
-            var unit = ironbane.unitList[x];
+        var me = this;
+        var count = ironbane.getUnitList().findUnits(function(unit){
+            return unit instanceof ChatBubble && unit != me && unit.unit == me.unit; 
+        }).length;
 
-            if ( !(unit instanceof ChatBubble) ) continue;
-            if ( unit == this ) break;
-
-            if ( unit.unit == this.unit ) { count++; }
-
-
-        }
+          
         var offset = ((this.unit == ironbane.player || this.unit.id < 0) ? 1.5 : 2.0) + (count * 0.6);
 
         this.object3D.position = this.unit.position.clone().add(new THREE.Vector3(0, offset, 0));

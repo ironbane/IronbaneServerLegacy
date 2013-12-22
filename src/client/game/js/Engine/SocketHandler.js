@@ -69,10 +69,10 @@ var SocketHandler = Class.extend({
             });
 
             this.socket.on('say', function(data) {
-                var unit = ironbane.findUnit(data.id);
+                var unit = ironbane.getUnitList().findUnit(data.id);
 
                 if (unit) {
-                    ironbane.getUnitList().push(new ChatBubble(unit, data.message));
+                    ironbane.getUnitList().addUnit(new ChatBubble(unit, data.message));
                 }
             });
 
@@ -83,12 +83,9 @@ var SocketHandler = Class.extend({
 
                 socketHandler.socket.disconnect();
 
-                var units = ironbane.getUnitList();
-                for (var u = 0; u < units.length; u++){
-                  units[u].Destroy();  
-                } 
+                ironbane.getUnitList().destroy();
 
-                ironbane.clearUnits();
+                ironbane.getUnitList().clear();
 
                 terrainHandler.Destroy();
 
@@ -299,13 +296,13 @@ var SocketHandler = Class.extend({
                     }
                 }
 
-                ironbane.getUnitList().push(unit);
+                ironbane.getUnitList().addUnit(unit);
             }
         });
         this.socket.on('doJump', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
 
             unit.jump();
 
@@ -333,7 +330,7 @@ var SocketHandler = Class.extend({
         this.socket.on('toggle', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
 
             if (unit && unit instanceof ToggleableObstacle) {
                 unit.Toggle(data.on);
@@ -348,12 +345,12 @@ var SocketHandler = Class.extend({
 
 
             if (!_.isUndefined(data.fu)) {
-                var unit = ironbane.findUnit(data.fu);
+                var unit = ironbane.getUnitList().findUnit(data.fu);
                 particleHandler.Add(ParticleTypeEnum[data.p], {
                     followUnit: unit
                 });
             } else if (!_.isUndefined(data.pfu)) {
-                var unit = ironbane.findUnit(data.pfu);
+                var unit = ironbane.getUnitList().findUnit(data.pfu);
                 particleHandler.Add(ParticleTypeEnum[data.p], {
                     particleFollowUnit: unit
                 });
@@ -369,7 +366,7 @@ var SocketHandler = Class.extend({
         this.socket.on('addProjectile', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var unit = ironbane.findUnit(data.o);
+            var unit = ironbane.getUnitList().findUnit(data.o);
 
             // if ( !data['p'] || _.isUndefined(ProjectileTypeEnum[data['p']]) ) ba('Bad projectile type');
 
@@ -395,11 +392,11 @@ var SocketHandler = Class.extend({
 
 
 
-            ironbane.getUnitList().push(particle);
+            ironbane.getUnitList().addUnit(particle);
         });
 
         this.socket.on('updateClothes', function(data) {
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
 
             console.log('updateClothes!', data);
 
@@ -415,7 +412,7 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('updateWeapon', function(data) {
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
             unit.updateWeapon(data.weapon);
         });
 
@@ -459,7 +456,7 @@ var SocketHandler = Class.extend({
         });
 
         this.socket.on('respawn', function(data) {
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
 
             if (unit) {
                 unit.health = data.h;
@@ -523,7 +520,7 @@ var SocketHandler = Class.extend({
         // });
 
         this.socket.on('setStat', function(data) {
-            var unit = ironbane.findUnit(data.id);
+            var unit = ironbane.getUnitList().findUnit(data.id);
 
             if (unit) {
                 if (data.s == 'h') {
@@ -591,17 +588,11 @@ var SocketHandler = Class.extend({
         this.socket.on('getMeleeHit', function(data) {
             //if ( !socketHandler.loggedIn ) return;
 
-            var victim = ironbane.findUnit(data.victim);
-            var attacker = ironbane.findUnit(data.attacker);
+            var victim = ironbane.getUnitList().findUnit(data.victim);
+            var attacker = ironbane.getUnitList().findUnit(data.attacker);
 
             victim.setHealth(data.h);
-
-
-
             victim.setArmor(data.a);
-
-
-
             victim.GetMeleeHit(attacker);
 
 
@@ -747,6 +738,7 @@ var SocketHandler = Class.extend({
             });
 
             if (!le("globalEnable")) {
+                console.log("deleting model");
                 terrainHandler.GetCellByWorldPosition(pos).Reload();
             }
 
@@ -781,7 +773,7 @@ var SocketHandler = Class.extend({
             socketHandler.bytesReceived += 2 * snapshot.length;
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
-                var unit = ironbane.findUnit(unitdata.id);
+                var unit = ironbane.getUnitList().findUnit(unitdata.id);
                 if (unit) {
                     if (unit != ironbane.player) {
 
@@ -801,7 +793,7 @@ var SocketHandler = Class.extend({
                         if (!_.isUndefined(unitdata.rz)) unit.targetRotation.z = unitdata.rz;
 
                         if (!_.isUndefined(unitdata.u)) {
-                            unit.unitStandingOn = ironbane.findUnit(unitdata.u);
+                            unit.unitStandingOn = ironbane.getUnitList().findUnit(unitdata.u);
                         } else {
                             unit.unitStandingOn = null;
                         }

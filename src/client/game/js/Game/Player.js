@@ -255,7 +255,7 @@ var Player = Fighter.extend({
     checkForLoot: function() {
         var player = this;
 
-        return _.find(ironbane.getUnitList, function(unit) {
+        return ironbane.getUnitList().findUnit(function(unit) {
             if (unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
                 if (player.inRangeOfUnit(unit, range)) {
@@ -270,7 +270,7 @@ var Player = Fighter.extend({
 
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
-        debug.setWatch("unitlist size", ironbane.getUnitList() ? ironbane.getUnitList().length : 0);
+        debug.setWatch("unitlist size", ironbane.getUnitList().size() ? ironbane.getUnitList().size() : 0);
         debug.setWatch("bytes received",socketHandler.bytesReceived);
 
 
@@ -603,13 +603,11 @@ var Player = Fighter.extend({
                     this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN;
                 } else {
 
-                    _.each(ironbane.getUnitList(), function(u) {
+                    ironbane.getUnitList().iterate(function(u) {
                         if (u instanceof Fighter && u != ironbane.player && u.InRangeOfPosition(point, 1) && u.id < 0 && !u.template.friendly && u.health > 0) {
                             ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
-
                         }
                     });
-
                 }
 
                 if (this.timers.attackTimeout > 0.5) {
@@ -794,7 +792,7 @@ var Player = Fighter.extend({
                         var particle = template.particle;
                         var proj = new Projectile(player.position.clone().add(player.side.clone().multiplyScalar(0.4)), position.clone(), player);
                         proj.velocity.add(player.velocity);
-                        ironbane.addUnit(proj);
+                        ironbane.getUnitList().addUnit(proj);
                         player.swingWeapon(null, template);
                     }
 

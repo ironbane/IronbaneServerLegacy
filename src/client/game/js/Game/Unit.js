@@ -249,7 +249,7 @@ var Unit = PhysicsObject.extend({
     }
   },
   fullDestroy: function() {
-    ironbane.unitList = _.without(ironbane.unitList, this);
+    ironbane.getUnitList().removeUnit(this);
     this.Destroy();
   },
   Destroy: function() {
