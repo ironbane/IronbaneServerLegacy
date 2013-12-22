@@ -603,13 +603,11 @@ var Player = Fighter.extend({
                     this.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_FORBIDDEN;
                 } else {
 
-                    _.each(ironbane.getUnitList().iterate(function(u) {
+                    ironbane.getUnitList().iterate(function(u) {
                         if (u instanceof Fighter && u != ironbane.player && u.InRangeOfPosition(point, 1) && u.id < 0 && !u.template.friendly && u.health > 0) {
                             ironbane.player.targetAimTexture = AimTextures.TARGET_AIM_TEXTURE_CLOSE;
-
                         }
-                    }));
-
+                    });
                 }
 
                 if (this.timers.attackTimeout > 0.5) {
