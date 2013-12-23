@@ -1779,18 +1779,13 @@ var SocketHandler = Class.extend({
                 var cx = unit.cellX;
                 var cz = unit.cellZ;
 
-                worldHandler.world[zone][cx][cz].units =
-                    _.without(worldHandler.world[zone][cx][cz].units, unit);
+                worldHandler.removeUnitFromCell(unit, cx, cz);
 
-                worldHandler.LoopUnitsNear(zone, cx, cz, function(unit) {
-                    unit.UpdateOtherUnitsList();
-                });
+                worldHandler.UpdateNearbyUnitsOtherUnitsLists(zone, cx, cz);
 
-                mysql.query('DELETE FROM ib_units WHERE ?',
-                {
+                mysql.query('DELETE FROM ib_units WHERE ?', {
                     id:-id
-                },
-                function (err, result) {
+                }, function (err, result) {
                     if ( err ) throw(err);
                 });
 
@@ -1830,35 +1825,25 @@ var SocketHandler = Class.extend({
                 var zone = socket.unit.zone;
                 var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
 
-                if (_.isUndefined(worldHandler.world[zone])) {
-                    return;
-                }
+                if(worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) { 
 
-                if (_.isUndefined(worldHandler.world[zone][cellPos.x])) {
-                    return;
-                }
+                    data.x = data.position.x;
+                    data.y = data.position.y;
+                    data.z = data.position.z;
+                    data.zone = zone;
 
-                if (_.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z])) {
-                    return;
-                }
+                    if (_.isUndefined(data.param)) {
+                        data.param = 0;
+                    }
+                    data.param = parseInt(data.param, 10);
 
-                data.x = data.position.x;
-                data.y = data.position.y;
-                data.z = data.position.z;
-                data.zone = zone;
+                    if (_.isUndefined(data.data)) {
+                        data.data = null;
+                    }
 
-                if (_.isUndefined(data.param)) {
-                    data.param = 0;
-                }
-                data.param = parseInt(data.param, 10);
+                    data.id = -server.GetAValidNPCID();
 
-                if (_.isUndefined(data.data)) {
-                    data.data = null;
-                }
-
-                data.id = -server.GetAValidNPCID();
-
-                mysql.query('INSERT INTO ib_units SET ?', {
+                    mysql.query('INSERT INTO ib_units SET ?', {
                         id: data.id,
                         zone: data.zone,
                         x: data.x,
@@ -1879,6 +1864,8 @@ var SocketHandler = Class.extend({
                             unit.Awake();
                         }
                     });
+
+                }
             });
 
             socket.on("moveNPC", function (data) {
@@ -1897,23 +1884,23 @@ var SocketHandler = Class.extend({
 
                 var cellPos = WorldToCellCoordinates(data.position.x, data.position.z, cellSize);
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                if(worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) { 
 
-                mysql.query('UPDATE ib_units SET'+
-                    ' x = ?,'+
-                    ' y = ?,'+
-                    ' z = ?'+
-                    ' WHERE id = ?',
-                [
-                    data.position.x,
-                    data.position.y,
-                    data.position.z,
-                    Math.abs(unit.id)
-                ]);
+                    mysql.query('UPDATE ib_units SET'+
+                        ' x = ?,'+
+                        ' y = ?,'+
+                        ' z = ?'+
+                        ' WHERE id = ?',
+                        [
+                        data.position.x,
+                        data.position.y,
+                        data.position.z,
+                        Math.abs(unit.id)
+                        ]);
 
-                unit.position.copy(data.position);
+                    unit.position.copy(data.position);
+                
+                }
 
             });
 
@@ -1921,11 +1908,8 @@ var SocketHandler = Class.extend({
 
                 //data.pos, data.metadata;
 
-
-
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
-
 
 
                 var pos = ConvertVector3(data.pos);
@@ -1935,48 +1919,42 @@ var SocketHandler = Class.extend({
 
                 var cellPos = WorldToCellCoordinates(pos.x, pos.z, cellSize);
 
+                if(worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) { 
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                    pushData = JSON.parse(JSON.stringify(data));
 
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer) ) {
-                    worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer = [];
+                    if ( data.global ) {
+                        pushData.metadata = {};
+                    }
+
+                    worldHandler.emitChangeObject(zone, cellPos.x, cellPos.z, pushData);
+                    
+                    // Parse to make sure the reference doesn't get updated afterwards
+                    // (no more tiles/... saved)
+                    // data = JSON.parse(JSON.stringify(data));
+
+
+                    worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
+
+                    if ( data.global ) {
+
+                        _.each(data.metadata, function(value, key, list) {
+                            mysql.query('UPDATE ib_meshes SET '+key+' = ? WHERE id = ?', ["tiles/"+value,data.id]);
+
+                            data.metadata[key] = "tiles/"+value;
+                        });
+
+
+                        chatHandler.announcePersonally(socket.unit,
+                                "The server needs to restart before you will see that texture change applied to all models!.", "cyan");
+                    }
+
+
+
+                    socket.unit.EmitNearby("paintModel", data, 0, true);
                 }
 
 
-                pushData = JSON.parse(JSON.stringify(data));
-
-                if ( data.global ) {
-                    pushData.metadata = {};
-                }
-
-                worldHandler.world[zone][cellPos.x][cellPos.z].changeBuffer.push(pushData);
-
-
-
-                // Parse to make sure the reference doesn't get updated afterwards
-                // (no more tiles/... saved)
-                // data = JSON.parse(JSON.stringify(data));
-
-
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-
-                if ( data.global ) {
-                    _.each(data.metadata, function(value, key, list) {
-                        mysql.query('UPDATE ib_meshes SET '+key+' = ? WHERE id = ?', ["tiles/"+value,data.id]);
-
-                        data.metadata[key] = "tiles/"+value;
-                    });
-
-
-                    chatHandler.announcePersonally(socket.unit,
-                        "The server needs to restart before you will see that texture change applied to all models!.", "cyan");
-                }
-
-
-
-                socket.unit.EmitNearby("paintModel", data, 0, true);
 
             });
 
@@ -1994,30 +1972,24 @@ var SocketHandler = Class.extend({
                 data = ConvertVector3(data);
                 data = data.Round(2);
 
-
                 var zone = socket.unit.zone;
 
                 var cellPos = WorldToCellCoordinates(data.x, data.z, cellSize);
 
+                if(worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) { 
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                    worldHandler.emitDeleteObject(zone, cellPos.x, cellPos.z, data);
+
+                    // Set a timer to auto save this cell
+                    // If we set the height again, reset the timer
+                    worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
 
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer) ) {
-                    worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer = [];
+                    socket.unit.EmitNearby("deleteModel", data, 0, true);
+
+                    reply(true);
+
                 }
-                worldHandler.world[zone][cellPos.x][cellPos.z].deleteBuffer.push(data);
-
-                // Set a timer to auto save this cell
-                // If we set the height again, reset the timer
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-
-
-                socket.unit.EmitNearby("deleteModel", data, 0, true);
-
-                reply(true);
             });
 
             socket.on("addModel", function (data, reply) {
@@ -2040,29 +2012,29 @@ var SocketHandler = Class.extend({
                 if ( !worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z) ) {
                     worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
                 }
+                
+                if( worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z) ) { 
 
-                if ( _.isUndefined(worldHandler.world[zone]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x]) ) return;
-                if ( _.isUndefined(worldHandler.world[zone][cellPos.x][cellPos.z]) ) return;
+                    // Just add the object, and save it. Clients should automatically add it
+                    worldHandler.addObject(zone, cellPos.x, cellPos.z, {
+                        x:data.position.x,
+                        y:data.position.y,
+                        z:data.position.z,
+                        t:data.type,
+                        p:data.param,
+                        rX:data.rX,
+                        rY:data.rY,
+                        rZ:data.rZ
+                    });
 
-                // Just add the object, and save it. Clients should automatically add it
-                worldHandler.world[zone][cellPos.x][cellPos.z].objects.push({
-                    x:data.position.x,
-                    y:data.position.y,
-                    z:data.position.z,
-                    t:data.type,
-                    p:data.param,
-                    rX:data.rX,
-                    rY:data.rY,
-                    rZ:data.rZ
-                });
+                    // Save directly
+                    worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
 
-                // Save directly
-                worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
+                    socket.unit.EmitNearby("addModel", data, 0, true);
 
-                socket.unit.EmitNearby("addModel", data, 0, true);
+                    reply(true);
 
-                reply(true);
+                }
             });
 
             socket.on("disconnect", function (data) {

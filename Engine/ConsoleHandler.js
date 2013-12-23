@@ -137,32 +137,24 @@ var ConsoleHandler = Class.extend({
 
     this.AddCommand(this.AccessLevel.GUEST, ["items"], "Log variable", "string", "", function (params) {
 
-      for(var z in worldHandler.world) {
-        for(var cx in worldHandler.world[z]) {
-          for(var cz in worldHandler.world[z][cx]) {
-            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+      _.each(worldHandler.getNPCs(), function(unit) {
 
-              var units = worldHandler.world[z][cx][cz].units;
+         if(!_.isUndefined(unit.loot)) {
 
-              for(var u=0;u<units.length;u++) {
+             log('Loot of ' + unit.template.name);
+             console.log(unit.loot);
 
-                if ( units[u] instanceof Player ) {
-                  log("Items of "+units[u].name+":");
-                  console.log(units[u].items);
-                }
-                else {
-                  if ( !_.isUndefined(units[u].loot) ) {
-                    log("Loot of "+units[u].template.name+":");
-                    console.log(units[u].loot);
-                  }
-                }
+         }
 
+      });
 
-              }
-            }
-          }
-        }
-      }
+      _.each(worldHandler.getPlayers(), function(unit) {
+
+         log('Items of ' + unit.name);
+         console.log(unit.items);
+
+      });
+
 
     });
 
@@ -251,33 +243,36 @@ var ConsoleHandler = Class.extend({
         log(""+count+": "+(sockets[s].unit?"Unit attached":"No unit attached")+"");
       }
 
-      var zonesLoaded = 0;
-      var cellsLoaded = 0;
-      var unitsLoaded = 0;
+      var zonesLoaded = [];
+      var cellCoordsLoaded = [];
+      var unitsLength = 0;
+    
 
+      _.each(worldHandler.getUnits(), function(unit) { 
 
-      for(var z in worldHandler.world) {
-        zonesLoaded++;
-        for(var cx in worldHandler.world[z]) {
-          for(var cz in worldHandler.world[z][cx]) {
-            cellsLoaded++;
-            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+           var cellCoords = WorldToCellCoordinates(unit.position.x, unit.position.z, cellSize);
+          
+           log("Unit found in zone " + unit.zone + " (" + cellCoords.x + ", " + cellCoords.z + ")");
 
-              var units = worldHandler.world[z][cx][cz].units;
+           zonesLoaded = _.union(zonesLoaded, [unit.zone]);
 
-              for(var u=0;u<units.length;u++) {
-                log("Unit found in zone "+cz+" ("+cx+", "+cz+")");
-                unitsLoaded++;
-              }
-            }
-          }
-        }
-      }
+           if(!_.some(cellCoordsLoaded, function(xz) { 
+                 return cellCoords.x === xz.x &&
+                        cellCoords.z === xz.z;
+              })) { 
 
-      log("Zones loaded: "+zonesLoaded);
-      log("Cells loaded: "+cellsLoaded);
-      log("Units loaded: "+unitsLoaded);
+               cellCoordsLoaded.push(cellCoords);
+           }
+
+           unitsLength++;
+
+      });
+
+      log("Zones loaded: "+zonesLoaded.length);
+      log("Cells loaded: "+cellsCoordsLoaded.length);
+      log("Units loaded: "+unitsLength);
       log("Average ticktime: "+endTime);
+
     });
 
   //log(this.commands);

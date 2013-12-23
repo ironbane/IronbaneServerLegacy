@@ -751,7 +751,50 @@ var WorldHandler = Class.extend({
 
         return unit;
     },
+    clearObjects : function(zoneId, cellX, cellZ) {
+
+        this.world[zoneId][cellX][cellZ].objects = [];
+        this.zones.emit(zoneId, 'clearObjects', Cells.center(cellX, cellZ));
+
+    },
+
+    addObject : function(zoneId, cellX, cellZ, object) {
+
+        var position = new THREE.Vector3(object.x, object.y, object.z);
+
+        this.world[zoneId][cellX][cellZ].objects.push(object);
+
+        this.zones.emit(zoneId, 'addObject', position, object); 
+
+    },
+
+    emitChangeObject : function(zoneId, cellX, cellZ, object) {
+        
+        if(_.isUndefined(worldHandler.world[zoneId][cellX][cellZ].changeBuffer) ) {
+            worldHandler.world[zoneId][cellX][cellZ].changeBuffer = [];
+        }
+
+        worldHandler.world[zoneId][cellX][cellZ].changeBuffer.push(pushData);
+
+        this.zones.emit(zoneId, 'changeObject', Cells.center(cellX, cellZ));
+
+    },
+
+    emitDeleteObject : function(zoneId, cellX, cellZ, object) { 
+
+       if(_.isUndefined(worldHandler.world[zoneId][cellX][cellZ].deleteBuffer)) {
+           worldHandler.world[zoneId][cellX][cellZ].deleteBuffer = [];
+       }
+
+       worldHandler.world[zoneId][cellX][cellZ].deleteBuffer.push(data);
+
+       this.zones.emit(zoneId, 'deleteObject', position, object);
+
+    },
     LoadCell: function(zoneId, cellX, cellZ) {
+
+        var self = this;
+
         // Query the entry
         var path = dataPath + "/" + zoneId + "/" + cellX + "/" + cellZ;
 
@@ -772,15 +815,9 @@ var WorldHandler = Class.extend({
 
                     var objects =  JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
 
-                    this.world[zoneId][cellX][cellZ].objects = objects;
+                     self.clearObjects();
 
-                    _.each(objects, function(object) { 
-
-                        var position = new THREE.Vector3(object.x, object.y, object.z);
-
-                        this.zones.emit(zoneId, 'addObject', position, object); 
-
-                    }); 
+                     _.each(objects, self.addObject.bind(self)); 
 
                     console.log(objects); 
                 }
