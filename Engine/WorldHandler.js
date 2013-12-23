@@ -149,6 +149,18 @@ var WorldHandler = Class.extend({
        });
 
     },
+    /**
+     * @method getNPCs
+     * @return {Array} - All of the units
+     * that are not an instance of player.
+     **/
+    getNPCs : function() {
+
+       return _.filter(this.getUnits(), function(unit) { 
+          return !(unit instanceof Player);
+       });
+
+    }, 
     /** 
      * @method autoSave
      * Auto-save all players currently managed by the world handler.
@@ -199,6 +211,7 @@ var WorldHandler = Class.extend({
 
 
     },
+
     removeUnitFromCell: function(unit, oldCellX, oldCellZ) {
 
         var x = oldCellX;
@@ -935,113 +948,77 @@ var WorldHandler = Class.extend({
 
         return foundUnit;
     },
-    // locate a unit (non-player) by data.name, optional zone (will return first or null)
-    findUnitByName: function(name, zoneId) {
-        var self = this,
-            z, cx, cz, u, units;
 
-        if (_.isNumber(zoneId)) {
-            for (cx in self.world[zoneId]) {
-                for (cz in self.world[zoneId][cx]) {
-                    if (!_.isUndefined(self.world[zoneId][cx][cz].units)) {
-                        units = self.world[zoneId][cx][cz].units;
-                        for (u = 0; u < units.length; u++) {
-                            if (units[u].isPlayer()) {
-                                continue;
-                            }
-
-                            if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
-                                continue;
-                            }
-
-                            if (units[u].data.name === name) {
-                                return units[u];
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            for (z in self.world) {
-                for (cx in self.world[z]) {
-                    for (cz in self.world[z][cx]) {
-                        if (!_.isUndefined(self.world[z][cx][cz].units)) {
-                            units = self.world[z][cx][cz].units;
-                            for (u = 0; u < units.length; u++) {
-                                if (units[u].isPlayer()) {
-                                    continue;
-                                }
-
-                                if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
-                                    continue;
-                                }
-
-                                if (units[u].data.name === name) {
-                                    return units[u];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    },
     // get ALL units matching name and in optional zone
     findUnitsByName: function(name, zoneId) {
-        var self = this,
-            z, cx, cz, u, units,
-            results = [];
 
-        if (_.isNumber(zoneId)) {
-            for (cx in self.world[zoneId]) {
-                for (cz in self.world[zoneId][cx]) {
-                    if (!_.isUndefined(self.world[zoneId][cx][cz].units)) {
-                        units = self.world[zoneId][cx][cz].units;
-                        for (u = 0; u < units.length; u++) {
-                            if (units[u].isPlayer()) {
-                                continue;
-                            }
+        return _.chain(this.getNPCs())
+                .filter(function(unit) { 
+                    return !_.isUndefined(zoneId) ?
+                       unit.zone === zoneId : true;
+                })
+                .filter(function(unit) { 
 
-                            if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
-                                continue;
-                            }
+                    return unit.data &&
+                    unit.data.name &&
+                    unit.data.name === name;
 
-                            if (units[u].data.name === name) {
-                                results.push(units[u]);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            for (z in self.world) {
-                for (cx in self.world[z]) {
-                    for (cz in self.world[z][cx]) {
-                        if (!_.isUndefined(self.world[z][cx][cz].units)) {
-                            units = self.world[z][cx][cz].units;
-                            for (u = 0; u < units.length; u++) {
-                                if (units[u].isPlayer()) {
-                                    continue;
-                                }
-
-                                if (!units[u].data || (units[u].data && !units[u].data.hasOwnProperty('name'))) {
-                                    continue;
-                                }
-
-                                if (units[u].data.name === name) {
-                                    results.push(units[u]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return results;
+                })
+                .value();
     },
+
+    // locate a unit (non-player) by data.name, 
+    findUnitByName: function(name, zoneId) {
+
+        return (_.chain(this.getNPCs())
+                 .filter(function(unit) {
+                     return !_.isUndefined(zoneId) ? 
+                        unit.zone === zoneId : true;
+                })
+                .find(function(unit) {
+
+                   if(unit.data && unit.data.name) { 
+                   console.log(unit.data.name); }
+
+                    return unit.data &&
+                    unit.data.name &&
+                    unit.data.name === name;
+
+                })
+                .value() || null);
+    },
+
+    // Only for players!!!!
+    FindPlayerByName: function(name) {
+
+        return (_.chain(this.getPlayers())
+                 .find(function(unit) {
+
+                    return unit.name &&
+                       unit.name === name;
+
+                 })
+                 .value() || null);
+
+    },
+
+    FindUnitNear: function(id, nearUnit) {
+
+        var zoneId = nearUnit.zone;
+        var cx = nearUnit.cellX;
+        var cz = nearUnit.cellZ;
+
+        var nearby = [];
+
+        this.LoopUnitsNear(zoneId, cx, cz, function(unit) {
+            if(unit.id === id) {
+               nearby.push(unit);
+            }
+        }, 1);
+
+        return (_.first(nearby) || null); 
+    },
+
     BuildWaypointListFromUnitIds: function(list) {
         var self = this,
             newList = [];
@@ -1057,72 +1034,21 @@ var WorldHandler = Class.extend({
         });
         return newList;
     },
-    // Only for players!!!!
-    FindPlayerByName: function(name) {
 
-        for (var z in worldHandler.world) {
-            for (var cx in worldHandler.world[z]) {
-                for (var cz in worldHandler.world[z][cx]) {
-
-                    if (!_.isUndefined(worldHandler.world[z][cx][cz].units)) {
-
-                        var units = worldHandler.world[z][cx][cz].units;
-
-                        for (var u in units) {
-
-                            if (units[u].isPlayer()) {
-
-                                if (units[u].name === name) return units[u];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    },
-    FindUnitNear: function(id, nearUnit) {
-        var zone = nearUnit.zone;
-        var cx = nearUnit.cellX;
-        var cz = nearUnit.cellZ;
-
-        for (var x = cx - 1; x <= cx + 1; x++) {
-            for (var z = cz - 1; z <= cz + 1; z++) {
-                if (!this.CheckWorldStructure(zone, x, z)) {
-                    continue;
-                }
-
-                if (!_.isUndefined(this.world[zone][x][z].units)) {
-                    var units = this.world[zone][x][z].units;
-                    for (var u = 0; u < units.length; u++) {
-                        if (units[u].id === id) {
-                            return units[u];
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    },
     DeleteUnit: function(id) {
-        for (var z in this.world) {
-            for (var cx in this.world[z]) {
-                for (var cz in this.world[z][cx]) {
-                    if (!_.isUndefined(this.world[z][cx][cz].units)) {
-                        var units = this.world[z][cx][cz].units;
 
-                        for (var u = 0; u < units.length; u++) {
-                            if (units[u].id === id) {
-                                this.world[z][cx][cz].units.splice(u, 1);
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
+        var unit = this.FindUnit(id);
+        var cellCoords;
+
+        if(unit == null) { 
+           return false;
         }
-        return false;
+
+        cellCoords = WorldToCellCoordinates(unit.position.x, unit.position.z, cellSize);
+        
+        this.removeUnitFromCell(unit, cellCoords.x, cellCoords.z);
+
+        return true;
     }
 });
 
