@@ -26,6 +26,7 @@ var aabb = require('aabb-3d');
 
 // var THREE = require('three');
 // var Snapshots = require('./snapshots.js');
+// var Cells = require('./zones.js').Cells;
 // var Zones = require('./zones.js').Zones;
 
 var WorldHandler = Class.extend({
@@ -133,6 +134,7 @@ var WorldHandler = Class.extend({
 
           }
         });
+
         return allUnits;
     },
     /** 
@@ -165,16 +167,11 @@ var WorldHandler = Class.extend({
         var x = newCellX;
         var z = newCellZ;
 
-        var worldCoords = (function(xz) { 
-            return new THREE.Vector3(xz.x, 0, xz.z);
-        })(CellToWorldCoordinates(x, z, cellSize));
-
         if (worldHandler.CheckWorldStructure(unit.zone, x, z)) {
 
             worldHandler.world[unit.zone][x][z].units.push(unit);
             
-            this.zones.emit(unit.zone, 'addUnit', worldCoords, unit);
-
+            this.zones.emit(unit.zone, 'addUnit', unit.position, unit);
 
         } else {
             // We are in a bad cell??? Find a place to spawn! Or DC
@@ -186,7 +183,7 @@ var WorldHandler = Class.extend({
                 worldHandler.GenerateCell(unit.zone, x, z);
                 worldHandler.world[unit.zone][x][z].units.push(unit);
 
-                this.zones.emit(unit.zone, 'addUnit', worldCoords, unit);
+                this.zones.emit(unit.zone, 'addUnit', unit.position, unit);
 
             }
         }
@@ -207,14 +204,9 @@ var WorldHandler = Class.extend({
         var x = oldCellX;
         var z = oldCellZ;
 
-        var worldCoords = (function(xz) { 
-            return new THREE.Vector3(xz.x, 0, xz.z);
-        })(CellToWorldCoordinates(x, z, cellSize));
-
-        this.zones.emit(unit.zone, 'removeUnit', worldCoords, unit); 
+        this.zones.emit(unit.zone, 'removeUnit', unit.position, unit); 
 
         worldHandler.world[unit.zone][x][z].units = _.without(worldHandler.world[unit.zone][x][z].units, unit);
-
 
         var me = this;
 
@@ -278,7 +270,6 @@ var WorldHandler = Class.extend({
         _.each(this.world, function(z, i) {
             pathFinder.loadZone(i);
         });
-
 
         pathFinder.test();
 
@@ -353,17 +344,22 @@ var WorldHandler = Class.extend({
                  async.each(info, function(i, callback) { 
                 
                      self.zones.createCell(i.zoneId, i.cellCoords)
-                         .then(function(bbox) {
+                         .then(function() {
 
                            //Will cause 'addUnit' emissions 
                            self.LoadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
+
+                           // For more performant ticking
+                           self.buildCellsArray();
+
+                           self.hasLoadedWorld = true;
                            
                            callback(null);
                            
                         })
                         .fail(function(err) {
                            
-                           if(err)  {
+                           if(err) {
                               console.error('WorldHandler', err);
                            }
                            
@@ -436,8 +432,6 @@ var WorldHandler = Class.extend({
 
                     cellsLoaded[zone]++;
 
-                    self.LoadUnits(zone, cx, cz);
-
                     info.push({ 
                         zoneId : zone, 
                         cellCoords: new THREE.Vector3(cx, 0, cz) 
@@ -447,11 +441,6 @@ var WorldHandler = Class.extend({
                 _.each(cellsLoaded, function(z, v) {
                     log("Loaded " + z + " cells in zone " + v);
                 });
-
-                // For more performant ticking
-                self.buildCellsArray();
-
-                self.hasLoadedWorld = true;
 
                 deferred.resolve(info);
 
@@ -489,6 +478,14 @@ var WorldHandler = Class.extend({
      * Applieds fn to each cell in the world handler.
      **/
     LoopCells: function(fn) {
+        
+        this.zones.selectAll()
+            .then(function(zones) {
+               _.each(zones, function(zone) {
+                  _.each(zone.cells, fn);
+               }); 
+            });
+
         _.each(this.world, function(zone) {
                _.each(zone, function(cellX) {
                    _.each(cellX, function(cellZ) {
@@ -497,21 +494,54 @@ var WorldHandler = Class.extend({
                });
         }); 
     },
-    LoopCellsNear: function(zone, cellX, cellZ, fn, offset) {
+    LoopCellsNear: function(zoneId, cellX, cellZ, fn, offset) {
 
         offset = offset || 1;
+
+        var minX = cellX - offset;
+        var maxX = cellX + offset;
+        var minZ = cellZ - offset;
+        var maxZ = cellZ + offset;
+
+        this.zones.selectZone(zoneId)
+            .then(function(zone) {
+                  _.chain(zone.cells)
+                   .filter(function(cell) { 
+                       return (
+                          cell.getX() > minX &&
+                          cell.getX() <= maxX &&
+                          cell.getZ() > minZ &&
+                          cell.getZ() <= maxZ
+                       );
+                   }).each(function(cell) {
+                      fn(zone.id);
+                   });
+
+               }); 
 
         var self = this;
 
         for (var x = cellX - offset; x <= cellX + offset; x++) {
             for (var z = cellZ - offset; z <= cellZ + offset; z++) {
-                if (self.CheckWorldStructure(zone, x, z)) {
-                    fn(self.world[zone][x][z]);
+                if (self.CheckWorldStructure(zoneId, x, z)) {
+                    fn(self.world[zoneId][x][z]);
                 }
             }
         }
     },
     LoopCellsWithIndex: function(fn) {
+        
+        this.zones.selectAll()
+            .then(function(zones) {
+               _.each(zones, function(zone) {
+                  _.each(zone.cells, function(cell) {
+                      fn(zone.id, cell.getX(), cell.getZ());
+                  });
+
+               }); 
+
+            });
+
         for (var zone in this.world) {
             if (!this.world.hasOwnProperty(zone)) {
                 continue;
@@ -708,9 +738,9 @@ var WorldHandler = Class.extend({
 
         return unit;
     },
-    LoadCell: function(zone, cellX, cellZ) {
+    LoadCell: function(zoneId, cellX, cellZ) {
         // Query the entry
-        var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
+        var path = dataPath + "/" + zoneId + "/" + cellX + "/" + cellZ;
 
         fsi.mkdirSync(path, 0777, true, function(err) {
             if (err) {
@@ -726,26 +756,50 @@ var WorldHandler = Class.extend({
                 stats = fs.lstatSync(path + "/objects.json");
 
                 if (stats.isFile()) {
-                    this.world[zone][cellX][cellZ].objects = JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
+
+                    var objects =  JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
+
+                    this.world[zoneId][cellX][cellZ].objects = objects;
+
+                    _.each(objects, function(object) { 
+
+                        var position = new THREE.Vector3(object.x, object.y, object.z);
+
+                        this.zones.emit(zoneId, 'addObject', position, object); 
+
+                    }); 
+
+                    console.log(objects); 
                 }
             } catch (e) {
                 throw e;
             }
         }
 
-        this.world[zone][cellX][cellZ].units = [];
+        this.world[zoneId][cellX][cellZ].units = [];
     },
     GenerateCell: function(zone, cellX, cellZ) {
-        this.BuildWorldStructure(zone, cellX, cellZ);
 
-        this.world[zone][cellX][cellZ].units = [];
-        this.world[zone][cellX][cellZ].objects = [];
+        var cellCoords = new THREE.Vector3(cellX, 0, cellZ);
 
-        log("Generated cell (" + cellX + "," + cellZ + ")");
+        this.zones.createCell(zone, new THREE.Vector3(cellX, 0, cellZ))
+            .then(function() {
 
-        this.SaveCell(zone, cellX, cellZ, true);
+                this.BuildWorldStructure(zone, cellX, cellZ);
+
+                this.world[zone][cellX][cellZ].units = [];
+                this.world[zone][cellX][cellZ].objects = [];
+
+                log("Generated cell (" + cellX + "," + cellZ + ")");
+
+                this.SaveCell(zone, cellX, cellZ, true);
+
+            });
     },
     SaveCell: function(zone, cellX, cellZ, clearObjects) {
+
+        self.zones.emit(zone, worldCoords, 'saveCell', Cells.center(cellX, cellZ));
+
         var self = this,
             doClearObjects = clearObjects || false;
 
@@ -758,52 +812,27 @@ var WorldHandler = Class.extend({
         this.LoadCell(zone, cellX, cellZ);
 
         if (doClearObjects) {
+
             this.world[zone][cellX][cellZ].objects = [];
+
             buffer_objects = [];
         }
 
         this.world[zone][cellX][cellZ].units = buffer_units;
 
-        for (var o = 0; o < buffer_objects.length; o++) {
-            this.world[zone][cellX][cellZ].objects.push(buffer_objects[o]);
-        }
+        this.world[zone][cellX][cellZ].objects = this.world[zone][cellX][cellZ].objects.concat(buffer_objects);
 
-        if (!_.isUndefined(self.world[zone][cellX][cellZ].changeBuffer)) {
-            _.each(self.world[zone][cellX][cellZ].changeBuffer, function(obj) {
-                var pos = ConvertVector3(obj.pos);
-                pos = pos.Round(2);
 
-                _.each(self.world[zone][cellX][cellZ].objects, function(loopObj) {
-                    if (pos.x === loopObj.x && pos.y === loopObj.y && pos.z === loopObj.z) {
-                        if (_.isEmpty(obj.metadata)) {
-                            delete loopObj.metadata;
-                        } else {
+        updateMetadata(
+            self.world[zone][cellX][cellZ].changeBuffer,
+            self.world[zone][cellX][cellZ].objects
+        );
 
-                            if (_.isUndefined(loopObj.metadata)) {
-                                loopObj.metadata = {};
-                            }
-
-                            _.extend(loopObj.metadata, obj.metadata);
-                        }
-                    }
-                });
-            });
-        }
-
-        // Delete the things from the terrain in the deleteBuffer
-        if (!_.isUndefined(self.world[zone][cellX][cellZ].deleteBuffer)) {
-            _.each(self.world[zone][cellX][cellZ].deleteBuffer, function(deleteObj) {
-                var deleteObjPos = ConvertVector3(deleteObj).Round(2);
-                _.each(self.world[zone][cellX][cellZ].objects, function(loopObj) {
-                    var loopObjPos = ConvertVector3(loopObj).Round(2);
-                    if (deleteObjPos.x === loopObjPos.x && deleteObjPos.y === loopObjPos.y && deleteObjPos.z === loopObjPos.z) {
-                        self.world[zone][cellX][cellZ].objects = _.without(self.world[zone][cellX][cellZ].objects, loopObj);
-                        self.world[zone][cellX][cellZ].deleteBuffer = _.without(self.world[zone][cellX][cellZ].deleteBuffer, deleteObj);
-                    }
-                });
-            });
-        }
-
+        self.world[zone][cellX][cellZ].objects = deleteObjects(
+            self.world[zone][cellX][cellZ].deleteBuffer,
+            self.world[zone][cellX][cellZ].objects
+        );
+            
         // Query the entry
         var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
 
@@ -822,17 +851,74 @@ var WorldHandler = Class.extend({
 
         // Clean up
         this.world[zone][cellX][cellZ].objects = [];
-    },
-    UpdateNearbyUnitsOtherUnitsLists: function(zone, cellX, cellZ) {
-        for (var x = cellX - 1; x <= cellX + 1; x++) {
-            for (var z = cellZ - 1; z <= cellZ + 1; z++) {
-                if (this.CheckWorldStructure(zone, x, z)) {
-                    for (var u = 0; u < this.world[zone][x][z].units.length; u++) {
-                        this.world[zone][x][z].units[u].UpdateOtherUnitsList();
-                    }
-                }
+
+
+        function updateMetadata(changeBuffer, objects) {
+
+            if (!_.isUndefined(changeBuffer)) {
+                _.each(changeBuffer, function(obj) {
+
+                    var pos = ConvertVector3(obj.pos);
+                    pos = pos.Round(2);
+
+                    _.each(objects, function(loopObj) {
+
+                        if (pos.x === loopObj.x && 
+                            pos.y === loopObj.y && 
+                            pos.z === loopObj.z) {
+
+                            if (_.isEmpty(obj.metadata)) {
+                                delete loopObj.metadata;
+                            } else {
+
+                                if (_.isUndefined(loopObj.metadata)) {
+                                    loopObj.metadata = {};
+                                }
+
+                                _.extend(loopObj.metadata, obj.metadata);
+                            }
+                        }
+                    });
+                });
             }
+
         }
+
+        function deleteObjects(deleteBuffer, objects) { 
+
+            // Delete the things from the terrain in the deleteBuffer
+            if (!_.isUndefined(deleteBuffer)) {
+
+                _.each(deleteBuffer, function(deleteObj) {
+
+                    var deleteObjPos = ConvertVector3(deleteObj).Round(2);
+
+                    _.each(objects, function(loopObj) {
+
+                        var loopObjPos = ConvertVector3(loopObj).Round(2);
+
+                        if (deleteObjPos.x === loopObjPos.x && 
+                            deleteObjPos.y === loopObjPos.y && 
+                            deleteObjPos.z === loopObjPos.z) {
+
+                            objects = _.without(objects, loopObj);
+                            deleteBuffer = _.without(deleteBuffer, deleteObj);
+                        }
+
+                    });
+                });
+
+            }
+            return objects;
+        }
+
+    },
+    UpdateNearbyUnitsOtherUnitsLists: function(zoneId, cellX, cellZ) {
+
+        this.LoopUnitsNear(zoneId, cellX, cellZ, function(unit) {
+            unit.UpdateOtherUnitsList();
+        }, 1);
+
     },
     FindUnit: function(id) {
         var foundUnit = null;
