@@ -47,23 +47,49 @@ var TeleportEntrance = Unit.extend({
             if (this.useTimeout > 0) {
                 this.useTimeout -= dTime;
             } else {
-                var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
 
-                for (var u = 0; u < units.length; u++) {
-                    if (!(units[u] instanceof Player)) {
-                        continue;
+                //var self = this,
+                //    shouldContinue = true;
+
+                 var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
+
+                 for (var u = 0; u < units.length; u++) {
+                     if (!(units[u] instanceof Player)) {
+                         continue;
+                     }
+
+                     if (units[u].InRangeOfUnit(this, 1)) {
+
+                         log("Teleport!");
+
+                         units[u].TeleportToUnit(this.targetExit);
+
+                         this.useTimeout = 2.0;
+                         break;
+                     }
+                 }
+
+                /** worldHandler.LoopUnitsNear(self.zone, self.cellX, self.cellZ, function(unit) { 
+
+                    if(!shouldContinue) {
+                       return;
                     }
 
-                    if (units[u].InRangeOfUnit(this, 1)) {
+                    if (!(unit.isPlayer())) {
+                        return;
+                    }
+
+                    if (unit.InRangeOfUnit(self, 1)) {
 
                         log("Teleport!");
 
-                        units[u].TeleportToUnit(this.targetExit);
+                        unit.TeleportToUnit(self.targetExit);
 
-                        this.useTimeout = 2.0;
-                        break;
+                        self.useTimeout = 2.0;
+
+                        shouldContinue = false;
                     }
-                }
+                }, 0); **/
             }
         }
     }
