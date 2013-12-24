@@ -777,73 +777,72 @@ var Fighter = Actor.extend({
         return true;
     },
     FindNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
+
         maxDistance = maxDistance || 0;
         onlyPlayers = onlyPlayers || false;
+
+        var self = this;
+
+        var target = null;
 
         var cx = this.cellX;
         var cz = this.cellZ;
 
         //log("FindNearestTarget, maxDistance "+maxDistance+", onlyPlayers "+(onlyPlayers?"true":"false")+"");
 
-        for (var x = cx - 1; x <= cx + 1; x++) {
-            for (var z = cz - 1; z <= cz + 1; z++) {
-                if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
-                    for (var u = 0; u < worldHandler.world[this.zone][x][z].units.length; u++) {
-                        var unit = worldHandler.world[this.zone][x][z].units[u];
+        worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) { 
 
-                        if (unit === this) {
-                            continue;
-                        }
-
-                        if (unit instanceof Fighter) {
-
-                            //debugger;
-
-                            if (unit.health <= 0) {
-                                //log("unit.health <= 0");
-                                continue;
-                            }
-
-                            if (unit.chInvisibleByMonsters) {
-                                //log("unit.chInvisibleByMonsters");
-                                continue;
-                            }
-
-                            if (onlyPlayers && !(unit.isPlayer())) {
-                                //log("onlyPlayers && unit.id < 0");
-                                continue;
-                            }
-
-                            if (!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === this.template.friendly) {
-                                // Don't attack our own kind!
-                                continue;
-                            }
-
-                            // Check if we are looking at the target
-                            if (!this.InLineOfSight(unit, noHeadingCheck)) {
-                                //log("not in line of sight!");
-                                continue;
-                            }
-
-
-                        } else {
-                            continue;
-                        }
-
-                        if (maxDistance > 0 && !this.InRangeOfUnit(unit, maxDistance)) {
-                            //log("too far away!");
-                            continue;
-                        }
-
-                        //if ( maxDistance > 0 && !unit.InRangeOfPosition(this.startPosition, maxDistance) ) continue;
-
-
-                        return unit;
-
-                    }
-                }
+            if (unit === self) {
+                return;
             }
-        }
-        return null;
+
+            if (unit instanceof Fighter) {
+
+                //debugger;
+
+                if (unit.health <= 0) {
+                    //log("unit.health <= 0");
+                    return;
+                }
+
+                if (unit.chInvisibleByMonsters) {
+                    //log("unit.chInvisibleByMonsters");
+                    return;
+                }
+
+                if (onlyPlayers && !(unit.isPlayer())) {
+                    //log("onlyPlayers && unit.id < 0");
+                    return;
+                }
+
+                if (!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === self.template.friendly) {
+                    // Don't attack our own kind!
+                    return;
+                }
+
+                // Check if we are looking at the target
+                if (!self.InLineOfSight(unit, noHeadingCheck)) {
+                    //log("not in line of sight!");
+                    return;
+                }
+
+
+            } else {
+                return;
+            }
+
+            if (maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance)) {
+                //log("too far away!");
+                return;
+            }
+
+            //if ( maxDistance > 0 && !unit.InRangeOfPosition(self.startPosition, maxDistance) ) return;
+
+
+            target = unit;
+
+        }, 1);
+
+        return target;
     }
 });

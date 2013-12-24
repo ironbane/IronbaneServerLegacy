@@ -134,7 +134,7 @@ var Unit = Class.extend({
     this.readyToReceiveUnits = false;
 
     if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-      worldHandler.world[this.zone][this.cellX][this.cellZ].units = _.without(worldHandler.world[this.zone][this.cellX][this.cellZ].units, this);
+        worldHandler.removeUnitFromCell(this, this.cellX, this.cellZ);
     }
 
     this.UpdateNearbyUnitsOtherUnitsLists();
@@ -146,16 +146,16 @@ var Unit = Class.extend({
     this.UpdateCellPosition();
 
     if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-      worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
+        worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
     }
     else {
-      log("[Teleport] Cell does not exist for unit #" +
-        this.id + " (" + this.cellX + ", " + this.cellZ + ")");
-      if (this.isPlayer() > 0 && this.editor) {
-        log("[Teleport] Generating cell because he's an editor.");
-        worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
-        worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
-      }
+        log("[Teleport] Cell does not exist for unit #" +
+                this.id + " (" + this.cellX + ", " + this.cellZ + ")");
+        if (this.isPlayer() > 0 && this.editor) {
+            log("[Teleport] Generating cell because he's an editor.");
+            worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
+            worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
+        }
     }
 
     this.UpdateNearbyUnitsOtherUnitsLists();
@@ -287,6 +287,8 @@ var Unit = Class.extend({
   },
   UpdateOtherUnitsList: function() {
 
+    var self = this;
+
     // If we are a player, only do so if we're ready to receive data
     if (this.isPlayer() && !this.readyToReceiveUnits) return;
 
@@ -302,51 +304,53 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    for (var x = cx - 1; x <= cx + 1; x++) {
-      for (var z = cz - 1; z <= cz + 1; z++) {
-        if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
-          _.each(worldHandler.world[this.zone][x][z].units, function(unit) {
-            if (unit !== this) secondList.push(unit);
-          }, this);
+    worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
+        if(unit !== self) {
+           secondList.push(unit);
         }
-      }
-    }
+    });
 
     for (var i = 0; i < firstList.length; i++) {
-      if (secondList.indexOf(firstList[i]) == -1) {
-        // Not found in the second list, so remove it
-        this.RemoveOtherUnit(firstList[i]);
-      }
+        if (secondList.indexOf(firstList[i]) == -1) {
+            // Not found in the second list, so remove it
+            this.RemoveOtherUnit(firstList[i]);
+        }
     }
+
     for (var i = 0; i < secondList.length; i++) {
-      if (firstList.indexOf(secondList[i]) == -1) {
-        // Not found in the first list, so add it
-        this.AddOtherUnit(secondList[i]);
-      }
+        if (firstList.indexOf(secondList[i]) == -1) {
+            // Not found in the first list, so add it
+            this.AddOtherUnit(secondList[i]);
+        }
     }
 
   },
   FindNearestUnit: function(maxDistance) {
-    maxDistance = maxDistance || 0;
-    var cx = this.cellX;
-    var cz = this.cellZ;
-    var nearestUnit = null
-    for (var x = cx - 1; x <= cx + 1; x++) {
-      for (var z = cz - 1; z <= cz + 1; z++) {
-        if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
-          nearestUnit = _.find(worldHandler.world[this.zone][x][z].units, function(unit) {
 
-            if (unit !== this) {
-              if (unit instanceof Fighter && unit.health > 0) {
-                if (maxDistance > 0 && DistanceBetweenPoints(this.position.x, this.position.z, unit.position.x, unit.position.z) <= maxDistance) {
-                  return unit;
+    maxDistance = maxDistance || 0;
+
+    var self = this;
+
+    var cx = self.cellX;
+    var cz = self.cellZ;
+    var nearestUnit = null;
+
+    worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) {
+
+        if (unit !== self) {
+            if (unit instanceof Fighter && unit.health > 0) {
+
+                var pos = self.position;
+
+                if (maxDistance > 0 &&
+                    DistanceBetweenPoints(pos.x, pos.z, unit.position.x, unit.position.z) <= maxDistance) {
+                    return unit;
                 }
-              }
             }
-          }, this);
         }
-      }
-    }
+
+    });
+
     return nearestUnit;
   },
   findNearestSpawnPoint: function() {
@@ -392,11 +396,6 @@ var Unit = Class.extend({
       // First, remove us from our world cell and add ourselves to the right cell
       // Remove the unit from the world cells
       if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
-        // var units = worldHandler.world[zone][cx][cz].units;
-        // var removeUnit = _.find(units, function(unit) {
-        //   return unit.id == this.id;
-        // }, this);
-        // worldHandler.world[zone][cx][cz].units = _.without(units, removeUnit);
         worldHandler.removeUnitFromCell(this, cx, cz);
       }
 
@@ -404,7 +403,6 @@ var Unit = Class.extend({
       // Add to the new cell
       // What if the cell doesn't exist? Don't add?
       if (worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) {
-        // worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
         worldHandler.addUnitToCell(this, newCellX, newCellZ);
       }
       else {
@@ -413,7 +411,6 @@ var Unit = Class.extend({
         if (this.isPlayer() && this.editor) {
           log("[ChangeCell] Generating cell because he's an editor.");
           worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
-          // worldHandler.world[zone][cellPos.x][cellPos.z].units.push(this);
           worldHandler.addUnitToCell(this, newCellX, newCellZ);
         }
       }
@@ -448,26 +445,29 @@ var Unit = Class.extend({
       }
 
       _.each(firstList, function(firstListItem) {
-        if (secondList.indexOf(firstListItem) == -1) {
-          // Not found in the secondlist, so recalculate all units inside
-          if (worldHandler.CheckWorldStructure(zone, firstListItem.x, firstListItem.z)) {
-            _.each(worldHandler.world[zone][firstListItem.x][firstListItem.z].units, function(sunit) {
-              sunit.UpdateOtherUnitsList();
-            });
+          if (secondList.indexOf(firstListItem) == -1) {
+              // Not found in the secondlist, so recalculate all units inside
+              if (worldHandler.CheckWorldStructure(zone, firstListItem.x, firstListItem.z)) {
+
+                  worldHandler.LoopUnitsNear(zone, firstListItem.x, firstListItem.z, function(sunit) { 
+                      sunit.UpdateOtherUnitsList();
+                  }, 0);
+              }
           }
-        }
       });
 
 
       _.each(secondList, function(secondListItem) {
-        if (firstList.indexOf(secondListItem) == -1) {
-          // Not found in the firstlist, so recalculate all units inside
-          if (worldHandler.CheckWorldStructure(zone, secondListItem.x, secondListItem.z)) {
-            _.each(worldHandler.world[zone][secondListItem.x][secondListItem.z].units, function(funit) {
-              funit.UpdateOtherUnitsList();
-            });
+          if (firstList.indexOf(secondListItem) == -1) {
+              // Not found in the firstlist, so recalculate all units inside
+              if (worldHandler.CheckWorldStructure(zone, secondListItem.x, secondListItem.z)) {
+
+                  worldHandler.LoopUnitsNear(zone, secondListItem.x, secondListItem.z, function(funit) { 
+                      funit.UpdateOtherUnitsList();
+                  }, 0);
+
+              }
           }
-        }
       });
 
 
@@ -496,17 +496,8 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    worldHandler.removeUnitFromCell(this, this.cellX, this.cellZ);
-
-    for (var x = cx - 1; x <= cx + 1; x++) {
-      for (var z = cz - 1; z <= cz + 1; z++) {
-        if (worldHandler.CheckWorldStructure(zone, x, z)) {
-          _.each(worldHandler.world[zone][x][z].units, function(unit) {
-            unit.UpdateOtherUnitsList();
-          });
-        }
-      }
-    }
+    worldHandler.removeUnitFromCell(this, cx, cz);
+    this.UpdateNearbyUnitsOtherUnitsLists();
 
   },
   EmitNearby: function(event, data, maxDistance, allowSelf) {
@@ -514,37 +505,31 @@ var Unit = Class.extend({
     allowSelf = allowSelf || false;
     maxDistance = maxDistance || 0;
 
+    var self = this;
+
     var zone = this.zone;
 
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    for (var x = cx - 1; x <= cx + 1; x++) {
-      for (var z = cz - 1; z <= cz + 1; z++) {
-        if (!worldHandler.CheckWorldStructure(zone, x, z)) continue;
+    worldHandler.LoopUnitsNear(zone, cx, cz, function(unit) {
 
-        if (!_.isUndefined(worldHandler.world[zone][x][z].units)) {
+        if (unit.isPlayer()) {
 
-          var units = worldHandler.world[zone][x][z].units;
-
-          for (var u = 0; u < units.length; u++) {
-            if (units[u].isPlayer()) {
-
-              // Don't send to ourselves...?
-              if (!allowSelf && units[u] == this) {
-                continue;
-              }
-
-              var distance = DistanceBetweenPoints(this.position.x, this.position.z, units[u].position.x, units[u].position.z);
-              // Check if the unit is too far from us
-              if (maxDistance > 0 && distance > maxDistance) continue;
-
-              units[u].socket.emit(event, data);
+            // Don't send to ourselves...?
+            if (!allowSelf && unit == self) {
+                return;
             }
-          }
+
+            var distance = DistanceBetweenPoints(self.position.x, self.position.z, unit.position.x, unit.position.z);
+            // Check if the unit is too far from us
+            if (maxDistance > 0 && distance > maxDistance) return;
+
+            unit.socket.emit(event, data);
         }
-      }
-    }
+
+    }, 1);
+
   },
   CalculatePath: function(targetPosition) {
 
