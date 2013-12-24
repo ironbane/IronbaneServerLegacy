@@ -60,19 +60,29 @@ var Lever = Unit.extend({
         if (this.useTimeout > 0) {
             this.useTimeout -= dTime;
         } else {
-            var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
+            
+            var self = this,
+                shouldContinue = true; 
 
-            for (var u = 0; u < units.length; u++) {
-                if(units[u].isPlayer()){
+            worldHandler.LoopUnitsNear(self.zone, self.cellX, self.cellZ, function(unit) { 
 
-                    if (units[u].InRangeOfUnit(this, 1)) {
-                        if (this.targetUnit) {
-                            this.targetUnit.Toggle(!this.on);
+                if(!shouldContinue) {
+                    return;
+                }
+
+                if(unit.isPlayer()) {
+                    if (unit.InRangeOfUnit(self, 1)) {
+
+                        if (self.targetUnit) {
+                            self.targetUnit.Toggle(!self.on);
                         }
-                        break;
+
+                        shouldContinue = false;
                     }
                 }
-            }
+
+            }, 0); 
+
         }
     }
 });
