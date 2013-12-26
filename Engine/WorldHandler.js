@@ -24,6 +24,7 @@ var aabb = require('aabb-3d');
 
 // For when node modules are used: 
 
+// var Q = require('q');
 // var THREE = require('three');
 // var Snapshots = require('./snapshots.js');
 // var Cells = require('./zones.js').Cells;
@@ -31,30 +32,17 @@ var aabb = require('aabb-3d');
 
 var WorldHandler = Class.extend({
     Init: function() {
-        // World structure
-        // [zone][cx][cz]
-        this.world = {};
 
         this.zones = new Zones();
 
         this.switches = {};
-        this.awake = false;
-        this.hasLoadedWorld = false;
-
     },
     Awake: function() {
 
-        this.LoadNavigationNodes();
-
-        var self = this;
-
         // All units ready! Awaken!
-        self.LoopUnits(function(u) {
-            u.Awake();
+        return this.LoopUnits(function(u) {
+           u.Awake();
         });
-
-        log("World has awaken!");
-        self.awake = true;
 
     },
     /** 
@@ -65,57 +53,24 @@ var WorldHandler = Class.extend({
      */
     tick: function(elapsed) {
 
-        var deferred = Q.defer();
-
-        if (this.hasLoadedWorld) {
-    
-            if (!this.awake) {
-
-                var hasLoadedUnits = true;
-
-                this.LoopCells(function(cell) {
-                    if (!cell.hasLoadedUnits) {
-                        hasLoadedUnits = false;
-                    }
-                });
-
-                if (hasLoadedUnits) {
-                    this.Awake();
-                }
-
-                deferred.resolve();
-
-            } else { 
-
-               this.updateUnits(elapsed);
-
-               Snapshots.broadcast(this.getPlayers())
-                  .then(deferred.resolve.bind(deferred));
-            }
-
-        } else {
-          deferred.resolve();
-        }
-
-        return deferred.promise; 
+      return this.updateUnits(elapsed)
+          .then(function() { 
+              return this.getPlayers();
+          })
+          .then(function(players) {
+              return Snapshots.broadcast(players);
+          });
 
     },
     updateUnits: function(dTime) {
 
-        var unitCount = 0;
-        var players = 0;
-        this.LoopUnits(function(unit) {
+        return this.LoopUnits(function(unit) {
+
             if (unit.active) {
-                unitCount++;
                 unit.Tick(dTime);
             }
-            if (unit instanceof Player) {
-                players++;
-            }
+
         });
-
-        // console.log(unitCount + " active units, " + players + " logged in players");
-
     },
     
     /**
@@ -123,19 +78,19 @@ var WorldHandler = Class.extend({
      * @return {Array} All of the units
      * handled by all cells in the world handler.
      **/
-    getUnits : function() { 
+    getUnits : function() {
+
+       var deferred = Q.defer(); 
        
        var allUnits = [];
 
-       _.each(this.allCells, function(cell) {
-           if (!_.isUndefined(cell.units)) {
+       this.LoopUnits(function(unit) { 
+           allUnits.push(unit);
+       }).then(function() {
+          deferred.resolve(allUnits); 
+       });
 
-               allUnits = allUnits.concat(cell.units);
-
-          }
-        });
-
-        return allUnits;
+       return deferred.promise;
     },
     /** 
      * @method getPlayers
@@ -144,9 +99,12 @@ var WorldHandler = Class.extend({
      **/
     getPlayers : function() {
       
-       return _.filter(this.getUnits(), function(unit) { 
-          return (unit instanceof Player);
-       });
+       return this.getUnits()
+          .then(function() { 
+             return _.filter(units, function(unit) { 
+                return (unit instanceof Player);
+             });
+          });
 
     },
     /**
@@ -156,10 +114,12 @@ var WorldHandler = Class.extend({
      **/
     getNPCs : function() {
 
-       return _.filter(this.getUnits(), function(unit) { 
-          return !(unit instanceof Player);
-       });
-
+       return this.getUnits()
+          .then(function() { 
+             return _.filter(units, function(unit) { 
+                return !(unit instanceof Player);
+             });
+          });
     }, 
     /** 
      * @method autoSave
@@ -167,130 +127,100 @@ var WorldHandler = Class.extend({
      **/
     autoSave : function() { 
 
-       log("Auto-saving all players...");
+       log('WorldHandler: Auto-saving all players.');
             
-       this.getPlayers().forEach(function(player) {
-           player.Save();
+       this.getPlayers().then(function(players) {
+
+           players.forEach(function(player) {
+              player.Save(); 
+           });
+
        });
 
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
 
+        var self = this;
+
+        var args = arguments;
+
+        var isPlayer = unit.id > 0;
+
         var x = newCellX;
         var z = newCellZ;
 
-        if (worldHandler.CheckWorldStructure(unit.zone, x, z)) {
+        return this.zones.emit(unit.zone, 'addUnit', unit.position, unit)
+            .then(function() { 
 
-            worldHandler.world[unit.zone][x][z].units.push(unit);
-            
-            this.zones.emit(unit.zone, 'addUnit', unit.position, unit);
+                if(isPlayer) {
 
-        } else {
-            // We are in a bad cell??? Find a place to spawn! Or DC
-            log("Bad cell found for " + unit.id);
+                   return this.zones.emitNear(unit.zone, 'activate', unit.position); 
 
-            if (unit.id > 0 && unit.editor) {
-
-                log("...but I'm generating one because he's an editor.");
-                worldHandler.GenerateCell(unit.zone, x, z);
-                worldHandler.world[unit.zone][x][z].units.push(unit);
-
-                this.zones.emit(unit.zone, 'addUnit', unit.position, unit);
-
-            }
-        }
-
-        if (unit.id > 0) {
-            // Active all NPC's that are nearby
-            this.LoopUnitsNear(unit.zone, newCellX, newCellZ, function(unit) {
-                if (unit.id < 0) {
-                    unit.active = true;
                 }
-            });
-        }
 
+            })
+            .fail(function() {
+
+                // We are in a bad cell? Find a place to spawn! Or DC
+                log('Bad cell found for ' + unit.id + '  ' + unit.zone + ',' + x + ',' + z);
+
+                if (isPlayer && unit.editor) {
+
+                    log('Generating cell for an editor.');
+                    return self.GenerateCell(unit.zone, x, z)
+                        .then(function() {
+                            self.addUnitToCell(unit, x, z);
+                        });
+
+                }
+
+            });
 
     },
 
     removeUnitFromCell: function(unit, oldCellX, oldCellZ) {
 
+        var self = this;
+
         var x = oldCellX;
         var z = oldCellZ;
 
-        this.zones.emit(unit.zone, 'removeUnit', unit.position, unit); 
+        var isPlayer = unit.id > 0;
 
-        worldHandler.world[unit.zone][x][z].units = _.without(worldHandler.world[unit.zone][x][z].units, unit);
+        return self.zones.emit(unit.zone, 'removeUnit', unit.position, unit)
+            .then(function() { 
 
-        var me = this;
+                if(isPlayer) { 
 
-        if (unit.id > 0) {
-            // Active all NPC's that are nearby
-            var allCells = [];
-            var activeCells = [];
-            this.LoopCells(function(cell) {
-                allCells.push(cell);
-                if (cell.units) {
-                    var foundUnit = _.find(cell.units, function(unit) {
-                        return unit.id > 0;
-                    });
-                    if (foundUnit !== undefined) {
-                        // Add all nearby cells
-                        me.LoopCellsNear(foundUnit.zone, foundUnit.cellX, foundUnit.cellZ, function(cell) {
-                            activeCells.push(cell);
-                        });
-                    }
+                    return self.zones.emitNear(unit.zone, 'deactivate', unit.position);
                 }
+    
             });
-
-            var cellsToBeDisabled = _.difference(allCells, activeCells);
-
-            _.each(cellsToBeDisabled, function(cell) {
-                if (cell.units) {
-                    _.each(cell.units, function(unit) {
-                        if (unit.id < 0) {
-                            unit.active = false;
-                        }
-                    });
-                }
-            });
-        }
-
-
     },
 
-    /** 
-     * @method buildCellsArray
-     * Modifies allCells, which stores 
-     * the data contained for each cell in 
-     * the world handler. Doing so reduces 
-     * the complexity of tasks that loop
-     * over the cells in the world handler.
-     **/
-    buildCellsArray: function() {
+    loadNavigationNodes: function() {
 
-        var me = this;
-        me.allCells = [];
-        
-        this.LoopCells(function(cell) { 
-            me.allCells.push(cell);
-        });
+        console.log('WorldHandler: Loading navigation nodes.");
 
-    },
-    LoadNavigationNodes: function() {
+        return this.zones.selectAll()
+            .then(function(zones) {
 
-        console.log("Loading navigation nodes...");
+               _.each(zones, function(zone) {
+                   pathFinder.loadZone(zone.id);
+               });
 
-        _.each(this.world, function(z, i) {
-            pathFinder.loadZone(i);
-        });
+              pathFinder.test();
 
-        pathFinder.test();
+            });
 
     },
     SaveWorld: function() {
-        this.LoopCellsWithIndex(function(z, cx, cz) {
-            this.SaveCell(z, cx, cz);
+        var self = this; 
+
+        return self.LoopCellsWithIndex(function(z, cx, cz) {
+            self.SaveCell(z, cx, cz);
         });
+        
     },
     DoFullBackup: function() {
         chatHandler.announceRoom('mods', "Backing up server...", "blue");
@@ -318,38 +248,14 @@ var WorldHandler = Class.extend({
             //console.log('child process exited with code ' + code);
         });
     },
-    CheckWorldStructure: function(zone, cx, cz) {
-        if (!_.isUndefined(zone) && _.isUndefined(this.world[zone])) {
-            return false;
-        }
-        if (!_.isUndefined(cx) && _.isUndefined(this.world[zone][cx])) {
-            return false;
-        }
-        if (!_.isUndefined(cz) && _.isUndefined(this.world[zone][cx][cz])) {
-            return false;
-        }
-        return true;
+    CheckWorldStructure: function(zoneId, cx, cz) {
+       return !(_.isUndefined(this.zones.getCell(zoneId, cx, cz)));
     },
-    BuildWorldStructure: function(zone, cx, cz) {
-
-        if (!_.isUndefined(zone) && _.isUndefined(this.world[zone])) {
-            this.world[zone] = {};
-        }
-        if (!_.isUndefined(cx) && _.isUndefined(this.world[zone][cx])) {
-            this.world[zone][cx] = {};
-        }
-        if (!_.isUndefined(cz) && _.isUndefined(this.world[zone][cx][cz])) {
-            this.world[zone][cx][cz] = {};
-        }
-
-    },
-    LoadWorldLight: function() {
+    loadWorld: function() {
         var self = this,
             cellsLoaded = {};
 
-        self.world = {};
-
-        readCellsInfo()
+        return readCellsInfo()
             .then(function(info) {
 
                  var deferred = Q.defer();
@@ -360,12 +266,7 @@ var WorldHandler = Class.extend({
                          .then(function() {
 
                            //Will cause 'addUnit' emissions 
-                           self.LoadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
-
-                           // For more performant ticking
-                           self.buildCellsArray();
-
-                           self.hasLoadedWorld = true;
+                           self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
                            
                            callback(null);
                            
@@ -392,6 +293,9 @@ var WorldHandler = Class.extend({
 
                 return deferred.promise;
 
+            })
+            .then(function() {
+               return self.loadNavigationNodes(); 
             });
 
         function readCellsInfo() {
@@ -432,12 +336,6 @@ var WorldHandler = Class.extend({
                         continue;
                     }
 
-                    self.BuildWorldStructure(zone, cx, cz);
-
-                    self.world[zone][cx][cz].objects = [];
-                    self.world[zone][cx][cz].units = [];
-                    self.world[zone][cx][cz].hasLoadedUnits = false;
-
                     //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
                     if (!cellsLoaded[zone]) {
                         cellsLoaded[zone] = 0;
@@ -469,7 +367,7 @@ var WorldHandler = Class.extend({
      * world handler.
      **/
     LoopUnits : function(fn) {
-       this.LoopCells(function(cell) { 
+       return this.LoopCells(function(cell) { 
            if (!_.isUndefined(cell.units)) {
                _.each(cell.units, function(unit) { 
                    fn(unit);
@@ -478,7 +376,7 @@ var WorldHandler = Class.extend({
        }); 
     },
     LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
-        this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
+        return this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
             if (!_.isUndefined(cell.units)) {
                 _.each(cell.units, function(unit) {
                     fn(unit);
@@ -492,20 +390,13 @@ var WorldHandler = Class.extend({
      **/
     LoopCells: function(fn) {
         
-        this.zones.selectAll()
-            .then(function(zones) {
-               _.each(zones, function(zone) {
-                  _.each(zone.cells, fn);
-               }); 
-            });
+        return this.zones.selectAll()
+          .then(function(zones) {
+             _.each(zones, function(zone) {
+                _.each(zone.cells, fn);
+             }); 
+          });
 
-        _.each(this.world, function(zone) {
-               _.each(zone, function(cellX) {
-                   _.each(cellX, function(cellZ) {
-                        fn(cellZ);
-                   });
-               });
-        }); 
     },
     LoopCellsNear: function(zoneId, cellX, cellZ, fn, offset) {
 
@@ -516,35 +407,25 @@ var WorldHandler = Class.extend({
         var minZ = cellZ - offset;
         var maxZ = cellZ + offset;
 
-        this.zones.selectZone(zoneId)
+        return this.zones.selectZone(zoneId)
             .then(function(zone) {
-                  _.chain(zone.cells)
-                   .filter(function(cell) { 
-                       return (
-                          cell.getX() > minX &&
-                          cell.getX() <= maxX &&
-                          cell.getZ() > minZ &&
-                          cell.getZ() <= maxZ
-                       );
-                   }).each(function(cell) {
-                      fn(zone.id);
-                   });
+                _.chain(zone.cells)
+                .filter(function(cell) { 
+                    return (
+                        cell.getX() > minX &&
+                        cell.getX() <= maxX &&
+                        cell.getZ() > minZ &&
+                        cell.getZ() <= maxZ
+                        );
+                }).each(function(cell) {
+                    fn(zone.id);
+                });
 
-               }); 
-
-        var self = this;
-
-        for (var x = cellX - offset; x <= cellX + offset; x++) {
-            for (var z = cellZ - offset; z <= cellZ + offset; z++) {
-                if (self.CheckWorldStructure(zoneId, x, z)) {
-                    fn(self.world[zoneId][x][z]);
-                }
-            }
-        }
+            }); 
     },
     LoopCellsWithIndex: function(fn) {
         
-        this.zones.selectAll()
+        return this.zones.selectAll()
             .then(function(zones) {
                _.each(zones, function(zone) {
                   _.each(zone.cells, function(cell) {
@@ -554,23 +435,6 @@ var WorldHandler = Class.extend({
                }); 
 
             });
-
-        for (var zone in this.world) {
-            if (!this.world.hasOwnProperty(zone)) {
-                continue;
-            }
-            for (var cellX in this.world[zone]) {
-                if (!this.world[zone].hasOwnProperty(cellX)) {
-                    continue;
-                }
-                for (var cellZ in this.world[zone][cellX]) {
-                    if (!this.world[zone][cellX].hasOwnProperty(cellZ)) {
-                        continue;
-                    }
-                    fn(zone, cellX, cellZ);
-                }
-            }
-        }
     },
     LoadSwitches: function() {
         var self = this;
@@ -587,24 +451,42 @@ var WorldHandler = Class.extend({
             });
         });
     },
-    LoadUnits: function(zone, cellX, cellZ) {
-        var worldPos = CellToWorldCoordinates(cellX, cellZ, cellSize),
-            self = this;
+    loadUnits: function(zone, cellX, cellZ) {
 
-        mysql.query('SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?', [zone, (worldPos.x - cellSizeHalf), (worldPos.z - cellSizeHalf), (worldPos.x + cellSizeHalf), (worldPos.z + cellSizeHalf)],
-            function(err, results) {
-                if (err) {
-                    console.log('DB error loading units!', err);
-                    throw err;
-                }
+        var self = this;
 
-                _.each(results, function(unitData) {
-                    self.MakeUnitFromData(unitData);
-                });
-                self.world[zone][cellX][cellZ].hasLoadedUnits = true;
+        var deferred = Q.defer();
+
+        var worldPos = Cells.toWorldCoordinates(cellX, cellZ);
+
+        var halfSize = Cells.size() / 2;
+
+        var dbQuery = 'SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?';
+
+        var x0 = (worldPos.x - cellSizeHalf), 
+            z0 = (worldPos.z - cellSizeHalf),
+            x1 = (worldPos.x + cellSizeHalf),
+            z1 = (worldPos.z + cellSizeHalf);
+        
+
+        mysql.query(dbQuery, [zone, x0, z0, x1, z1], function(err, results) {
+
+            if (err) {
+                console.log('WorldHandler: DB error loading units!', err);
+                throw err;
+            }
+
+            _.each(results, function(unitData) {
+                self.makeUnitFromData(unitData);
             });
+
+            deferred.resolve();
+
+        });
+
+        return deferred.promise;
     },
-    MakeUnitFromData: function(data) {
+    makeUnitFromData: function(data) {
 
         data.id = -data.id;
 
@@ -752,48 +634,51 @@ var WorldHandler = Class.extend({
         return unit;
     },
     clearObjects : function(zoneId, cellX, cellZ) {
-
-        this.world[zoneId][cellX][cellZ].objects = [];
-        this.zones.emit(zoneId, 'clearObjects', Cells.center(cellX, cellZ));
-
+       return this.zones.clearObjects(zoneId, cellX, cellZ);
     },
 
     addObject : function(zoneId, cellX, cellZ, object) {
 
-        var position = new THREE.Vector3(object.x, object.y, object.z);
-
-        this.world[zoneId][cellX][cellZ].objects.push(object);
-
-        this.zones.emit(zoneId, 'addObject', position, object); 
-
-    },
-
-    emitChangeObject : function(zoneId, cellX, cellZ, object) {
-        
-        if(_.isUndefined(worldHandler.world[zoneId][cellX][cellZ].changeBuffer) ) {
-            worldHandler.world[zoneId][cellX][cellZ].changeBuffer = [];
-        }
-
-        worldHandler.world[zoneId][cellX][cellZ].changeBuffer.push(pushData);
-
-        this.zones.emit(zoneId, 'changeObject', Cells.center(cellX, cellZ));
+       return this.zones.getObjects(zoneId, cellX, cellZ)
+          .then(function(objects) {
+             objects.push(object);
+          });
 
     },
 
-    emitDeleteObject : function(zoneId, cellX, cellZ, object) { 
+    emitChangeObject : function(zoneId, cellX, cellZ, pushData) {
 
-       if(_.isUndefined(worldHandler.world[zoneId][cellX][cellZ].deleteBuffer)) {
-           worldHandler.world[zoneId][cellX][cellZ].deleteBuffer = [];
-       }
+       return this.zones.getChangeBuffer(zoneId, cellX, cellZ)
+           .then(function(changeBuffer) { 
+              changeBuffer.push(pushData);
+           });
 
-       worldHandler.world[zoneId][cellX][cellZ].deleteBuffer.push(data);
+    },
 
-       this.zones.emit(zoneId, 'deleteObject', position, object);
+    emitDeleteObject : function(zoneId, cellX, cellZ, object) {
+
+       return this.zones.getDeleteBuffer(zoneId, cellX, cellZ)
+           .then(function(deleteBuffer) {
+              deleteBuffer.push(object); 
+           });
+
+    },
+    clearUnits : function(zoneId, cellX, cellZ) {
+
+       var deferred = Q.defer();
+
+       this.zones.getCell(zoneId, cellX, cellZ).units = [];
+
+       deferred.resolve();
+
+       return deferred.promise;
 
     },
     LoadCell: function(zoneId, cellX, cellZ) {
 
         var self = this;
+
+        var deferred = Q.defer();
 
         // Query the entry
         var path = dataPath + "/" + zoneId + "/" + cellX + "/" + cellZ;
@@ -815,93 +700,107 @@ var WorldHandler = Class.extend({
 
                     var objects =  JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
 
-                     self.clearObjects();
+                     self.clearObjects()
+                         .then(function() {
 
-                     _.each(objects, self.addObject.bind(self)); 
+                            var promises = _.map(objects, function(object) {
+                               return self.addObject(object); 
+                            });
 
-                    console.log(objects); 
+                            return Q.all(promises); 
+
+                         })
+                         .then(function() {
+                            return self.clearUnits(zoneId, cellX, cellZ);
+                         })
+                         .then(function() {
+                            deferred.resolve(); 
+                         });
+
                 }
             } catch (e) {
-                throw e;
+
+                console.error('WorldHandler.LoadCell:', err);
+                deferred.reject(e);
+
             }
         }
 
-        this.world[zoneId][cellX][cellZ].units = [];
+        return deferred.promise;
+
     },
     GenerateCell: function(zone, cellX, cellZ) {
 
+        var self = this;
+
         var cellCoords = new THREE.Vector3(cellX, 0, cellZ);
 
-        this.zones.createCell(zone, new THREE.Vector3(cellX, 0, cellZ))
+        return this.zones.createCell(zone, new THREE.Vector3(cellX, 0, cellZ))
             .then(function() {
-
-                this.BuildWorldStructure(zone, cellX, cellZ);
-
-                this.world[zone][cellX][cellZ].units = [];
-                this.world[zone][cellX][cellZ].objects = [];
 
                 log("Generated cell (" + cellX + "," + cellZ + ")");
 
-                this.SaveCell(zone, cellX, cellZ, true);
+                self.SaveCell(zone, cellX, cellZ, true);
 
             });
     },
     SaveCell: function(zone, cellX, cellZ, clearObjects) {
 
-        self.zones.emit(zone, worldCoords, 'saveCell', Cells.center(cellX, cellZ));
-
         var self = this,
             doClearObjects = clearObjects || false;
 
         chatHandler.announceRoom('editors', "Saving cell " + cellX + ", " + cellZ + " in zone " + zone + "...");
+  
+        this.LoadCell(zone, cellX, cellZ)
+            .then(function() {
 
-        // Instead of saving instantly, we load the cell, overwrite it with the terrain we have, and save it! And empty terrain!
-        var buffer_objects = JSON.parse(JSON.stringify(this.world[zone][cellX][cellZ].objects));
-        var buffer_units = this.world[zone][cellX][cellZ].units;
+                if (doClearObjects) {
 
-        this.LoadCell(zone, cellX, cellZ);
+                    return self.zones.clearObjects(); 
 
-        if (doClearObjects) {
+                }
 
-            this.world[zone][cellX][cellZ].objects = [];
+            })
+            .then(function() {
 
-            buffer_objects = [];
-        }
-
-        this.world[zone][cellX][cellZ].units = buffer_units;
-
-        this.world[zone][cellX][cellZ].objects = this.world[zone][cellX][cellZ].objects.concat(buffer_objects);
+               var objectsPromise = JSON.parse(JSON.stringify(self.zones.getObjects(zone, cellX, cellZ)));
+               var changeBufferPromise = self.zones.getChangeBuffer(zone, cellX, cellZ);
+               var deleteBufferPromise = self.zones.getDeleteBuffer(zone, cellX, cellZ);
 
 
-        updateMetadata(
-            self.world[zone][cellX][cellZ].changeBuffer,
-            self.world[zone][cellX][cellZ].objects
-        );
+               return [ objectsPromise, changeBufferPromise, deleteBufferPromise ];
+            })
+            .spread(function(objects, changeBuffer, deleteBuffer) {
 
-        self.world[zone][cellX][cellZ].objects = deleteObjects(
-            self.world[zone][cellX][cellZ].deleteBuffer,
-            self.world[zone][cellX][cellZ].objects
-        );
-            
-        // Query the entry
-        var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
+                objects = updateMetadata(changeBuffer, objects); 
+                objects = deleteObjects(deleteBuffer, objects);
 
-        fsi.mkdirSync(path, 0777, true, function(err) {
-            if (err) {
-                log("Error:" + err);
-            } else {
-                log('Directory created');
-            }
-        });
+                return objects;
 
-        var str = JSON.stringify(this.world[zone][cellX][cellZ].objects, null, 4);
-        fs.writeFileSync(path + "/objects.json", str);
+            })
+            .then(function(objects) {
 
-        log("Saved cell (" + cellX + "," + cellZ + ") in zone " + zone + "");
+                // Query the entry
+                var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
 
-        // Clean up
-        this.world[zone][cellX][cellZ].objects = [];
+                fsi.mkdirSync(path, 0777, true, function(err) {
+                    if (err) {
+                        log("Error:" + err);
+                    } else {
+                        log('Directory created');
+                    }
+                });
 
+                var str = JSON.stringify(objects, null, 4);
+                fs.writeFileSync(path + "/objects.json", str);
+
+                log("Saved cell (" + cellX + "," + cellZ + ") in zone " + zone + "");
+
+                // Clean up
+                return self.zones.clearObjects(zone, cellX, cellZ);
+                
+            });
+ 
 
         function updateMetadata(changeBuffer, objects) {
 
@@ -931,6 +830,8 @@ var WorldHandler = Class.extend({
                     });
                 });
             }
+
+            return objects;
 
         }
 
@@ -965,34 +866,32 @@ var WorldHandler = Class.extend({
     },
     UpdateNearbyUnitsOtherUnitsLists: function(zoneId, cellX, cellZ) {
 
-        this.LoopUnitsNear(zoneId, cellX, cellZ, function(unit) {
+        return this.LoopUnitsNear(zoneId, cellX, cellZ, function(unit) {
             unit.UpdateOtherUnitsList();
         }, 1);
 
     },
     FindUnit: function(id) {
-        var foundUnit = null;
 
-        this.LoopUnits(function(unit) {
-            if (foundUnit) {
-                return;
-            }
+        return this.getUnits()
+            .then(function(units) {
 
-            if (unit.id === id) {
-                foundUnit = unit;
-            }
-        });
-
-        return foundUnit;
+               return _.find(units, function(unit) {
+                  return unit.id === id; 
+               });
+                
+            });
     },
 
     // get ALL units matching name and in optional zone
     findUnitsByName: function(name, zoneId) {
 
-        return _.chain(this.getNPCs())
+        return this.getNPCs()
+            .then(function(npcs) { 
+                return _.chain(npcs)
                 .filter(function(unit) { 
                     return !_.isUndefined(zoneId) ?
-                       unit.zone === zoneId : true;
+                    unit.zone === zoneId : true;
                 })
                 .filter(function(unit) { 
 
@@ -1002,20 +901,21 @@ var WorldHandler = Class.extend({
 
                 })
                 .value();
+            });
+
     },
 
     // locate a unit (non-player) by data.name, 
     findUnitByName: function(name, zoneId) {
 
-        return (_.chain(this.getNPCs())
+        return this.getNPCs()
+           .then(function(npcs) { 
+              return (_.chain(npcs)
                  .filter(function(unit) {
                      return !_.isUndefined(zoneId) ? 
                         unit.zone === zoneId : true;
                 })
                 .find(function(unit) {
-
-                   if(unit.data && unit.data.name) { 
-                   console.log(unit.data.name); }
 
                     return unit.data &&
                     unit.data.name &&
@@ -1023,19 +923,25 @@ var WorldHandler = Class.extend({
 
                 })
                 .value() || null);
+          });
     },
 
     // Only for players!!!!
     FindPlayerByName: function(name) {
 
-        return (_.chain(this.getPlayers())
+        return this.getPlayers()
+           .then(function(players) {
+              
+              return ( _.chain(players)
                  .find(function(unit) {
 
-                    return unit.name &&
-                       unit.name === name;
+                   return unit.name &&
+                   unit.name === name;
 
                  })
                  .value() || null);
+
+           });
 
     },
 
@@ -1047,46 +953,47 @@ var WorldHandler = Class.extend({
 
         var nearby = [];
 
-        this.LoopUnitsNear(zoneId, cx, cz, function(unit) {
+        return this.LoopUnitsNear(zoneId, cx, cz, function(unit) {
             if(unit.id === id) {
                nearby.push(unit);
             }
-        }, 1);
+        }, 1)
+        .then(function() {
 
-        return (_.first(nearby) || null); 
+          return (_.first(nearby) || null); 
+
+        });
+
     },
 
     BuildWaypointListFromUnitIds: function(list) {
+
         var self = this,
             newList = [];
-        _.each(list, function(number) {
-            var unit = self.FindUnit(-number);
-            if (unit) {
-                // Passing by reference on purpose, for dynamic waypoints in the future
-                newList.push({
-                    id: number,
-                    pos: unit.position
-                });
-            }
+
+        var promises = _.map(list, function(number) {
+
+           return self.FindUnit(-number)
+              .then(function(unit) { 
+                  if (unit) {
+
+                      // Passing by reference on purpose, for dynamic waypoints in the future
+                      newList.push({
+                          id: number,
+                          pos: unit.position
+                      });
+
+                  }
+              });
+
         });
-        return newList;
-    },
 
-    DeleteUnit: function(id) {
-
-        var unit = this.FindUnit(id);
-        var cellCoords;
-
-        if(unit == null) { 
-           return false;
-        }
-
-        cellCoords = WorldToCellCoordinates(unit.position.x, unit.position.z, cellSize);
-        
-        this.removeUnitFromCell(unit, cellCoords.x, cellCoords.z);
-
-        return true;
+        return Q.all(promises)
+           .then(function() {
+              return newList;
+           });
     }
+
 });
 
 var worldHandler = new WorldHandler();

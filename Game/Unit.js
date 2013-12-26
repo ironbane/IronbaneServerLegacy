@@ -24,394 +24,393 @@ var Unit = Class.extend({
     this.active = this.id > 0 ? true : false;
 
 
-    // Whether the unit has a custom script attached
-    this.isScripted = false;
+        // Whether the unit has a custom script attached
+        this.isScripted = false;
 
-    // Physics...
-    //
+        // Physics...
+        //
 
-    this.mass = 0.5;
+        this.mass = 0.5;
 
-    // Server-side velocity, is not sent to the client
-    this.velocity = new THREE.Vector3();
+        // Server-side velocity, is not sent to the client
+        this.velocity = new THREE.Vector3();
 
-    // a normalized vector pointing in the direction the entity is heading.
-    this.heading = new THREE.Vector3();
+        // a normalized vector pointing in the direction the entity is heading.
+        this.heading = new THREE.Vector3();
 
-    //a vector perpendicular to the heading vector
-    this.side = new THREE.Vector3();
+        //a vector perpendicular to the heading vector
+        this.side = new THREE.Vector3();
 
-    //the maximum speed at which this entity may travel.
-    this.maxSpeed = 5.0;
-
-
-    // A list of other units that this unit can see, updated by the server
-    // Used by the server to inform each clients which units are nearby, and which need full/light updates
-    this.otherUnits = [];
-
-    // The fields of this unit that will be sent on the next snapshot
-    // We should only send fields that have changed since last snapshot, or when we initially send all data
-    this.updatedFields = {};
+        //the maximum speed at which this entity may travel.
+        this.maxSpeed = 5.0;
 
 
-    // Make additional properties
+        // A list of other units that this unit can see, updated by the server
+        // Used by the server to inform each clients which units are nearby, and which need full/light updates
+        this.otherUnits = [];
 
-    this.position = new THREE.Vector3(this.x, this.y, this.z);
-    this.localPosition = new THREE.Vector3();
-
-    this.rotx = this.rotx === undefined ? 0 : this.rotx;
-    this.roty = this.roty === undefined ? 0 : this.roty;
-    this.rotz = this.rotz === undefined ? 0 : this.rotz;
-
-    this.rotation = new THREE.Vector3(this.rotx, this.roty, this.rotz);
-
-    // Convert zone to int
-    this.zone = parseInt(this.zone, 10);
+        // The fields of this unit that will be sent on the next snapshot
+        // We should only send fields that have changed since last snapshot, or when we initially send all data
+        this.updatedFields = {};
 
 
-    // Update the heading based on the rotation
-    var radians = (this.rotation.y + (Math.PI / 2));
+        // Make additional properties
 
-    this.heading.x = Math.sin(radians);
-    this.heading.y = 0;
-    this.heading.z = Math.cos(radians);
-    this.heading.normalize();
+        this.position = new THREE.Vector3(this.x, this.y, this.z);
+        this.localPosition = new THREE.Vector3();
+
+        this.rotx = this.rotx === undefined ? 0 : this.rotx;
+        this.roty = this.roty === undefined ? 0 : this.roty;
+        this.rotz = this.rotz === undefined ? 0 : this.rotz;
+
+        this.rotation = new THREE.Vector3(this.rotx, this.roty, this.rotz);
+
+        // Convert zone to int
+        this.zone = parseInt(this.zone, 10);
 
 
+        // Update the heading based on the rotation
+        var radians = (this.rotation.y + (Math.PI / 2));
 
-    this.sendRotationPacketX = false;
-    this.sendRotationPacketY = false;
-    this.sendRotationPacketZ = false;
-
-    this.UpdateCellPosition();
-
-    this.closestNode = null;
+        this.heading.x = Math.sin(radians);
+        this.heading.y = 0;
+        this.heading.z = Math.cos(radians);
+        this.heading.normalize();
 
 
 
-    this.standingOnUnitId = 0;
+        this.sendRotationPacketX = false;
+        this.sendRotationPacketY = false;
+        this.sendRotationPacketZ = false;
+
+        this.UpdateCellPosition();
+
+        this.closestNode = null;
 
 
 
-    this.startPosition = this.position.clone();
-    this.startRotation = this.rotation.clone();
+        this.standingOnUnitId = 0;
 
 
-    var me = this;
-
-    setTimeout(function() {
-      me.UpdateNearbyUnitsOtherUnitsLists();
-      worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
-    }, 0);
+        this.startPosition = this.position.clone();
+        this.startRotation = this.rotation.clone();
 
 
-    this.navigationMeshGroup = null;
+        var me = this;
+
+        setTimeout(function() {
+          me.UpdateNearbyUnitsOtherUnitsLists();
+          worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
+        }, 0);
 
 
-  },
-  isPlayer: function() {
-    return this instanceof Player;
-  },
-  isA: function(type) {
-      var self = this;
-      return eval('self instanceof ' + type);
-  },
-  Awake: function() {
-    //log(this.id+" is awake!");
-    // For fast searching, we need to precompute what group of nodes
-    // from the navigation mesh we are going to search in
-    this.navigationMeshGroup = pathFinder.getGroup(this.zone, this.position);
-  },
-  TeleportToUnit: function(unit, noEmit) {
-    this.Teleport(unit.zone, unit.position, noEmit);
-  },
-  Teleport: function(zone, position, noEmit) {
+        this.navigationMeshGroup = null;
 
 
-    noEmit = noEmit || false;
+      },
+      isPlayer: function() {
+        return this instanceof Player;
+      },
+      isA: function(type) {
+          var self = this;
+          return eval('self instanceof ' + type);
+      },
+      Awake: function() {
+        //log(this.id+" is awake!");
+        // For fast searching, we need to precompute what group of nodes
+        // from the navigation mesh we are going to search in
+        this.navigationMeshGroup = pathFinder.getGroup(this.zone, this.position);
+      },
+      TeleportToUnit: function(unit, noEmit) {
+        this.Teleport(unit.zone, unit.position, noEmit);
+      },
+      Teleport: function(zone, position, noEmit) {
 
-    // Prevent all stuff from spawning under the ground, etc
-    this.readyToReceiveUnits = false;
 
-    if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-        worldHandler.removeUnitFromCell(this, this.cellX, this.cellZ);
-    }
+        noEmit = noEmit || false;
 
-    this.UpdateNearbyUnitsOtherUnitsLists();
+        // Prevent all stuff from spawning under the ground, etc
+        this.readyToReceiveUnits = false;
 
-    this.socket.leave('zone_'+this.zone);
-    this.zone = zone;
-    // copy instead of clone so that this can be a plain obj
-    this.position.copy(position);
-    this.UpdateCellPosition();
+        if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
+            worldHandler.removeUnitFromCell(this, this.cellX, this.cellZ);
+        }
 
-    if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
-        worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
-    }
-    else {
-        log("[Teleport] Cell does not exist for unit #" +
-                this.id + " (" + this.cellX + ", " + this.cellZ + ")");
-        if (this.isPlayer() > 0 && this.editor) {
-            log("[Teleport] Generating cell because he's an editor.");
-            worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
+        this.UpdateNearbyUnitsOtherUnitsLists();
+
+        this.socket.leave('zone_'+this.zone);
+        this.zone = zone;
+        // copy instead of clone so that this can be a plain obj
+        this.position.copy(position);
+        this.UpdateCellPosition();
+
+        if (worldHandler.CheckWorldStructure(this.zone, this.cellX, this.cellZ)) {
             worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
         }
-    }
+        else {
+            log("[Teleport] Cell does not exist for unit #" +
+                    this.id + " (" + this.cellX + ", " + this.cellZ + ")");
+            if (this.isPlayer() > 0 && this.editor) {
+                log("[Teleport] Generating cell because he's an editor.");
+                worldHandler.GenerateCell(this.zone, this.cellX, this.cellZ);
+                worldHandler.addUnitToCell(this, this.cellX, this.cellZ);
+            }
+        }
 
-    this.UpdateNearbyUnitsOtherUnitsLists();
+        this.UpdateNearbyUnitsOtherUnitsLists();
 
 
-    if (this.isPlayer() && !noEmit) {
-      this.socket.emit('teleport', {
-        zone: zone,
-        pos: position
-      });
-      this.socket.join('zone_'+zone);
-    }
-  },
-  UpdateNearbyUnitsOtherUnitsLists: function() {
-    worldHandler.UpdateNearbyUnitsOtherUnitsLists(this.zone, this.cellX, this.cellZ);
-  },
-  UpdateCellPosition: function() {
+        if (this.isPlayer() && !noEmit) {
+          this.socket.emit('teleport', {
+            zone: zone,
+            pos: position
+          });
+          this.socket.join('zone_'+zone);
+        }
+      },
+      UpdateNearbyUnitsOtherUnitsLists: function() {
+        worldHandler.UpdateNearbyUnitsOtherUnitsLists(this.zone, this.cellX, this.cellZ);
+      },
+      UpdateCellPosition: function() {
 
-    var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
+        var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
-    // Maintain a cell position
-    this.cellX = cellPos.x;
-    this.cellZ = cellPos.z;
+        // Maintain a cell position
+        this.cellX = cellPos.x;
+        this.cellZ = cellPos.z;
 
-  },
-  AddOtherUnit: function(unit) {
-    var specialAppearance;
+      },
+      AddOtherUnit: function(unit) {
+        var specialAppearance;
 
-    // Auto send AddUnit if we're a player
-    this.otherUnits.push(unit);
+        // Auto send AddUnit if we're a player
+        this.otherUnits.push(unit);
 
-    // Add the unit to ourselves clientside (only if WE are a player)
-    if (this.isPlayer()) {
+        // Add the unit to ourselves clientside (only if WE are a player)
+        if (this.isPlayer()) {
 
-      var id = unit.id;
+          var id = unit.id;
 
-      var packet = {
-        id: id,
-        position: unit.position,
-        rotY: unit.rotation.y,
-        param: unit.param
-      };
+          var packet = {
+            id: id,
+            position: unit.position,
+            rotY: unit.rotation.y,
+            param: unit.param
+          };
 
-      if (unit instanceof Fighter) {
+          if (unit instanceof Fighter) {
 
-        packet.health = unit.health;
-        packet.armor = unit.armor;
-        packet.healthMax = unit.healthMax;
-        packet.armorMax = unit.armorMax;
+            packet.health = unit.health;
+            packet.armor = unit.armor;
+            packet.healthMax = unit.healthMax;
+            packet.armorMax = unit.armorMax;
 
-        packet.size = unit.size;
+            packet.size = unit.size;
 
-        // special appearance items check (TODO: consolidate into method somewhere?)
-        _.each(unit.items, function(item) {
-            if(item.equipped) {
-                if(item.data && item.data.specialSkin) {
-                    specialAppearance = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
+            // special appearance items check (TODO: consolidate into method somewhere?)
+            _.each(unit.items, function(item) {
+                if(item.equipped) {
+                    if(item.data && item.data.specialSkin) {
+                        specialAppearance = {skin: item.data.specialSkin, eyes: 0, hair: 0, head: 0, body: 0, feet: 0};
+                    }
                 }
+            });
+
+            if(specialAppearance) {
+                packet.skin = specialAppearance.skin;
+                packet.eyes = specialAppearance.eyes;
+                packet.hair = specialAppearance.hair;
+                packet.head = specialAppearance.head;
+                packet.body = specialAppearance.body;
+                packet.feet = specialAppearance.feet;
+            } else {
+                packet.skin = unit.skin;
+                packet.eyes = unit.eyes;
+                packet.hair = unit.hair;
+                packet.head = unit.head;
+                packet.body = unit.body;
+                packet.feet = unit.feet;
+            }
+
+            if (unit.isPlayer()) {
+              // Add additional data to the packet
+              packet.name = unit.name;
+
+              var item = unit.GetEquippedWeapon();
+              if (item) {
+                packet.weapon = item.template;
+              }
+
+            }
+            else {
+              if (unit.weapon && unit.displayweapon) {
+                packet.weapon = unit.weapon.id;
+              }
+            }
+          }
+
+          if (!(unit.isPlayer())) {
+            packet.template = unit.template.id;
+
+            if (unit.template.type === UnitTypeEnum.TRAIN ||
+              unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
+              unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
+              packet.rotX = unit.rotation.x;
+              packet.rotZ = unit.rotation.z;
+            }
+
+            if (unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
+              unit.data.on = unit.on;
+            }
+
+            if (unit.template.special) {
+              packet.metadata = unit.data;
+            }
+          }
+          this.socket.emit("addUnit", packet);
+        }
+      },
+
+      RemoveOtherUnit: function(unit) {
+        // Auto send AddUnit if we're a player
+
+        this.otherUnits = _.without(this.otherUnits, unit);
+
+
+        // Add the unit to ourselves clientside (only if WE are a player)
+        if (this.isPlayer()) {
+          this.socket.emit("removeUnit", {
+            id: unit.id
+          });
+        }
+      },
+      UpdateOtherUnitsList: function() {
+
+        var self = this;
+
+        // If we are a player, only do so if we're ready to receive data
+        if (this.isPlayer() && !this.readyToReceiveUnits) return;
+
+        // We have two lists
+        // There is a list of units we currently have, and a list that we will have once we recalculate
+        // If an item is in the first list, but no longer in the second list, do RemoveOtherUnit
+        // If an item is in the first & second list, don't do anything
+        // If an item is only in the last list, do AddOtherUnit
+        var firstList = this.otherUnits;
+        var secondList = [];
+
+        // Loop over the world cells nearby and add all units
+        var cx = this.cellX;
+        var cz = this.cellZ;
+
+        worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
+            if(unit !== self) {
+               secondList.push(unit);
             }
         });
 
-        if(specialAppearance) {
-            packet.skin = specialAppearance.skin;
-            packet.eyes = specialAppearance.eyes;
-            packet.hair = specialAppearance.hair;
-            packet.head = specialAppearance.head;
-            packet.body = specialAppearance.body;
-            packet.feet = specialAppearance.feet;
-        } else {
-            packet.skin = unit.skin;
-            packet.eyes = unit.eyes;
-            packet.hair = unit.hair;
-            packet.head = unit.head;
-            packet.body = unit.body;
-            packet.feet = unit.feet;
-        }
-
-        if (unit.isPlayer()) {
-          // Add additional data to the packet
-          packet.name = unit.name;
-
-          var item = unit.GetEquippedWeapon();
-          if (item) {
-            packet.weapon = item.template;
-          }
-
-        }
-        else {
-          if (unit.weapon && unit.displayweapon) {
-            packet.weapon = unit.weapon.id;
-          }
-        }
-      }
-
-      if (!(unit.isPlayer())) {
-        packet.template = unit.template.id;
-
-        if (unit.template.type === UnitTypeEnum.TRAIN ||
-          unit.template.type === UnitTypeEnum.MOVINGOBSTACLE ||
-          unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
-          packet.rotX = unit.rotation.x;
-          packet.rotZ = unit.rotation.z;
-        }
-
-        if (unit.template.type === UnitTypeEnum.LEVER || unit.template.type === UnitTypeEnum.TOGGLEABLEOBSTACLE) {
-          unit.data.on = unit.on;
-        }
-
-        if (unit.template.special) {
-          packet.metadata = unit.data;
-        }
-      }
-      this.socket.emit("addUnit", packet);
-    }
-  },
-
-  RemoveOtherUnit: function(unit) {
-    // Auto send AddUnit if we're a player
-
-    this.otherUnits = _.without(this.otherUnits, unit);
-
-
-    // Add the unit to ourselves clientside (only if WE are a player)
-    if (this.isPlayer()) {
-      this.socket.emit("removeUnit", {
-        id: unit.id
-      });
-    }
-  },
-  UpdateOtherUnitsList: function() {
-
-    var self = this;
-
-    // If we are a player, only do so if we're ready to receive data
-    if (this.isPlayer() && !this.readyToReceiveUnits) return;
-
-    // We have two lists
-    // There is a list of units we currently have, and a list that we will have once we recalculate
-    // If an item is in the first list, but no longer in the second list, do RemoveOtherUnit
-    // If an item is in the first & second list, don't do anything
-    // If an item is only in the last list, do AddOtherUnit
-    var firstList = this.otherUnits;
-    var secondList = [];
-
-    // Loop over the world cells nearby and add all units
-    var cx = this.cellX;
-    var cz = this.cellZ;
-
-    worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
-        if(unit !== self) {
-           secondList.push(unit);
-        }
-    });
-
-    for (var i = 0; i < firstList.length; i++) {
-        if (secondList.indexOf(firstList[i]) == -1) {
-            // Not found in the second list, so remove it
-            this.RemoveOtherUnit(firstList[i]);
-        }
-    }
-
-    for (var i = 0; i < secondList.length; i++) {
-        if (firstList.indexOf(secondList[i]) == -1) {
-            // Not found in the first list, so add it
-            this.AddOtherUnit(secondList[i]);
-        }
-    }
-
-  },
-  FindNearestUnit: function(maxDistance) {
-
-    maxDistance = maxDistance || 0;
-
-    var self = this;
-
-    var cx = self.cellX;
-    var cz = self.cellZ;
-    var nearestUnit = null;
-
-    worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) {
-
-        if (unit !== self) {
-            if (unit instanceof Fighter && unit.health > 0) {
-
-                var pos = self.position;
-
-                if (maxDistance > 0 &&
-                    DistanceBetweenPoints(pos.x, pos.z, unit.position.x, unit.position.z) <= maxDistance) {
-                    return unit;
-                }
+        for (var i = 0; i < firstList.length; i++) {
+            if (secondList.indexOf(firstList[i]) == -1) {
+                // Not found in the second list, so remove it
+                this.RemoveOtherUnit(firstList[i]);
             }
         }
 
-    });
+        for (var i = 0; i < secondList.length; i++) {
+            if (firstList.indexOf(secondList[i]) == -1) {
+                // Not found in the first list, so add it
+                this.AddOtherUnit(secondList[i]);
+            }
+        }
 
-    return nearestUnit;
-  },
-  findNearestSpawnPoint: function() {
-    var unit = this,
-      spawn = null,
-      spawns = worldHandler.findUnitsByName('player_spawn_point', unit.zone);
+      },
+      FindNearestUnit: function(maxDistance) {
 
-    if (spawns.length === 0) {
-      return spawn;
-    }
+        maxDistance = maxDistance || 0;
 
-    if (spawns.length === 1) {
-      spawn = spawns[0];
-    }
+        var self = this;
 
-    var distance = Number.MAX_VALUE;
-    _.each(spawns, function(point) {
-      var d = DistanceBetweenPoints(unit.position.x, unit.position.z, point.position.x, point.position.z);
-      if (d < distance) {
-        spawn = point;
-        distance = d;
-      }
-    });
+        var cx = self.cellX;
+        var cz = self.cellZ;
+        var nearestUnit = null;
 
-    return spawn;
-  },
-  ChangeCell: function(newCellX, newCellZ) {
+        worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) {
 
-    // Make sure we generate adjacent cells if they don't exist
-    var cx = this.cellX;
-    var cz = this.cellZ;
-    var zone = this.zone;
+            if (unit !== self) {
+                if (unit instanceof Fighter && unit.health > 0) {
+
+                    var pos = self.position;
+
+                    if (maxDistance > 0 &&
+                        DistanceBetweenPoints(pos.x, pos.z, unit.position.x, unit.position.z) <= maxDistance) {
+                        return unit;
+                    }
+                }
+            }
+
+        });
+
+        return nearestUnit;
+      },
+      findNearestSpawnPoint: function() {
+        var unit = this,
+          spawn = null,
+          spawns = worldHandler.findUnitsByName('player_spawn_point', unit.zone);
+
+        if (spawns.length === 0) {
+          return spawn;
+        }
+
+        if (spawns.length === 1) {
+          spawn = spawns[0];
+        }
+
+        var distance = Number.MAX_VALUE;
+        _.each(spawns, function(point) {
+          var d = DistanceBetweenPoints(unit.position.x, unit.position.z, point.position.x, point.position.z);
+          if (d < distance) {
+            spawn = point;
+            distance = d;
+          }
+        });
+
+        return spawn;
+      },
+      ChangeCell: function(newCellX, newCellZ) {
+
+        // Make sure we generate adjacent cells if they don't exist
+        var cx = this.cellX;
+        var cz = this.cellZ;
+        var zone = this.zone;
 
 
-    var cellPos = {
-      x: newCellX,
-      z: newCellZ
-    };
+        var cellPos = {
+          x: newCellX,
+          z: newCellZ
+        };
 
-    if (cellPos.x != this.cellX || cellPos.z != this.cellZ) {
-
-
-      // First, remove us from our world cell and add ourselves to the right cell
-      // Remove the unit from the world cells
-      if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
-        worldHandler.removeUnitFromCell(this, cx, cz);
-      }
+        if (cellPos.x != this.cellX || cellPos.z != this.cellZ) {
 
 
-      // Add to the new cell
-      // What if the cell doesn't exist? Don't add?
-      if (worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) {
-        worldHandler.addUnitToCell(this, newCellX, newCellZ);
-      }
-      else {
-        log("[ChangeCell] Cell does not exist for unit #" +
-          this.id + " (" + cellPos.x + ", " + cellPos.z + ")");
-        if (this.isPlayer() && this.editor) {
-          log("[ChangeCell] Generating cell because he's an editor.");
-          worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
-          worldHandler.addUnitToCell(this, newCellX, newCellZ);
+          // First, remove us from our world cell and add ourselves to the right cell
+          // Remove the unit from the world cells
+          if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
+            worldHandler.removeUnitFromCell(this, cx, cz);
+          }
+
+
+          // Add to the new cell
+          // What if the cell doesn't exist? Don't add?
+          if (worldHandler.CheckWorldStructure(zone, cellPos.x, cellPos.z)) {
+            worldHandler.addUnitToCell(this, newCellX, newCellZ);
+          }
+          else {
+            log("[ChangeCell] Cell does not exist for unit #" +
+              this.id + " (" + cellPos.x + ", " + cellPos.z + ")");
+            if (this.isPlayer() && this.editor) {
+              log("[ChangeCell] Generating cell because he's an editor.");
+              worldHandler.GenerateCell(zone, cellPos.x, cellPos.z);
+              worldHandler.addUnitToCell(this, newCellX, newCellZ);
         }
       }
 

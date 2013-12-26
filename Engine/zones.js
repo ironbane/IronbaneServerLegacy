@@ -20,7 +20,64 @@
  **/
 var aabb = require('aabb-3d'),
     spatial = require('spatial-events'),
-    q = require('q');
+    Q = require('q');
+
+spatial.prototype.listens(name, bbox) = function() {
+
+    //support point emitting
+    if('0' in bbox) {
+         bbox = aabb(bbox, [0, 0, 0]) 
+    }
+
+    var treeListens = function(node, event, bbox) { 
+       
+        var nodeListens,
+            childListens = false;
+
+        for(var i = 0; i < node.children.length; i < len; ++i) {
+            if(bbox.intersects(node.children[i].bbox)) {
+                childListens = nodeListens(node.children[i], event, bbox);
+                break;
+            }
+        }  
+
+        var list = this.listeners[event];
+
+        if(list) {
+
+            for(var i = 0, len = list.length; i < len; ++i) {
+                if(list[i].bbox.intersects(bbox)) {
+                    nodeListens = true;
+                    break;
+                }
+            }
+
+        }
+
+        return nodeListens || childListens;
+
+    };
+
+    if(this.root) {
+        if(treeListens(root, event, bbox)) {
+            return true;
+        }
+    }
+
+
+    if(!this.infinites[event]) {
+        return false;
+    }
+
+    var list = this.infinites[event].slice();
+        for(var i = 0, len = list.length; i < len; ++i) {
+            if(list[i].bbox.intersects(bbox)) {
+                return true;
+            }
+        }
+
+    return false;
+};
 
 var CellHandler = function(bbox, cellCoords) {
 
@@ -28,7 +85,9 @@ var CellHandler = function(bbox, cellCoords) {
         bbox : bbox,
         cellCoords : cellCoords,
         units : [],
-        objects : []
+        objects : [],
+        changeBuffer : [],
+        deleteBuffer : []
     }; 
 
     function getX() { 
@@ -42,12 +101,12 @@ var CellHandler = function(bbox, cellCoords) {
     function loadCell() { }
     function loadUnits() { }
 
-    function addUnit(unit) {
+    function addUnit(deferred, unit) {
 
        if(!_.isUndefined(unit) &&
           !_.isUndefined(unit.id) &&
           !_.some(this.fields.units, function(u) { 
-             return u.id == unit.id; })) {
+             return u.id === unit.id; })) {
 
           this.fields.units[unit.id] = unit; 
 
@@ -57,16 +116,46 @@ var CellHandler = function(bbox, cellCoords) {
 
        }
 
+       deferred.resolve();
     }
 
-    function removeUnit(unit)  {
+    function removeUnit(deferred, unit)  {
 
        if(!_.isUndefined(unit) &&
           !_.isUndefined(unit.id)) { 
       
            delete this.fields.units[unit.id]; 
        }
-    
+
+       deferred.resolve();
+    }
+
+    function changeActivity(val) { 
+
+        var isNPC = function(unit) { return !(unit.id > 0); };
+
+        if(_.every(this.fields.units, isNPC)) { 
+
+           _.each(this.fields.units, function(unit) { 
+               unit.active = val;
+           }); 
+
+        }
+
+    }
+
+    function deactivate(deferred) {
+
+        changeActivity(false);
+
+        deferred.resolve();
+    }
+
+    function activate(deferred) {
+
+        changeActivity(true);
+
+        deferred.resolve();
     }
 
     this.getX = getX;
@@ -75,18 +164,29 @@ var CellHandler = function(bbox, cellCoords) {
     this.loadUnits = loadUnits;
     this.addUnit = addUnit;
     this.removeUnit = removeUnit;
+    this.activate = activate;
+    this.deactivate = deactivate;
 
 };
 
 var Cells = (function() {
 
+    function size() {
+       
+       return cellSize || 20;
+
+    }
+
+    function toWorldCoordinates(cellX, cellZ) {
+       return CellToWorldCoordinates(cellX, cellZ, size()); 
+    }
+
     function nearest(cellCoords) {
 
-        // cellSize from common/constants.js 
-        var args = [cellCoords.x, cellCoords.z, cellSize]; 
-        var xz = CellToWorldCoordinates.apply(null, args); // from Shared/Util.js
+        var xz = toWorldCoordinates(cellCoords.x, cellCoords.z); // from Shared/Util.js
+
         var begin = [xz.x, 0, xz.z];
-        var dimensions = [cellSize, cellSize, cellSize];
+        var dimensions = [size(), size(), size()];
 
         return aabb(begin, dimensions); 
 
@@ -95,10 +195,12 @@ var Cells = (function() {
     function center(cellX, cellZ) {
        return (function(xz) { 
            return new THREE.Vector3(xz.x, 0, xz.z);
-       })(CellToWorldCoordinates(cellX, cellZ, cellSize));
+       })(toWorldCoordinates(cellX, cellZ));
     } 
 
     return { 
+        size: size, 
+        toWorldCoordinates,
         nearest : nearest,
         center  : center
     }; 
@@ -111,6 +213,8 @@ var Cells = (function() {
 var Zone = function(id) {
 
     this.spatial = new spatial();
+    this.spatial.size = Cells.size();
+
     this.cells = []; 
     this.id = id; 
 
@@ -135,11 +239,68 @@ var Zone = function(id) {
  **/
 var Zones = function() { 
 
-    this.table = {}; 
+    this.table = {};
 
-    function emit(zoneId, name, vec, args) { 
+    function getCell(zoneId, cellX, cellZ) {
+        return  _.find(this.table[zoneId].cells, function(cell) {
+           return (cell.getX() === cellX &&
+                   cell.getZ() === cellZ);
+        });
+    }
+
+    function getUnits(zoneId, cellX, cellZ) { 
+        return this.getCell(zoneId, cellX, cellZ).fields.units;
+    }
+
+    function clearObjects(zoneId, cellX, cellZ) {
+
+        var deferred = Q.defer();
+
+        this.getCell(zoneId, cellX, cellZ).fields.objects = [];
+
+        deferred.resolve();
+
+        return deferred.promise;
+    }
+
+    function getObjects(zoneId, cellX, cellZ) {
+
+        var deferred = Q.defer();
+
+        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.objects);
+
+        return deferred.promise;
+
+    }
+
+    function getChangeBuffer(zoneId, cellX, cellZ) {
+
+        var deferred = Q.defer(); 
+
+        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.changeBuffer);
+
+        return deferred.promise;
+    }
+
+
+    function getDeleteBuffer(zoneId, cellX, cellZ) {
+
+        var deferred = Q.defer();
+
+        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.deleteBuffer);
+
+        return deferred.promise;
+    }
+
+    function emit(zoneId, name, vec) {
+
+        var args = Array.prototype.slice.call(arguments, 3);
+
+        var deferred = Q.defer(); 
 
         var point = [vec.x, vec.y, vec.z];
+
+        args = [name, point, deferred].concat(args);
 
         if(_.isUndefined(zoneId)) {
 
@@ -153,9 +314,57 @@ var Zones = function() {
 
             var spatial = this.table[zoneId].spatial;
 
-            spatial.emit(name, point, args);
+            if(spatial.listens(name, point)) { 
+
+               spatial.emit.apply(spatial, args);
+
+            } else {
+
+               deferred.reject(new Error(''));
+
+            }
 
         }
+
+        return deferred.promise;
+
+    }
+
+    function emitNear(zoneId, name, vec, radius) {
+
+        radius = radius || 1;
+
+        var self = this;
+
+        var args = Array.prototype.slice.call(arguments, 4);
+
+        var offsets = _.range(-radius, radius + 1, -1);
+
+        var positions = _.chain(offsets)
+            .map(function(x) { 
+                return _.map(offsets, function(z) {
+                    return new THREE.Vector3(x, 0, z);
+                });
+            })
+            .flatten()
+            .map(function(v) { 
+                return v.addScalar(Cells.size());
+            })
+            .map(function(v) { 
+               return v.addSelf(vec);
+            })
+            .value();
+
+
+        var promises = _.map(positions, function(nearVec) { 
+
+           var emitArgs = [zoneId, name, nearVec].concat(args);
+
+           return self.emit.apply(self, emitArgs);
+
+        });
+
+        return Q.all(promises);
 
     }
 
@@ -203,19 +412,18 @@ var Zones = function() {
 
                 if(!zone.contains(bbox)) { 
 
-                    var cell = new CellHandler(bbox, cellCoords); 
+                    var cell = new CellHandler(bbox, cellCoords);
 
                     zone.spatial.on('loadCell', bbox, cell.loadCell.bind(cell)); 
                     zone.spatial.on('loadUnits', bbox, cell.loadUnits.bind(cell));
                     zone.spatial.on('addUnit', bbox, cell.addUnit.bind(cell));
                     zone.spatial.on('removeUnit', bbox, cell.removeUnit.bind(cell));
-                    // addObject
-                    // saveCell
-
+                    zone.spatial.on('activate', bbox, cell.activate.bind(cell));
+                    zone.spatial.on('deactivate', bbox, cell.deactivate.bind(cell));
 
                     zone.cells.push(cell);
 
-                    deferred.resolve();
+                    deferred.resolve(cell);
 
                 } else { // Reject promise
 
@@ -236,6 +444,11 @@ var Zones = function() {
     this.selectAll = selectAll;
     this.selectZone = selectZone;
     this.createCell = createCell;
+    this.getCell = getCell;
+    this.clearObjects = clearObjects;
+    this.getObjects = getObjects;
+    this.getChangeBuffer = getChangeBuffer;
+    this.getDeleteBuffer = getDeleteBuffer;
 
 };
 
