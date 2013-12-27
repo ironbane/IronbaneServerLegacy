@@ -342,17 +342,22 @@ var Fighter = Actor.extend({
             });
 
             // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
-            var spawnpoint = self.findNearestSpawnPoint();
-            if (spawnpoint) {
-                self.TeleportToUnit(spawnpoint);
-            } else {
-                // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
-                if (self.zone === tutorialSpawnZone) {
-                    self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
-                } else {
-                    self.Teleport(normalSpawnZone, normalSpawnPosition, true);
-                }
-            }
+            self.findNearestSpawnPoint()
+                .then(function(spawnpoint) {
+
+                    if (spawnpoint) {
+                        self.TeleportToUnit(spawnpoint);
+                    } else {
+                        // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
+                        if (self.zone === tutorialSpawnZone) {
+                            self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+                        } else {
+                            self.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                        }
+                    }
+
+                });
+
         } else {
             if (self instanceof NPC) {
                 self.SetWeaponsAndLoot();
@@ -782,67 +787,24 @@ var Fighter = Actor.extend({
         onlyPlayers = onlyPlayers || false;
 
         var self = this;
+        
+        return this.FindNearestUnit()
+            .then(function(unit) { 
 
-        var target = null;
+                if (unit instanceof Fighter &&
+                    !(unit === self) &&
+                    !(unit.health <= 0) &&
+                    !(unit.chInvisibleByMonsters) &&
+                    !(onlyPlayers && !(unit.isPlayer())) &&
+                    !(!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === self.template.friendly) &&
+                    self.InLineOfSight(unit, noHeadingCheck) &&
+                    !(maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance))) {
 
-        var cx = this.cellX;
-        var cz = this.cellZ;
+                        return unit; // resolve target
 
-        //log("FindNearestTarget, maxDistance "+maxDistance+", onlyPlayers "+(onlyPlayers?"true":"false")+"");
-
-        worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) { 
-
-            if (unit === self) {
-                return;
-            }
-
-            if (unit instanceof Fighter) {
-
-                //debugger;
-
-                if (unit.health <= 0) {
-                    //log("unit.health <= 0");
-                    return;
+                } else {
+                    throw new Error('Fighter: nearest target not found.');
                 }
-
-                if (unit.chInvisibleByMonsters) {
-                    //log("unit.chInvisibleByMonsters");
-                    return;
-                }
-
-                if (onlyPlayers && !(unit.isPlayer())) {
-                    //log("onlyPlayers && unit.id < 0");
-                    return;
-                }
-
-                if (!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === self.template.friendly) {
-                    // Don't attack our own kind!
-                    return;
-                }
-
-                // Check if we are looking at the target
-                if (!self.InLineOfSight(unit, noHeadingCheck)) {
-                    //log("not in line of sight!");
-                    return;
-                }
-
-
-            } else {
-                return;
-            }
-
-            if (maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance)) {
-                //log("too far away!");
-                return;
-            }
-
-            //if ( maxDistance > 0 && !unit.InRangeOfPosition(self.startPosition, maxDistance) ) return;
-
-
-            target = unit;
-
-        }, 1);
-
-        return target;
+        });
     }
 });

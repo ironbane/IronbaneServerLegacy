@@ -25,17 +25,15 @@ module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: true,
         action: function(unit, target, params) {
-            var Q = require('q'),
-                unfortunate = worldHandler.FindPlayerByName(params[0]);
-
-            if (unfortunate) {
-                unfortunate.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
-                chatHandler.announcePersonally(unfortunate, "You were teleported back to town.", "lightgreen");
-            } else {
-                chatHandler.announcePersonally(unit, "Playername " + params[0] + " not found", "red");
-            }
-
-            return Q();
+            return worldHandler.FindPlayerByName(params[0])
+               .then(function(unfortunate) {
+                   if (unfortunate) {
+                       unfortunate.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
+                       chatHandler.announcePersonally(unfortunate, "You were teleported back to town.", "lightgreen");
+                   } else {
+                       chatHandler.announcePersonally(unit, "Playername " + params[0] + " not found", "red");
+                   }
+               });
         }
     };
 };

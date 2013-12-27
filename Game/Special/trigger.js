@@ -31,7 +31,8 @@ var Trigger = Unit.extend({
     },
     Tick: function(dTime) {
         var trigger = this,
-            quitters = [];
+            quitters = [],
+            promises = [];
 
         trigger._super(dTime);
 
@@ -40,35 +41,47 @@ var Trigger = Unit.extend({
         }
 
         // check guests to see if still present
-        _.each(trigger.guests, function(unit) {
+        promises = _.map(trigger.guests, function(unit) {
+
             // make sure we are still in the world and near the chest
             // TODO: faster / better than FindUnit??
-            if(worldHandler.FindUnit(unit.id) && unit.InRangeOfUnit(trigger, trigger.range)) {
-                // still in range, maybe get a pulse
-                if(trigger.triggerTimeout <= 0) {
-                    trigger.onTick(unit);
-                }
-            } else {
-                console.log('quitter!', unit.id);
-                quitters.push(unit);
-                trigger.onExit(unit);
-            }
+            return worldHandler.FindUnit(unit.id)
+               .then(function() {
+
+                   if(unit.InRangeOfUnit(trigger, trigger.range)) {
+                       // still in range, maybe get a pulse
+                       if(trigger.triggerTimeout <= 0) {
+                           trigger.onTick(unit);
+                       }
+                   } else {
+                       console.log('quitter!', unit.id);
+                       quitters.push(unit);
+                       trigger.onExit(unit);
+                   }
+
+               });
+ 
         });
 
-        // dont reset tick trigger timer until whole loop done
-        if(trigger.triggerTimeout <= 0) {
-            trigger.triggerTimeout = trigger.triggerInterval;
-        }
+        Q.all(promises)
+         .then(function() { 
 
-        // clear guests of quitters outside the first loop
-        trigger.guests = _.difference(trigger.guests, quitters);
+             // dont reset tick trigger timer until whole loop done
+             if(trigger.triggerTimeout <= 0) {
+                 trigger.triggerTimeout = trigger.triggerInterval;
+             }
 
-        // check area for new guests
-        worldHandler.LoopUnitsNear(trigger.zone, trigger.cellX, trigger.cellZ, function(unit) {
-            if(unit.id !== trigger.id && unit.InRangeOfUnit(trigger, trigger.range)) {
-                trigger.addGuest(unit);
-            }
-        });
+             // clear guests of quitters outside the first loop
+             trigger.guests = _.difference(trigger.guests, quitters);
+
+             // check area for new guests
+             return worldHandler.LoopUnitsNear(trigger.zone, trigger.cellX, trigger.cellZ, function(unit) {
+                 if(unit.id !== trigger.id && unit.InRangeOfUnit(trigger, trigger.range)) {
+                     trigger.addGuest(unit);
+                 }
+             });
+         });
+
     },
     addGuest: function(unit) {
         var current = _.pluck(this.guests, 'id');

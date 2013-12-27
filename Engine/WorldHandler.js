@@ -200,7 +200,7 @@ var WorldHandler = Class.extend({
 
     loadNavigationNodes: function() {
 
-        console.log('WorldHandler: Loading navigation nodes.");
+        console.log('WorldHandler: Loading navigation nodes.');
 
         return this.zones.selectAll()
             .then(function(zones) {
@@ -251,114 +251,61 @@ var WorldHandler = Class.extend({
     CheckWorldStructure: function(zoneId, cx, cz) {
        return !(_.isUndefined(this.zones.getCell(zoneId, cx, cz)));
     },
-    loadWorld: function() {
-        var self = this,
-            cellsLoaded = {};
+    requireCell : function(zoneId, cx, cz) {
 
-        return readCellsInfo()
+       var deferred = Q.defer();
+
+       if(!this.CheckWorldStructure(zoneId, cx, cz)) {
+
+           this.GenerateCell(zoneId, cx, cz)
+               .then(function() { 
+                   deferred.resolve();
+               });
+
+       } else {
+
+           deferred.resolve();
+
+       }
+    
+       return deferred.promise; 
+
+    },
+    loadWorld: function() {
+        var self = this;
+
+        console.log('WorldHandler', 'Loading World.');
+
+        return Cells.readInfo()
             .then(function(info) {
 
-                 var deferred = Q.defer();
+                 return Q.all(_.map(info, function(i) {
 
-                 async.each(info, function(i, callback) { 
-                
-                     self.zones.createCell(i.zoneId, i.cellCoords)
+
+                     return self.zones.createCell(i.zoneId, i.cellCoords)
                          .then(function() {
 
                            //Will cause 'addUnit' emissions 
-                           self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
-                           
-                           callback(null);
+                           return self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
                            
                         })
                         .fail(function(err) {
                            
-                           if(err) {
-                              console.error('WorldHandler', err);
-                           }
-                           
-                           callback(null);
+                            console.error('WorldHandler', err);
 
                         });
 
-                }, function(err) { 
-                  
-                  if(err) {
-                     console.error('WorldHandler', err);
-                  }
 
-                  deferred.resolve(); 
-                    
-                });
-
-                return deferred.promise;
+                 }));
 
             })
             .then(function() {
+
+               console.log('WorldHandler', 'Done loading all units.');
+                
                return self.loadNavigationNodes(); 
             });
 
-        function readCellsInfo() {
-
-            var deferred = Q.defer();
-
-            var info = []; 
-
-            util.walk(dataPath, function(err, results) {
-                if (err) {
-                    throw err;
-                }
-                var rl = results.length;
-                for (var r = 0; r < rl; r++) {
-
-                    results[r] = results[r].replace(dataPath + "/", "");
-
-                    var data = results[r].split("/");
-
-                    //log(data);
-
-                    var zone = parseInt(data[0], 10);
-                    var cx = parseInt(data[1], 10);
-                    var cz = parseInt(data[2], 10);
-
-                    var file = data[3];
-                    if (!_.isNumber(zone)) {
-                        continue;
-                    }
-                    if (!_.isNumber(cx)) {
-                        continue;
-                    }
-                    if (!_.isNumber(cz)) {
-                        continue;
-                    }
-
-                    if (file !== "objects.json") {
-                        continue;
-                    }
-
-                    //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
-                    if (!cellsLoaded[zone]) {
-                        cellsLoaded[zone] = 0;
-                    }
-
-                    cellsLoaded[zone]++;
-
-                    info.push({ 
-                        zoneId : zone, 
-                        cellCoords: new THREE.Vector3(cx, 0, cz) 
-                    });
-                }
-
-                _.each(cellsLoaded, function(z, v) {
-                    log("Loaded " + z + " cells in zone " + v);
-                });
-
-                deferred.resolve(info);
-
-            });
-
-            return deferred.promise;
-        }
     },
 
     /** 
@@ -463,10 +410,10 @@ var WorldHandler = Class.extend({
 
         var dbQuery = 'SELECT * FROM ib_units WHERE zone = ? AND x > ? AND z > ? AND x < ? AND z < ?';
 
-        var x0 = (worldPos.x - cellSizeHalf), 
-            z0 = (worldPos.z - cellSizeHalf),
-            x1 = (worldPos.x + cellSizeHalf),
-            z1 = (worldPos.z + cellSizeHalf);
+        var x0 = (worldPos.x - halfSize), 
+            z0 = (worldPos.z - halfSize),
+            x1 = (worldPos.x + halfSize),
+            z1 = (worldPos.z + halfSize);
         
 
         mysql.query(dbQuery, [zone, x0, z0, x1, z1], function(err, results) {
@@ -477,7 +424,7 @@ var WorldHandler = Class.extend({
             }
 
             _.each(results, function(unitData) {
-                self.makeUnitFromData(unitData);
+                self.MakeUnitFromData(unitData);
             });
 
             deferred.resolve();
@@ -486,7 +433,7 @@ var WorldHandler = Class.extend({
 
         return deferred.promise;
     },
-    makeUnitFromData: function(data) {
+    MakeUnitFromData: function(data) {
 
         data.id = -data.id;
 
@@ -641,6 +588,7 @@ var WorldHandler = Class.extend({
 
        return this.zones.getObjects(zoneId, cellX, cellZ)
           .then(function(objects) {
+
              objects.push(object);
           });
 
@@ -876,9 +824,18 @@ var WorldHandler = Class.extend({
         return this.getUnits()
             .then(function(units) {
 
-               return _.find(units, function(unit) {
+               // Reject promise when no unit is found
+               var err = new Error('WorldHandler: Unit ' + id + ' not found.');
+
+               var found = _.find(units, function(unit) {
                   return unit.id === id; 
                });
+                
+               if(!_.isUndefined(found)) { 
+                   return found;
+               }
+
+               throw err;
                 
             });
     },

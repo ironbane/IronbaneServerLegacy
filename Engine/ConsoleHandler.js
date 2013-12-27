@@ -15,6 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// var Cells = require('./zones').Cells;
+
 var ConsoleHandler = Class.extend({
   Init: function() {
     this.AccessLevel = {
@@ -40,17 +42,23 @@ var ConsoleHandler = Class.extend({
       worldHandler.SaveWorld();
     });
     this.AddCommand(this.AccessLevel.GUEST, ["generatecellrange","gcr"], "Generates a cell range inside a zone, starting from (0,0)", "zone range octaves persistence scale", "1 0 2 5 1.0", function (params) {
-      var startTime = (new Date()).getTime();
 
-      for(var x=-params[1];x<=params[1];x++){
-        for(var z=-params[1];z<=params[1];z++){
-          worldHandler.GenerateCell(params[0], x, z, params[2], params[3], params[4]);
+        var startTime = (new Date()).getTime();
+
+        var promises = []; 
+        for(var x=-params[1];x<=params[1];x++){
+            for(var z=-params[1];z<=params[1];z++){
+                promises.push(worldHandler.GenerateCell(params[0], x, z, params[2], params[3], params[4]));
+            }
         }
-      }
 
-      var endTime = (new Date()).getTime() - startTime;
+        Q.all(promises).then(function() { 
 
-      log("Cell range generation complete! Took "+endTime/1000+" seconds");
+            var endTime = (new Date()).getTime() - startTime;
+
+            log("Cell range generation complete! Took "+endTime/1000+" seconds");
+
+        });
 
 
     });
@@ -137,24 +145,33 @@ var ConsoleHandler = Class.extend({
 
     this.AddCommand(this.AccessLevel.GUEST, ["items"], "Log variable", "string", "", function (params) {
 
-      _.each(worldHandler.getNPCs(), function(unit) {
+      worldHandler.getNPCs()
+          .then(function(npcs) {
 
-         if(!_.isUndefined(unit.loot)) {
+              _.each(npcs, function(unit) {
 
-             log('Loot of ' + unit.template.name);
-             console.log(unit.loot);
+                  if(!_.isUndefined(unit.loot)) {
 
-         }
+                      log('Loot of ' + unit.template.name);
+                      console.log(unit.loot);
 
-      });
+                  }
 
-      _.each(worldHandler.getPlayers(), function(unit) {
+              });
 
-         log('Items of ' + unit.name);
-         console.log(unit.items);
+              return worldHandler.getPlayers();
 
-      });
+          })
+          .then(function(players) {
 
+              _.each(players, function(unit) {
+
+                  log('Items of ' + unit.name);
+                  console.log(unit.items);
+
+              });
+              
+          });
 
     });
 
@@ -243,35 +260,32 @@ var ConsoleHandler = Class.extend({
         log(""+count+": "+(sockets[s].unit?"Unit attached":"No unit attached")+"");
       }
 
-      var zonesLoaded = [];
-      var cellCoordsLoaded = [];
-      var unitsLength = 0;
-    
+      worldHandler.getUnits()
+         .then(function(units) {
 
-      _.each(worldHandler.getUnits(), function(unit) { 
+             var unitsLoaded = units.length;
+             var zonesLoaded = _.pluck(units, 'zone').length;
 
-           var cellCoords = WorldToCellCoordinates(unit.position.x, unit.position.z, cellSize);
-          
-           log("Unit found in zone " + unit.zone + " (" + cellCoords.x + ", " + cellCoords.z + ")");
+             var cellsLoaded = _.chain(units)
+                 .map(function(unit) {
+                     return Cells.toCellCoordinates(unit.position.x, unit.position.z); 
+                 })
+                 .reduce(function(coord, memo) { //remove duplicates
+                     return _.filter(memo, function(coordCompare) {
+                        return coord.x !== coordCompare.x &&
+                               coord.z !== coordCompare.z;
+                     });
+                 }, [])
+                 .value()
+                 .length;
+                    
 
-           zonesLoaded = _.union(zonesLoaded, [unit.zone]);
+             log('Zones loaded: '+zonesLoaded);
+             log('Cells loaded: '+cellsLoaded);
+             log('Units loaded: '+unitsLoaded);
+             log('Average ticktime: '+endTime);
 
-           if(!_.some(cellCoordsLoaded, function(xz) { 
-                 return cellCoords.x === xz.x &&
-                        cellCoords.z === xz.z;
-              })) { 
-
-               cellCoordsLoaded.push(cellCoords);
-           }
-
-           unitsLength++;
-
-      });
-
-      log("Zones loaded: "+zonesLoaded.length);
-      log("Cells loaded: "+cellsCoordsLoaded.length);
-      log("Units loaded: "+unitsLength);
-      log("Average ticktime: "+endTime);
+         }); 
 
     });
 

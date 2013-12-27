@@ -23,24 +23,31 @@ var Lever = Unit.extend({
         this.on = false;
     },
     Awake: function() {
-        if (!this.data.switchNumber) {
-            log("Bad switch number for " + this.id);
-            this.targetUnit = null;
+
+        var self = this;
+
+        if (!self.data.switchNumber) {
+            log("Bad switch number for " + self.id);
+            self.targetUnit = null;
         } else {
-            this.data.switchNumber = -Math.abs(this.data.switchNumber);
-            this.targetUnit = worldHandler.FindUnit(this.data.switchNumber);
+
+            self.data.switchNumber = -Math.abs(self.data.switchNumber);
+            worldHandler.FindUnit(self.data.switchNumber)
+                .then(function(unit) {
+
+                    if (unit instanceof ToggleableObstacle) {
+                        self.targetUnit = unit;
+                    }
+
+                    if (self.targetUnit) {
+                        self.targetUnit.UpdateLeverList();
+                        self.Toggle(self.targetUnit.on);
+                    }
+
+                });       
         }
 
-        if (!(this.targetUnit instanceof ToggleableObstacle)) {
-            this.targetUnit = null;
-        }
-
-        if (this.targetUnit) {
-            this.targetUnit.UpdateLeverList();
-            this.Toggle(this.targetUnit.on);
-        }
-
-        this._super();
+        self._super();
     },
     Toggle: function(bool) {
         log("[Lever] " + this.id + " toggled " + (bool ? "on" : "off"));

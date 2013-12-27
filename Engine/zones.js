@@ -22,7 +22,9 @@ var aabb = require('aabb-3d'),
     spatial = require('spatial-events'),
     Q = require('q');
 
-spatial.prototype.listens(name, bbox) = function() {
+// var util = require('./util');
+
+spatial.prototype.listens = function(name, bbox) {
 
     //support point emitting
     if('0' in bbox) {
@@ -34,7 +36,7 @@ spatial.prototype.listens(name, bbox) = function() {
         var nodeListens,
             childListens = false;
 
-        for(var i = 0; i < node.children.length; i < len; ++i) {
+        for(var i = 0; i < node.children.length; ++i) {
             if(bbox.intersects(node.children[i].bbox)) {
                 childListens = nodeListens(node.children[i], event, bbox);
                 break;
@@ -172,9 +174,11 @@ var CellHandler = function(bbox, cellCoords) {
 var Cells = (function() {
 
     function size() {
-       
        return cellSize || 20;
+    }
 
+    function toCellCoordinates(x, z)  {
+        return WorldToCellCoordinates(x, z, size());
     }
 
     function toWorldCoordinates(cellX, cellZ) {
@@ -196,13 +200,80 @@ var Cells = (function() {
        return (function(xz) { 
            return new THREE.Vector3(xz.x, 0, xz.z);
        })(toWorldCoordinates(cellX, cellZ));
+    }
+
+    function readInfo() {
+
+        var cellsLoaded = {};
+
+        var deferred = Q.defer();
+
+        var info = []; 
+
+        util.walk(dataPath, function(err, results) {
+
+            if (err) {
+                throw err;
+            }
+            var rl = results.length;
+            for (var r = 0; r < rl; r++) {
+
+                results[r] = results[r].replace(dataPath + "/", "");
+
+                var data = results[r].split("/");
+
+                //log(data);
+
+                var zone = parseInt(data[0], 10);
+                var cx = parseInt(data[1], 10);
+                var cz = parseInt(data[2], 10);
+
+                var file = data[3];
+                if (!_.isNumber(zone)) {
+                    continue;
+                }
+                if (!_.isNumber(cx)) {
+                    continue;
+                }
+                if (!_.isNumber(cz)) {
+                    continue;
+                }
+
+                if (file !== "objects.json") {
+                    continue;
+                }
+
+                //log("Loaded cell ("+cx+","+cz+") in zone "+zone);
+                if (!cellsLoaded[zone]) {
+                    cellsLoaded[zone] = 0;
+                }
+
+                cellsLoaded[zone]++;
+
+                info.push({ 
+                    zoneId : zone, 
+                    cellCoords: new THREE.Vector3(cx, 0, cz) 
+                });
+            }
+
+            _.each(cellsLoaded, function(z, v) {
+                log("Loaded " + z + " cells in zone " + v);
+            });
+
+            deferred.resolve(info);
+
+        });
+
+        return deferred.promise;
     } 
 
     return { 
-        size: size, 
-        toWorldCoordinates,
+        size: size,
+        toCellCoordinates : toCellCoordinates, 
+        toWorldCoordinates : toWorldCoordinates,
         nearest : nearest,
-        center  : center
+        center  : center,
+        readInfo : readInfo
     }; 
 
 })();
@@ -314,7 +385,9 @@ var Zones = function() {
 
             var spatial = this.table[zoneId].spatial;
 
-            if(spatial.listens(name, point)) { 
+            if(spatial.listens(name, point)) {
+
+               console.log('spatial listens'); 
 
                spatial.emit.apply(spatial, args);
 

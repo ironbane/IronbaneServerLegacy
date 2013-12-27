@@ -28,16 +28,24 @@ var TeleportEntrance = Unit.extend({
         this.FindTargetExit();
     },
     FindTargetExit: function() {
-        if (this.data && !_.isUndefined(this.data.targetExit)) {
-            this.data.targetExit = -Math.abs(this.data.targetExit);
 
-            this.targetExit = worldHandler.FindUnit(this.data.targetExit);
+        var self = this;
 
-            if (!(this.targetExit instanceof TeleportExit)) {
-                this.targetExit = null;
-            }
+        if (self.data && !_.isUndefined(self.data.targetExit)) {
+
+            self.data.targetExit = -Math.abs(self.data.targetExit);
+
+            worldHandler.FindUnit(self.data.targetExit)
+               .then(function(exit) {
+
+                   if (exit instanceof TeleportExit) {
+                       self.targetExit = exit;
+                   }
+
+               });
+
         } else {
-            this.targetExit = null;
+            self.targetExit = null;
         }
     },
     Tick: function(dTime) {

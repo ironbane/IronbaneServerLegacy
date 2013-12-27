@@ -220,13 +220,12 @@ var Player = Fighter.extend({
         var cz = player.cellZ;
         var zone = player.zone;
 
-        // Remove the unit from the world cells
-        if (worldHandler.CheckWorldStructure(zone, cx, cz)) {
-            worldHandler.removeUnitFromCell(unit, cx, cz); 
-        }
-
-        // Update all players that are nearby
-        worldHandler.UpdateNearbyUnitsOtherUnitsLists();
-
+        worldHandler.requireCell(zone, cx, cz)
+            .then(function() { 
+               return worldHandler.removeUnitFromCell(unit, cx, cz); 
+            })
+            .then(function() {
+               return worldHandler.UpdateNearbyUnitsOtherUnitsLists(); 
+            });
     }
 });
