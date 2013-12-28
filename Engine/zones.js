@@ -24,26 +24,27 @@ var aabb = require('aabb-3d'),
 
 // var util = require('./util');
 
-spatial.prototype.listens = function(name, bbox) {
+spatial.prototype.listens = function(event, bbox) {
+
 
     //support point emitting
     if('0' in bbox) {
-         bbox = aabb(bbox, [0, 0, 0]) 
+         bbox = aabb(bbox, [0, 0, 0]); 
     }
 
     var treeListens = function(node, event, bbox) { 
        
-        var nodeListens,
-            childListens = false;
+        var nodeListens = false;
+        var childListens = false;
 
         for(var i = 0; i < node.children.length; ++i) {
             if(bbox.intersects(node.children[i].bbox)) {
-                childListens = nodeListens(node.children[i], event, bbox);
+                childListens = treeListens(node.children[i], event, bbox);
                 break;
             }
-        }  
+        } 
 
-        var list = this.listeners[event];
+        var list = node.listeners[event];
 
         if(list) {
 
@@ -61,11 +62,10 @@ spatial.prototype.listens = function(name, bbox) {
     };
 
     if(this.root) {
-        if(treeListens(root, event, bbox)) {
+       if(treeListens(this.root, event, bbox)) {
             return true;
         }
     }
-
 
     if(!this.infinites[event]) {
         return false;
@@ -110,23 +110,28 @@ var CellHandler = function(bbox, cellCoords) {
           !_.some(this.fields.units, function(u) { 
              return u.id === unit.id; })) {
 
-          this.fields.units[unit.id] = unit; 
+          this.fields.units.push(unit);
+
+          deferred.resolve();
 
        } else { 
-          
-           console.error('CellHandler: Cannot add unit!');
+         
+           deferred.reject(new Error('CellHandler: Cannot add unit!'));
 
        }
 
-       deferred.resolve();
     }
 
     function removeUnit(deferred, unit)  {
 
        if(!_.isUndefined(unit) &&
           !_.isUndefined(unit.id)) { 
+
+           this.fields.units = _.reject(this.fields.units, function(u) { 
+               return unit.id === u.id;
+           });
       
-           delete this.fields.units[unit.id]; 
+           //delete this.fields.units[unit.id]; 
        }
 
        deferred.resolve();
@@ -179,6 +184,7 @@ var Cells = (function() {
 
     function toCellCoordinates(x, z)  {
         return WorldToCellCoordinates(x, z, size());
+
     }
 
     function toWorldCoordinates(cellX, cellZ) {
@@ -365,6 +371,7 @@ var Zones = function() {
 
     function emit(zoneId, name, vec) {
 
+
         var args = Array.prototype.slice.call(arguments, 3);
 
         var deferred = Q.defer(); 
@@ -373,27 +380,27 @@ var Zones = function() {
 
         args = [name, point, deferred].concat(args);
 
+
         if(_.isUndefined(zoneId)) {
 
-            console.error('Zones', 'emit: zoneId is undefined!');
+            deferred.reject(new Error('Zones', 'emit: zoneId is undefined!'));
 
         } else if (_.isUndefined(this.table[zoneId])) {
 
-            console.error('Zones', 'emit: ' + zoneId + ' not found!');
+            deferred.reject(new Error('Zones', 'emit: ' + zoneId + ' not found!'));
 
         } else {
 
-            var spatial = this.table[zoneId].spatial;
 
-            if(spatial.listens(name, point)) {
+            var s = this.table[zoneId].spatial;
 
-               console.log('spatial listens'); 
+            if(s.listens(name, point)) {
 
-               spatial.emit.apply(spatial, args);
+               s.emit.apply(s, args);
 
             } else {
 
-               deferred.reject(new Error(''));
+               deferred.reject(new Error('No listener for ' + name + ', ' + point));
 
             }
 
@@ -514,6 +521,7 @@ var Zones = function() {
     }
 
     this.emit = emit;
+    this.emitNear = emitNear;
     this.selectAll = selectAll;
     this.selectZone = selectZone;
     this.createCell = createCell;

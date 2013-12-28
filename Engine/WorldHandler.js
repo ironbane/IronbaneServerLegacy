@@ -20,7 +20,8 @@ var dataPath = clientDir + 'data';
 var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
 pathFinder.setPath(dataPath);
 
-var aabb = require('aabb-3d');
+var aabb = require('aabb-3d'),
+    test = require('assert-tap').test;
 
 // For when node modules are used: 
 
@@ -36,6 +37,7 @@ var WorldHandler = Class.extend({
         this.zones = new Zones();
 
         this.switches = {};
+
     },
     Awake: function() {
 
@@ -142,37 +144,46 @@ var WorldHandler = Class.extend({
 
         var self = this;
 
-        var args = arguments;
-
         var isPlayer = unit.id > 0;
 
+        var zone = unit.zone;
         var x = newCellX;
         var z = newCellZ;
 
-        return this.zones.emit(unit.zone, 'addUnit', unit.position, unit)
+        var worldCoords = Cells.toWorldCoordinates(x,z);
+
+        worldCoords.x += Cells.size() / 2;
+        worldCoords.z += Cells.size() / 2;
+        
+
+        return Q()
             .then(function() { 
+                if(isPlayer && unit.editor) { 
+                    return self.requireCell(zone, x, z);
+                }
+            })
+            .then(function() {
+
+                return self.zones.emit(zone, 'addUnit', worldCoords, unit);
+
+            })
+            .then(function() {
 
                 if(isPlayer) {
 
-                   return this.zones.emitNear(unit.zone, 'activate', unit.position); 
+                   return self.zones.emitNear(unit.zone, 'activate', worldCoords); 
 
                 }
 
             })
-            .fail(function() {
+            .fail(function(err) {
 
-                // We are in a bad cell? Find a place to spawn! Or DC
-                log('Bad cell found for ' + unit.id + '  ' + unit.zone + ',' + x + ',' + z);
+                test('WorldHandler -- Add Unit Error', function(t) { 
 
-                if (isPlayer && unit.editor) {
+                    t.fail(err);
+                    t.end();
 
-                    log('Generating cell for an editor.');
-                    return self.GenerateCell(unit.zone, x, z)
-                        .then(function() {
-                            self.addUnitToCell(unit, x, z);
-                        });
-
-                }
+                });
 
             });
 
@@ -187,12 +198,17 @@ var WorldHandler = Class.extend({
 
         var isPlayer = unit.id > 0;
 
-        return self.zones.emit(unit.zone, 'removeUnit', unit.position, unit)
+        var worldCoords = Cells.toWorldCoordinates(x,z);
+
+        worldCoords.x += Cells.size() / 2;
+        worldCoords.z += Cells.size() / 2; 
+
+        return self.zones.emit(unit.zone, 'removeUnit', worldCoords, unit)
             .then(function() { 
 
                 if(isPlayer) { 
 
-                    return self.zones.emitNear(unit.zone, 'deactivate', unit.position);
+                    return self.zones.emitNear(unit.zone, 'deactivate', worldCoords);
                 }
     
             });
@@ -273,38 +289,91 @@ var WorldHandler = Class.extend({
     },
     loadWorld: function() {
         var self = this;
+        var total = 0;
 
         console.log('WorldHandler', 'Loading World.');
+            
+        var compareUnits = function(promise) {
 
-        return Cells.readInfo()
+           return self.getUnits()
+              .then(function(unitsBefore) {
+                 return Q()
+                    .then(promise)
+                    .then(function() { 
+                       return self.getUnits();
+                    })
+                    .then(function(unitsAfter) {
+                       return [unitsBefore.length, unitsAfter.length];
+                    });
+              }); 
+
+        };
+
+        return compareUnits(function() { 
+            return Cells.readInfo()
             .then(function(info) {
 
-                 return Q.all(_.map(info, function(i) {
+                return Q.all(_.map(info, function(i) {
+                    return self.zones.createCell(i.zoneId, i.cellCoords);
+                }))
+                .then(function() {
 
+                    var compare = info.length;
 
-                     return self.zones.createCell(i.zoneId, i.cellCoords)
-                         .then(function() {
+                    var countCells = function() {
 
-                           //Will cause 'addUnit' emissions 
-                           return self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z);
-                           
-                        })
-                        .fail(function(err) {
-                           
-                            console.error('WorldHandler', err);
+                        var count = 0;
+
+                        return self.LoopCells(function() { count++; })
+                    .then(function() { return count; });
+
+                    };
+
+                    return countCells()
+                    .then(function(count) {
+
+                        test('WorldHandler -- Loaded Cells Test', function(t) {
+
+                            t.equal(count, compare, count + '===' + compare);
+                            t.end(); 
 
                         });
 
+                    }); 
 
-                 }));
+                })
+                .then(function() { 
+                    return Q.all(_.map(info, function(i) {
 
-            })
-            .then(function() {
+                        //Create all cells first because adding units effects neighbouring cells 
+                        return self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z)
+                        .then(function(added) { 
+                            total += added;
+                        });
 
-               console.log('WorldHandler', 'Done loading all units.');
-                
-               return self.loadNavigationNodes(); 
-            });
+                    }));
+
+                });
+            }); 
+        }).spread(function(before, after) {
+
+            test('WorldHandler -- Loaded Units Test', function(t) { 
+
+                var compare = before + total;
+                t.ok(after > 0, 'Should have loaded at least one unit.');
+                t.equal(compare, after, compare + '===' + after);
+                t.end(); 
+            }); 
+
+        })
+        .then(function() {
+            return self.loadNavigationNodes(); 
+        })
+        .fail(function(err) {
+
+            console.error('WorldHandler', err);
+
+        });
 
     },
 
@@ -315,8 +384,8 @@ var WorldHandler = Class.extend({
      **/
     LoopUnits : function(fn) {
        return this.LoopCells(function(cell) { 
-           if (!_.isUndefined(cell.units)) {
-               _.each(cell.units, function(unit) { 
+           if (!_.isUndefined(cell.fields.units)) {
+               _.each(cell.fields.units, function(unit) { 
                    fn(unit);
                });
            }
@@ -324,8 +393,8 @@ var WorldHandler = Class.extend({
     },
     LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
         return this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
-            if (!_.isUndefined(cell.units)) {
-                _.each(cell.units, function(unit) {
+            if (!_.isUndefined(cell.fields.units)) {
+                _.each(cell.fields.units, function(unit) {
                     fn(unit);
                 });
             }
@@ -356,16 +425,17 @@ var WorldHandler = Class.extend({
 
         return this.zones.selectZone(zoneId)
             .then(function(zone) {
+
                 _.chain(zone.cells)
                 .filter(function(cell) { 
                     return (
-                        cell.getX() > minX &&
+                        cell.getX() >= minX &&
                         cell.getX() <= maxX &&
-                        cell.getZ() > minZ &&
+                        cell.getZ() >= minZ &&
                         cell.getZ() <= maxZ
                         );
                 }).each(function(cell) {
-                    fn(zone.id);
+                    fn(cell);
                 });
 
             }); 
@@ -419,15 +489,28 @@ var WorldHandler = Class.extend({
         mysql.query(dbQuery, [zone, x0, z0, x1, z1], function(err, results) {
 
             if (err) {
-                console.log('WorldHandler: DB error loading units!', err);
-                throw err;
+                console.error('WorldHandler: DB error loading units!', err);
+                deferred.reject(err);
             }
 
-            _.each(results, function(unitData) {
-                self.MakeUnitFromData(unitData);
-            });
+            var total = 0;
 
-            deferred.resolve();
+            Q.all(_.map(results, function(unitData) {
+
+                var unit = self.MakeUnitFromData(unitData);
+
+                if(unit) { 
+                    total++;
+                    return unit.load();
+                } 
+                
+                return Q();
+
+            })).then(function() {
+                deferred.resolve(total); 
+            }).fail(function(err) {
+                deferred.reject(err);
+            });
 
         });
 
@@ -813,10 +896,20 @@ var WorldHandler = Class.extend({
 
     },
     UpdateNearbyUnitsOtherUnitsLists: function(zoneId, cellX, cellZ) {
-
+        
         return this.LoopUnitsNear(zoneId, cellX, cellZ, function(unit) {
             unit.UpdateOtherUnitsList();
-        }, 1);
+        }, 1)
+        .fail(function(err) {
+
+            test('WorldHandler -- UpdateNearbyUnitsOtherUnitsLists', function(t) { 
+            
+                t.fail(err);
+                t.end();
+
+            });
+
+        });
 
     },
     FindUnit: function(id) {

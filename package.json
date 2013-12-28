@@ -56,7 +56,8 @@
     "async": "~0.2.9",
     "spatial-events": "~0.0.1",
     "three": "~0.58.10",
-    "aabb-3d": "git+https://markfarrell@github.com/markfarrell/aabb-3d.git"
+    "aabb-3d": "~0.1.0",
+    "assert-tap" : "~0.1.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

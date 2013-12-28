@@ -19,6 +19,7 @@
 // var Q = require('q');
 
 var Unit = Class.extend({
+
   Init: function(data) {
     _.extend(this, data);
 
@@ -80,7 +81,6 @@ var Unit = Class.extend({
         this.heading.normalize();
 
 
-
         this.sendRotationPacketX = false;
         this.sendRotationPacketY = false;
         this.sendRotationPacketZ = false;
@@ -94,19 +94,18 @@ var Unit = Class.extend({
         this.startPosition = this.position.clone();
         this.startRotation = this.rotation.clone();
 
-        var me = this;
-
-        setTimeout(function() {
-
-          me.UpdateNearbyUnitsOtherUnitsLists()
-            .then(function() { 
-               return worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
-            });
-
-        }, 0);
-
 
         this.navigationMeshGroup = null;
+
+      },
+      load : function() {
+
+         var me = this; 
+
+         return me.UpdateNearbyUnitsOtherUnitsLists()
+             .then(function() {
+                 return worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
+             });
 
       },
       isPlayer: function() {
@@ -305,25 +304,28 @@ var Unit = Class.extend({
         var cx = this.cellX;
         var cz = this.cellZ;
 
-        worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
+        return worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
             if(unit !== self) {
                secondList.push(unit);
             }
+        })
+        .then(function() { 
+
+            for (var i = 0; i < firstList.length; i++) {
+                if (secondList.indexOf(firstList[i]) == -1) {
+                    // Not found in the second list, so remove it
+                    this.RemoveOtherUnit(firstList[i]);
+                }
+            }
+
+            for (var i = 0; i < secondList.length; i++) {
+                if (firstList.indexOf(secondList[i]) == -1) {
+                    // Not found in the first list, so add it
+                    this.AddOtherUnit(secondList[i]);
+                }
+            }
+
         });
-
-        for (var i = 0; i < firstList.length; i++) {
-            if (secondList.indexOf(firstList[i]) == -1) {
-                // Not found in the second list, so remove it
-                this.RemoveOtherUnit(firstList[i]);
-            }
-        }
-
-        for (var i = 0; i < secondList.length; i++) {
-            if (firstList.indexOf(secondList[i]) == -1) {
-                // Not found in the first list, so add it
-                this.AddOtherUnit(secondList[i]);
-            }
-        }
 
       },
       FindNearestUnit: function(maxDistance) {
@@ -477,12 +479,12 @@ var Unit = Class.extend({
                   });
 
 
-                  this.cellX = cellPos.x;
-                  this.cellZ = cellPos.z;
+                  self.cellX = cellPos.x;
+                  self.cellZ = cellPos.z;
 
 
                   // Of course, update for ourselves too!
-                  this.UpdateOtherUnitsList();
+                  return self.UpdateOtherUnitsList();
 
               })
               .then(function() {
@@ -507,13 +509,15 @@ var Unit = Class.extend({
   },
   Remove: function() {
 
+    var self = this;
+
     var zone = this.zone;
     var cx = this.cellX;
     var cz = this.cellZ;
 
     worldHandler.removeUnitFromCell(this, cx, cz)
         .then(function() { 
-            return this.UpdateNearbyUnitsOtherUnitsLists();
+            return self.UpdateNearbyUnitsOtherUnitsLists();
         });
 
   },

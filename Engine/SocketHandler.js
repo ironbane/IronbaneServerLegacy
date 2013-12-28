@@ -1960,6 +1960,7 @@ var SocketHandler = Class.extend({
 
                             var unit = worldHandler.MakeUnitFromData(data);
                             if (unit) {
+                                unit.load();
                                 unit.Awake();
                             }
                         });

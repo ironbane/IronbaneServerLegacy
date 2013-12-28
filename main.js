@@ -106,7 +106,10 @@ var startREPL = function() {
 
         serverREPL.on('exit', function() {
            // todo: other shutdown stuff, like stop db, etc.
+          
+           
            process.exit();
+
         });
 
         // context variables get attached to "global" of this instance
