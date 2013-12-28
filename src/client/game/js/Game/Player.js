@@ -864,7 +864,7 @@ var Player = Fighter.extend({
                 }
                 // remove item from inv
                 player.removeItem(item);
-                hudHandler.updateInvSlotStatus(item.slot, 'used');
+                hudHandler.getInventory().updateInvSlotStatus(item.slot, 'used');
                 break;
 
             case 'weapon':
@@ -874,7 +874,7 @@ var Player = Fighter.extend({
                 });
                 if (eqWeapon) {
                     eqWeapon.equipped = 0;
-                    hudHandler.updateInvSlotStatus(eqWeapon.slot, 'unequipped');
+                    hudHandler.getInventory().updateInvSlotStatus(eqWeapon.slot, 'unequipped');
                     if (eqWeapon.subtype === 'book') {
                         hudHandler.hideBook();
                     }
@@ -885,7 +885,7 @@ var Player = Fighter.extend({
                 item.equipped = +!item.equipped;
                 soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
                 player.updateWeapon(item.equipped ? item.template : 0);
-                hudHandler.updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
+                hudHandler.getInventory().updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
                 if (item.subtype === 'book') {
                     if (item.equipped === 1) {
                         $.get('/api/books/' + item.attr1)
@@ -924,7 +924,7 @@ var Player = Fighter.extend({
                 item.equipped = +!item.equipped;
                 soundHandler.Play(item.equipped ? "equip/equip1" : "equip/equip2");
                 player.updateAppearance();
-                hudHandler.updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
+                hudHandler.getInventory().updateInvSlotStatus(item.slot, item.equipped ? 'equipped' : 'unequipped');
                 break;
         }
 
