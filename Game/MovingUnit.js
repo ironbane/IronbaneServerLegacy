@@ -35,6 +35,7 @@ var MovingUnit = Unit.extend({
     },
     Tick: function(dTime) {
 
+
         var acceleration = this.steeringForce.divideScalar(this.mass);
 
         this.velocity.add(acceleration.multiplyScalar(dTime));
@@ -52,6 +53,7 @@ var MovingUnit = Unit.extend({
         }
 
         var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
+
         if ( cellPos.x !== this.cellX || cellPos.z !== this.cellZ ) {
               this.ChangeCell(cellPos.x, cellPos.z);
         }

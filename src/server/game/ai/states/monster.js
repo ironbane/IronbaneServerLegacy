@@ -48,38 +48,41 @@ var MonsterState = State.extend({
     },
     execute: function(unit, dTime) {
         if (!(unit.stateMachine.currentState instanceof ChaseEnemy)) {
-            var target = unit.FindNearestTarget(unit.template.aggroradius, true);
 
             var me = this;
 
-            if (target &&
-                !outsideSpawnGuardRadius(unit) &&
-                unit.InLineOfSight(target) ) {
+            unit.FindNearestTarget(unit.template.aggroradius, true).then(function(target) { 
+
+                if (target &&
+                    !outsideSpawnGuardRadius(unit) &&
+                    unit.InLineOfSight(target) ) {
 
 
-                if ( !this.cantReachTable[target.id] )  {
-                    if (unit.navigationMeshGroup) {
-                      var paths = pathFinder.findPath(unit.position,
-                        target.position,
-                        unit.zone,
-                        unit.navigationMeshGroup);
-                        if ( paths ) {
-                            unit.maxSpeed = this.chaseSpeed;
-                            // log("[MonsterState] Found enemy!");
-                            unit.stateMachine.changeState(new ChaseEnemy(target));
-                        }
-                        else {
-                            this.cantReachTable[target.id] = true;
+                    if ( !me.cantReachTable[target.id] )  {
+                        if (unit.navigationMeshGroup) {
+                            var paths = pathFinder.findPath(unit.position,
+                                target.position,
+                                unit.zone,
+                                unit.navigationMeshGroup);
+                            if ( paths ) {
+                                unit.maxSpeed = me.chaseSpeed;
+                                // log("[MonsterState] Found enemy!");
+                                unit.stateMachine.changeState(new ChaseEnemy(target));
+                            }
+                            else {
+                                me.cantReachTable[target.id] = true;
 
-                            setTimeout(function() {
-                                delete me.cantReachTable[target.id];
-                            }, 2000);
+                                setTimeout(function() {
+                                    delete me.cantReachTable[target.id];
+                                }, 2000);
+                            }
                         }
                     }
+
+
                 }
 
-
-            }
+            });
         }
     },
     evaluateThreat: function(unit) {

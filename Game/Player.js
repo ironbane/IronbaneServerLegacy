@@ -222,10 +222,10 @@ var Player = Fighter.extend({
 
         worldHandler.requireCell(zone, cx, cz)
             .then(function() { 
-               return worldHandler.removeUnitFromCell(unit, cx, cz); 
+               return worldHandler.removeUnitFromCell(player, cx, cz); 
             })
             .then(function() {
-               return worldHandler.UpdateNearbyUnitsOtherUnitsLists(); 
+               return worldHandler.UpdateNearbyUnitsOtherUnitsLists(zone, cx, cz); 
             });
     }
 });

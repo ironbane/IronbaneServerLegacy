@@ -94,7 +94,6 @@ var Unit = Class.extend({
         this.startPosition = this.position.clone();
         this.startRotation = this.rotation.clone();
 
-
         this.navigationMeshGroup = null;
 
       },
@@ -116,7 +115,7 @@ var Unit = Class.extend({
           return eval('self instanceof ' + type);
       },
       Awake: function() {
-        //log(this.id+" is awake!");
+        // log(this.id+" is awake!");
         // For fast searching, we need to precompute what group of nodes
         // from the navigation mesh we are going to search in
         this.navigationMeshGroup = pathFinder.getGroup(this.zone, this.position);
@@ -148,7 +147,7 @@ var Unit = Class.extend({
                 self.position.copy(position);
                 self.UpdateCellPosition();
 
-                return worldHandler.requireCell(self, self.cellX, self.cellZ); 
+                return worldHandler.requireCell(self.zone, self.cellX, self.cellZ); 
 
             })
             .then(function() {
@@ -290,21 +289,21 @@ var Unit = Class.extend({
         var self = this;
 
         // If we are a player, only do so if we're ready to receive data
-        if (this.isPlayer() && !this.readyToReceiveUnits) return;
+        if (self.isPlayer() && !self.readyToReceiveUnits) return;
 
         // We have two lists
         // There is a list of units we currently have, and a list that we will have once we recalculate
         // If an item is in the first list, but no longer in the second list, do RemoveOtherUnit
         // If an item is in the first & second list, don't do anything
         // If an item is only in the last list, do AddOtherUnit
-        var firstList = this.otherUnits;
+        var firstList = self.otherUnits;
         var secondList = [];
 
         // Loop over the world cells nearby and add all units
-        var cx = this.cellX;
-        var cz = this.cellZ;
+        var cx = self.cellX;
+        var cz = self.cellZ;
 
-        return worldHandler.LoopUnitsNear(this.zone, cx, cz, function(unit) { 
+        return worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) { 
             if(unit !== self) {
                secondList.push(unit);
             }
@@ -314,14 +313,14 @@ var Unit = Class.extend({
             for (var i = 0; i < firstList.length; i++) {
                 if (secondList.indexOf(firstList[i]) == -1) {
                     // Not found in the second list, so remove it
-                    this.RemoveOtherUnit(firstList[i]);
+                    self.RemoveOtherUnit(firstList[i]);
                 }
             }
 
             for (var i = 0; i < secondList.length; i++) {
                 if (firstList.indexOf(secondList[i]) == -1) {
                     // Not found in the first list, so add it
-                    this.AddOtherUnit(secondList[i]);
+                    self.AddOtherUnit(secondList[i]);
                 }
             }
 
@@ -515,7 +514,7 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    worldHandler.removeUnitFromCell(this, cx, cz)
+    worldHandler.removeUnitFromCell(self, cx, cz)
         .then(function() { 
             return self.UpdateNearbyUnitsOtherUnitsLists();
         });
@@ -533,7 +532,7 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    worldHandler.LoopUnitsNear(zone, cx, cz, function(unit) {
+    return worldHandler.LoopUnitsNear(zone, cx, cz, function(unit) {
 
         if (unit.isPlayer()) {
 

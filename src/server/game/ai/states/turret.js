@@ -29,18 +29,24 @@ var Turret = State.extend({
         unit.AttemptAttack(victim);
     },
     execute: function(unit, dTime) {
-        if (this.attackTimeout > 0) {
-            this.attackTimeout -= dTime;
+
+        var self = this;
+
+        if (self.attackTimeout > 0) {
+            self.attackTimeout -= dTime;
         }
 
-        var player = unit.FindNearestTarget(unit.template.aggroradius, true, true);
-        if (player) {
-            if (this.attackTimeout <= 0) {
-                this.attackTimeout = unit.weapon.delay;
+        unit.FindNearestTarget(unit.template.aggroradius, true, true).then(function(player) { 
+        
+            if (player) {
+                if (self.attackTimeout <= 0) {
+                    self.attackTimeout = unit.weapon.delay;
 
-                this.attack(unit, player);
+                    self.attack(unit, player);
+                }
             }
-        }
+
+        });
     },
     exit: function(unit) {
         unit.maxSpeed = this.originalMaxSpeed;

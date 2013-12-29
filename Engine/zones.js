@@ -93,11 +93,11 @@ var CellHandler = function(bbox, cellCoords) {
     }; 
 
     function getX() { 
-       return cellCoords.x;
+       return this.fields.cellCoords.x;
     }
 
     function getZ() {
-       return cellCoords.z;
+       return this.fields.cellCoords.z;
     }
 
     function loadCell() { }
@@ -139,28 +139,26 @@ var CellHandler = function(bbox, cellCoords) {
 
     function changeActivity(val) { 
 
-        var isNPC = function(unit) { return !(unit.id > 0); };
+        var isNPC = function(unit) { return !(unit instanceof Player); };
 
-        if(_.every(this.fields.units, isNPC)) { 
-
-           _.each(this.fields.units, function(unit) { 
-               unit.active = val;
-           }); 
-
-        }
+        _.chain(this.fields.units)
+            .filter(isNPC)
+            .each(function(unit) { 
+                unit.active = val;
+            }); 
 
     }
 
     function deactivate(deferred) {
 
-        changeActivity(false);
+        this.changeActivity(false);
 
         deferred.resolve();
     }
 
     function activate(deferred) {
 
-        changeActivity(true);
+        this.changeActivity(true);
 
         deferred.resolve();
     }
@@ -171,6 +169,7 @@ var CellHandler = function(bbox, cellCoords) {
     this.loadUnits = loadUnits;
     this.addUnit = addUnit;
     this.removeUnit = removeUnit;
+    this.changeActivity = changeActivity;
     this.activate = activate;
     this.deactivate = deactivate;
 
@@ -418,7 +417,7 @@ var Zones = function() {
 
         var args = Array.prototype.slice.call(arguments, 4);
 
-        var offsets = _.range(-radius, radius + 1, -1);
+        var offsets = _.range(-radius, radius + 1, 1);
 
         var positions = _.chain(offsets)
             .map(function(x) { 
@@ -427,11 +426,15 @@ var Zones = function() {
                 });
             })
             .flatten()
-            .map(function(v) { 
-                return v.addScalar(Cells.size());
+            .map(function(v) {
+                v.x *= Cells.size();
+                v.z *= Cells.size(); 
+                return v;
             })
-            .map(function(v) { 
-               return v.addSelf(vec);
+            .map(function(v) {
+               v.x += vec.x;
+               v.z += vec.z; 
+               return v;
             })
             .value();
 
@@ -440,7 +443,9 @@ var Zones = function() {
 
            var emitArgs = [zoneId, name, nearVec].concat(args);
 
-           return self.emit.apply(self, emitArgs);
+           return self.emit.apply(self, emitArgs).fail(function(err) { 
+               console.error('Zones.emitNear', err);
+           });
 
         });
 

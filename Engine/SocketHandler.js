@@ -42,6 +42,9 @@ var SocketHandler = Class.extend({
             var socket = req.io.socket; // todo: move this, not supposed to use it directly in express.io
 
             var unit = new Player(chardata);
+
+            unit.load(); // Asynchronous operation: add player to cell and update nearby units
+
             // Link the unit with the player ID
             unit.playerID = req.user ? req.user.id : 0; // either authenticated user or guest, don't trust the client data
             unit.isGuest = !!!req.user;
@@ -1960,8 +1963,11 @@ var SocketHandler = Class.extend({
 
                             var unit = worldHandler.MakeUnitFromData(data);
                             if (unit) {
-                                unit.load();
-                                unit.Awake();
+
+                                unit.load().then(function() { 
+                                    unit.Awake();
+                                });
+
                             }
                         });
 

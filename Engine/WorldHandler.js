@@ -43,7 +43,7 @@ var WorldHandler = Class.extend({
 
         // All units ready! Awaken!
         return this.LoopUnits(function(u) {
-           u.Awake();
+            u.Awake();
         });
 
     },
@@ -55,13 +55,16 @@ var WorldHandler = Class.extend({
      */
     tick: function(elapsed) {
 
-      return this.updateUnits(elapsed)
+      var self = this;
+
+      return self.updateUnits(elapsed)
           .then(function() { 
-              return this.getPlayers();
+              return self.getPlayers();
           })
           .then(function(players) {
               return Snapshots.broadcast(players);
           });
+
 
     },
     updateUnits: function(dTime) {
@@ -70,7 +73,7 @@ var WorldHandler = Class.extend({
 
             if (unit.active) {
                 unit.Tick(dTime);
-            }
+            } 
 
         });
     },
@@ -102,7 +105,7 @@ var WorldHandler = Class.extend({
     getPlayers : function() {
       
        return this.getUnits()
-          .then(function() { 
+          .then(function(units) { 
              return _.filter(units, function(unit) { 
                 return (unit instanceof Player);
              });
@@ -117,7 +120,7 @@ var WorldHandler = Class.extend({
     getNPCs : function() {
 
        return this.getUnits()
-          .then(function() { 
+          .then(function(units) { 
              return _.filter(units, function(unit) { 
                 return !(unit instanceof Player);
              });
@@ -171,7 +174,7 @@ var WorldHandler = Class.extend({
 
                 if(isPlayer) {
 
-                   return self.zones.emitNear(unit.zone, 'activate', worldCoords); 
+                   return self.zones.emitNear(unit.zone, 'activate', worldCoords)
 
                 }
 
@@ -180,7 +183,7 @@ var WorldHandler = Class.extend({
 
                 test('WorldHandler -- Add Unit Error', function(t) { 
 
-                    t.fail(err);
+                    t.fail(err.message);
                     t.end();
 
                 });
@@ -293,83 +296,91 @@ var WorldHandler = Class.extend({
 
         console.log('WorldHandler', 'Loading World.');
             
-        var compareUnits = function(promise) {
 
-           return self.getUnits()
-              .then(function(unitsBefore) {
-                 return Q()
-                    .then(promise)
-                    .then(function() { 
-                       return self.getUnits();
-                    })
-                    .then(function(unitsAfter) {
-                       return [unitsBefore.length, unitsAfter.length];
+        return Cells.readInfo().then(function(info) {
+
+            return Q.all(_.map(info, function(i) {
+                return self.zones.createCell(i.zoneId, i.cellCoords);
+            })).then(function() {
+
+                var compare = info.length;
+
+                var countCells = function() {
+
+                    var count = 0;
+
+                    return self.LoopCells(function() { 
+                        count++;
+                    }).then(function() { 
+                        return count;
                     });
-              }); 
 
-        };
+                };
 
-        return compareUnits(function() { 
-            return Cells.readInfo()
-            .then(function(info) {
+                return countCells().then(function(count) {
 
+                    test('WorldHandler -- Loaded Cells Test', function(t) {
+
+                        t.equal(count, compare, count + '===' + compare);
+
+                        _.each(info, function(i) {
+
+                            var msg = 'Should have cell [ zone: ' + i.zoneId;
+                            msg += ', cx: ' + i.cellCoords.x;
+                            msg += ', cz: ' + i.cellCoords.z + ']';
+
+                            t.ok(self.CheckWorldStructure(i.zoneId, i.cellCoords.x, i.cellCoords.z), msg);
+                        });
+
+                        t.end(); 
+
+                    });
+
+                }); 
+
+            })
+            .then(function() { 
                 return Q.all(_.map(info, function(i) {
-                    return self.zones.createCell(i.zoneId, i.cellCoords);
-                }))
-                .then(function() {
 
-                    var compare = info.length;
+                    //Create all cells first because adding units effects neighbouring cells 
+                    return self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z)
 
-                    var countCells = function() {
+                }));
 
-                        var count = 0;
+            });
+        })
+        .then(function(result) {
 
-                        return self.LoopCells(function() { count++; })
-                    .then(function() { return count; });
-
-                    };
-
-                    return countCells()
-                    .then(function(count) {
-
-                        test('WorldHandler -- Loaded Cells Test', function(t) {
-
-                            t.equal(count, compare, count + '===' + compare);
-                            t.end(); 
-
-                        });
-
-                    }); 
-
-                })
-                .then(function() { 
-                    return Q.all(_.map(info, function(i) {
-
-                        //Create all cells first because adding units effects neighbouring cells 
-                        return self.loadUnits(i.zoneId, i.cellCoords.x, i.cellCoords.z)
-                        .then(function(added) { 
-                            total += added;
-                        });
-
-                    }));
-
-                });
-            }); 
-        }).spread(function(before, after) {
+            var compareUnits = _.flatten(result);
 
             test('WorldHandler -- Loaded Units Test', function(t) { 
 
-                var compare = before + total;
-                t.ok(after > 0, 'Should have loaded at least one unit.');
-                t.equal(compare, after, compare + '===' + after);
-                t.end(); 
+
+                self.getNPCs().then(function(npcs) {
+
+                    _.each(compareUnits, function(compareUnit) {
+
+                        var msg = 'NPC ' + compareUnit.id + ' should exist.';
+
+                        var check = _.some(npcs, function(npc) {
+                            return npc.id === compareUnit.id;
+                        });
+
+                        t.ok(check, msg);
+
+                    });
+
+                    t.equal(compareUnits.length, npcs.length, 'Lengths of unit collections should be equal');
+
+                    t.end();
+
+                });
+
             }); 
 
-        })
-        .then(function() {
+        }).then(function() {
             return self.loadNavigationNodes(); 
-        })
-        .fail(function(err) {
+        }).fail(function(err) {
 
             console.error('WorldHandler', err);
 
@@ -493,21 +504,20 @@ var WorldHandler = Class.extend({
                 deferred.reject(err);
             }
 
-            var total = 0;
-
             Q.all(_.map(results, function(unitData) {
 
                 var unit = self.MakeUnitFromData(unitData);
 
                 if(unit) { 
-                    total++;
-                    return unit.load();
-                } 
-                
-                return Q();
+                    return unit.load().then(function() {
+                        return unit; 
+                    });
+                }
 
-            })).then(function() {
-                deferred.resolve(total); 
+                return unit; 
+
+            })).then(function(units) {
+                deferred.resolve(_.reject(units, _.isUndefined.bind(_))); 
             }).fail(function(err) {
                 deferred.reject(err);
             });
@@ -904,7 +914,7 @@ var WorldHandler = Class.extend({
 
             test('WorldHandler -- UpdateNearbyUnitsOtherUnitsLists', function(t) { 
             
-                t.fail(err);
+                t.fail(err.message);
                 t.end();
 
             });

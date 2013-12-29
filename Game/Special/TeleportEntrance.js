@@ -72,7 +72,7 @@ var TeleportEntrance = Unit.extend({
 
                     if (unit.InRangeOfUnit(self, 1)) {
 
-                        log("Teleport!");
+                        log('Game/Special/TeleportEntrance: Teleport to ' + self.targetExit.position);
 
                         unit.TeleportToUnit(self.targetExit);
 

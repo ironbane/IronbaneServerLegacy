@@ -791,7 +791,8 @@ var Fighter = Actor.extend({
         return this.FindNearestUnit()
             .then(function(unit) { 
 
-                if (unit instanceof Fighter &&
+                if (unit &&
+                    unit instanceof Fighter &&
                     !(unit === self) &&
                     !(unit.health <= 0) &&
                     !(unit.chInvisibleByMonsters) &&

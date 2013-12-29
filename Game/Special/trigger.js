@@ -46,7 +46,7 @@ var Trigger = Unit.extend({
             // make sure we are still in the world and near the chest
             // TODO: faster / better than FindUnit??
             return worldHandler.FindUnit(unit.id)
-               .then(function() {
+               .then(function(unit) {
 
                    if(unit.InRangeOfUnit(trigger, trigger.range)) {
                        // still in range, maybe get a pulse
@@ -59,8 +59,10 @@ var Trigger = Unit.extend({
                        trigger.onExit(unit);
                    }
 
+               }).fail(function(err) {
+                   console.error('Game/Special/trigger.js', err); 
                });
- 
+
         });
 
         Q.all(promises)
