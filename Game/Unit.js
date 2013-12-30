@@ -16,16 +16,16 @@
 */
 
 
-// var Q = require('q');
+var Q = require('q');
 
 var Unit = Class.extend({
 
   Init: function(data) {
-    _.extend(this, data);
 
-    // When things die or otherwise shut off this will disable AI and other processes
-    this.active = this.id > 0 ? true : false;
+        _.extend(this, data);
 
+        // When things die or otherwise shut off this will disable AI and other processes
+        this.active = this.id > 0 ? true : false;
 
         // Whether the unit has a custom script attached
         this.isScripted = false;
@@ -96,15 +96,30 @@ var Unit = Class.extend({
 
         this.navigationMeshGroup = null;
 
+        this.load(); 
+
       },
-      load : function() {
+      load: function() {
 
-         var me = this; 
+         var self = this; 
 
-         return me.UpdateNearbyUnitsOtherUnitsLists()
-             .then(function() {
-                 return worldHandler.addUnitToCell(me, me.cellX, me.cellZ);
+         if(_.isUndefined(self.loadDeferred)) {
+
+             self.loadDeferred = Q.defer();
+
+             return self.UpdateNearbyUnitsOtherUnitsLists().then(function() {
+
+                return worldHandler.addUnitToCell(self, self.cellX, self.cellZ);
+
+             }).then(function() {
+
+                self.loadDeferred.resolve(); 
+
              });
+
+         }
+
+         return self.loadDeferred.promise;
 
       },
       isPlayer: function() {
@@ -121,7 +136,7 @@ var Unit = Class.extend({
         this.navigationMeshGroup = pathFinder.getGroup(this.zone, this.position);
       },
       TeleportToUnit: function(unit, noEmit) {
-        this.Teleport(unit.zone, unit.position, noEmit);
+        return this.Teleport(unit.zone, unit.position, noEmit);
       },
       Teleport: function(zone, position, noEmit) {
 
@@ -132,7 +147,7 @@ var Unit = Class.extend({
         // Prevent all stuff from spawning under the ground, etc
         this.readyToReceiveUnits = false;
 
-        worldHandler.requireCell(self.zone, self.cellX, self.cellZ)
+        return worldHandler.requireCell(self.zone, self.cellX, self.cellZ)
             .then(function() { 
                return worldHandler.removeUnitFromCell(self, self.cellX, self.cellZ);
             })
@@ -371,7 +386,7 @@ var Unit = Class.extend({
                 var spawn = null; 
 
                 if (spawns.length === 0) {
-                    return spawn;
+                    return null;
                 }
 
                 if (spawns.length === 1) {

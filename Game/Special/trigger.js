@@ -38,6 +38,7 @@ var Trigger = Unit.extend({
 
         if(trigger.triggerTimeout > 0) {
             trigger.triggerTimeout -= dTime;
+            return;
         }
 
         // check guests to see if still present

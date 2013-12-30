@@ -855,6 +855,8 @@ var SocketHandler = Class.extend({
                     roty: 0
                 }, false);
 
+                bag.load(); //Add unit to a cell
+
                 item.owner = bag.id;
 
                 // Add the item to the lootbag
@@ -1533,7 +1535,8 @@ var SocketHandler = Class.extend({
                            });
 
                            return;
-                       } else if (bag.template.type !== UnitTypeEnum.LOOTABLE && bag.template.type !== UnitTypeEnum.VENDOR) {
+                       } else if (bag.template.type !== UnitTypeEnum.LOOTABLE && 
+                                  bag.template.type !== UnitTypeEnum.VENDOR) {
 
                            reply({
                                errmsg: "Wrong NPC type for loot!"
@@ -1833,12 +1836,12 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
+                var promises = [
+                    worldHandler.FindPlayerByName(data.name),
+                    worldHandler.FindPlayerByName(data.targetName)
+                ];
 
-                worldHandler.FindPlayerByName(data.name)
-                   .then(function(unit) { 
-                       return [unit, worldHandler.FindPlayerByName(data.targetName)];
-                   })
-                   .spread(function(unit, targetUnit) { 
+                   Q.all(promises).spread(function(unit, targetUnit) { 
 
                        var zone = parseInt(data.zone, 10);
                        var pos = targetUnit ? targetUnit.position : ConvertVector3(data.pos);
@@ -1858,18 +1861,19 @@ var SocketHandler = Class.extend({
                 // Later report them!
                 if ( !socket.unit || socket.unit.editor === false ) return;
 
-                var zone = socket.unit.zone;
 
                 worldHandler.FindUnit(id)
                     .then(function(unit) {
 
+                        var zone = unit.zone;
+
                         var cx = unit.cellX;
                         var cz = unit.cellZ;
 
-                        return worldHandler.removeUnitFromCell(unit, cx, cz);
+                        return [zone, cx, cz, worldHandler.removeUnitFromCell(unit, cx, cz)];
                         
                     })
-                    .then(function() {
+                    .spread(function(zone, cx, cz) {
                         return worldHandler.UpdateNearbyUnitsOtherUnitsLists(zone, cx, cz);
                     })
                     .then(function() {

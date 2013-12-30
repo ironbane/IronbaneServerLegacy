@@ -148,7 +148,6 @@ var NPC = Fighter.extend({
 
         var distance = DistanceSq(this.position, this.targetNodePosition);
 
-
         // log("TravelToPosition dist:");
         // console.log(distance);
         var targetPositionDistance = DistanceSq(this.position, targetPosition);

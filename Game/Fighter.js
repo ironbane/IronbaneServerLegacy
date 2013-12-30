@@ -298,6 +298,8 @@ var Fighter = Actor.extend({
                     roty: 0
                 }, false);
 
+                bag.load();
+
                 for (var i = 0; i < self.loot.length; i++) {
                     var item = self.loot[i];
 
@@ -320,6 +322,7 @@ var Fighter = Actor.extend({
         }
     },
     Respawn: function() {
+
         var self = this;
 
         // reset the respawn timer now
@@ -330,56 +333,61 @@ var Fighter = Actor.extend({
         self.SetHealth(self.healthMax, true);
         self.SetArmor(self.armorMax, true);
 
-        if (self.isPlayer()) {
-            //      self.position = new THREE.Vector3(0, 0, 0);
-            //      self.zone = 1;
-            //debugger;
+        // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
+        self.findNearestSpawnPoint().then(function(spawnpoint) {
 
-            // need a better "reset"
-            self.UpdateAppearance(true);
-            self.socket.emit('updateInventory', {
-                items: self.items
-            });
+            if (spawnpoint) {
+                return self.TeleportToUnit(spawnpoint);
+            } else {
+                // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
+                if (self.zone === tutorialSpawnZone) {
+                    return self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+                } else {
+                    console.log('Teleporting to default', normalSpawnZone, normalSpawnPosition);
+                    return self.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                }
+            }
 
-            // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
-            self.findNearestSpawnPoint()
-                .then(function(spawnpoint) {
+        }).then(function() {
 
-                    if (spawnpoint) {
-                        self.TeleportToUnit(spawnpoint);
-                    } else {
-                        // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
-                        if (self.zone === tutorialSpawnZone) {
-                            self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
-                        } else {
-                            self.Teleport(normalSpawnZone, normalSpawnPosition, true);
-                        }
-                    }
+            if(self.isPlayer()) { 
 
+                // need a better "reset"
+                self.UpdateAppearance(true);
+                self.socket.emit('updateInventory', {
+                    items: self.items
                 });
 
-        } else {
-            if (self instanceof NPC) {
-                self.SetWeaponsAndLoot();
+            } else {
+
+                if (self instanceof NPC) {
+                    self.SetWeaponsAndLoot();
+                }
+                self.position = self.startPosition.clone();
+                self.targetNodePosition = self.position.clone();
+                self.handleMessage("respawned", {});
             }
-            self.position = self.startPosition.clone();
-            self.targetNodePosition = self.position.clone();
-            self.handleMessage("respawned", {});
-        }
 
-        // log("Respawned "+self.id);
 
-        // Send the client that it's okay to revert back
-        self.EmitNearby("respawn", {
-            id: self.id,
+        }).then(function() { 
+
+            // log("Respawned "+self.id);
+
+            // Send the client that it's okay to revert back
+            self.EmitNearby("respawn", {
+                id: self.id,
             p: self.position.clone().Round(2),
             z: self.zone,
             h: self.health
-        }, 0, true);
+            }, 0, true);
 
-        if (!(self.isPlayer())) {
-            self.velocity.set(0, 0, 0);
-        }
+            if (!(self.isPlayer())) {
+                self.velocity.set(0, 0, 0);
+            }
+
+
+        });
+
     },
     // Returns true when the max health changed
     CalculateMaxHealth: function(doEmit) {

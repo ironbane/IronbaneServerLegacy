@@ -32,6 +32,7 @@ var Lever = Unit.extend({
         } else {
 
             self.data.switchNumber = -Math.abs(self.data.switchNumber);
+
             worldHandler.FindUnit(self.data.switchNumber)
                 .then(function(unit) {
 
@@ -44,6 +45,11 @@ var Lever = Unit.extend({
                         self.Toggle(self.targetUnit.on);
                     }
 
+                }).fail(function(err) { 
+
+                    console.error('Game/Special/Lever.js',
+                        'Not found', self.data.switchNumber);
+                
                 });       
         }
 

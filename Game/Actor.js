@@ -59,25 +59,16 @@ var Actor = MovingUnit.extend({
             // Check if we have a global state defined
             if (!_.isUndefined(actorScripts[identifier])) {
 
-
-                if(identifier.indexOf('Zeppelin') == 0) { 
-
-                    console.log('Game/Special/Actor', 'Creating actor with script: ' + identifier);
-
-                }
-
                 this.isScripted = true;
                 this.stateMachine.setGlobalState(new actorScripts[identifier]());
             }
+
         }
 
         this._super();
+
     },
     Tick: function(dTime) {
-
-         if(this.template.name.indexOf('Zeppelin') == 0) { 
-             console.log('Zeppelin tick');
-         }
 
         this.stateMachine.update(dTime);
 

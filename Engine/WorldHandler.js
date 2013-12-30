@@ -673,6 +673,7 @@ var WorldHandler = Class.extend({
 
         return unit;
     },
+
     clearObjects : function(zoneId, cellX, cellZ) {
        return this.zones.clearObjects(zoneId, cellX, cellZ);
     },
@@ -681,8 +682,7 @@ var WorldHandler = Class.extend({
 
        return this.zones.getObjects(zoneId, cellX, cellZ)
           .then(function(objects) {
-
-             objects.push(object);
+              objects.push(object);
           });
 
     },
@@ -804,7 +804,7 @@ var WorldHandler = Class.extend({
             })
             .then(function() {
 
-               var objectsPromise = JSON.parse(JSON.stringify(self.zones.getObjects(zone, cellX, cellZ)));
+               var objectsPromise = self.zones.getObjects(zone, cellX, cellZ);
                var changeBufferPromise = self.zones.getChangeBuffer(zone, cellX, cellZ);
                var deleteBufferPromise = self.zones.getDeleteBuffer(zone, cellX, cellZ);
 
@@ -812,7 +812,8 @@ var WorldHandler = Class.extend({
                return [ objectsPromise, changeBufferPromise, deleteBufferPromise ];
             })
             .spread(function(objects, changeBuffer, deleteBuffer) {
-
+        
+                objects = JSON.parse(JSON.stringify(objects));
                 objects = updateMetadata(changeBuffer, objects); 
                 objects = deleteObjects(deleteBuffer, objects);
 
@@ -1050,7 +1051,7 @@ var WorldHandler = Class.extend({
 
         return Q.all(promises)
            .then(function() {
-              return newList;
+               return newList;
            });
     }
 
