@@ -20,8 +20,7 @@ var dataPath = clientDir + 'data';
 var pathFinder = require(APP_ROOT_PATH + '/src/server/game/pathFinder.js');
 pathFinder.setPath(dataPath);
 
-var aabb = require('aabb-3d'),
-    test = require('assert-tap').test;
+var aabb = require('aabb-3d');
 
 // For when node modules are used: 
 
@@ -159,36 +158,29 @@ var WorldHandler = Class.extend({
         worldCoords.z += Cells.size() / 2;
         
 
-        return Q()
-            .then(function() { 
-                if(isPlayer && unit.editor) { 
-                    return self.requireCell(zone, x, z);
-                }
-            })
-            .then(function() {
+        return Q().then(function() { 
 
-                return self.zones.emit(zone, 'addUnit', worldCoords, unit);
+            if(isPlayer && unit.editor) { 
+                return self.requireCell(zone, x, z);
+            }
 
-            })
-            .then(function() {
+        }).then(function() {
 
-                if(isPlayer) {
+            return self.zones.emit(zone, 'addUnit', worldCoords, unit);
 
-                   return self.zones.emitNear(unit.zone, 'activate', worldCoords)
+        }).then(function() {
 
-                }
+            if(isPlayer) {
 
-            })
-            .fail(function(err) {
+                return self.zones.emitNear(unit.zone, 'activate', worldCoords)
 
-                test('WorldHandler -- Add Unit Error', function(t) { 
+            }
 
-                    t.fail(err.message);
-                    t.end();
+        }).fail(function(err) {
 
-                });
+            console.error('WorldHandler -- Add Unit Error', err);
 
-            });
+        });
 
     },
 
@@ -206,31 +198,29 @@ var WorldHandler = Class.extend({
         worldCoords.x += Cells.size() / 2;
         worldCoords.z += Cells.size() / 2; 
 
-        return self.zones.emit(unit.zone, 'removeUnit', worldCoords, unit)
-            .then(function() { 
+        return self.zones.emit(unit.zone, 'removeUnit', worldCoords, unit).then(function() { 
 
-                if(isPlayer) { 
+            if(isPlayer) { 
 
-                    return self.zones.emitNear(unit.zone, 'deactivate', worldCoords);
-                }
-    
-            });
+                return self.zones.emitNear(unit.zone, 'deactivate', worldCoords);
+            }
+
+        });
     },
 
     loadNavigationNodes: function() {
 
         console.log('WorldHandler: Loading navigation nodes.');
 
-        return this.zones.selectAll()
-            .then(function(zones) {
+        return this.zones.selectAll().then(function(zones) {
 
-               _.each(zones, function(zone) {
-                   pathFinder.loadZone(zone.id);
-               });
-
-              pathFinder.test();
-
+            _.each(zones, function(zone) {
+                pathFinder.loadZone(zone.id);
             });
+
+            pathFinder.test();
+
+        });
 
     },
     SaveWorld: function() {
@@ -303,43 +293,6 @@ var WorldHandler = Class.extend({
                 return self.zones.createCell(i.zoneId, i.cellCoords);
             })).then(function() {
 
-                var compare = info.length;
-
-                var countCells = function() {
-
-                    var count = 0;
-
-                    return self.LoopCells(function() { 
-                        count++;
-                    }).then(function() { 
-                        return count;
-                    });
-
-                };
-
-                return countCells().then(function(count) {
-
-                    test('WorldHandler -- Loaded Cells Test', function(t) {
-
-                        t.equal(count, compare, count + '===' + compare);
-
-                        _.each(info, function(i) {
-
-                            var msg = 'Should have cell [ zone: ' + i.zoneId;
-                            msg += ', cx: ' + i.cellCoords.x;
-                            msg += ', cz: ' + i.cellCoords.z + ']';
-
-                            t.ok(self.CheckWorldStructure(i.zoneId, i.cellCoords.x, i.cellCoords.z), msg);
-                        });
-
-                        t.end(); 
-
-                    });
-
-                }); 
-
-            })
-            .then(function() { 
                 return Q.all(_.map(info, function(i) {
 
                     //Create all cells first because adding units effects neighbouring cells 
@@ -348,36 +301,6 @@ var WorldHandler = Class.extend({
                 }));
 
             });
-        })
-        .then(function(result) {
-
-            var compareUnits = _.flatten(result);
-
-            test('WorldHandler -- Loaded Units Test', function(t) { 
-
-
-                self.getNPCs().then(function(npcs) {
-
-                    _.each(compareUnits, function(compareUnit) {
-
-                        var msg = 'NPC ' + compareUnit.id + ' should exist.';
-
-                        var check = _.some(npcs, function(npc) {
-                            return npc.id === compareUnit.id;
-                        });
-
-                        t.ok(check, msg);
-
-                    });
-
-                    t.equal(compareUnits.length, npcs.length, 'Lengths of unit collections should be equal');
-
-                    t.end();
-
-                });
-
-            }); 
-
         }).then(function() {
             return self.loadNavigationNodes(); 
         }).fail(function(err) {
@@ -674,102 +597,6 @@ var WorldHandler = Class.extend({
         return unit;
     },
 
-    clearObjects : function(zoneId, cellX, cellZ) {
-       return this.zones.clearObjects(zoneId, cellX, cellZ);
-    },
-
-    addObject : function(zoneId, cellX, cellZ, object) {
-
-       return this.zones.getObjects(zoneId, cellX, cellZ)
-          .then(function(objects) {
-              objects.push(object);
-          });
-
-    },
-
-    emitChangeObject : function(zoneId, cellX, cellZ, pushData) {
-
-       return this.zones.getChangeBuffer(zoneId, cellX, cellZ)
-           .then(function(changeBuffer) { 
-              changeBuffer.push(pushData);
-           });
-
-    },
-
-    emitDeleteObject : function(zoneId, cellX, cellZ, object) {
-
-       return this.zones.getDeleteBuffer(zoneId, cellX, cellZ)
-           .then(function(deleteBuffer) {
-              deleteBuffer.push(object); 
-           });
-
-    },
-    clearUnits : function(zoneId, cellX, cellZ) {
-
-       var deferred = Q.defer();
-
-       this.zones.getCell(zoneId, cellX, cellZ).units = [];
-
-       deferred.resolve();
-
-       return deferred.promise;
-
-    },
-    LoadCell: function(zoneId, cellX, cellZ) {
-
-        var self = this;
-
-        var deferred = Q.defer();
-
-        // Query the entry
-        var path = dataPath + "/" + zoneId + "/" + cellX + "/" + cellZ;
-
-        fsi.mkdirSync(path, 0777, true, function(err) {
-            if (err) {
-                log("Error:" + err);
-            } else {
-                log('Directory created');
-            }
-        });
-
-        if (fs.existsSync(path + "/objects.json")) {
-            // Load static gameobjects
-            try {
-                stats = fs.lstatSync(path + "/objects.json");
-
-                if (stats.isFile()) {
-
-                    var objects =  JSON.parse(fs.readFileSync(path + "/objects.json", 'utf8'));
-
-                     self.clearObjects()
-                         .then(function() {
-
-                            var promises = _.map(objects, function(object) {
-                               return self.addObject(object); 
-                            });
-
-                            return Q.all(promises); 
-
-                         })
-                         .then(function() {
-                            return self.clearUnits(zoneId, cellX, cellZ);
-                         })
-                         .then(function() {
-                            deferred.resolve(); 
-                         });
-
-                }
-            } catch (e) {
-
-                console.error('WorldHandler.LoadCell:', err);
-                deferred.reject(e);
-
-            }
-        }
-
-        return deferred.promise;
-
-    },
     GenerateCell: function(zone, cellX, cellZ) {
 
         var self = this;
@@ -779,147 +606,28 @@ var WorldHandler = Class.extend({
         return this.zones.createCell(zone, new THREE.Vector3(cellX, 0, cellZ))
             .then(function() {
 
-                log("Generated cell (" + cellX + "," + cellZ + ")");
+                log('Generated cell (' + cellX + ',' + cellZ + ')');
 
-                self.SaveCell(zone, cellX, cellZ, true);
+                self.SaveCell(zone, cellX, cellZ, true, [], [], []);
 
             });
     },
-    SaveCell: function(zone, cellX, cellZ, clearObjects) {
+    SaveCell: function(zoneId, cellX, cellZ, shouldClear, objects, changes, deletes) {
 
-        var self = this,
-            doClearObjects = clearObjects || false;
+        var worldCoords = Cells.toWorldCoordinates(cellX, cellZ);
 
-        chatHandler.announceRoom('editors', "Saving cell " + cellX + ", " + cellZ + " in zone " + zone + "...");
-  
-        this.LoadCell(zone, cellX, cellZ)
-            .then(function() {
+        worldCoords.x += Cells.size() / 2;
+        worldCoords.z += Cells.size() / 2;
 
-                if (doClearObjects) {
-
-                    return self.zones.clearObjects(); 
-
-                }
-
-            })
-            .then(function() {
-
-               var objectsPromise = self.zones.getObjects(zone, cellX, cellZ);
-               var changeBufferPromise = self.zones.getChangeBuffer(zone, cellX, cellZ);
-               var deleteBufferPromise = self.zones.getDeleteBuffer(zone, cellX, cellZ);
-
-
-               return [ objectsPromise, changeBufferPromise, deleteBufferPromise ];
-            })
-            .spread(function(objects, changeBuffer, deleteBuffer) {
-        
-                objects = JSON.parse(JSON.stringify(objects));
-                objects = updateMetadata(changeBuffer, objects); 
-                objects = deleteObjects(deleteBuffer, objects);
-
-                return objects;
-
-            })
-            .then(function(objects) {
-
-                // Query the entry
-                var path = dataPath + "/" + zone + "/" + cellX + "/" + cellZ;
-
-                fsi.mkdirSync(path, 0777, true, function(err) {
-                    if (err) {
-                        log("Error:" + err);
-                    } else {
-                        log('Directory created');
-                    }
-                });
-
-                var str = JSON.stringify(objects, null, 4);
-                fs.writeFileSync(path + "/objects.json", str);
-
-                log("Saved cell (" + cellX + "," + cellZ + ") in zone " + zone + "");
-
-                // Clean up
-                return self.zones.clearObjects(zone, cellX, cellZ);
-                
-            });
- 
-
-        function updateMetadata(changeBuffer, objects) {
-
-            if (!_.isUndefined(changeBuffer)) {
-                _.each(changeBuffer, function(obj) {
-
-                    var pos = ConvertVector3(obj.pos);
-                    pos = pos.Round(2);
-
-                    _.each(objects, function(loopObj) {
-
-                        if (pos.x === loopObj.x && 
-                            pos.y === loopObj.y && 
-                            pos.z === loopObj.z) {
-
-                            if (_.isEmpty(obj.metadata)) {
-                                delete loopObj.metadata;
-                            } else {
-
-                                if (_.isUndefined(loopObj.metadata)) {
-                                    loopObj.metadata = {};
-                                }
-
-                                _.extend(loopObj.metadata, obj.metadata);
-                            }
-                        }
-                    });
-                });
-            }
-
-            return objects;
-
-        }
-
-        function deleteObjects(deleteBuffer, objects) { 
-
-            // Delete the things from the terrain in the deleteBuffer
-            if (!_.isUndefined(deleteBuffer)) {
-
-                _.each(deleteBuffer, function(deleteObj) {
-
-                    var deleteObjPos = ConvertVector3(deleteObj).Round(2);
-
-                    _.each(objects, function(loopObj) {
-
-                        var loopObjPos = ConvertVector3(loopObj).Round(2);
-
-                        if (deleteObjPos.x === loopObjPos.x && 
-                            deleteObjPos.y === loopObjPos.y && 
-                            deleteObjPos.z === loopObjPos.z) {
-
-                            objects = _.without(objects, loopObj);
-                            deleteBuffer = _.without(deleteBuffer, deleteObj);
-                        }
-
-                    });
-                });
-
-            }
-            return objects;
-        }
+        return this.zones.emit(zoneId, 'edit', worldCoords, shouldClear, objects, changes, deletes); 
 
     },
     UpdateNearbyUnitsOtherUnitsLists: function(zoneId, cellX, cellZ) {
         
         return this.LoopUnitsNear(zoneId, cellX, cellZ, function(unit) {
             unit.UpdateOtherUnitsList();
-        }, 1)
-        .fail(function(err) {
-
-            test('WorldHandler -- UpdateNearbyUnitsOtherUnitsLists', function(t) { 
-            
-                t.fail(err.message);
-                t.end();
-
-            });
-
+        }, 1).fail(function(err) {
+            console.error('WorldHandler.UpdateOtherUnitsList', err);
         });
 
     },

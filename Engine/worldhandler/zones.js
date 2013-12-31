@@ -103,15 +103,13 @@ spatial.prototype.listens = function(event, bbox) {
  * @param cellCoords {Object} - An object containing numeric
  * properties x and z. 
  **/
-var CellHandler = function(bbox, cellCoords) {
+var CellHandler = function(bbox, zoneId, cellCoords) {
 
     this.fields = {
         bbox : bbox,
+        zoneId : zoneId,
         cellCoords : cellCoords,
-        units : [],
-        objects : [],
-        changeBuffer : [],
-        deleteBuffer : []
+        units : []
     }; 
 
     /**
@@ -223,6 +221,179 @@ var CellHandler = function(bbox, cellCoords) {
         deferred.resolve();
     }
 
+    /**
+     * @method loadObjects
+     * @return {Array} - An array of existing objects in this cell.
+     **/
+    function loadObjects() {
+
+        var self = this;
+
+        var cellX = this.fields.cellCoords.x,
+            cellZ = this.fields.cellCoords.z,
+            zoneId = this.fields.zoneId;
+
+        var objects = []; 
+
+        // Query the entry
+        var path = dataPath + '/' + zoneId + '/' + cellX + '/' + cellZ;
+
+        fsi.mkdirSync(path, 0777, true, function(err) {
+            if (err) {
+                log('Error:' + err);
+            } else {
+                log('Directory created');
+            }
+        });
+
+        try { 
+
+            if (fs.existsSync(path + '/objects.json')) {
+                // Load static gameobjects
+                stats = fs.lstatSync(path + '/objects.json');
+
+                if (stats.isFile()) {
+
+                    objects = JSON.parse(fs.readFileSync(path + '/objects.json', 'utf8'));
+
+                }
+
+            }
+
+        } catch (err) {
+
+            console.error('CellHandler.loadObjects', err);
+
+        }
+
+        return objects;
+
+    }
+
+    /**
+     * @method saveObjects
+     * @param objects {Array} - Overwrite the objects in this cell.
+     **/
+    function saveObjects(objects) {
+
+        var cellX = this.fields.cellCoords.x,
+            cellZ = this.fields.cellCoords.z,
+            zone =  this.fields.zoneId;
+
+        if(chatHandler) { 
+
+            chatHandler.announceRoom('editors', 'Saving cell ' + cellX + ', ' + cellZ + ' in zone ' + zone + '...');
+
+        }
+  
+        // Query the entry
+        var path = dataPath + '/' + zone + '/' + cellX + '/' + cellZ;
+
+        fsi.mkdirSync(path, 0777, true, function(err) {
+            if (err) {
+                log('Error:' + err);
+            } else {
+                log('Directory created');
+            }
+        });
+
+        var str = JSON.stringify(objects, null, 4);
+        fs.writeFileSync(path + '/objects.json', str);
+
+        log('CellHandler.saveObjects: wrote ' + path + '/objects.json');
+
+    }
+
+    /**
+     * @method edit
+     *
+     * @param deferred {Object} 
+     * @param objects {Array}
+     * @param changes {Array}
+     * @param deletes {Array}
+     *
+     **/
+    function edit(deferred, shouldClear, addObjects, changes, deletes) {
+
+        var objects = [];
+
+        if(!shouldClear) {
+
+            objects = this.loadObjects().concat(addObjects);
+
+            objects = updateMetadata(changes, objects);
+
+            objects = deleteObjects(deletes, objects);
+
+        }
+
+       this.saveObjects(objects);
+
+       deferred.resolve();
+
+       function updateMetadata(changeBuffer, objects) {
+
+           if (_.isArray(changeBuffer)) {
+               _.each(changeBuffer, function(changedObject) {
+
+                   var pos = ConvertVector3(changedObject.pos);
+                   pos = pos.Round(2);
+
+                   _.each(objects, function(loopObj) {
+
+                       if (pos.x === loopObj.x && 
+                           pos.y === loopObj.y && 
+                           pos.z === loopObj.z) {
+
+                           if (_.isEmpty(changedObject.metadata)) {
+                               delete loopObj.metadata;
+                           } else {
+
+                               if (_.isUndefined(loopObj.metadata)) {
+                                   loopObj.metadata = {};
+                               }
+
+                               _.extend(loopObj.metadata, changedObject.metadata);
+                           }
+                       }
+                   });
+               });
+           }
+
+           return objects;
+
+       }
+
+       function deleteObjects(deleteBuffer, objects) { 
+
+           // Delete the things from the terrain in the deleteBuffer
+           if (_.isArray(deleteBuffer)) {
+
+               _.each(deleteBuffer, function(deleteObj) {
+
+                   var deleteObjPos = ConvertVector3(deleteObj).Round(2);
+
+                   _.each(objects, function(loopObj) {
+
+                       var loopObjPos = ConvertVector3(loopObj).Round(2);
+
+                       if (deleteObjPos.x === loopObjPos.x && 
+                           deleteObjPos.y === loopObjPos.y && 
+                           deleteObjPos.z === loopObjPos.z) {
+
+                           objects = _.without(objects, loopObj);
+                           deleteBuffer = _.without(deleteBuffer, deleteObj);
+                       }
+
+                   });
+               });
+
+           }
+           return objects;
+       }
+
+    }
+
     this.getX = getX;
     this.getZ = getZ;
     this.addUnit = addUnit;
@@ -230,6 +401,9 @@ var CellHandler = function(bbox, cellCoords) {
     this.changeActivity = changeActivity;
     this.activate = activate;
     this.deactivate = deactivate;
+    this.loadObjects = loadObjects;
+    this.saveObjects = saveObjects;
+    this.edit = edit;
 
 };
 
@@ -452,70 +626,6 @@ var Zones = function() {
     }
 
     /**
-     * @method clearObjects
-     * @param zoneId {Number}
-     * @param cellX {Number}
-     * @param cellZ {Number}    
-     **/
-    function clearObjects(zoneId, cellX, cellZ) {
-
-        var deferred = Q.defer();
-
-        this.getCell(zoneId, cellX, cellZ).fields.objects = [];
-
-        deferred.resolve();
-
-        return deferred.promise;
-    }
-
-    /**
-     * @method getObjects
-     * @param zoneId {Number}
-     * @param cellX {Number}
-     * @param cellZ {Number}
-     **/
-    function getObjects(zoneId, cellX, cellZ) {
-
-        var deferred = Q.defer();
-
-        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.objects);
-
-        return deferred.promise;
-
-    }
-
-    /**
-     * @method getChangeBuffer
-     * @param zoneId {Number}
-     * @param cellX {Number}
-     * @param cellZ {Number}
-     **/
-    function getChangeBuffer(zoneId, cellX, cellZ) {
-
-        var deferred = Q.defer(); 
-
-        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.changeBuffer);
-
-        return deferred.promise;
-    }
-
-
-    /**
-     * @method getDeleteBuffer
-     * @param zoneId {Number}
-     * @param cellX {Number}
-     * @param cellZ {Number}
-     **/
-    function getDeleteBuffer(zoneId, cellX, cellZ) {
-
-        var deferred = Q.defer();
-
-        deferred.resolve(this.getCell(zoneId, cellX, cellZ).fields.deleteBuffer);
-
-        return deferred.promise;
-    }
-
-    /**
      * @method emit
      * @param zoneId {Number}
      * @param name {String}
@@ -679,12 +789,13 @@ var Zones = function() {
 
                 if(!zone.contains(bbox)) { 
 
-                    var cell = new CellHandler(bbox, cellCoords);
+                    var cell = new CellHandler(bbox, zoneId, cellCoords);
 
                     zone.spatial.on('addUnit', bbox, cell.addUnit.bind(cell));
                     zone.spatial.on('removeUnit', bbox, cell.removeUnit.bind(cell));
                     zone.spatial.on('activate', bbox, cell.activate.bind(cell));
                     zone.spatial.on('deactivate', bbox, cell.deactivate.bind(cell));
+                    zone.spatial.on('edit', bbox, cell.edit.bind(cell));
 
                     zone.cells.push(cell);
 
@@ -705,16 +816,13 @@ var Zones = function() {
         // Add fail to the chain after returning to handle error messages.
     }
 
+
     this.emit = emit;
     this.emitNear = emitNear;
     this.selectAll = selectAll;
     this.selectZone = selectZone;
     this.createCell = createCell;
     this.getCell = getCell;
-    this.clearObjects = clearObjects;
-    this.getObjects = getObjects;
-    this.getChangeBuffer = getChangeBuffer;
-    this.getDeleteBuffer = getDeleteBuffer;
 
 };
 

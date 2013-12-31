@@ -2018,6 +2018,8 @@ var SocketHandler = Class.extend({
 
             socket.on("paintModel", function (data) {
 
+                console.log('SocketHandler:paintModel', data);
+
                 //data.pos, data.metadata;
 
                 // Later report them!
@@ -2036,14 +2038,11 @@ var SocketHandler = Class.extend({
                     changeData.metadata = {};
                 }
 
-                worldHandler.requireCell(zone, cellPos.x, cellPos.z)
-                   .then(function() {
-                      return worldHandler.emitChangeObject(zone, cellPos.x, cellPos.z, changeData);
-                   })
-                   .then(function() { 
-                      return worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-                   })
-                   .then(function() {
+                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() { 
+                      return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [], [changeData], []);
+                   }).then(function() {
+
+                       console.log('SocketHandler onPaint', 'Painted model');
 
                        if ( data.global ) {
 
@@ -2082,22 +2081,21 @@ var SocketHandler = Class.extend({
 
                 var cellPos = Cells.toCellCoordinates(data.x, data.z);
 
-                worldHandler.requireCell(zone, cellPos.x, cellPos.z)
-                    .then(function() { 
-                        return worldHandler.emitDeleteObject(zone, cellPos.x, cellPos.z, data);
-                    })
-                    .then(function() { 
-                        // Set a timer to auto save this cell
-                        // If we set the height again, reset the timer
-                        return worldHandler.SaveCell(zone, cellPos.x, cellPos.z);
-                    })
-                    .then(function() {
+                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() { 
 
-                        socket.unit.EmitNearby("deleteModel", data, 0, true);
+                    // Set a timer to auto save this cell
+                    // If we set the height again, reset the timer
+                    return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [], [], [data]);
 
-                        reply(true);
+                }).then(function() {
 
-                    });
+                    console.log('Deleted model');
+
+                    socket.unit.EmitNearby("deleteModel", data, 0, true);
+
+                    reply(true);
+
+                });
 
             });
 
@@ -2118,30 +2116,25 @@ var SocketHandler = Class.extend({
 
                 var cellPos = Cells.toCellCoordinates(data.position.x, data.position.z);
 
-                worldHandler.requireCell(zone, cellPos.x, cellPos.z)
-                    .then(function() {
+                // Just add the object, and save it. Clients should automatically add it
+                var addObject = {
+                    x : data.position.x,
+                    y : data.position.y,
+                    z : data.position.z,
+                    t : data.type,
+                    p : data.param,
+                    rX : data.rX,
+                    rY : data.rY,
+                    rZ : data.rZ
+                };
 
-                        // Just add the object, and save it. Clients should automatically add it
-                        return worldHandler.addObject(zone, cellPos.x, cellPos.z, {
-                            x : data.position.x,
-                            y : data.position.y,
-                            z : data.position.z,
-                            t : data.type,
-                            p : data.param,
-                            rX : data.rX,
-                            rY : data.rY,
-                            rZ : data.rZ
-                        });
+                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() {
+                    return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [addObject], [], []);  
+                }).then(function() { 
+                    socket.unit.EmitNearby("addModel", data, 0, true);
 
-                    })
-                    .then(function() {
-                       return worldHandler.SaveCell(zone, cellPos.x, cellPos.z);  
-                    })
-                    .then(function() { 
-                       socket.unit.EmitNearby("addModel", data, 0, true);
-
-                       reply(true);
-                    });
+                    reply(true);
+                });
             });
 
             socket.on("disconnect", function (data) {
