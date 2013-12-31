@@ -152,10 +152,7 @@ var WorldHandler = Class.extend({
         var x = newCellX;
         var z = newCellZ;
 
-        var worldCoords = Cells.toWorldCoordinates(x,z);
-
-        worldCoords.x += Cells.size() / 2;
-        worldCoords.z += Cells.size() / 2;
+        var cellCoords = new THREE.Vector3(x, 0, z); 
         
 
         return Q().then(function() { 
@@ -166,13 +163,13 @@ var WorldHandler = Class.extend({
 
         }).then(function() {
 
-            return self.zones.emit(zone, 'addUnit', worldCoords, unit);
+            return self.zones.emit(zone, 'addUnit', cellCoords, unit);
 
         }).then(function() {
 
             if(isPlayer) {
 
-                return self.zones.emitNear(unit.zone, 'activate', worldCoords)
+                return self.zones.emitNear(unit.zone, 'activate', cellCoords);
 
             }
 
@@ -193,16 +190,13 @@ var WorldHandler = Class.extend({
 
         var isPlayer = unit.id > 0;
 
-        var worldCoords = Cells.toWorldCoordinates(x,z);
+        var cellCoords = new THREE.Vector3(x, 0, z);
 
-        worldCoords.x += Cells.size() / 2;
-        worldCoords.z += Cells.size() / 2; 
-
-        return self.zones.emit(unit.zone, 'removeUnit', worldCoords, unit).then(function() { 
+        return self.zones.emit(unit.zone, 'removeUnit', cellCoords, unit).then(function() { 
 
             if(isPlayer) { 
 
-                return self.zones.emitNear(unit.zone, 'deactivate', worldCoords);
+                return self.zones.emitNear(unit.zone, 'deactivate', cellCoords);
             }
 
         });
@@ -614,12 +608,9 @@ var WorldHandler = Class.extend({
     },
     SaveCell: function(zoneId, cellX, cellZ, shouldClear, objects, changes, deletes) {
 
-        var worldCoords = Cells.toWorldCoordinates(cellX, cellZ);
+        var cellCoords = new THREE.Vector3(cellX, 0, cellZ);
 
-        worldCoords.x += Cells.size() / 2;
-        worldCoords.z += Cells.size() / 2;
-
-        return this.zones.emit(zoneId, 'edit', worldCoords, shouldClear, objects, changes, deletes); 
+        return this.zones.emit(zoneId, 'edit', cellCoords, shouldClear, objects, changes, deletes); 
 
     },
     UpdateNearbyUnitsOtherUnitsLists: function(zoneId, cellX, cellZ) {

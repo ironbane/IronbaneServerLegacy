@@ -444,16 +444,14 @@ var Cells = (function() {
     }
 
     /**
-     * @method nearest
+     * @method point
      * @param cellCoords {Object} - Containing x and z properties.
-     * @return {AABB} - Nearest cell bounding box.
+     * @return {AABB} - A point representation of the cell coordinates.
      **/
-    function nearest(cellCoords) {
+    function point(cellCoords) {
 
-        var xz = toWorldCoordinates(cellCoords.x, cellCoords.z); // from Shared/Util.js
-
-        var begin = [xz.x, 0, xz.z];
-        var dimensions = [size(), size(), size()];
+        var begin = [cellCoords.x, 0, cellCoords.z];
+        var dimensions = [0, 0, 0];
 
         return aabb(begin, dimensions); 
 
@@ -545,7 +543,7 @@ var Cells = (function() {
         size: size,
         toCellCoordinates : toCellCoordinates, 
         toWorldCoordinates : toWorldCoordinates,
-        nearest : nearest,
+        point : point,
         center  : center,
         readInfo : readInfo
     }; 
@@ -561,7 +559,7 @@ var Cells = (function() {
 var ZoneHandler = function(id) {
 
     this.spatial = new spatial();
-    this.spatial.size = Cells.size();
+    this.spatial.size = 1;
 
     this.cells = []; 
     this.id = id; 
@@ -704,11 +702,6 @@ var Zones = function() {
             })
             .flatten()
             .map(function(v) {
-                v.x *= Cells.size();
-                v.z *= Cells.size(); 
-                return v;
-            })
-            .map(function(v) {
                v.x += vec.x;
                v.z += vec.z; 
                return v;
@@ -785,7 +778,7 @@ var Zones = function() {
 
                 var deferred = Q.defer();
 
-                var bbox = Cells.nearest(cellCoords);
+                var bbox = Cells.point(cellCoords);
 
                 if(!zone.contains(bbox)) { 
 
