@@ -31,7 +31,6 @@ var Trigger = Unit.extend({
     },
     Tick: function(dTime) {
         var trigger = this,
-            quitters = [],
             promises = [];
 
         trigger._super(dTime);
@@ -56,7 +55,11 @@ var Trigger = Unit.extend({
                        }
                    } else {
                        console.log('quitter!', unit.id);
-                       quitters.push(unit);
+
+                       triggers.guests = _.reject(trigger.guests, function(guest) { 
+                           return guest.id === unit.id;
+                       });
+
                        trigger.onExit(unit);
                    }
 
@@ -74,8 +77,6 @@ var Trigger = Unit.extend({
                  trigger.triggerTimeout = trigger.triggerInterval;
              }
 
-             // clear guests of quitters outside the first loop
-             trigger.guests = _.difference(trigger.guests, quitters);
 
              // check area for new guests
              return worldHandler.LoopUnitsNear(trigger.zone, trigger.cellX, trigger.cellZ, function(unit) {
