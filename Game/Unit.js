@@ -96,6 +96,8 @@ var Unit = Class.extend({
 
         this.navigationMeshGroup = null;
 
+        this.isChanging = false;
+
         this.load(); 
 
       },
@@ -111,7 +113,7 @@ var Unit = Class.extend({
 
                 return worldHandler.addUnitToCell(self, self.cellX, self.cellZ);
 
-             }).then(function() {
+             }).fin(function() {
 
                 self.loadDeferred.resolve(); 
 
@@ -289,8 +291,9 @@ var Unit = Class.extend({
       RemoveOtherUnit: function(unit) {
         // Auto send AddUnit if we're a player
 
-        this.otherUnits = _.without(this.otherUnits, unit);
-
+        this.otherUnits = _.reject(this.otherUnits, function(other) { 
+            return other.id === unit.id;
+        });
 
         // Add the unit to ourselves clientside (only if WE are a player)
         if (this.isPlayer()) {
@@ -318,12 +321,13 @@ var Unit = Class.extend({
         var cx = self.cellX;
         var cz = self.cellZ;
 
-        return worldHandler.LoopUnitsNear(self.zone, cx, cz, function(unit) { 
+        return worldHandler.LoopUnitsNear(self.zone, self.cellX, self.cellZ, function(unit) {
+
             if(unit !== self) {
-               secondList.push(unit);
+                secondList.push(unit);
             }
-        })
-        .then(function() { 
+
+        }).then(function() { 
 
             for (var i = 0; i < firstList.length; i++) {
                 if (secondList.indexOf(firstList[i]) == -1) {
@@ -339,7 +343,7 @@ var Unit = Class.extend({
                 }
             }
 
-        });
+        }); 
 
       },
       FindNearestUnit: function(maxDistance) {
@@ -368,8 +372,7 @@ var Unit = Class.extend({
                 }
             }
 
-        })
-        .then(function() { 
+        }).then(function() { 
            deferred.resolve(nearestUnit);
         });
 
@@ -380,8 +383,7 @@ var Unit = Class.extend({
 
         var unit = this;
 
-        return worldHandler.findUnitsByName('player_spawn_point', unit.zone)
-            .then(function(spawns) {
+        return worldHandler.findUnitsByName('player_spawn_point', unit.zone).then(function(spawns) {
 
                 var spawn = null; 
 
@@ -410,7 +412,7 @@ var Unit = Class.extend({
 
         var self = this;
 
-        var deferred = Q.defer();
+
 
         // Make sure we generate adjacent cells if they don't exist
         var cx = this.cellX;
@@ -425,91 +427,109 @@ var Unit = Class.extend({
 
         if (cellPos.x != this.cellX || cellPos.z != this.cellZ) {
 
-          worldHandler.requireCell(zone, cx, cz)
-              .then(function() { 
-                 return worldHandler.removeUnitFromCell(self, cx, cz);
-              })
-              .then(function() { 
-                 return worldHandler.addUnitToCell(self, newCellX, newCellZ);
-              })
-              .then(function() {
-                  
-                  var cellsToRecalculate = [];
+            self.isChanging = self.isChanging || false;
 
-                  // Build two lists, and recalculate all units inside that are not in both lists at the same time
-                  var firstList = [];
-                  var secondList = [];
+            if(self.isChanging) { 
+
+                return Q(); 
+
+            } 
+
+            self.isChanging = true;
 
 
-                  for (var x = cx - 1; x <= cx + 1; x++) {
-                      for (var z = cz - 1; z <= cz + 1; z++) {
-                          firstList.push({
-                              x: x,
-                              z: z
-                          });
-                      }
-                  }
+            return worldHandler.requireCell(zone, cx, cz).then(function() { 
+                return worldHandler.removeUnitFromCell(self, cx, cz);
+            }).then(function() { 
+                return worldHandler.addUnitToCell(self, newCellX, newCellZ);
+            }).then(function() {
 
-                  cx = cellPos.x;
-                  cz = cellPos.z;
+                var cellsToRecalculate = [];
 
-                  for (var x = cx - 1; x <= cx + 1; x++) {
-                      for (var z = cz - 1; z <= cz + 1; z++) {
-                          secondList.push({
-                              x: x,
-                              z: z
-                          });
-
-                      }
-                  }
-
-                  _.each(firstList, function(firstListItem) {
-                      if (secondList.indexOf(firstListItem) == -1) {
-                          // Not found in the secondlist, so recalculate all units inside
-                          worldHandler.requireCell(zone, firstListItem.x, firstListItem.z)
-                              .then(function() { 
-
-                                  worldHandler.LoopUnitsNear(zone, firstListItem.x, firstListItem.z, function(sunit) { 
-                                      sunit.UpdateOtherUnitsList();
-                                  }, 0);
-
-                              });
-                      }
-                  });
+                // Build two lists, and recalculate all units inside that are not in both lists at the same time
+                var firstList = [];
+                var secondList = [];
 
 
-                  _.each(secondList, function(secondListItem) {
-                      if (firstList.indexOf(secondListItem) == -1) {
-                          // Not found in the firstlist, so recalculate all units inside
-                          worldHandler.requireCell(zone, secondListItem.x, secondListItem.z)
-                              .then(function() { 
+                for (var x = cx - 1; x <= cx + 1; x++) {
+                    for (var z = cz - 1; z <= cz + 1; z++) {
+                        firstList.push({
+                            x: x,
+                            z: z
+                        });
+                    }
+                }
 
-                                  worldHandler.LoopUnitsNear(zone, secondListItem.x, secondListItem.z, function(funit) { 
-                                      funit.UpdateOtherUnitsList();
-                                  }, 0);
+                cx = cellPos.x;
+                cz = cellPos.z;
 
-                              });
-                      }
-                  });
+                for (var x = cx - 1; x <= cx + 1; x++) {
+                    for (var z = cz - 1; z <= cz + 1; z++) {
+                        secondList.push({
+                            x: x,
+                            z: z
+                        });
+
+                    }
+                }
+
+                var promises = [];
+
+                return Q.all(_.map(firstList, function(firstListItem) {
+
+                    if (secondList.indexOf(firstListItem) == -1) {
+                        // Not found in the secondlist, so recalculate all units inside
+                        return worldHandler.requireCell(zone, firstListItem.x, firstListItem.z).then(function() { 
+
+                            return worldHandler.LoopUnitsNear(zone, firstListItem.x, firstListItem.z, function(sunit) { 
+                                promises.push(sunit.UpdateOtherUnitsList());
+                            }, 0);
+
+                        });
+                    }
+
+                })).then(function() {
 
 
-                  self.cellX = cellPos.x;
-                  self.cellZ = cellPos.z;
+                    return Q.all(_.map(secondList, function(secondListItem) {
+
+                        if (firstList.indexOf(secondListItem) == -1) {
+                            // Not found in the firstlist, so recalculate all units inside
+                            return worldHandler.requireCell(zone, secondListItem.x, secondListItem.z).then(function() { 
+
+                                return worldHandler.LoopUnitsNear(zone, secondListItem.x, secondListItem.z, function(funit) { 
+                                    promises.push(funit.UpdateOtherUnitsList());
+                                }, 0);
+
+                            });
+                        }
+
+                    }));
+
+                }).then(function() {
+
+                    return Q.all(promises);
+
+                }).then(function() {
+
+                    self.cellX = cellPos.x;
+                    self.cellZ = cellPos.z;
+
+                    return self.UpdateOtherUnitsList();
+
+                }).then(function() {
+
+                    self.isChanging = false;
+
+                });
 
 
-                  // Of course, update for ourselves too!
-                  return self.UpdateOtherUnitsList();
+            });
 
-              })
-              .then(function() {
-                 deferred.resolve(); 
-              });
- 
-      } else {
-          deferred.resolve();
-      }
+        } 
 
-      return deferred.promise;
+      return Q();
+
   },
   Tick: function(dTime) {
 

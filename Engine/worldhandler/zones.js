@@ -109,7 +109,8 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         bbox : bbox,
         zoneId : zoneId,
         cellCoords : cellCoords,
-        units : []
+        units : [],
+        isTicking : false
     }; 
 
     /**
@@ -138,18 +139,19 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      **/
     function addUnit(deferred, unit) {
 
-       if(!_.isUndefined(unit) &&
-          !_.isUndefined(unit.id) &&
-          !_.some(this.fields.units, function(u) { 
-             return u.id === unit.id; })) {
+       //if(!_.isUndefined(unit) &&
+       //   !_.isUndefined(unit.id) &&
+       //   !_.some(this.fields.units, function(u) { 
+       //      return u.id === unit.id; })) {
 
+       if(!_.contains(this.fields.units, unit)) { 
           this.fields.units.push(unit);
 
           deferred.resolve();
 
        } else { 
          
-           deferred.reject(new Error('CellHandler: Cannot add unit!'));
+           deferred.reject(new Error('CellHandler: Cannot add unit! ' + unit.isPlayer()));
 
        }
 
@@ -162,17 +164,9 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      **/
     function removeUnit(deferred, unit)  {
 
-       if(!_.isUndefined(unit) &&
-          !_.isUndefined(unit.id)) { 
+        this.fields.units = _.without(this.fields.units, unit);
 
-           this.fields.units = _.reject(this.fields.units, function(u) { 
-               return unit.id === u.id;
-           });
-      
-           //delete this.fields.units[unit.id]; 
-       }
-
-       deferred.resolve();
+        deferred.resolve();
     }
 
     /** 
@@ -204,9 +198,20 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      **/
     function deactivate(deferred) {
 
-        this.changeActivity(false);
+        var hasPlayer = _.some(this.fields.units, function(unit) {
+            return unit.isPlayer();
+        });
 
-        deferred.resolve();
+        if(!hasPlayer) {
+
+            console.log('CellHandler.deactivate', this.fields.zoneId, this.fields.cellCoords);
+
+            this.changeActivity(false);
+            this.stopTicking();
+            deferred.resolve();
+
+        } 
+
     }
 
     /**
@@ -217,8 +222,91 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
     function activate(deferred) {
 
         this.changeActivity(true);
+        this.startTicking();
 
         deferred.resolve();
+    }
+
+    /** 
+     * @method awake
+     * @return {Array} - An array of promises.
+     **/
+    function awake() { 
+
+        return Q.all(_.map(this.fields.units, function(unit) {
+            return unit.Awake(); 
+        }));
+
+    }
+
+    /**
+     * @method tick
+     * @param elapsed {Number}
+     * @return {Promise}
+     **/
+    function tick(elapsed) {
+
+        var players = _.filter(this.fields.units, function(unit) {
+            return unit.isPlayer(); 
+        });
+
+        return Q.all(_.map(this.fields.units, function(unit) {
+
+            if(unit.active) { 
+                return unit.Tick(elapsed);
+            } 
+
+        })).then(function() { ;
+
+            return Snapshots.broadcast(players); 
+
+        });
+
+    }
+
+    /**
+     * @method startTicking
+     **/
+    function startTicking() {
+
+        if(this.fields.isTicking) { 
+            return; //Don't schedule ticking twice.
+        }
+
+        this.fields.isTicking = true;
+
+        (function ticker(cell, elapsed) {
+
+            elapsed = elapsed || 0; 
+
+            var begin = Date.now() / 1000;
+
+            var wait = Math.min(0, (0.1 - elapsed) * 1000);
+
+            cell.tick(elapsed).then(function() {
+
+                setTimeout(function() {
+
+                    var delta = Date.now() /1000 - begin;
+
+                    if(cell.fields.isTicking) { 
+                        ticker(cell, Math.min(delta, 0.1)); 
+                    }
+
+                }, wait);
+
+            }); 
+
+
+        })(this);
+
+    }
+
+    /**
+     * @method stopTicking
+     **/
+    function stopTicking() {
+       this.fields.isTicking = false;
     }
 
     /**
@@ -401,6 +489,10 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
     this.changeActivity = changeActivity;
     this.activate = activate;
     this.deactivate = deactivate;
+    this.awake = awake;
+    this.tick = tick;
+    this.startTicking = startTicking;
+    this.stopTicking = stopTicking;
     this.loadObjects = loadObjects;
     this.saveObjects = saveObjects;
     this.edit = edit;
@@ -773,8 +865,7 @@ var Zones = function() {
      **/
     function createCell(zoneId, cellCoords) {
 
-        return this.selectZone(zoneId)
-            .then(function(zone) {
+        return this.selectZone(zoneId).then(function(zone) {
 
                 var deferred = Q.defer();
 

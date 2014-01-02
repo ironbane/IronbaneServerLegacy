@@ -273,10 +273,11 @@ function start(scripts) {
                 engine.tick();
             });
 
-            // this replaces MainLoop, must go here since server hasn't been defined earlier...
+
             engine.on('tick', function(elapsed) {
-                // eventually we wouldn't be accessing the global var here...
+
                 server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
+
             });
 
             engine.start();

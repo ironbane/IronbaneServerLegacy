@@ -39,6 +39,8 @@ var Snapshots = (function() {
      **/
     function send(cached, unit) {
 
+        if(!unit.readyToReceiveUnits) { return; }
+
         _.chain(unit.otherUnits)
            .filter(function(ud) {
                return ud.id !== unit.id;

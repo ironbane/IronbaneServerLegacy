@@ -38,32 +38,32 @@ var WorldHandler = Class.extend({
         this.switches = {};
 
     },
-    Awake: function() {
 
-        // All units ready! Awaken!
-        return this.LoopUnits(function(u) {
-            u.Awake();
+    /**
+     * @method getCells
+     * @return {Array} - A list of promises, for all cells in all zones.
+     **/
+    getCells : function() {
+
+        var promises = [];
+
+        return this.LoopCells(function(cell) {
+            promises.push(cell); 
+        }).then(function() { 
+            return promises;
         });
 
     },
-    /** 
-     * @method tick
-     *
-     * @param {Number} elapsed
-     * @return {Object} - A promise.
-     */
-    tick: function(elapsed) {
 
-      var self = this;
+    Awake: function() {
 
-      return self.updateUnits(elapsed)
-          .then(function() { 
-              return self.getPlayers();
-          })
-          .then(function(players) {
-              return Snapshots.broadcast(players);
-          });
+        return this.getCells().then(function(cells) {
 
+            return Q.all(_.map(cells, function(cell) {
+                return cell.awake(); 
+            }));
+
+        });
 
     },
     updateUnits: function(dTime) {
@@ -199,6 +199,10 @@ var WorldHandler = Class.extend({
                 return self.zones.emitNear(unit.zone, 'deactivate', cellCoords);
             }
 
+        }).fail(function(err) { 
+
+            console.err('WorldHandler.removeUnitFromCell', err);
+            
         });
     },
 
@@ -260,10 +264,9 @@ var WorldHandler = Class.extend({
 
        if(!this.CheckWorldStructure(zoneId, cx, cz)) {
 
-           this.GenerateCell(zoneId, cx, cz)
-               .then(function() { 
-                   deferred.resolve();
-               });
+           this.GenerateCell(zoneId, cx, cz).then(function() { 
+               deferred.resolve();
+           });
 
        } else {
 

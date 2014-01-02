@@ -192,13 +192,11 @@ var SocketHandler = Class.extend({
                     }
 
                     // Check if the character is already being used in the server (since they bypassed the member check)
-                    worldHandler.FindUnit(character.id)
-                       .then(function(gu) { 
+                    worldHandler.FindUnit(character.id).then(function(gu) { 
                            respond({
                                errmsg: "There is already a guest playing under your credentials!"
                            });
-                       })
-                       .fin(function() {
+                       }).fin(function() {
 
                            loadCharItems(character, function() {
                                // we should be all good now!
@@ -2183,7 +2181,7 @@ var SocketHandler = Class.extend({
                         // In addition, recalculate the unitlist for some units
                         // Which ones?
                         var cellPos = Cells.toCellCoordinates(socket.unit.position.x, socket.unit.position.z);
-                        if ( cellPos.x !== socket.unit.cellX || cellPos.z !== socket.unit.cellZ ) {
+                        if ( cellPos.x != socket.unit.cellX || cellPos.z != socket.unit.cellZ ) {
                             return socket.unit.ChangeCell(cellPos.x, cellPos.z);
                         }
 
