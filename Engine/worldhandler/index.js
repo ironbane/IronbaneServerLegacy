@@ -728,30 +728,30 @@ var WorldHandler = Class.extend({
 
     BuildWaypointListFromUnitIds: function(list) {
 
-        var self = this,
-            newList = [];
+        var self = this;
 
         var promises = _.map(list, function(number) {
 
-           return self.FindUnit(-number)
-              .then(function(unit) { 
-                  if (unit) {
+           return self.FindUnit(-number).then(function(unit) { 
 
-                      // Passing by reference on purpose, for dynamic waypoints in the future
-                      newList.push({
-                          id: number,
-                          pos: unit.position
-                      });
+               // Passing by reference on purpose, for dynamic waypoints in the future
+               return {
+                   id: number,
+                   pos: unit.position
+               };
 
-                  }
-              });
+           }).fail(function(err) {
+              console.error('WorldHandler.BuildWaypointListFromUnitIds', err); 
+               /** Unit not found **/
+           });
 
         });
 
-        return Q.all(promises)
-           .then(function() {
-               return newList;
-           });
+        return Q.all(promises).then(function(waypoints) { 
+            return _.reject(waypoints, function(waypoint) {
+               return !waypoint; 
+            });
+        });
     }
 
 });

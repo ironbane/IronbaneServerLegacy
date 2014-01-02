@@ -45,8 +45,7 @@ var Trigger = Unit.extend({
 
             // make sure we are still in the world and near the chest
             // TODO: faster / better than FindUnit??
-            return worldHandler.FindUnit(unit.id)
-               .then(function(unit) {
+            return worldHandler.FindUnit(unit.id).then(function(unit) {
 
                    if(unit.InRangeOfUnit(trigger, trigger.range)) {
                        // still in range, maybe get a pulse
@@ -56,7 +55,7 @@ var Trigger = Unit.extend({
                    } else {
                        console.log('quitter!', unit.id);
 
-                       triggers.guests = _.reject(trigger.guests, function(guest) { 
+                       trigger.guests = _.reject(trigger.guests, function(guest) { 
                            return guest.id === unit.id;
                        });
 
