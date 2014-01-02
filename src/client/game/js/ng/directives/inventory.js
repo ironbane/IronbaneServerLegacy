@@ -4,7 +4,10 @@ IronbaneApp
 .directive('inventory', ['$log', '$window', '$timeout', function($log, $window, $timeout) {
 	return {
 		restrict: 'E',
-		template: '<div id="itemBar" class="dragon-bar"></div>' ,
+		templateUrl: '/game/templates/inventory.html' ,
+		controller: function($scope){
+			$scope.slots = _.range(10);
+		}/*,
 		link: function($scope, el, attrs){
 			$scope.makeInventorySlots = function(num) {
 				spaces = num;
@@ -31,6 +34,7 @@ IronbaneApp
 				el.empty();
 				for (var x = 0; x < spaces; x++) {
 					var slot = $('<div id="is' + x + '" class="dragon-slot itemBarSlot"></div>');
+					console.log(slot);
 					slot.data('slot', x);
 					el.append(slot);
 					slot.droppable({
@@ -105,6 +109,6 @@ IronbaneApp
 				hudHandler.makeCoinBar();
 			};
 
-		}      
+		}*/      
 	};
 }]);
