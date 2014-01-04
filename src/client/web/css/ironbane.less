@@ -13,6 +13,7 @@
 @inputDisabledFontColor:        #ececec;
 @errorTextColor:                #FF0000;
 
+
 html {height: 100%;}
 body {
     background-image: url(../images/bg.png);
@@ -273,7 +274,7 @@ forumuserprofile {
         background-color: @black;
         padding: 20px;
     }
-    input { .placeholder(darken(@textColor, 10%)); }
+    input { .placeholder(darken(@text-color, 10%)); }
     input[type=text] {
         width: 95%;
     }
@@ -293,12 +294,12 @@ forumuserprofile {
     text-align: center;
     .loginForm {
         input,
-        textarea { .placeholder(darken(@textColor, 10%)); }
+        textarea { .placeholder(darken(@text-color, 10%)); }
 
         input[type=text],
         input[type=password],
         button {
-            color: @textColor;
+            color: @text-color;
             border-color: @primary4;
             background-color: @primary3;
             font-weight: bold;
