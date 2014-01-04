@@ -556,7 +556,7 @@ var Fighter = Actor.extend({
                     body: self.body,
                     feet: self.feet,
                     special: special
-                });
+                }, 0, true);
             }
         }
     },
@@ -797,7 +797,7 @@ var Fighter = Actor.extend({
 
         var self = this;
         
-        return this.FindNearestUnit().then(function(unit) { 
+        return this.FindNearestUnit(maxDistance).then(function(unit) { 
 
                 if (unit &&
                     unit instanceof Fighter &&
@@ -808,6 +808,8 @@ var Fighter = Actor.extend({
                     !(!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === self.template.friendly) &&
                     self.InLineOfSight(unit, noHeadingCheck) &&
                     !(maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance))) {
+
+                        console.log('Fighter.js', 'Found nearest target');
 
                         return unit; // resolve target
 

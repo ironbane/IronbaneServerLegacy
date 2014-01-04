@@ -30,8 +30,6 @@ var MovingUnit = Unit.extend({
 
         this.steeringForce = new THREE.Vector3();
 
-
-
     },
     Tick: function(dTime) {
 

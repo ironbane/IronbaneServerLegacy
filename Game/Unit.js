@@ -71,7 +71,6 @@ var Unit = Class.extend({
         // Convert zone to int
         this.zone = parseInt(this.zone, 10);
 
-
         // Update the heading based on the rotation
         var radians = (this.rotation.y + (Math.PI / 2));
 
@@ -79,7 +78,6 @@ var Unit = Class.extend({
         this.heading.y = 0;
         this.heading.z = Math.cos(radians);
         this.heading.normalize();
-
 
         this.sendRotationPacketX = false;
         this.sendRotationPacketY = false;
@@ -372,8 +370,6 @@ var Unit = Class.extend({
                 }
             }
 
-        }).fail(function(err) {
-            console.error('Unit.FindNearestUnit', err);
         }).fin(function() { 
            deferred.resolve(nearestUnit);
         });
@@ -551,10 +547,9 @@ var Unit = Class.extend({
     var cx = this.cellX;
     var cz = this.cellZ;
 
-    worldHandler.removeUnitFromCell(self, cx, cz)
-        .then(function() { 
-            return self.UpdateNearbyUnitsOtherUnitsLists();
-        });
+    worldHandler.removeUnitFromCell(self, cx, cz).then(function() { 
+        return self.UpdateNearbyUnitsOtherUnitsLists();
+    });
 
   },
   EmitNearby: function(event, data, maxDistance, allowSelf) {
