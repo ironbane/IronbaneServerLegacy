@@ -372,7 +372,9 @@ var Unit = Class.extend({
                 }
             }
 
-        }).then(function() { 
+        }).fail(function(err) {
+            console.error('Unit.FindNearestUnit', err);
+        }).fin(function() { 
            deferred.resolve(nearestUnit);
         });
 

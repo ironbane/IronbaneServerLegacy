@@ -16,13 +16,14 @@
 */
 
 /** 
- * @module zones 
+ * @module zones
  **/
 var aabb = require('aabb-3d'),
     spatial = require('spatial-events'),
-    Q = require('q');
+    Q = require('q'),
+    Ticker = require('./Engine/worldhandler/ticker.js');
 
-// var util = require('./util');
+// var util = require('../util');
 
 /** 
  * @method listens
@@ -109,8 +110,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         bbox : bbox,
         zoneId : zoneId,
         cellCoords : cellCoords,
-        units : [],
-        isTicking : false
+        units : []
     }; 
 
     /**
@@ -138,11 +138,6 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      * by this cell.
      **/
     function addUnit(deferred, unit) {
-
-       //if(!_.isUndefined(unit) &&
-       //   !_.isUndefined(unit.id) &&
-       //   !_.some(this.fields.units, function(u) { 
-       //      return u.id === unit.id; })) {
 
        if(!_.contains(this.fields.units, unit)) { 
           this.fields.units.push(unit);
@@ -208,9 +203,10 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
             this.changeActivity(false);
             this.stopTicking();
-            deferred.resolve();
 
-        } 
+        }
+
+        deferred.resolve(); 
 
     }
 
@@ -253,7 +249,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         return Q.all(_.map(this.fields.units, function(unit) {
 
             if(unit.active) { 
-                return unit.Tick(elapsed);
+                unit.Tick(elapsed);
             } 
 
         })).then(function() { ;
@@ -268,45 +264,14 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      * @method startTicking
      **/
     function startTicking() {
-
-        if(this.fields.isTicking) { 
-            return; //Don't schedule ticking twice.
-        }
-
-        this.fields.isTicking = true;
-
-        (function ticker(cell, elapsed) {
-
-            elapsed = elapsed || 0; 
-
-            var begin = Date.now() / 1000;
-
-            var wait = Math.min(0, (0.1 - elapsed) * 1000);
-
-            cell.tick(elapsed).then(function() {
-
-                setTimeout(function() {
-
-                    var delta = Date.now() /1000 - begin;
-
-                    if(cell.fields.isTicking) { 
-                        ticker(cell, Math.min(delta, 0.1)); 
-                    }
-
-                }, wait);
-
-            }); 
-
-
-        })(this);
-
+        Ticker.add(this);
     }
 
     /**
      * @method stopTicking
      **/
     function stopTicking() {
-       this.fields.isTicking = false;
+        Ticker.remove(this);
     }
 
     /**

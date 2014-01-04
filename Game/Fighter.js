@@ -793,11 +793,11 @@ var Fighter = Actor.extend({
 
         maxDistance = maxDistance || 0;
         onlyPlayers = onlyPlayers || false;
+        noHeadingCheck = noHeadingCheck || false;
 
         var self = this;
         
-        return this.FindNearestUnit()
-            .then(function(unit) { 
+        return this.FindNearestUnit().then(function(unit) { 
 
                 if (unit &&
                     unit instanceof Fighter &&
