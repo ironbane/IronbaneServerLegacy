@@ -36,7 +36,7 @@ module.exports = function(units, worldHandler, chatHandler) {
 
             }
 
-            message = '<b>* ' + unit.name + " rolled " + randomdice + ' on a ' + sides + ' sided dice. *</b>';
+            message = '<b>* ' + unit.name + " rolled " + randomdice + ' on a ' + sides + ' sided die. *</b>';
 
             if (target) {
                 chatHandler.announceRoom(target, message, color);
