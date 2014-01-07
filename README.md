@@ -14,7 +14,7 @@ Play the game at <http://www.ironbane.com/>.
 
 ## Getting started
 
-* Clone this repository somewhere on your system.
+* Clone this repository somewhere on your system. If you wish to play the production (i.e. live) version of Ironbane, checkout the 'master' branch. If you wish to contribute with coding, then checkout the 'develop' branch. Make sure that you make Pull Requests towards the develop branch, rather than the master branch.
 
 ```
     git clone https://github.com/ironbane/IronbaneServer.git
