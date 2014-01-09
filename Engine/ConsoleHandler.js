@@ -15,6 +15,8 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// var Cells = require('./zones').Cells;
+
 var ConsoleHandler = Class.extend({
   Init: function() {
     this.AccessLevel = {
@@ -40,17 +42,23 @@ var ConsoleHandler = Class.extend({
       worldHandler.SaveWorld();
     });
     this.AddCommand(this.AccessLevel.GUEST, ["generatecellrange","gcr"], "Generates a cell range inside a zone, starting from (0,0)", "zone range octaves persistence scale", "1 0 2 5 1.0", function (params) {
-      var startTime = (new Date()).getTime();
 
-      for(var x=-params[1];x<=params[1];x++){
-        for(var z=-params[1];z<=params[1];z++){
-          worldHandler.GenerateCell(params[0], x, z, params[2], params[3], params[4]);
+        var startTime = (new Date()).getTime();
+
+        var promises = []; 
+        for(var x=-params[1];x<=params[1];x++){
+            for(var z=-params[1];z<=params[1];z++){
+                promises.push(worldHandler.GenerateCell(params[0], x, z, params[2], params[3], params[4]));
+            }
         }
-      }
 
-      var endTime = (new Date()).getTime() - startTime;
+        Q.all(promises).then(function() { 
 
-      log("Cell range generation complete! Took "+endTime/1000+" seconds");
+            var endTime = (new Date()).getTime() - startTime;
+
+            log("Cell range generation complete! Took "+endTime/1000+" seconds");
+
+        });
 
 
     });
@@ -137,32 +145,33 @@ var ConsoleHandler = Class.extend({
 
     this.AddCommand(this.AccessLevel.GUEST, ["items"], "Log variable", "string", "", function (params) {
 
-      for(var z in worldHandler.world) {
-        for(var cx in worldHandler.world[z]) {
-          for(var cz in worldHandler.world[z][cx]) {
-            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+      worldHandler.getNPCs()
+          .then(function(npcs) {
 
-              var units = worldHandler.world[z][cx][cz].units;
+              _.each(npcs, function(unit) {
 
-              for(var u=0;u<units.length;u++) {
+                  if(!_.isUndefined(unit.loot)) {
 
-                if ( units[u] instanceof Player ) {
-                  log("Items of "+units[u].name+":");
-                  console.log(units[u].items);
-                }
-                else {
-                  if ( !_.isUndefined(units[u].loot) ) {
-                    log("Loot of "+units[u].template.name+":");
-                    console.log(units[u].loot);
+                      log('Loot of ' + unit.template.name);
+                      console.log(unit.loot);
+
                   }
-                }
 
+              });
 
-              }
-            }
-          }
-        }
-      }
+              return worldHandler.getPlayers();
+
+          })
+          .then(function(players) {
+
+              _.each(players, function(unit) {
+
+                  log('Items of ' + unit.name);
+                  console.log(unit.items);
+
+              });
+              
+          });
 
     });
 
@@ -251,33 +260,33 @@ var ConsoleHandler = Class.extend({
         log(""+count+": "+(sockets[s].unit?"Unit attached":"No unit attached")+"");
       }
 
-      var zonesLoaded = 0;
-      var cellsLoaded = 0;
-      var unitsLoaded = 0;
+      worldHandler.getUnits()
+         .then(function(units) {
 
+             var unitsLoaded = units.length;
+             var zonesLoaded = _.pluck(units, 'zone').length;
 
-      for(var z in worldHandler.world) {
-        zonesLoaded++;
-        for(var cx in worldHandler.world[z]) {
-          for(var cz in worldHandler.world[z][cx]) {
-            cellsLoaded++;
-            if ( !_.isUndefined(worldHandler.world[z][cx][cz].units) ) {
+             var cellsLoaded = _.chain(units)
+                 .map(function(unit) {
+                     return Cells.toCellCoordinates(unit.position.x, unit.position.z); 
+                 })
+                 .reduce(function(coord, memo) { //remove duplicates
+                     return _.filter(memo, function(coordCompare) {
+                        return coord.x !== coordCompare.x &&
+                               coord.z !== coordCompare.z;
+                     });
+                 }, [])
+                 .value()
+                 .length;
+                    
 
-              var units = worldHandler.world[z][cx][cz].units;
+             log('Zones loaded: '+zonesLoaded);
+             log('Cells loaded: '+cellsLoaded);
+             log('Units loaded: '+unitsLoaded);
+             log('Average ticktime: '+endTime);
 
-              for(var u=0;u<units.length;u++) {
-                log("Unit found in zone "+cz+" ("+cx+", "+cz+")");
-                unitsLoaded++;
-              }
-            }
-          }
-        }
-      }
+         }); 
 
-      log("Zones loaded: "+zonesLoaded);
-      log("Cells loaded: "+cellsLoaded);
-      log("Units loaded: "+unitsLoaded);
-      log("Average ticktime: "+endTime);
     });
 
   //log(this.commands);

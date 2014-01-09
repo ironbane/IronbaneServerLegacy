@@ -58,14 +58,18 @@ var Actor = MovingUnit.extend({
 
             // Check if we have a global state defined
             if (!_.isUndefined(actorScripts[identifier])) {
+
                 this.isScripted = true;
                 this.stateMachine.setGlobalState(new actorScripts[identifier]());
             }
+
         }
 
         this._super();
+
     },
     Tick: function(dTime) {
+
         this.stateMachine.update(dTime);
 
         this._super(dTime);

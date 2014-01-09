@@ -28,16 +28,24 @@ var TeleportEntrance = Unit.extend({
         this.FindTargetExit();
     },
     FindTargetExit: function() {
-        if (this.data && !_.isUndefined(this.data.targetExit)) {
-            this.data.targetExit = -Math.abs(this.data.targetExit);
 
-            this.targetExit = worldHandler.FindUnit(this.data.targetExit);
+        var self = this;
 
-            if (!(this.targetExit instanceof TeleportExit)) {
-                this.targetExit = null;
-            }
+        if (self.data && !_.isUndefined(self.data.targetExit)) {
+
+            self.data.targetExit = -Math.abs(self.data.targetExit);
+
+            worldHandler.FindUnit(self.data.targetExit)
+               .then(function(exit) {
+
+                   if (exit instanceof TeleportExit) {
+                       self.targetExit = exit;
+                   }
+
+               });
+
         } else {
-            this.targetExit = null;
+            self.targetExit = null;
         }
     },
     Tick: function(dTime) {
@@ -47,23 +55,32 @@ var TeleportEntrance = Unit.extend({
             if (this.useTimeout > 0) {
                 this.useTimeout -= dTime;
             } else {
-                var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
 
-                for (var u = 0; u < units.length; u++) {
-                    if (!(units[u] instanceof Player)) {
-                        continue;
+                var self = this,
+                    shouldContinue = true;
+
+
+                worldHandler.LoopUnitsNear(self.zone, self.cellX, self.cellZ, function(unit) { 
+
+                    if(!shouldContinue) {
+                        return;
                     }
 
-                    if (units[u].InRangeOfUnit(this, 1)) {
-
-                        log("Teleport!");
-
-                        units[u].TeleportToUnit(this.targetExit);
-
-                        this.useTimeout = 2.0;
-                        break;
+                    if (!(unit.isPlayer())) {
+                        return;
                     }
-                }
+
+                    if (unit.InRangeOfUnit(self, 1)) {
+
+                        log('Game/Special/TeleportEntrance: Teleport to ' + self.targetExit.position);
+
+                        unit.TeleportToUnit(self.targetExit);
+
+                        self.useTimeout = 2.0;
+
+                        shouldContinue = false;
+                    }
+                }, 0);
             }
         }
     }

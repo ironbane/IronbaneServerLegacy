@@ -21,6 +21,7 @@ var THREE = require(global.APP_ROOT_PATH + '/src/client/game/lib/three/three.js'
 // Requires nodes!
 var Patrol = State.extend({
     init: function(waypoints, options) {
+
         this.waypoints = waypoints;
         this.options = options || {};
         this.options.pause = this.options.pause || 0;
@@ -45,6 +46,7 @@ var Patrol = State.extend({
         }
     },
     execute: function(unit, dTime) {
+
         if ( unit.position.distanceToSquared(this.targetPosition) < Math.pow(1.0 * unit.mass, 2) && !this.sentTimeout) {
             if (this.options.navMode === "line") {
                 if (this.forward) {

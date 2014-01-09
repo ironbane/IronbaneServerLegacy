@@ -37,7 +37,9 @@ var Snapshots = (function() {
      * @param {Function} cached - The memoized, toPacket function, for snapshot caching.
      * @param {Player} player - The player to send the snapshot to.
      **/
-    function send(cached, unit) { 
+    function send(cached, unit) {
+
+        if(!unit.readyToReceiveUnits) { return; }
 
         _.chain(unit.otherUnits)
            .filter(function(ud) {

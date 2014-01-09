@@ -106,7 +106,10 @@ var startREPL = function() {
 
         serverREPL.on('exit', function() {
            // todo: other shutdown stuff, like stop db, etc.
+          
+           
            process.exit();
+
         });
 
         // context variables get attached to "global" of this instance
@@ -189,7 +192,7 @@ var LoadActorScripts = function() {
                 _.each(_.keys(script), function(key) {
                     global.actorScripts[key] = script[key];
                 });
-            }catch(e) {
+            } catch(e) {
                 console.error("error loading script!!" + e);
             }
         });
@@ -246,50 +249,59 @@ function start(scripts) {
     global.worldHandler = worldHandler;
 
     global.actorScripts = {};
-    LoadActorScripts().then(function(scripts) {
-        _.extend(global.actorScripts, scripts);
-    });
+    LoadActorScripts()
+        .then(function(scripts) {
 
-    // Load Chat module - after worldHandler, there is a dep
-    global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.units, global.worldHandler);
+            _.extend(global.actorScripts, scripts);
 
-    // All set! Tell WorldHandler to load
-    worldHandler.LoadWorldLight();
+            // Load Chat module - after worldHandler, there is a dep
+            global.chatHandler = require('./src/server/game/chat')(io, global.dataHandler.units, global.worldHandler);
 
-    // create game server, do it first so that the other 2 "servers" can query it
-    engine = new GameEngine();
+            // All set! Tell WorldHandler to load
+            return worldHandler.loadWorld();
 
-    engine.on('start', function() { 
-       engine.tick();
-    });
+        }).then(function() { 
 
-    // this replaces MainLoop, must go here since server hasn't been defined earlier...
-    engine.on('tick', function(elapsed) {
-        // eventually we wouldn't be accessing the global var here...
-        server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
-    });
+            return worldHandler.Awake(); // Awaken units after loading
 
-    engine.start();
+        }).then(function() { 
+
+            // create game server, do it first so that the other 2 "servers" can query it
+            engine = new GameEngine();
+
+            engine.on('start', function() { 
+                engine.tick();
+            });
 
 
-    // start it up, todo: only per config?
-    startREPL();
+            engine.on('tick', function(elapsed) {
 
-    setInterval(keepAlive, 10000);
+                server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
 
-    setInterval(function() { 
-        worldHandler.autoSave();
-    }, 60 * 1 * 1000);
+            });
 
-    // Schedule an auto-restart to prevent EM readfile errors
-    // We can only prevent this by upgrading to a real dedicated server, which we will do
-    // when we have more people. Currently IB runs on a VPS.
-    setTimeout(function() {
-        global.chatHandler.announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
-        setTimeout(function() {
-            process.exit();
-        }, 60000);
-    }, 60 * 60 * 24 * 1000);
+            engine.start();
+
+            // start it up, todo: only per config?
+            startREPL();
+
+            setInterval(keepAlive, 10000);
+
+            setInterval(function() { 
+                worldHandler.autoSave();
+            }, 60 * 1 * 1000);
+
+            // Schedule an auto-restart to prevent EM readfile errors
+            // We can only prevent this by upgrading to a real dedicated server, which we will do
+            // when we have more people. Currently IB runs on a VPS.
+            setTimeout(function() {
+                global.chatHandler.announce("This server needs to restart in order to keep it running smoothly. The restart will happen in 1 minute. Your progress will be saved.", "red");
+                setTimeout(function() {
+                    process.exit();
+                }, 60000);
+            }, 60 * 60 * 24 * 1000);
+
+        });
 }
 
 // These are all to be converted to modules
@@ -297,12 +309,13 @@ var includes = [
     '/Shared/seedrandom.js',
     '/Shared/Buffs.js',
     '/Shared/Util.js',
+    '/Engine/worldhandler/snapshots.js',
+    '/Engine/worldhandler/zones.js',
     '/Engine/ConsoleCommand.js',
     '/Engine/ConsoleHandler.js',
     '/Engine/Switch.js',
     '/Engine/SocketHandler.js',
-    '/Engine/snapshots.js',
-    '/Engine/WorldHandler.js',
+    '/Engine/worldhandler/index.js',
     '/Game/SteeringBehaviour.js',
     '/Game/Unit.js',
     '/Game/MovingUnit.js',

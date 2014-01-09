@@ -30,10 +30,10 @@ var MovingUnit = Unit.extend({
 
         this.steeringForce = new THREE.Vector3();
 
-
-
     },
     Tick: function(dTime) {
+
+        this._super(dTime);
 
         var acceleration = this.steeringForce.divideScalar(this.mass);
 
@@ -52,12 +52,12 @@ var MovingUnit = Unit.extend({
         }
 
         var cellPos = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
+
         if ( cellPos.x !== this.cellX || cellPos.z !== this.cellZ ) {
-              this.ChangeCell(cellPos.x, cellPos.z);
+              return this.ChangeCell(cellPos.x, cellPos.z);
         }
 
 
-        this._super(dTime);
 
     }
 });

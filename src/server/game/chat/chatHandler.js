@@ -134,27 +134,35 @@ module.exports = function(units, worldHandler) {
             if (filterMessage.status !== "clean") {
                 switch (filterMessage.status) {
                     case 'lightwarn':
+
                         // Send lightwarn
-                        player = worldHandler.FindPlayerByName(unit.name);
-                        if (player) {
-                            player.LightWarn();
-                        }
+                        worldHandler.FindPlayerByName(unit.name)
+                            .then(function(player) { 
+                                if (player) {
+                                    player.LightWarn();
+                                }
+                            });
+
                         break;
 
                     case 'warn':
-                        // Send serius warn
-                        player = worldHandler.FindPlayerByName(unit.name);
-                        if (player) {
-                            player.SeriousWarn();
-                        }
+                        // Send serious warn
+                        worldHandler.FindPlayerByName(unit.name)
+                           .then(function(player) { 
+                               if (player) {
+                                   player.SeriousWarn();
+                               }
+                           });
                         break;
 
                     case 'kick':
                         // Send kick
-                        player = worldHandler.FindPlayerByName(unit.name);
-                        if (player) {
-                            player.Kick('Untolerated behaviour');
-                        }
+                        worldHandler.FindPlayerByName(unit.name)
+                           .then(function(player) { 
+                               if (player) {
+                                   player.Kick('Untolerated behaviour');
+                               }
+                           });
                         break;
 
                     default:

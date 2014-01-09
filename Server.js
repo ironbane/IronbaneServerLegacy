@@ -58,8 +58,6 @@ var Server = Class.extend({
      * that for when the tick finishes.
      **/ 
     tick: function(dTime) {
-        
-        var deferred = Q.defer();
 
         if ( this.versionWarningTimer > 0 ) {
             this.versionWarningTimer -= dTime;
@@ -87,9 +85,8 @@ var Server = Class.extend({
                 chatHandler.announce(msg);
             }
         }
-        worldHandler.tick(dTime).then(deferred.resolve.bind(deferred));
 
-        return deferred.promise;
+        return Q();
     } 
 });
 

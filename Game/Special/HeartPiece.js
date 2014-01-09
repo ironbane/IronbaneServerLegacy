@@ -28,20 +28,5 @@ var HeartPiece = Unit.extend({
 
         this._super(dTime);
 
-
-        var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
-
-        for(var u=0;u<units.length;u++) {
-            if ( units[u] instanceof Player){
-
-                if ( units[u].InRangeOfUnit(this, 1) ) {
-                    break;
-                }
-            }
-        }
-
-
-
-
     }
 });

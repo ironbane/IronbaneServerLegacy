@@ -23,17 +23,16 @@ module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: true,
         action: function(unit, target, params) {
-            var Q = require('q'),
-                name = params[0],
+            var name = params[0],
                 hours = params[1],
-                reason = params[2],
-                player = worldHandler.FindPlayerByName(name);
+                reason = params[2];
+                return worldHandler.FindPlayerByName(name)
+                    .then(function(player) { 
+                        if (player) {
+                            player.Ban(hours, reason);
+                        }
+                    });
 
-            if (player) {
-                player.Ban(hours, reason);
-            }
-
-            return Q();
         }
     };
 };

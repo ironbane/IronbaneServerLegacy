@@ -298,6 +298,8 @@ var Fighter = Actor.extend({
                     roty: 0
                 }, false);
 
+                bag.load();
+
                 for (var i = 0; i < self.loot.length; i++) {
                     var item = self.loot[i];
 
@@ -320,6 +322,7 @@ var Fighter = Actor.extend({
         }
     },
     Respawn: function() {
+
         var self = this;
 
         // reset the respawn timer now
@@ -330,51 +333,61 @@ var Fighter = Actor.extend({
         self.SetHealth(self.healthMax, true);
         self.SetArmor(self.armorMax, true);
 
-        if (self.isPlayer()) {
-            //      self.position = new THREE.Vector3(0, 0, 0);
-            //      self.zone = 1;
-            //debugger;
+        // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
+        self.findNearestSpawnPoint().then(function(spawnpoint) {
 
-            // need a better "reset"
-            self.UpdateAppearance(true);
-            self.socket.emit('updateInventory', {
-                items: self.items
-            });
-
-            // respawn @ nearest player_spawn_point (or old method if map doesn't have it)
-            var spawnpoint = self.findNearestSpawnPoint();
             if (spawnpoint) {
-                self.TeleportToUnit(spawnpoint);
+                return self.TeleportToUnit(spawnpoint);
             } else {
                 // deprecated method, fall back to warning server that zone has no spawn point? and/or 0,0,0 ??
                 if (self.zone === tutorialSpawnZone) {
-                    self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
+                    return self.Teleport(tutorialSpawnZone, tutorialSpawnPosition, true);
                 } else {
-                    self.Teleport(normalSpawnZone, normalSpawnPosition, true);
+                    console.log('Teleporting to default', normalSpawnZone, normalSpawnPosition);
+                    return self.Teleport(normalSpawnZone, normalSpawnPosition, true);
                 }
             }
-        } else {
-            if (self instanceof NPC) {
-                self.SetWeaponsAndLoot();
+
+        }).then(function() {
+
+            if(self.isPlayer()) { 
+
+                // need a better "reset"
+                self.UpdateAppearance(true);
+                self.socket.emit('updateInventory', {
+                    items: self.items
+                });
+
+            } else {
+
+                if (self instanceof NPC) {
+                    self.SetWeaponsAndLoot();
+                }
+                self.position = self.startPosition.clone();
+                self.targetNodePosition = self.position.clone();
+                self.handleMessage("respawned", {});
             }
-            self.position = self.startPosition.clone();
-            self.targetNodePosition = self.position.clone();
-            self.handleMessage("respawned", {});
-        }
 
-        // log("Respawned "+self.id);
 
-        // Send the client that it's okay to revert back
-        self.EmitNearby("respawn", {
-            id: self.id,
+        }).then(function() { 
+
+            // log("Respawned "+self.id);
+
+            // Send the client that it's okay to revert back
+            self.EmitNearby("respawn", {
+                id: self.id,
             p: self.position.clone().Round(2),
             z: self.zone,
             h: self.health
-        }, 0, true);
+            }, 0, true);
 
-        if (!(self.isPlayer())) {
-            self.velocity.set(0, 0, 0);
-        }
+            if (!(self.isPlayer())) {
+                self.velocity.set(0, 0, 0);
+            }
+
+
+        });
+
     },
     // Returns true when the max health changed
     CalculateMaxHealth: function(doEmit) {
@@ -543,7 +556,7 @@ var Fighter = Actor.extend({
                     body: self.body,
                     feet: self.feet,
                     special: special
-                });
+                }, 0, true);
             }
         }
     },
@@ -777,73 +790,32 @@ var Fighter = Actor.extend({
         return true;
     },
     FindNearestTarget: function(maxDistance, onlyPlayers, noHeadingCheck) {
+
         maxDistance = maxDistance || 0;
         onlyPlayers = onlyPlayers || false;
+        noHeadingCheck = noHeadingCheck || false;
 
-        var cx = this.cellX;
-        var cz = this.cellZ;
+        var self = this;
+        
+        return this.FindNearestUnit(maxDistance).then(function(unit) { 
 
-        //log("FindNearestTarget, maxDistance "+maxDistance+", onlyPlayers "+(onlyPlayers?"true":"false")+"");
+                if (unit &&
+                    unit instanceof Fighter &&
+                    !(unit === self) &&
+                    !(unit.health <= 0) &&
+                    !(unit.chInvisibleByMonsters) &&
+                    !(onlyPlayers && !(unit.isPlayer())) &&
+                    !(!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === self.template.friendly) &&
+                    self.InLineOfSight(unit, noHeadingCheck) &&
+                    !(maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance))) {
 
-        for (var x = cx - 1; x <= cx + 1; x++) {
-            for (var z = cz - 1; z <= cz + 1; z++) {
-                if (worldHandler.CheckWorldStructure(this.zone, x, z)) {
-                    for (var u = 0; u < worldHandler.world[this.zone][x][z].units.length; u++) {
-                        var unit = worldHandler.world[this.zone][x][z].units[u];
+                        console.log('Fighter.js', 'Found nearest target');
 
-                        if (unit === this) {
-                            continue;
-                        }
+                        return unit; // resolve target
 
-                        if (unit instanceof Fighter) {
-
-                            //debugger;
-
-                            if (unit.health <= 0) {
-                                //log("unit.health <= 0");
-                                continue;
-                            }
-
-                            if (unit.chInvisibleByMonsters) {
-                                //log("unit.chInvisibleByMonsters");
-                                continue;
-                            }
-
-                            if (onlyPlayers && !(unit.isPlayer())) {
-                                //log("onlyPlayers && unit.id < 0");
-                                continue;
-                            }
-
-                            if (!onlyPlayers && !(unit.isPlayer()) && unit.template.friendly === this.template.friendly) {
-                                // Don't attack our own kind!
-                                continue;
-                            }
-
-                            // Check if we are looking at the target
-                            if (!this.InLineOfSight(unit, noHeadingCheck)) {
-                                //log("not in line of sight!");
-                                continue;
-                            }
-
-
-                        } else {
-                            continue;
-                        }
-
-                        if (maxDistance > 0 && !this.InRangeOfUnit(unit, maxDistance)) {
-                            //log("too far away!");
-                            continue;
-                        }
-
-                        //if ( maxDistance > 0 && !unit.InRangeOfPosition(this.startPosition, maxDistance) ) continue;
-
-
-                        return unit;
-
-                    }
+                } else {
+                    throw new Error('Fighter: nearest target not found.');
                 }
-            }
-        }
-        return null;
+        });
     }
 });

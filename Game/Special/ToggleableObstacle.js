@@ -76,34 +76,33 @@ var ToggleableObstacle = Unit.extend({
     this._super(dTime);
 
     if ( this.keyUseTimeout > 0 ) {
-      this.keyUseTimeout -= dTime;
-    }
-    else {
-      var units = worldHandler.world[this.zone][this.cellX][this.cellZ].units;
+       this.keyUseTimeout -= dTime;
+    } else {
+     
+        var self = this;
 
-      for(var u=0;u<units.length;u++) {
-        if ( units[u].isPlayer() ){
+        worldHandler.LoopUnitsNear(self.zone, self.cellX, self.cellZ, function(unit) { 
 
-        if ( units[u].InRangeOfUnit(this, 2) ) {
+            if ( unit.isPlayer() ) {
 
+                if ( unit.InRangeOfUnit(self, 2) ) {
 
+                    // Check the equipped weapon of self unit, and see if it's a key?
 
-          // Check the equipped weapon of this unit, and see if it's a key?
-
-          var item = units[u].GetEquippedWeapon();
-          if ( item ) {
-            var template = dataHandler.items[item.template];
-            if ( template.type === "tool" && template.subtype === "key" ) {
-              if ( item.attr1 === -this.id ) {
-                this.Toggle(!this.on);
-                this.keyUseTimeout = TIMER_KEY_TIME_OUT;
-              }
+                    var item = unit.GetEquippedWeapon();
+                    if ( item ) {
+                        var template = dataHandler.items[item.template];
+                        if ( template.type === "tool" && template.subtype === "key" ) {
+                            if ( item.attr1 === -self.id ) {
+                                self.Toggle(!self.on);
+                                self.keyUseTimeout = TIMER_KEY_TIME_OUT;
+                            }
+                        }
+                    }
+                }
             }
-          }
-        }
-}
 
-      }
+        }, 0);
 
     }
   }

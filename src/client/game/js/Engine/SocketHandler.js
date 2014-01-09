@@ -601,15 +601,15 @@ var SocketHandler = Class.extend({
         this.socket.on('removeUnit', function(data) {
 
             // Remove the unit from the list
-            var unit = _.find(ironbane.getUnitList(), function(unit) {
+            var unit = _.find(ironbane.getUnitList().all(), function(unit) {
                 return unit.id === data.id;
             });
 
             if ( unit ) {
                 unit.Destroy();
-                ironbane.removeUnit(unit);
+                ironbane.getUnitList().removeUnit(unit);
             }
-
+            
         });
 
         this.socket.on('addModel', function(data) {

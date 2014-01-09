@@ -27,19 +27,19 @@ module.exports = function(units, worldHandler, chatHandler) {
     return {
         requiresEditor: false,
         action: function(unit, target, params) {
-            var Q = require('q'),
-            player = worldHandler.FindPlayerByName(unit.name);
+            return  worldHandler.FindPlayerByName(unit.name)
+               .then(function(player) {
 
-            if (player) {
-                if (player.zone === 41) {
-                    chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
-                } else {
-                    unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
-                    chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
-                }
-            }
+                   if (player) {
+                       if (player.zone === 41) {
+                           chatHandler.announcePersonally(unit, "Hell no!! You can't stuck away from Hell.<br>What did you expect? Muhahahaha", "red");
+                       } else {
+                           unit.Teleport(constants.normalSpawnZone, constants.normalSpawnPosition);
+                           chatHandler.announcePersonally(unit, "You were teleported back to town.", "lightgreen");
+                       }
+                   }
 
-            return Q();
+               });
         }
     };
 };
