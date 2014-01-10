@@ -3,78 +3,61 @@
 <head>
     <meta charset="utf-8" />
     <title>Ironbane! {{ subTitle }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- we need to base at other than root -->
     <base href="@@root/" />
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/ironbane.css" />
 
-    <link rel="stylesheet" href="/lib/markitup/skins/markitup/style.css" />
-    <link rel="stylesheet" href="/lib/markitup/sets/bbcode/style.css" />
-    <script src="/lib/jquery-2.0.3.min.js"></script>
-   <script src="/lib/angular-1.1.4/angular.min.js"></script>
-<script src="/lib/angular-ui/ui-utils.js"></script>
+<!--     <link rel="stylesheet" href="/lib/markitup/skins/markitup/style.css" />
+    <link rel="stylesheet" href="/lib/markitup/sets/bbcode/style.css" /> -->
 
-
-<script src="/lib/markitup/jquery.markitup.js"></script>
-<script src="/lib/markitup/sets/bbcode/set.js"></script>
-
-
-
-
-    <!-- todo: get this from grunt replace -->
-    <script src="js/@@appName-@@appVersion.js"></script>
 
 </head>
 <body>
-    <section id="pageWrap">
 
-        <header class="logo">
-            <div class="gradient"></div>
-            <div class="left-pillar"></div>
-            <div class="right-pillar"></div>
-            <a href="/"><img src="images/logo_isolated.png" alt="Ironbane Logo" /></a>
-        </header>
-        <div class="content-wrap">
-            <div class="middle-left-pillar"></div>
-            <div class="content">
-                <div class="shadow-left"></div>
-                <div class="shadow-right"></div>
-                <div class="border-line"></div>
-                <div class="navigation">
-                    <ul class="horizontal-list">
-                        <li><a href="/">About</a></li>
-                        <li><a href="/forum">Forum</a></li>
-                        <li><a href="/game" target="_self">Play!</a></li>
-                        <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
-                        <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
-                        <li><a href="/article/faq">FAQ</a></li>
-                        <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
-                        <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li>
-                    </ul>
-                </div>
 
-  <div id="loading">
-    <img src="images/ajax-loader.gif" class="ajax-loader"/>
-  </div>
-                <ng-view></ng-view>
+    <header class="navbar navbar-inverse navbar-fixed-top" style="padding-left:60px;">
+     <nav>
+        <div class="navbar-header" style="padding-top: 8px; padding-right: 20px;">
+            <div class="small-logo-wrapper">
+                <a href="/"><img class="small-logo" src="images/mascot_small.png"></a>
             </div>
-            <div class="middle-right-pillar"></div>
         </div>
-        <footer>
-            <div class="bottom-pillar"></div>
-            <div class="sock">
-                <p>&copy; Ironbane 2013</p>
-                <ul class="horizontal-list pipe-list">
-                    <li><a href="article/terms">Terms of Use</a></li>
-                    <li><a href="article/privacy">Privacy Policy</a></li>
-                    <li><a href="http://twitter.com/Ironbane">Twitter</a></li>
-                        <li><a href="/article/get-involved">Get Involved</a></li>
+        <ul class="nav navbar-nav">
+            <li><a href="/?scrollTo=news">News</a></li>
+            <li><a href="/forum">Forum</a></li>
+            <li><a href="/game" target="_self">Play!</a></li>
+            <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
+<!--             <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
+            <li><a href="/article/faq">FAQ</a></li> -->
+            <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a><a target="_self" href="/logout" ng-show="currentUser.authenticated">Log Out</a></li>
+<!--             <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li> -->
+        </ul>
+    </nav>
+    </header>
 
-                </ul>
+    <div class="container">
+        <ng-view></ng-view>
+
+        <footer class="row">
+            <div class="col-md-12 box text-center">
+                    <p>&copy; Ironbane 2013</p>
+                    <p><a href="article/terms">Terms of Use</a> - <a href="article/privacy">Privacy Policy</a></p>
             </div>
         </footer>
-    </section>
+
+    </div>
+    <script src="/lib/jquery-2.0.3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-route.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular-sanitize.js"></script>
+    <script src="/lib/angular-ui/ui-utils.js"></script>
+    <script src="/lib/markitup/jquery.markitup.js"></script>
+    <script src="/lib/markitup/sets/bbcode/set.js"></script>
+
+    <!-- todo: get this from grunt replace -->
+    <script src="js/@@appName-@@appVersion.js"></script>
 </body>
 </html>

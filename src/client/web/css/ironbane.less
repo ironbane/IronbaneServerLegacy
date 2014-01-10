@@ -3,364 +3,106 @@
 // load all the base styles (shared between web and game)
 @import "../../common/css/import.less";
 
-@pageBackground: #051d1c;
-
-@baseFont:                      Verdana, Arial, sans-serif;
-@baseFontSize:                  12px;
-@baseFontColor:                 @primary1;
-@baseFontLineHeight:            1.231;
-
-@inputDisabledFontColor:        #ececec;
-@errorTextColor:                #FF0000;
-
-
-html {height: 100%;}
 body {
-    background-image: url(../images/bg.png);
-    -webkit-font-smoothing: antialiased;
-}
+    padding-top: 80px;
 
-.clear {clear: both;}
-
-.OffScreen {
-    position: absolute; overflow: hidden; top: -9999px; width: 1px; height: 1px;
-}
-
-header.logo {
-    height:192px;
-    position:relative;
-    text-align: center;
-    .left-pillar, .right-pillar {
-        width: 125px;
-        height:100%;
-        position: absolute;
-    }
-    .left-pillar {
-        left:0;
-        background-image: url(../images/top_left.png);
-    }
-    .right-pillar {
-        right:0;
-        background-image: url(../images/top_right.png);
-    }
-    .gradient {
-        z-index: -1;
-        height: 160px;
-        width: 820px;
-        position: absolute;
-        left:70px;
-        background: -moz-linear-gradient(top,  rgba(12,197,181,0.34) 0%, rgba(12,195,179,0.34) 1%, rgba(11,179,165,0.2) 9%, rgba(0,0,0,0) 100%); /* FF3.6+ */
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(12,197,181,0.34)), color-stop(1%,rgba(12,195,179,0.34)), color-stop(9%,rgba(11,179,165,0.2)), color-stop(100%,rgba(0,0,0,0))); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(top,  rgba(12,197,181,0.34) 0%,rgba(12,195,179,0.34) 1%,rgba(11,179,165,0.2) 9%,rgba(0,0,0,0) 100%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(top,  rgba(12,197,181,0.34) 0%,rgba(12,195,179,0.34) 1%,rgba(11,179,165,0.2) 9%,rgba(0,0,0,0) 100%); /* Opera 11.10+ */
-        background: -ms-linear-gradient(top,  rgba(12,197,181,0.34) 0%,rgba(12,195,179,0.34) 1%,rgba(11,179,165,0.2) 9%,rgba(0,0,0,0) 100%); /* IE10+ */
-        background: linear-gradient(to bottom,  rgba(12,197,181,0.34) 0%,rgba(12,195,179,0.34) 1%,rgba(11,179,165,0.2) 9%,rgba(0,0,0,0) 100%); /* W3C */
-    }
-
-    img {
-        padding-top: 10px;
-    }
-}
-
-// all links...
-a {
-    color: @primary2;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.content-wrap {
-    display: table;
-    width: 896px;
-    margin-left: auto;
-    margin-right: auto;
-    .middle-left-pillar,
-    .middle-right-pillar {display: table-cell;width: 44px;}
-    .middle-left-pillar {background: url(../images/pillarleftloop.png);}
-    .middle-right-pillar {background: url(../images/pillarrightloop.png);}
-    .content {
-        min-height: 214px;
-        //border-top: 1px solid #7fae84;
-        padding-top: 4px;
-
-        .navigation {
-            text-align: center;
-            width:100%;
-            padding-top: 5px;
-            padding-bottom: 10px;
-            top:10px;
-            //background: url(../images/stonetile.png);
-            font-family: 'PressStart2P';
-            font-size: 12px;
-
-            li {
-                a {
-                    padding:5px 5px;
-                    text-decoration: none;
-                    line-height: 20px;
-                    background:#0E3229;
-                    &:hover {
-                        cursor: pointer;
-                        background:#C5B50C;
-                        color:#2B2702;
-                    }
-                }
-            }
-        }
-
-        background-color: @primary4;
-        position: relative;
-
-        .border-line {
-            top:-2px;
-            height: 10px;
-            width: 808px;
-            position: absolute;
-            #gradient > .vertical-three-colors(rgba(155,242,189,0), rgba(22,119,93,1), rgba(22,119,93,0));
-        }
-
-        .shadow-left {
-            width:26px;
-            position: absolute;
-            height:100%;
-            z-index:10;
-            background: url(../images/shadow_left.png);
-        }
-
-        .shadow-right {
-            width:26px;
-            position: absolute;
-            height:100%;
-            z-index:10;
-            right:0;
-            background: url(../images/shadow_right.png);
-        }
-
-        .content-body {
-            margin: 0 20px;
-            form {padding: 20px;margin: 20px;}
-        }
-    }
-}
-
-.bottom-pillar {
-    margin-left: auto;
-    margin-right: auto;
-    width: 896px;
-    height: 64px;
-    background-image: url(../images/bottombg.png);
+    /*background-color: #22162c;*/
+    background-image: url('../images/portal_bg.jpg');
     background-repeat: no-repeat;
+    background-position: 50% 0%;
+    background-size: 1280px;
+    background-attachment: fixed;
 }
 
-footer .sock {
-    text-align: center;
-    outline: 2px dashed @primary3;
-    background-color: @pageBackground;
-    width: 300px;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    a {color: @primary2;}
+.header {
+
 }
 
-#pageWrap {
-    width: 960px;
-    margin-left: auto;
-    margin-right: auto;
+.navbar-inverse {
+    background-color: rgba(6, 83, 102, 0.6);
 }
 
-.horizontal-list {
-    margin: 0;
-    padding: 0;
-    cursor: default;
-    list-style-type: none;
-    display: inline;
-    li {
-        display: inline;
-        float: none;
-        list-style: none;
-        a {
-            &:hover {
-                cursor:pointer;
-            }
+.navbar {
+    .small-logo-wrapper {
+        position: absolute;
+        overflow: visible;
+        .small-logo {
+            left:-45px;
+            top: -12px;
+            position: relative;
         }
     }
 }
 
-forumuserprofile {
-    float:left;
-    width: 200px;
-    height: 250px;
-    border-right: 3px dotted #000;
+.big-logo-wrapper {
+
+    background-image: url('../images/logo_isolated.png');
+    background-repeat: no-repeat;
+    background-position: 50% 0%;
+    height: 586px;
+    background-size: 100%;
+    position: relative;
+    top: 0px;
+    margin: auto;
+    max-width: 600px;
+    /*outline: 1px solid red;*/
+    padding-top:250px;
+    text-align: center;
+
+    .jumbotron {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        h2 {
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 2;
+        }
+    }
+
 }
 
-.postcontent {
-    float: right;
-    width: 500px;
-}
-
-.board-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+.box {
+    margin-bottom: 30px;
+    border-radius: 16px;
+    padding: 30px;
+    background-color: fade(@gray-darker, 80%);
+    color: @gray-lighter;
+    h2 {
+        margin-top: 0px;
+    }
 }
 
 .forum-listing {
-    text-align: left;
-    padding: 8px;
-    .tools {
-        text-align: right;
-        padding: 6px;
-        a {text-decoration: none;}
+    .icon {
+        background-size: 64px 64px;
+        width: 64px;
+        height: 64px;
     }
-    .forum-category {
-        .board {
-            background-color: #000;
-            padding: 20px 10px 0;
-            border-bottom: 1px dashed;
-            .board-stats {float: right;}
-            .board-name {
-                margin: 0;
-                padding: 20px 0 20px 60px;
-                font-weight: bold;
-                font-size: 22px;
-                line-height: 20px;
-                background-repeat: no-repeat;
-                background-position: 15px;
-            }
-        }
+    h3 {
+        margin-top: 0px;
     }
-    .forum-group {
-        h1 {
-            margin: 0;
-            padding: 20px 0 20px 60px;
-            font-size: 22px;
-            line-height: 20px;
-            background-repeat: no-repeat;
-            background-position: 15px;
-            background-color: @primary3;
-        }
-        .board-list {
-            .board {
-                //clear: both;
-                //height: 20px;
-                padding: 8px;
-                margin: 0;
-                border-bottom: 1px dashed;
-                background-color: @pageBackground;
-                .thread-author {float: right;width: 125px;}
-                .thread-post {float: right;}
-                .thread-name {color: @primary2;cursor: pointer;}
-                .thread-replies {
-                    float: left;
-                    width: 25px;
-                    margin: 0 10px;
-                }
-            }
-        }
+    .board {
+        margin-top: 30px;
     }
 }
 
-.new-topic-form {
-    text-align: left;
+.thread-listing {
+    .icon {
+        background-size: 32px 32px;
+        width: 32px;
+        height: 32px;
+        margin-left: 32px;
+    }
     h1 {
-        margin: 0;
-        font-size: 22px;
-        text-align: left;
-        background-color: @black;
-        padding: 20px;
+        margin-bottom: 0px;
+        margin-top: 2px;
     }
-    input { .placeholder(darken(@text-color, 10%)); }
-    input[type=text] {
-        width: 95%;
+    h4 {
+        margin-top: 0px;
+        margin-bottom: 0px;
     }
-}
-
-.customCheckbox {display: inline-block; vertical-align: baseline; font-size: 14px;
-    .customCheckboxInput {width: 16px; height: 16px;display: inline-block; text-align: left; margin: 0 5px 0 0;}
-    .customCheckboxInput,
-    .customCheckboxLabel {cursor: pointer; display: inline-block; vertical-align: baseline;margin-left: 4px;}
-    &.disabled {cursor: default; color: @inputDisabledFontColor !important;}
-}
-
-.error {color: @errorTextColor;}
-
-.loginPage {
-    padding: 16px;
-    text-align: center;
-    .loginForm {
-        input,
-        textarea { .placeholder(darken(@text-color, 10%)); }
-
-        input[type=text],
-        input[type=password],
-        button {
-            color: @text-color;
-            border-color: @primary4;
-            background-color: @primary3;
-            font-weight: bold;
-            font-size: 20px;
-            padding: 10px;
-            height: 30px;
-            text-indent: 2px;
-            margin: 8px;
-        }
-
-        button {
-            font-weight: bold;
-            font-size: 16px;
-            padding: 5px;
-        }
+    .thread {
+        margin-top: 10px;
     }
 }
-
-// todo: vars, classes;
-table thead tr th {background-color: #0C0C0C;}
-
-.article-wrap {
-    text-align: left;
-    padding: 16px;
-    .article-body {
-        h2 {color: @primary5;}
-        .centered {width: 100%;text-align: center;}
-    }
-    .article-author {
-        float: right;
-    }
-}
-
-.editor-menu-list {
-    text-align: left;
-    background: black;
-    margin: 16px;
-    li {
-        font-size: 16px;
-        font-weight: bold;
-        margin: 8px 0;
-        span {
-            display: inline-block;
-            &.title {width: 160px;}
-        }
-        .tool {
-            text-decoration: none;
-            float: right;
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-            &.remove {color: darkred;}
-        }
-    }
-}
-
-.pipe-list {
-    li a {margin: 0.5em;text-decoration: none;}
-    li:after {content: "|";}
-    li:last-child:after {content: "";}
-}
-
-// load sections now
-@import "home.less";

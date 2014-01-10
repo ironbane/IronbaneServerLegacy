@@ -12,6 +12,11 @@ angular.module('IronbaneApp')
                     angular.copy(user, $rootScope.currentUser);
                 });
                 $scope.message = "Update succesful!";
+               setTimeout(function() {
+                    $("body").animate({
+                        scrollTop: 0
+                    }, "slow");
+                }, 1);
             })
             .error(function(response) {
                 $log.warn('update error', response);

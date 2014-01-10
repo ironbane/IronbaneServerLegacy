@@ -1,16 +1,16 @@
 // app.js
-angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
+angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User','$rootScope', function(User, $rootScope) {
     $rootScope.currentUser = {};
-    
+
     User.getCurrentUser()
         .then(function(user) {
             angular.copy(user, $rootScope.currentUser);
         });
 }])
 .config(['$routeProvider', '$locationProvider','$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
-    
+
     $httpProvider.responseInterceptors.push('myHttpInterceptor');
     var spinnerFunction = function (data, headersGetter) {
         // todo start the spinner here
@@ -18,7 +18,7 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
         return data;
     };
     $httpProvider.defaults.transformRequest.push(spinnerFunction);
-  
+
     $locationProvider.html5Mode(true);
 
     $routeProvider
@@ -230,5 +230,16 @@ angular.module('IronbaneApp', ['ui.utils', 'IBCommon', 'User'])
                 }]
             }
         })
+        .when('/bootstrap', {
+            templateUrl: '/views/bootstrap'
+            // controller: 'ForumCtrl'
+        })
         .otherwise({redirectTo: '/'});
-}]);
+}])
+.run(function($rootScope, $location, $anchorScroll, $routeParams) {
+  //when the route is changed scroll to the proper element.
+  $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
+    $location.hash($routeParams.scrollTo);
+    $anchorScroll();
+  });
+});

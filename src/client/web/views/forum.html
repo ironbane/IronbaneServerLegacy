@@ -1,20 +1,30 @@
 <div class="content-body forum-listing">
-Also seen today: <span ng-repeat="user in users"><userlink name={{user.name}}/>, </span>
-    <section class="forum-category" ng-repeat="cat in cats">
-        <h2>{{ cat.name }}</h2>
-        <ul class="board-list">
-            <li class="board" ng-repeat="board in cat.boards">
-                <a ng-style="board.iconStyle" class="board-name" ng-href="/forum/{{ board.id }}">{{ board.name }}</a>
-                <span class="board-stats"><em>Topics: {{ board.topicCount | number }} Posts: {{ board.postCount | number }}</em></span>
-                <p class="board-descr">{{ board.description }}</p>
-            </li>
-        </ul>
-    </section>
-    <section>
-        Statistics:<br>
+    <div class="row" ng-repeat="cat in cats">
+         <div class="col-md-12 box">
+            <h2>{{ cat.name }}</h2>
+
+            <div ng-repeat="board in cat.boards">
+                <div class="row board">
+                    <div class="col-md-1">
+                        <div class="icon" ng-style="board.iconStyle"></div>
+                    </div>
+                    <div class="col-md-9">
+                        <h3><a ng-href="/forum/{{ board.id }}">{{ board.name }}</a></h3>
+                        <p class="board-descr">{{ board.description }}</p>
+                    </div>
+                    <div class="col-md-2 text-right">
+                        {{ board.topicCount | number }} Topics<br>{{ board.postCount | number }} Posts
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+    <div class="row">
+         <div class="col-md-12 box">
         In total, our players have made about {{statistics.totalposts}} forum posts.<br>
 We have {{statistics.totalusers}} registered players!<br>
 The newest registered player is <userlink name="{{statistics.lastregistered}}"/>.<br>
-
-    </section>
+Players seen today: <span ng-repeat="user in users"><userlink name={{user.name}}/>, </span>
+        </div>
+    </div>
 </div>

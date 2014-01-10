@@ -19,7 +19,7 @@
                             <time datetime="{{ post.time * 1000 }}">{{ post.time * 1000 | timeSince }}</time>
                         </p>
                     </header>
-                    <p ng-bind-html-unsafe="post.content"></p>
+                    <p ng-bind-html="post.content | unsafe"></p>
                     <footer>
                         <hr>
                     </footer>

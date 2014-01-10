@@ -1,16 +1,10 @@
 angular.module('IronbaneApp')
 .directive('forumuserprofile', [function(){
 	return {
-    restrict: "E", 
+    restrict: "E",
 		scope: {
 			user: "="
-
 		},
-		template:
-		 '<span class="forumuserprofile"> ' +
-		 '<userlink name="{{user.name}}"/> <br> posts: {{user.postcount}} <br> rank:{{user.rank}} <br> <img ng-src="{{user.avatar}}"/> </span>'
+		templateUrl: '/partials/forumuserprofile.html'
 	};
-	
-
-
 }]);

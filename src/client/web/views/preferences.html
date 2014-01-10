@@ -1,40 +1,175 @@
-<div class="content-body">
-	<h3>{{message}}</h3>
-<h1>User Preferences</h1>
+<div class="row">
+     <div class="col-md-12 box">
+        <div class="alert alert-success" ng-show="message">{{message}}</div>
 
-<h2>Important stuff</h2><br>
-Old Password: <input type="password" ng-model="user.passwordold"/><br>
-If you would like to keep your password, leave this blank.	<br>
-New Password: <input type="password" ng-model="user.passwordnew"/><br>
-Case-sensitive, min. 4 characters, max. 20 characters.	<br>
-Confirm New Password: <input type="password" ng-model="user.passwordnewconfirm"/><span ng-show="user.passwordnew != user.passwordnewconfirm">password not matching</span><br>
 
-E-mail Address: <input type="email" ng-model="user.email"/><br>
-Show my e-mail address <input type="checkbox" ng-model="user.show_email" ng-checked="user.show_email"/><br>
-<h2>Optional stuff:</h2> <br>
-It would be awesome if you'd tell us a bit more who you are and what you do!
-This information will be put on your profile page. <br>
-Name : <input type="text" ng-model="user.info_realname"/>	<br>
-Country	: <input type="text" ng-model="user.info_country"/><br>
-Location : <input type="text" ng-model="user.info_location"/><br>	
-Gender : <select ng-model="user.info_gender" ng-options="g.gender as g.gender for g in genderOptions"/><br>
- 
-Birthday : <input type="date" ng-model="user.info_birthday"/><br>
-Occupation:	<input type="text" ng-model="user.info_occupation"/><br>
-Interests : <input type="text" ng-model="user.info_interests"/><br>	
-Website	: <input type="text" ng-model="user.info_website"/><br>
-Receive newsletter : <input type="checkbox" ng-model="user.newsletter" ng-checked="user.newsletter"/><br>
-	
-Signature : <input type="text" ng-model="user.forum_sig" maxlength=255></post-editor><br>
-Max. 255 characters.	
 
-<button ng-click="save()">Update</button>
-<hr>
-<h2>Coming soon: Avatars</h2><br>
-Upload an avatar : <input disabled="true" name="uploadavatar" type="file" file="user.forum_avatar"/><br>
-Max. 100 KB, Max. 100x100 pixels.	<br>
-Uploading a new avatar will replace your old one.
+        <form class="form-horizontal" role="form">
 
-<button disabled="true">Upload</button>
+            <h2>Important stuff</h2>
+            <hr>
 
+            <div class="col-md-offset-4 alert alert-info">If you would like to keep your password, leave these password fields blank.</div>
+          <div class="form-group">
+            <label for="oldPassword" class="col-sm-4 control-label">Old password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" id="oldPassword" ng-model="user.passwordold">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword" class="col-sm-4 control-label">New password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" id="newPassword" ng-model="user.passwordnew">
+            </div>
+          </div>
+
+           <div class="form-group">
+            <label for="newPasswordConfirm" class="col-sm-4 control-label">Confirm new password</label>
+            <div class="col-sm-8">
+              <input type="password" class="form-control" id="newPasswordConfirm" ng-model="user.passwordnewconfirm">
+            </div>
+          </div>
+
+            <div class="col-md-offset-4 alert alert-danger" ng-show="user.passwordnew && user.passwordnewconfirm && user.passwordnew != user.passwordnewconfirm">The new passwords you entered do not match!</div>
+
+          <div class="form-group">
+            <label for="inputEmail" class="col-sm-4 control-label">Email</label>
+            <div class="col-sm-8">
+              <input type="email" class="form-control" id="inputEmail" ng-model="user.email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="user.show_email" ng-checked="user.show_email">Show my email address
+                </label>
+              </div>
+            </div>
+          </div>
+
+            <h2>Optional stuff</h2>
+            <hr>
+
+          <div class="form-group">
+            <label for="infoRealName" class="col-sm-4 control-label">Real name</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoRealName" ng-model="user.info_realname">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoCountry" class="col-sm-4 control-label">Country</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoCountry" ng-model="user.info_country">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoLocation" class="col-sm-4 control-label">Location</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoLocation" ng-model="user.info_location">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoGender" class="col-sm-4 control-label">Gender</label>
+            <div class="col-sm-8">
+              <select class="form-control" id="infoGender" ng-model="user.info_gender" ng-options="g.gender as g.gender for g in genderOptions"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoBirthday" class="col-sm-4 control-label">Birthday</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoBirthday" ng-model="user.info_birthday">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoOccupation" class="col-sm-4 control-label">Occupation</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoOccupation" ng-model="user.info_occupation">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoInterests" class="col-sm-4 control-label">Interests</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoInterests" ng-model="user.info_interests">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoWebsite" class="col-sm-4 control-label">Website</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="infoWebsite" ng-model="user.info_website">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="user.newsletter" ng-checked="user.newsletter">Receive newsletter
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="infoSignature" class="col-sm-4 control-label">Signature</label>
+            <div class="col-sm-8">
+              <textarea class="form-control" rows="3" ng-model="user.forum_sig" maxlength="255"></textarea>
+            </div>
+          </div>
+
+          <div class="col-md-offset-4 alert alert-warning">Avatars will be supported again soon!</div>
+
+          <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+              <button type="submit" class="btn btn-default" ng-click="save()">Save changes</button>
+            </div>
+          </div>
+
+        </form>
+
+
+
+<!--         Old Password: <input type="password" ng-model="user.passwordold"/><br>
+        If you would like to keep your password, leave this blank.	<br>
+        New Password: <input type="password" ng-model="user.passwordnew"/><br>
+        Case-sensitive, min. 4 characters, max. 20 characters.	<br>
+        Confirm New Password: <input type="password" ng-model="user.passwordnewconfirm"/><span ng-show="user.passwordnew != user.passwordnewconfirm">password not matching</span><br>
+
+        E-mail Address: <input type="email" ng-model="user.email"/><br>
+        Show my e-mail address <input type="checkbox" ng-model="user.show_email" ng-checked="user.show_email"/><br>
+        <h2>Optional stuff:</h2> <br>
+        It would be awesome if you'd tell us a bit more who you are and what you do!
+        This information will be put on your profile page. <br>
+        Name : <input type="text" ng-model="user.info_realname"/>	<br>
+        Country	: <input type="text" ng-model="user.info_country"/><br>
+        Location : <input type="text" ng-model="user.info_location"/><br>
+        Gender : <select ng-model="user.info_gender" ng-options="g.gender as g.gender for g in genderOptions"/><br>
+
+        Birthday : <input type="date" ng-model="user.info_birthday"/><br>
+        Occupation:	<input type="text" ng-model="user.info_occupation"/><br>
+        Interests : <input type="text" ng-model="user.info_interests"/><br>
+        Website	: <input type="text" ng-model="user.info_website"/><br>
+        Receive newsletter : <input type="checkbox" ng-model="user.newsletter" ng-checked="user.newsletter"/><br>
+
+        Signature : <input type="text" ng-model="user.forum_sig" maxlength=255></post-editor><br>
+        Max. 255 characters.
+
+        <button ng-click="save()">Update</button>
+        <hr>
+        <h2>Coming soon: Avatars</h2><br>
+        Upload an avatar : <input disabled="true" name="uploadavatar" type="file" file="user.forum_avatar"/><br>
+        Max. 100 KB, Max. 100x100 pixels.	<br>
+        Uploading a new avatar will replace your old one.
+
+        <button disabled="true">Upload</button> -->
+    </div>
 </div>

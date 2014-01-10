@@ -54,11 +54,12 @@
     "progress": "~1.1.2",
     "net-repl": "~0.1.2",
     "async": "~0.2.9",
-    "q-async" : "0.1.2",
+    "q-async": "0.1.2",
     "spatial-events": "~0.0.1",
     "three": "~0.58.10",
     "aabb-3d": "~0.1.0",
-    "assert-tap" : "~0.1.4"
+    "assert-tap": "~0.1.4",
+    "async": "~0.2.9"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -69,7 +70,7 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-replace": "~0.5.1",
-    "grunt-contrib-watch": "~0.4.3",
+    "grunt-contrib-watch": "~0.5.3",
     "grunt-beep": "~0.3.0"
   }
 }

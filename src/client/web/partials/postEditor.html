@@ -1,5 +1,5 @@
 <form name="postEditorForm">
-    <input ng-show="topic == null" type="text" ng-model="post.title" placeholder="title your post" ng-maxlength="100" value="topic.title" />
-    <mark-it-up ng-model="post.body"></mark-it-up>
-    <button ng-click="save()">Post</button>
+    <p><input class="form-control" ng-show="topic == null" type="text" ng-model="post.title" placeholder="Title" ng-maxlength="100" /></p>
+    <p><textarea placeholder="Content" class="form-control" rows="8" ng-model="post.body"></textarea></p>
+    <p><button ng-click="save()" class="btn btn-primary btn-lg">{{ topic == null ? "Start new topic" : "Reply to topic" }}</button></p>
 </form>

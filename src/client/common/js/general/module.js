@@ -1,5 +1,5 @@
 // a set of common widgets and such
-angular.module('IBCommon', [])
+angular.module('IBCommon', ['ngSanitize'])
 // this borrowed from three.js "Detector"
 .constant('FeatureDetection', {
     canvas: !! window.CanvasRenderingContext2D,

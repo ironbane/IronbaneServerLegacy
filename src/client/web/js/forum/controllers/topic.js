@@ -28,7 +28,7 @@ angular.module('IronbaneApp')
             $log.log("topic liked");
             angular.forEach($scope.posts, function(_post){
                 $log.log($scope.posts);
-                
+
                 if(_post.id === post){
                     if(_post.likes===null){
                         _post.likes = [];
@@ -84,5 +84,16 @@ angular.module('IronbaneApp')
         }, function(error){
             $log.log('error while unstickying topic');
         });
+    };
+
+    $scope.isShowingReplyForm = false;
+
+    $scope.showReplyForm = function() {
+        $scope.isShowingReplyForm = !$scope.isShowingReplyForm;
+        if ( $scope.isShowingReplyForm ) {
+            setTimeout(function() {
+                $("body").animate({scrollTop: $("post-editor").offset().top}, "slow");
+            }, 1);
+        }
     };
 }]);

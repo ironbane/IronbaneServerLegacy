@@ -14,4 +14,16 @@ angular.module('IronbaneApp')
         });
     });
 
+    $scope.isShowingNewPostForm = false;
+
+    $scope.showNewPostForm = function() {
+        $scope.isShowingNewPostForm = !$scope.isShowingNewPostForm;
+
+        if ( $scope.isShowingNewPostForm ) {
+            setTimeout(function() {
+                $("body").animate({scrollTop: $("post-editor").offset().top}, "slow");
+            }, 1);
+        }
+    };
+
 }]);

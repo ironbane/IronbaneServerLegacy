@@ -1,28 +1,84 @@
 <div class="content-body">
-    <section class="forum-listing">
+    <div class="row">
+        <div class="col-md-12 box">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4><a href = "/forum">Forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}</h4>
+                </div>
+                <div class="col-md-4 text-right">
+                    <button ng-show="currentUser.authenticated && !topic.locked" ng-click="showReplyForm()" class="btn btn-default">Reply to this topic</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-repeat="post in posts">
+        <div class="col-md-12 box">
+            <div class="row">
+                <div class="col-md-2">
+                    <forumuserprofile user="post.user"/>
+                </div>
+                <div class="col-md-10">
+                    <article class="postcontent" ng-bind-html="post.content | unsafe">
+                        <hr ng-show="post.user.sig">
+                        <span ng-show="post.user.sig" class="signature">
+                            {{post.user.sig}}
+                        </span>
+                    </article>
+                </div>
+<!-- Post likes are bugged, so commenting this out for now -->
+<!--                 <div class="col-md-1">
+                    <likebutton post="post.id" like="likePost(post.id)"/>
+                </div> -->
+            </div>
+
+<!--             <div class="row">
+                <div class="col-md-12 col-md-offset-2">
+                    Liked by <span ng-repeat="like in post.likes">{{like}}</span>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 box">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4><a href = "/forum">Forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}</h4>
+                </div>
+                <div class="col-md-4 text-right">
+                    <button ng-show="currentUser.authenticated && !topic.locked" ng-click="showReplyForm()" class="btn btn-default">Reply to this topic</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-show="isShowingReplyForm">
+        <div class="col-md-12 box">
+            <post-editor board="board.id" topic="topic.id"></post-editor>
+        </div>
+    </div>
+<!--     <section class="forum-listing">
         <section class="forum-group">
-        
+
         <a href = "/forum">Ironbane forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}
             <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }} - {{ topic.title }}</h1>
-          
-        </section>  
+
+        </section>
 
         <span ng-show="topic.locked">This topic is locked</span>
             <ul class="board-list">
                 <li class="board" ng-repeat="post in posts">
                     <header>
                             <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
-                        
+
                         <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
                     </header>
                     <forumuserprofile user="post.user"/>
                     <article class="postcontent" ng-bind-html-unsafe="post.content">
-                        
+
                      <span class="signature">{{post.user.sig}}</span>
                      </article>
                      <likebutton post="post.id" like="likePost(post.id)"/>
                      <span ng-repeat="like in post.likes">{{like}}</span>
-                     
+
                      <br class="clear">
                 </li>
             </ul>
@@ -42,5 +98,5 @@
                 <post-editor board="board.id" topic="topic.id"/>
             </div>
         </div>
-    </section>
+    </section> -->
 </div>

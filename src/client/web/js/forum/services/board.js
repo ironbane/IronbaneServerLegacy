@@ -5,11 +5,11 @@ angular.module('IronbaneApp')
         // update with config
         angular.copy(json || {}, this);
 
-       
+
 
         if(!this.icon) {
             // todo: some fallback in the css?
-            this.$setIcon(this.name.toLowerCase());
+            this.$setIcon(this.name.toLowerCase().replace(/ /g, '_'));
         } else {
             this.$setIcon(this.icon);
         }
@@ -18,8 +18,7 @@ angular.module('IronbaneApp')
     Board.prototype.$setIcon = function(icon) {
         this.icon = icon;
         this.iconStyle = {
-            'background-image': 'url("/images/icons/forum/'+ icon + '.png")',
-            'background-size': '32px 32px'
+            'background-image': 'url(/images/icons/boards/'+ icon + '.png)'
         };
     };
 

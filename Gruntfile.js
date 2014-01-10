@@ -40,6 +40,7 @@ module.exports = function(grunt) {
                     "src/client/common/js/general/module.js",
                     "src/client/common/js/general/directives/passwordField.js",
                     "src/client/common/js/general/directives/checkboxCustom.js",
+                    "src/client/common/js/general/filters/unsafe.js",
 
                     "src/client/common/js/user/module.js",
                     "src/client/common/js/user/services/user.js",
@@ -65,6 +66,7 @@ module.exports = function(grunt) {
                     "src/client/common/js/general/module.js",
                     "src/client/common/js/general/directives/passwordField.js",
                     "src/client/common/js/general/directives/checkboxCustom.js",
+                    "src/client/common/js/general/filters/unsafe.js",
 
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     //"<%= gameScriptPath %>/ng/states.js", // do not load this yet
@@ -315,15 +317,15 @@ module.exports = function(grunt) {
             html: {
                 files: 'src/client/**/*.html',
                 tasks: ['game', 'website', 'beep']
-            },
-            js: {
-                files: 'src/client/**/*.js',
-                tasks: ['game', 'website', 'beep']
-            },
-            assets: {
-                files: '<%= cfg.get("assetDir") %>**/*',
-                tasks: ['assets', 'beep']
             }
+            // js: {
+            //     files: 'src/client/**/*.js',
+            //     tasks: ['game', 'website', 'beep']
+            // },
+            // assets: {
+            //     files: '<%= cfg.get("assetDir") %>**/*',
+            //     tasks: ['assets', 'beep']
+            // }
         },
         // TODO: should process these from asset dir instead of copying both over?
         three_obj: {
