@@ -59,6 +59,7 @@ var Ticker = (function() {
             cell.tick(elapsed).then(function() {
                 callback(null);
             }).fail(function(err) { 
+                console.error('Ticker.start', err);
                 callback(err);
             }); 
 
@@ -66,7 +67,8 @@ var Ticker = (function() {
 
         var tickAll = _.throttle(function(elapsed) {
 
-            if(cells.length === 0) { 
+            if(cells.length === 0) {
+                started = false; 
                 return;
             }
 
