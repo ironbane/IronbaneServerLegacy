@@ -1,15 +1,29 @@
-<div class="loginPage">
-    <h1>Log in</h1>
-    <form class='loginForm' name="LoginForm">
-        <div class="error" ng-show="loginError">{{ loginErrorMsg }}</div>
-        <input type="text" name="username" ng-model="username" placeholder="username" />
-        <br>
-        <password-field name="password" toggle="togglePW" ng-model="password" placeholder="password"></password-field>
-        <div class="passwordToggle"><input type="checkbox" checkbox-custom id="hidePassToggle" name="hidePassToggle" ng-model="togglePW" label="hide password" /></div>
-        <br>
-        <button ng-click="login()">Sign In</button>
-    </form>
-    <a href="/passwordReset">Forgot your password?</a>
-    <br>
-    <a href="/register">Need an account?</a>
+<div class="row">
+  <div class="col-md-12 box">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="inputUsername" class="col-sm-2 control-label">Username</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputUsername" placeholder="Username" ng-model="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+            <div class="col-sm-10">
+              <input type="password" class="form-control" id="inputPassword3" placeholder="Password" ng-model="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button ng-click="login()" class="btn btn-primary">Sign in</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <p><a href="/passwordReset">Forgot your password?</a></p>
+                <p><a href="/register">Need an account?</a></p>
+            </div>
+          </div>
+        </form>
+    </div>
 </div>

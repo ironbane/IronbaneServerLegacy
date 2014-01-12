@@ -239,7 +239,13 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
 .run(function($rootScope, $location, $anchorScroll, $routeParams) {
   //when the route is changed scroll to the proper element.
   $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
-    $location.hash($routeParams.scrollTo);
-    $anchorScroll();
+    // $location.hash($routeParams.scrollTo);
+    // $anchorScroll();
+    if ( $routeParams.scrollTo ) {
+        setTimeout(function() {
+            // Scroll to the element minus the navbar height
+            $("body").animate({scrollTop: $("#"+$routeParams.scrollTo).offset().top-80}, "slow");
+        }, 1);
+    }
   });
 });

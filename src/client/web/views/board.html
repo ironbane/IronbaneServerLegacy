@@ -1,18 +1,17 @@
-<div class="thread-listing">
+<div>
     <div class="row">
         <div class="col-md-12 box">
             <div class="row">
                 <div class="col-md-8">
-                    <h1><a href="/forum">Forum</a> - {{board.name}}</h1>
+                    <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
                 </div>
                 <div class="col-md-4 text-right">
-                    <button ng-click="showNewPostForm()" class="btn btn-default btn-lg">New topic</button>
+                    <button ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
                 </div>
             </div>
         </div>
     </div>
-    </section>
-    <div class="row">
+    <div class="row thread-listing">
          <div class="col-md-12 box">
             <div ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
                 <div class="row thread">
@@ -46,10 +45,10 @@
         <div class="col-md-12 box">
             <div class="row">
                 <div class="col-md-8">
-                    <h1><a href="/forum">Forum</a> - {{board.name}}</h1>
+                    <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
                 </div>
                 <div class="col-md-4 text-right">
-                    <button ng-click="showNewPostForm()" class="btn btn-default btn-lg">New topic</button>
+                    <button ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
                 </div>
             </div>
         </div>

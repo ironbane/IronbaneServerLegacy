@@ -1,15 +1,51 @@
-<div class="content-body">
-    {{ profile.name }}'s profile<br>
-    <a href="/forum">Ironbane forum</a><br>
-    Joined: {{profile.reg_date * 1000 | date:'medium'}} <br>
-    Total posts: {{profile.totalposts}} <br>
-    Country : {{profile.info_country}} <br>
-	Location : {{profile.info_location}} <br>
-	Website : {{profile.info_website}} <br>
-	Occupation : {{profile.info_occupation}}  <br>
-	Interests : {{profile.info_interests}} <br>
-	Real name : {{profile.info_realname}} <br>
-	Age : {{profile.age}} <br>
-	Gender : {{profile.info_gender}}<br>
-	<span ng-show="profile.show_email == 1">email-address : {{profile.email}}</span>
+<div class="row">
+    <div class="col-md-12 box profile">
+        <h2>{{ profile.name }}</h2>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Joined</b></td>
+                <td>{{profile.reg_date * 1000 | date:'medium'}}</td>
+            </tr>
+            <tr>
+                <td><b>Total posts</b></td>
+                <td>{{profile.totalposts}}</td>
+            </tr>
+            <tr>
+                <td><b>Country</b></td>
+                <td>{{profile.info_country}}</td>
+            </tr>
+            <tr>
+                <td><b>Location</b></td>
+                <td>{{profile.info_location}}</td>
+            </tr>
+            <tr>
+                <td><b>Website</b></td>
+                <td>{{profile.info_website}}</td>
+            </tr>
+            <tr>
+                <td><b>Occupation</b></td>
+                <td>{{profile.info_occupation}}</td>
+            </tr>
+            <tr>
+                <td><b>Interests</b></td>
+                <td>{{profile.info_interests}}</td>
+            </tr>
+            <tr>
+                <td><b>Real name</b></td>
+                <td>{{profile.info_realname}}</td>
+            </tr>
+            <tr>
+                <td><b>Age</b></td>
+                <td>{{profile.age}}</td>
+            </tr>
+            <tr>
+                <td><b>Gender</b></td>
+                <td>{{profile.info_gender}}</td>
+            </tr>
+            <tr ng-show="profile.show_email == 1">
+                <td>Email</td>
+                <td>{{profile.email}}</td>
+            </tr>
+        </table>
+    </div>
 </div>

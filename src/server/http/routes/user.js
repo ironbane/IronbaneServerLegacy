@@ -134,13 +134,13 @@ module.exports = function(app, db) {
 
     //currently still stubbed
     app.post('/api/user/preferences', app.ensureAuthenticated, function(req, res) {
-        
+
         //update the server user instance with the parameters in the req.body
         req.user.$update(req.body);
         //save it. 2 options:
         // 1) save is ok, server user instance is updated and returned to client
         // 2) save is not ok, server user instance is rolled back and returned to the client
-        
+
         req.user.$save()
             .then(function(user){
                 res.send(user);
@@ -178,7 +178,7 @@ module.exports = function(app, db) {
     });
 
     app.post('/api/user/avatar', app.ensureAuthenticated, function(req, res) {
-         
+
     });
 
     // add a friend (currently signed in user!)
