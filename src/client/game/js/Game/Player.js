@@ -770,10 +770,8 @@ var Player = Fighter.extend({
                 player.isAttemptAttack = true;
                 // Send the projectile
                 socketHandler.socket.emit('addProjectile', {
-                    s: player.position.clone().Round(2),
                     t: position.clone().Round(2),
                     w: weapon.id,
-                    o: player.id,
                     sw: true
                 }, function(reply) {
                     player.isAttemptAttack = false;

@@ -192,7 +192,7 @@ var SocketHandler = Class.extend({
                     }
 
                     // Check if the character is already being used in the server (since they bypassed the member check)
-                    worldHandler.FindUnit(character.id).then(function(gu) { 
+                    worldHandler.FindUnit(character.id).then(function(gu) {
                            respond({
                                errmsg: "There is already a guest playing under your credentials!"
                            });
@@ -242,11 +242,11 @@ var SocketHandler = Class.extend({
 
                             // Check if the character is already being used in the server
                             worldHandler.FindUnit(character.id)
-                                .then(function(gu) { 
+                                .then(function(gu) {
 
                                     // duplicate, remove them from online list and force disconnect
                                     socketHandler.onlinePlayers = _.without(
-                                        socketHandler.onlinePlayers, 
+                                        socketHandler.onlinePlayers,
                                         _.find(socketHandler.onlinePlayers, function(p) {
                                             return p.id === gu.id;
                                         })
@@ -258,7 +258,7 @@ var SocketHandler = Class.extend({
                                     });
                                     return;
                                 })
-                                .fin(function() { 
+                                .fin(function() {
 
                                     loadCharItems(character, function() {
                                         // we should be all good now!
@@ -383,42 +383,34 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                if (data.o > 0) { // only for players
-                    // check server's attack timeout not client
-                    var weapon = socket.unit.GetEquippedWeapon();
-                    if (!weapon) {
-                        reply({
-                            errmsg: 'No Equipped Weapon!'
-                        });
-                        return;
-                    }
-                    if (socket.unit.attackTimeout > 0.2) {
-                        //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
-                        // send the real delay, even non cheating players will be slightly out of sync
-                        // every now and then because of the server vs. client loops
-                        reply({
-                            delay: socket.unit.attackTimeout
-                        });
-                        return;
-                    } else { // update the attack timer using server's value
-                        if (weapon) {
-                            socket.unit.attackTimeout = weapon.$template.delay;
-                        } else {
-                            socket.unit.attackTimeout = 1;
-                        }
-                    }
-                }
-
-                if (!CheckData(data, ["s", "t", "w", "o", "sw"])) {
+                // check server's attack timeout not client
+                var weapon = socket.unit.GetEquippedWeapon();
+                if (!weapon) {
                     reply({
-                        errmsg: "Corrupt projectile data"
+                        errmsg: 'No Equipped Weapon!'
                     });
                     return;
                 }
-
-                if (!CheckVector(data.s)) {
+                if (socket.unit.attackTimeout > 0.2) {
+                    //console.log('attackTimeout not in sync', socket.unit.attackTimeout);
+                    // send the real delay, even non cheating players will be slightly out of sync
+                    // every now and then because of the server vs. client loops
                     reply({
-                        errmsg: "Corrupt start vector for addProjectile"
+                        delay: socket.unit.attackTimeout
+                    });
+                    return;
+                } else { // update the attack timer using server's value
+                    if (weapon) {
+                        socket.unit.attackTimeout = weapon.$template.delay;
+                    } else {
+                        socket.unit.attackTimeout = 1;
+                    }
+                }
+
+
+                if (!CheckData(data, ["t", "w"])) {
+                    reply({
+                        errmsg: "Corrupt projectile data"
                     });
                     return;
                 }
@@ -430,14 +422,8 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                data.s = ConvertVector3(data.s);
-                data.s = data.s.Round(2);
-
                 data.t = ConvertVector3(data.t);
                 data.t = data.t.Round(2);
-
-                data.sw = data.sw ? true : false;
-
 
                 // Convert the weapon ID to a template ID
                 var item = _.find(socket.unit.items, function(i) {
@@ -451,30 +437,19 @@ var SocketHandler = Class.extend({
                     return;
                 }
 
-                worldHandler.FindUnitNear(data.o, socket.unit)
-                    .then(function(unit) {
-
-                        if (!unit) {
-                            reply({
-                                errmsg: "Unit not found for addProjectile!"
-                            });
-                            return;
-                        }
-
-                        if (socket.unit) {
-                            socket.unit.EmitNearby("addProjectile", {
-                                s: data.s,
-                                t: data.t,
-                                w: item.template,
-                                o: data.o,
-                                sw: data.sw
-                            });
-                        }
-
-                        // need to let the local client know it's OK
-                        reply('OK');
-
+                if (socket.unit) {
+                    socket.unit.EmitNearby("addProjectile", {
+                        s: socket.unit.position.clone().Round(2),
+                        t: data.t,
+                        w: item.template,
+                        o: socket.unit.id,
+                        sw: true
                     });
+                }
+
+                // need to let the local client know it's OK
+                reply('OK');
+
             });
 
             socket.on("useItem", function (barIndex, reply) {
@@ -587,7 +562,7 @@ var SocketHandler = Class.extend({
                 }
 
                 worldHandler.FindUnit(data.id)
-                    .then(function(bank) { 
+                    .then(function(bank) {
 
                         // in this case data.slot refers to target bank slot
                         var result = bank.storeItem(data.item, player, data.slot);
@@ -1217,7 +1192,7 @@ var SocketHandler = Class.extend({
                         if ( bag.id === -2112 ) {
 
                             worldHandler.FindUnit(-2085)
-                                .then(function(exit) { 
+                                .then(function(exit) {
                                     player.TeleportToUnit(exit);
                                 });
 
@@ -1524,7 +1499,7 @@ var SocketHandler = Class.extend({
 
                 // todo: check if NPC is nearby
                 worldHandler.FindUnitNear(npcID, player)
-                   .then(function(bag) { 
+                   .then(function(bag) {
 
                        if (!bag) {
 
@@ -1533,7 +1508,7 @@ var SocketHandler = Class.extend({
                            });
 
                            return;
-                       } else if (bag.template.type !== UnitTypeEnum.LOOTABLE && 
+                       } else if (bag.template.type !== UnitTypeEnum.LOOTABLE &&
                                   bag.template.type !== UnitTypeEnum.VENDOR) {
 
                            reply({
@@ -1631,7 +1606,7 @@ var SocketHandler = Class.extend({
                     if ( id === socket.unit.id ) return;
 
                     worldHandler.FindUnitNear(id, socket.unit)
-                        .then(function(targetUnit) { 
+                        .then(function(targetUnit) {
                             if ( !targetUnit ) {
                                 reply({
                                     errmsg:"No targetUnit found for hit!"
@@ -1677,7 +1652,7 @@ var SocketHandler = Class.extend({
                 }
 
                 worldHandler.FindUnitNear(data.o, socket.unit)
-                    .then(function(owner) { 
+                    .then(function(owner) {
 
                         if ( !owner || !(owner instanceof NPC) ) {
 
@@ -1685,7 +1660,7 @@ var SocketHandler = Class.extend({
                                 errmsg: "Bad unit type for ghit"
                             });
 
-                            return; 
+                            return;
                         }
 
                         var weapon = null;
@@ -1714,7 +1689,7 @@ var SocketHandler = Class.extend({
                         }
 
                         owner.Attack(socket.unit, weapon);
-                
+
                     });
 
             });
@@ -1787,7 +1762,7 @@ var SocketHandler = Class.extend({
                 }
 
                 worldHandler.FindPlayerByName(data.characterName)
-                    .then(function(foundUnit) { 
+                    .then(function(foundUnit) {
 
                         if ( !foundUnit ) {
                             reply({
@@ -1839,7 +1814,7 @@ var SocketHandler = Class.extend({
                     worldHandler.FindPlayerByName(data.targetName)
                 ];
 
-                   Q.all(promises).spread(function(unit, targetUnit) { 
+                   Q.all(promises).spread(function(unit, targetUnit) {
 
                        var zone = parseInt(data.zone, 10);
                        var pos = targetUnit ? targetUnit.position : ConvertVector3(data.pos);
@@ -1869,7 +1844,7 @@ var SocketHandler = Class.extend({
                         var cz = unit.cellZ;
 
                         return [zone, cx, cz, worldHandler.removeUnitFromCell(unit, cx, cz)];
-                        
+
                     })
                     .spread(function(zone, cx, cz) {
                         return worldHandler.UpdateNearbyUnitsOtherUnitsLists(zone, cx, cz);
@@ -1881,7 +1856,7 @@ var SocketHandler = Class.extend({
                         }, function (err, result) {
                             if ( err ) throw(err);
                         });
-                        
+
                     });
 
             });
@@ -1899,16 +1874,16 @@ var SocketHandler = Class.extend({
 
                 socket.unit.UpdateCellPosition();
 
-                worldHandler.GenerateCell( 
-                    socket.unit.zone, 
-                    cellPos.x, 
+                worldHandler.GenerateCell(
+                    socket.unit.zone,
+                    cellPos.x,
                     cellPos.z,
                     parseInt(data.octaves, 10),
-                    parseInt(data.persistence, 10), 
-                    parseFloat(data.scale), 
+                    parseInt(data.persistence, 10),
+                    parseFloat(data.scale),
                     parseInt(data.tile, 10),
                     parseInt(data.heightOffset, 10)
-                ).then(function() { 
+                ).then(function() {
                     reply("OK");
                 });
 
@@ -1929,7 +1904,7 @@ var SocketHandler = Class.extend({
                 var cellPos = Cells.toCellCoordinates(data.position.x, data.position.z);
 
                 worldHandler.requireCell(zone, cellPos.x, cellPos.z)
-                    .then(function() { 
+                    .then(function() {
 
                         data.x = data.position.x;
                         data.y = data.position.y;
@@ -1966,7 +1941,7 @@ var SocketHandler = Class.extend({
                             var unit = worldHandler.MakeUnitFromData(data);
                             if (unit) {
 
-                                unit.load().then(function() { 
+                                unit.load().then(function() {
                                     unit.Awake();
                                 });
 
@@ -2036,7 +2011,7 @@ var SocketHandler = Class.extend({
                     changeData.metadata = {};
                 }
 
-                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() { 
+                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() {
                       return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [], [changeData], []);
                    }).then(function() {
 
@@ -2079,7 +2054,7 @@ var SocketHandler = Class.extend({
 
                 var cellPos = Cells.toCellCoordinates(data.x, data.z);
 
-                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() { 
+                worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() {
 
                     // Set a timer to auto save this cell
                     // If we set the height again, reset the timer
@@ -2127,8 +2102,8 @@ var SocketHandler = Class.extend({
                 };
 
                 worldHandler.requireCell(zone, cellPos.x, cellPos.z).then(function() {
-                    return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [addObject], [], []);  
-                }).then(function() { 
+                    return worldHandler.SaveCell(zone, cellPos.x, cellPos.z, false, [addObject], [], []);
+                }).then(function() {
                     socket.unit.EmitNearby("addModel", data, 0, true);
 
                     reply(true);
