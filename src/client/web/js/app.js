@@ -1,13 +1,21 @@
 // app.js
 angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
-.run(['User','$rootScope', function(User, $rootScope) {
+.run(['User','$rootScope', '$log', '$location', function(User, $rootScope, $log, $location) {
     $rootScope.currentUser = {};
 
     User.getCurrentUser()
         .then(function(user) {
             angular.copy(user, $rootScope.currentUser);
         });
+
+    $rootScope.logout = function() {
+        User.logout().then(function() {
+            $location.path('/');
+        }, function(err) {
+            $log.error('Error logging out! ' + err);
+        });
+    };
 }])
 .config(['$routeProvider', '$locationProvider','$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 
