@@ -252,6 +252,11 @@ module.exports = function(grunt) {
                     dest: '<%= cfg.get("buildTarget") %>web/',
                     expand: true,
                     cwd: 'src/client/web'
+                }, {
+                    src: 'lib/**/*',
+                    dest: '<%= cfg.get("buildTarget") %>web/',
+                    expand: true,
+                    cwd: 'src/client/common'
                 }]
             },
             game: {

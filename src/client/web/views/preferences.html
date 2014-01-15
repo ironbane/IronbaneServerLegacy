@@ -126,7 +126,12 @@
             </div>
           </div>
 
-          <div class="col-md-offset-4 alert alert-warning">Avatars will be supported again soon!</div>
+          <div class="form-group">
+            <label for="inputGravatarEmail" class="col-sm-4 control-label">Gravatar Email</label>
+            <div class="col-sm-8">
+              <input type="email" class="form-control" id="inputGravatarEmail" ng-model="user.gravatar_email">
+            </div>
+          </div>
 
           <div class="form-group">
             <div class="col-sm-offset-4 col-sm-8">
@@ -135,41 +140,5 @@
           </div>
 
         </form>
-
-
-
-<!--         Old Password: <input type="password" ng-model="user.passwordold"/><br>
-        If you would like to keep your password, leave this blank.	<br>
-        New Password: <input type="password" ng-model="user.passwordnew"/><br>
-        Case-sensitive, min. 4 characters, max. 20 characters.	<br>
-        Confirm New Password: <input type="password" ng-model="user.passwordnewconfirm"/><span ng-show="user.passwordnew != user.passwordnewconfirm">password not matching</span><br>
-
-        E-mail Address: <input type="email" ng-model="user.email"/><br>
-        Show my e-mail address <input type="checkbox" ng-model="user.show_email" ng-checked="user.show_email"/><br>
-        <h2>Optional stuff:</h2> <br>
-        It would be awesome if you'd tell us a bit more who you are and what you do!
-        This information will be put on your profile page. <br>
-        Name : <input type="text" ng-model="user.info_realname"/>	<br>
-        Country	: <input type="text" ng-model="user.info_country"/><br>
-        Location : <input type="text" ng-model="user.info_location"/><br>
-        Gender : <select ng-model="user.info_gender" ng-options="g.gender as g.gender for g in genderOptions"/><br>
-
-        Birthday : <input type="date" ng-model="user.info_birthday"/><br>
-        Occupation:	<input type="text" ng-model="user.info_occupation"/><br>
-        Interests : <input type="text" ng-model="user.info_interests"/><br>
-        Website	: <input type="text" ng-model="user.info_website"/><br>
-        Receive newsletter : <input type="checkbox" ng-model="user.newsletter" ng-checked="user.newsletter"/><br>
-
-        Signature : <input type="text" ng-model="user.forum_sig" maxlength=255></post-editor><br>
-        Max. 255 characters.
-
-        <button ng-click="save()">Update</button>
-        <hr>
-        <h2>Coming soon: Avatars</h2><br>
-        Upload an avatar : <input disabled="true" name="uploadavatar" type="file" file="user.forum_avatar"/><br>
-        Max. 100 KB, Max. 100x100 pixels.	<br>
-        Uploading a new avatar will replace your old one.
-
-        <button disabled="true">Upload</button> -->
     </div>
 </div>

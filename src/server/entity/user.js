@@ -45,6 +45,8 @@ module.exports = function(db) {
             this.info_website = parameters.info_website;
             this.show_email = parameters.show_email;
             this.newsletter = parameters.newsletter;
+            this.gravatar_email = parameters.gravatar_email;
+            this.character_avatar = parameters.character_avatar || 0;
 
 
             pHash.update(cryptSalt + parameters.passwordnewconfirm);
@@ -301,13 +303,22 @@ module.exports = function(db) {
     };
 
     User.getUserByNameView = function(username) {
-        var deferred = Q.defer();
-        db.query("select id, name, reg_date, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, show_email, email from bcs_users where bcs_users.name = ?", [username], function(err, userview) {
+        var deferred = Q.defer(),
+            gravatar = require('nodejs-gravatar');
+
+        db.query("select id, name, reg_date, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, show_email, email, gravatar_email, character_avatar from bcs_users where bcs_users.name = ?", [username], function(err, userview) {
             if (err) {
                 deferred.reject(err);
                 return;
             }
             var user = userview[0];
+            if(user.character_avatar !== 0) {
+                // get character based avatar
+                user.avatarUrl = "";
+            } else {
+                // do gravatar based
+                user.avatarUrl = gravatar.imageUrl(user.gravatar_email || "404", {"size": "80", "d": "retro"});
+            }
             db.query("SELECT COUNT(forum_posts.id) as totalpost FROM forum_posts where forum_posts.user = ?", user.id, function(err, totalpostcount){
                 if (err) {
                     deferred.reject(err);
