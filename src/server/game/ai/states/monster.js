@@ -51,7 +51,7 @@ var MonsterState = State.extend({
 
             var me = this;
 
-            unit.FindNearestTarget(unit.template.aggroradius, true).then(function(target) { 
+            unit.FindNearestTarget(unit.template.aggroradius, true).then(function(target) {
 
                 if (target &&
                     !outsideSpawnGuardRadius(unit) &&
@@ -59,7 +59,7 @@ var MonsterState = State.extend({
 
 
                     if ( !me.cantReachTable[target.id] )  {
-                        if (unit.navigationMeshGroup) {
+                        if (unit.navigationMeshGroup != null) {
                             var paths = pathFinder.findPath(unit.position,
                                 target.position,
                                 unit.zone,

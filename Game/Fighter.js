@@ -350,7 +350,7 @@ var Fighter = Actor.extend({
 
         }).then(function() {
 
-            if(self.isPlayer()) { 
+            if(self.isPlayer()) {
 
                 // need a better "reset"
                 self.UpdateAppearance(true);
@@ -369,7 +369,7 @@ var Fighter = Actor.extend({
             }
 
 
-        }).then(function() { 
+        }).then(function() {
 
             // log("Respawned "+self.id);
 
@@ -796,8 +796,8 @@ var Fighter = Actor.extend({
         noHeadingCheck = noHeadingCheck || false;
 
         var self = this;
-        
-        return this.FindNearestUnit(maxDistance).then(function(unit) { 
+
+        return this.FindNearestUnit(maxDistance).then(function(unit) {
 
                 if (unit &&
                     unit instanceof Fighter &&
@@ -809,7 +809,7 @@ var Fighter = Actor.extend({
                     self.InLineOfSight(unit, noHeadingCheck) &&
                     !(maxDistance > 0 && !self.InRangeOfUnit(unit, maxDistance))) {
 
-                        console.log('Fighter.js', 'Found nearest target');
+                        // console.log('Fighter.js', 'Found nearest target');
 
                         return unit; // resolve target
 
