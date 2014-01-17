@@ -47,6 +47,8 @@ module.exports = function(db) {
             this.newsletter = parameters.newsletter;
             this.gravatar_email = parameters.gravatar_email;
             this.character_avatar = parameters.character_avatar || 0;
+            this.forum_sig = parameters.forum_sig;
+            this.info_gender = parameters.info_gender;
 
 
             pHash.update(cryptSalt + parameters.passwordnewconfirm);

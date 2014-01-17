@@ -1,6 +1,7 @@
 // user.js - routes concerning users, login, registration, etc.
 module.exports = function(app, db) {
     var User = require('../../entity/user')(db),
+        _ = require('underscore'),
         log = require('util').log;
 
     app.post('/login', function(req, res, next) {
@@ -52,7 +53,10 @@ module.exports = function(app, db) {
     app.get('/api/session/user', function(req, res) {
         if(req.user) {
             // send only needed info for UI, NOT password
-            res.send({
+            var clone = _.clone(req.user);
+            delete clone.pass;
+            res.send(clone);
+            /*res.send({
                 id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
@@ -66,7 +70,7 @@ module.exports = function(app, db) {
                 info_website: req.user.info_website,
                 show_email: req.user.show_email,
                 newsletter: req.user.newsletter
-            });
+            });*/
         } else {
             res.send(404, 'no user signed in');
         }
