@@ -10,7 +10,7 @@ CREATE TABLE `discussions` (
   `parent_thread` VARCHAR(45) NULL,
   PRIMARY KEY (`id`));
 
-CREATE TABLE `discussion_tags` (
+CREATE TABLE `discussions_tags` (
   `discussion_id` VARCHAR(45) NOT NULL,
   `tag` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`discussion_id`, `tag`));
