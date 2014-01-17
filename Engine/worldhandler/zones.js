@@ -15,7 +15,7 @@
    along with Ironbane MMO. If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** 
+/**
  * @module zones
  **/
 var aabb = require('aabb-3d'),
@@ -25,9 +25,9 @@ var aabb = require('aabb-3d'),
 
 // var util = require('../util');
 
-/** 
+/**
  * @method listens
- * Test whether or not a SpatialEventEmitter listens 
+ * Test whether or not a SpatialEventEmitter listens
  * for an event at a particular location.
  *
  * @param event {String}
@@ -39,11 +39,11 @@ spatial.prototype.listens = function(event, bbox) {
 
     //support point emitting
     if('0' in bbox) {
-         bbox = aabb(bbox, [0, 0, 0]); 
+         bbox = aabb(bbox, [0, 0, 0]);
     }
 
-    var treeListens = function(node, event, bbox) { 
-       
+    var treeListens = function(node, event, bbox) {
+
         var nodeListens = false;
         var childListens = false;
 
@@ -52,7 +52,7 @@ spatial.prototype.listens = function(event, bbox) {
                 childListens = treeListens(node.children[i], event, bbox);
                 break;
             }
-        } 
+        }
 
         var list = node.listeners[event];
 
@@ -92,17 +92,17 @@ spatial.prototype.listens = function(event, bbox) {
 };
 
 
-/** 
+/**
  *
  * @class CellHandler
  *
  * @constructor
  *
- * @param bbox {AABB} - The bounding box, in  world coordinates, 
- * for which the cellhandler listens for events within. 
+ * @param bbox {AABB} - The bounding box, in  world coordinates,
+ * for which the cellhandler listens for events within.
  *
  * @param cellCoords {Object} - An object containing numeric
- * properties x and z. 
+ * properties x and z.
  **/
 var CellHandler = function(bbox, zoneId, cellCoords) {
 
@@ -111,13 +111,13 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         zoneId : zoneId,
         cellCoords : cellCoords,
         units : []
-    }; 
+    };
 
     /**
      * @method getX
      * @return {Number} - This cell's x value in cell coordinates.
      **/
-    function getX() { 
+    function getX() {
        return this.fields.cellCoords.x;
     }
 
@@ -139,13 +139,13 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      **/
     function addUnit(deferred, unit) {
 
-       if(!_.contains(this.fields.units, unit)) { 
+       if(!_.contains(this.fields.units, unit)) {
           this.fields.units.push(unit);
 
           deferred.resolve();
 
-       } else { 
-         
+       } else {
+
            deferred.reject(new Error('CellHandler: Cannot add unit! ' + unit.isPlayer()));
 
        }
@@ -154,7 +154,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
     /**
      * @method removeUnit
-     * @param deferred {Object} - A Q deferred object. 
+     * @param deferred {Object} - A Q deferred object.
      * @param unit {Unit} - The unit to be removed from this cell.
      **/
     function removeUnit(deferred, unit)  {
@@ -164,7 +164,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         deferred.resolve();
     }
 
-    /** 
+    /**
      * @method changeActivity
      * Abstracts the code shared by deactivate and activate methods.
      * Sets the property 'active' of all NPCs handled by this cell to
@@ -173,19 +173,19 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
      * @param val {Boolean}
      *
      **/
-    function changeActivity(val) { 
+    function changeActivity(val) {
 
         var isNPC = function(unit) { return !(unit instanceof Player); };
 
         _.chain(this.fields.units)
             .filter(isNPC)
-            .each(function(unit) { 
+            .each(function(unit) {
                 unit.active = val;
-            }); 
+            });
 
     }
 
-    /** 
+    /**
      * @method deactivate
      *
      * @param deferred {Object} - A Q deferred object.
@@ -206,12 +206,12 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
         }
 
-        deferred.resolve(); 
+        deferred.resolve();
 
     }
 
     /**
-     * @method activate 
+     * @method activate
      *
      * @param deferred {Object} - A Q deferred object.
      **/
@@ -223,14 +223,14 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         deferred.resolve();
     }
 
-    /** 
+    /**
      * @method awake
      * @return {Array} - An array of promises.
      **/
-    function awake() { 
+    function awake() {
 
         return Q.all(_.map(this.fields.units, function(unit) {
-            return unit.Awake(); 
+            return unit.Awake();
         }));
 
     }
@@ -243,18 +243,18 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
     function tick(elapsed) {
 
         var players = _.filter(this.fields.units, function(unit) {
-            return unit.isPlayer(); 
+            return unit.isPlayer();
         });
 
         return Q.all(_.map(this.fields.units, function(unit) {
 
-            if(unit.active) { 
+            if(unit.active) {
                 unit.Tick(elapsed);
-            } 
+            }
 
         })).then(function() { ;
 
-            return Snapshots.broadcast(players); 
+            return Snapshots.broadcast(players);
 
         });
 
@@ -286,7 +286,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
             cellZ = this.fields.cellCoords.z,
             zoneId = this.fields.zoneId;
 
-        var objects = []; 
+        var objects = [];
 
         // Query the entry
         var path = dataPath + '/' + zoneId + '/' + cellX + '/' + cellZ;
@@ -299,7 +299,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
             }
         });
 
-        try { 
+        try {
 
             if (fs.existsSync(path + '/objects.json')) {
                 // Load static gameobjects
@@ -333,12 +333,12 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
             cellZ = this.fields.cellCoords.z,
             zone =  this.fields.zoneId;
 
-        if(chatHandler) { 
+        if(chatHandler) {
 
             chatHandler.announceRoom('editors', 'Saving cell ' + cellX + ', ' + cellZ + ' in zone ' + zone + '...');
 
         }
-  
+
         // Query the entry
         var path = dataPath + '/' + zone + '/' + cellX + '/' + cellZ;
 
@@ -360,7 +360,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
     /**
      * @method edit
      *
-     * @param deferred {Object} 
+     * @param deferred {Object}
      * @param objects {Array}
      * @param changes {Array}
      * @param deletes {Array}
@@ -394,8 +394,8 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
                    _.each(objects, function(loopObj) {
 
-                       if (pos.x === loopObj.x && 
-                           pos.y === loopObj.y && 
+                       if (pos.x === loopObj.x &&
+                           pos.y === loopObj.y &&
                            pos.z === loopObj.z) {
 
                            if (_.isEmpty(changedObject.metadata)) {
@@ -417,7 +417,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
        }
 
-       function deleteObjects(deleteBuffer, objects) { 
+       function deleteObjects(deleteBuffer, objects) {
 
            // Delete the things from the terrain in the deleteBuffer
            if (_.isArray(deleteBuffer)) {
@@ -430,8 +430,8 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
                        var loopObjPos = ConvertVector3(loopObj).Round(2);
 
-                       if (deleteObjPos.x === loopObjPos.x && 
-                           deleteObjPos.y === loopObjPos.y && 
+                       if (deleteObjPos.x === loopObjPos.x &&
+                           deleteObjPos.y === loopObjPos.y &&
                            deleteObjPos.z === loopObjPos.z) {
 
                            objects = _.without(objects, loopObj);
@@ -464,7 +464,7 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
 
 };
 
-/** 
+/**
  * @class Cells
  *
  * Provides static utility methods for working with cells.
@@ -497,7 +497,7 @@ var Cells = (function() {
      * @return {Object} - Containing x and z properties.
      **/
     function toWorldCoordinates(cellX, cellZ) {
-       return CellToWorldCoordinates(cellX, cellZ, size()); 
+       return CellToWorldCoordinates(cellX, cellZ, size());
     }
 
     /**
@@ -510,7 +510,7 @@ var Cells = (function() {
         var begin = [cellCoords.x, 0, cellCoords.z];
         var dimensions = [0, 0, 0];
 
-        return aabb(begin, dimensions); 
+        return aabb(begin, dimensions);
 
     }
 
@@ -521,14 +521,14 @@ var Cells = (function() {
      * @return {Object} - Containing x and z properties.
      **/
     function center(cellX, cellZ) {
-       return (function(xz) { 
+       return (function(xz) {
            return new THREE.Vector3(xz.x, 0, xz.z);
        })(toWorldCoordinates(cellX, cellZ));
     }
 
     /**
      * @method readInfo
-     * @return {Array} - Collection of objects in 
+     * @return {Array} - Collection of objects in
      * the form { zoneId : Number, cellCoords : Object }.
      **/
     function readInfo() {
@@ -537,7 +537,7 @@ var Cells = (function() {
 
         var deferred = Q.defer();
 
-        var info = []; 
+        var info = [];
 
         util.walk(dataPath, function(err, results) {
 
@@ -579,9 +579,9 @@ var Cells = (function() {
 
                 cellsLoaded[zone]++;
 
-                info.push({ 
-                    zoneId : zone, 
-                    cellCoords: new THREE.Vector3(cx, 0, cz) 
+                info.push({
+                    zoneId : zone,
+                    cellCoords: new THREE.Vector3(cx, 0, cz)
                 });
             }
 
@@ -594,32 +594,32 @@ var Cells = (function() {
         });
 
         return deferred.promise;
-    } 
+    }
 
-    return { 
+    return {
         size: size,
-        toCellCoordinates : toCellCoordinates, 
+        toCellCoordinates : toCellCoordinates,
         toWorldCoordinates : toWorldCoordinates,
         point : point,
         center  : center,
         readInfo : readInfo
-    }; 
+    };
 
 })();
 
-/** 
+/**
  * @class ZoneHandler
  *
- * @constructor 
- * @param id - {Number} 
+ * @constructor
+ * @param id - {Number}
  **/
 var ZoneHandler = function(id) {
 
     this.spatial = new spatial();
     this.spatial.size = 1;
 
-    this.cells = []; 
-    this.id = id; 
+    this.cells = [];
+    this.id = id;
 
     /**
      * @method contains
@@ -634,24 +634,24 @@ var ZoneHandler = function(id) {
      **/
     function contains(bbox) {
 
-        return _.some(this.cells, function(cell) { // overlaps? 
+        return _.some(this.cells, function(cell) { // overlaps?
 
-            return !bbox.touches(cell.fields.bbox) && 
-                   bbox.intersects(cell.fields.bbox); 
+            return !bbox.touches(cell.fields.bbox) &&
+                   bbox.intersects(cell.fields.bbox);
 
-        }); 
+        });
     }
 
     this.contains = contains;
 
 };
 
-/** 
- * @class Zones 
- * Maintains a hashtable with zone ids as keys, 
+/**
+ * @class Zones
+ * Maintains a hashtable with zone ids as keys,
  * and Zone objects as values (for constant time lookup).
  **/
-var Zones = function() { 
+var Zones = function() {
 
     this.table = {};
 
@@ -674,9 +674,9 @@ var Zones = function() {
      * @param zoneId {Number}
      * @param cellX {Number}
      * @param cellZ {Number}
-     * @return {Array} 
+     * @return {Array}
      **/
-    function getUnits(zoneId, cellX, cellZ) { 
+    function getUnits(zoneId, cellX, cellZ) {
         return this.getCell(zoneId, cellX, cellZ).fields.units;
     }
 
@@ -692,7 +692,7 @@ var Zones = function() {
 
         var args = Array.prototype.slice.call(arguments, 3);
 
-        var deferred = Q.defer(); 
+        var deferred = Q.defer();
 
         var point = [vec.x, vec.y, vec.z];
 
@@ -731,7 +731,7 @@ var Zones = function() {
     /**
      * @method emitNear
      *
-     * Try to emit events for neighbouring cells 
+     * Try to emit events for neighbouring cells
      * around the cell containing the world coordinates of 'vec'.
      *
      * @param zoneId {Number}
@@ -752,7 +752,7 @@ var Zones = function() {
         var offsets = _.range(-radius, radius + 1, 1);
 
         var positions = _.chain(offsets)
-            .map(function(x) { 
+            .map(function(x) {
                 return _.map(offsets, function(z) {
                     return new THREE.Vector3(x, 0, z);
                 });
@@ -760,17 +760,17 @@ var Zones = function() {
             .flatten()
             .map(function(v) {
                v.x += vec.x;
-               v.z += vec.z; 
+               v.z += vec.z;
                return v;
             })
             .value();
 
 
-        var promises = _.map(positions, function(nearVec) { 
+        var promises = _.map(positions, function(nearVec) {
 
            var emitArgs = [zoneId, name, nearVec].concat(args);
 
-           return self.emit.apply(self, emitArgs).fail(function(err) { 
+           return self.emit.apply(self, emitArgs).fail(function(err) {
                console.error('Zones.emitNear', err);
            });
 
@@ -784,7 +784,7 @@ var Zones = function() {
      * @method selectAll
      * @return {Promise}
      **/
-    function selectAll() { 
+    function selectAll() {
 
        var deferred = Q.defer();
 
@@ -799,7 +799,7 @@ var Zones = function() {
      * @param zoneId {Number}
      * @return {Promise}
      **/
-    function selectZone(zoneId) { 
+    function selectZone(zoneId) {
 
         var deferred = Q.defer();
 
@@ -809,7 +809,7 @@ var Zones = function() {
 
         } else {
 
-            if(_.isUndefined(this.table[zoneId])) { 
+            if(_.isUndefined(this.table[zoneId])) {
 
                 this.table[zoneId] = new ZoneHandler(zoneId);
 
@@ -836,7 +836,7 @@ var Zones = function() {
 
                 var bbox = Cells.point(cellCoords);
 
-                if(!zone.contains(bbox)) { 
+                if(!zone.contains(bbox)) {
 
                     var cell = new CellHandler(bbox, zoneId, cellCoords);
 
@@ -856,9 +856,9 @@ var Zones = function() {
 
                 }
 
-                return deferred.promise; 
+                return deferred.promise;
 
-            }); 
+            });
 
         // Note:
         // No rejection handler passes errors down the method chain.
