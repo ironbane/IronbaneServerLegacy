@@ -94,6 +94,11 @@ $(document).keydown(function(event) {
         }
     }
 
+    // Firefox arrow keys scrolling fix
+    if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
+        event.preventDefault();
+    }
+
 });
 
 $(document).keyup(function(event) {
