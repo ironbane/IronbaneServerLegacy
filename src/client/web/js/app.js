@@ -16,6 +16,31 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
             $log.error('Error logging out! ' + err);
         });
     };
+
+    $rootScope.$on("$routeChangeError", function(event, current, previous, rejection) {
+        //$log.debug('routeChangeError: ', arguments);
+
+        if(previous && previous.path) {
+            $location.path(previous.path);
+        } else {
+            $location.path('/');
+        }
+    });
+}])
+.service('RouteSecurity', ['User', '$rootScope', '$q', '$log', function(User, $rootScope, $q, $log) {
+    this.secureEditor = function() {
+        var deferred = $q.defer(),
+            user = $rootScope.currentUser;
+
+        //$log.debug('secured route attempt: ', user);
+        if(!user.authenticated || !user.$hasRole('EDITOR')) {
+            deferred.reject('not allowed');
+        } else {
+            deferred.resolve('proceed');
+        }
+
+        return deferred.promise;
+    };
 }])
 .config(['$routeProvider', '$locationProvider','$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 
@@ -120,7 +145,10 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
         .when('/editor', {
             templateUrl: '/views/editorMenu',
             resolve: {
-                location: '$location'
+                location: '$location',
+                authorized: ['RouteSecurity', function(RouteSecurity) {
+                    return RouteSecurity.secureEditor();
+                }]
             }
         })
         .when('/user/profile/:username' , {
@@ -142,64 +170,22 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
             }
 
         })
-        .when('/editor/item_template', {
-            templateUrl: '/views/item_template_list',
-            controller: 'ItemTemplateList'
-
-        })
-        .when('/editor/item_template/:id', {
-            templateUrl: '/views/item_template_editor',
-            controller: 'ItemTemplateEditor',
-            resolve: {
-                ResolveData: ['Item', '$q', '$route', '$location', function(Item, $q, $route, $location) {
-                    var deferred = $q.defer();
-                    Item.get($route.current.params.id)
-                        .then(function(template) {
-                            if(template.id === null){
-
-                                $location.path('/editor/item_template');
-                                deferred.reject();
-                                return;
-                            }
-                            deferred.resolve({template: template});
-                        }, function(err) {
-                           deferred.reject();
-                        });
-                        return deferred.promise;
-                }]
-            }
-
-        })
-        .when('/editor/unit_template', {
-            templateUrl: '/views/unit_template_list',
-            controller: 'UnitTemplateList'
-
-        })
-        .when('/editor/unit_template/:id', {
-            templateUrl: '/views/unit_template_editor',
-            controller: 'UnitTemplateEditor',
-            resolve: {
-                ResolveData: ['User', '$q', '$route', function(User, $q, $route) {
-                    var deferred = $q.defer();
-                    Item.get($route.current.params.id)
-                        .then(function(template) {
-                            deferred.resolve({template: template});
-                        }, function(err) {
-                           deferred.reject();
-                        });
-                        return deferred.promise;
-                }]
-            }
-
-        })
         .when('/editor/article', {
             templateUrl: '/views/articlelist',
-            controller: 'ArticleList'
+            controller: 'ArticleList',
+            resolve: {
+                authorized: ['RouteSecurity', function(RouteSecurity) {
+                    return RouteSecurity.secureEditor();
+                }]
+            }
         })
         .when('/editor/article/:id', {
             templateUrl: '/views/articleedit',
             controller: 'ArticleEditor',
             resolve: {
+                authorized: ['RouteSecurity', function(RouteSecurity) {
+                    return RouteSecurity.secureEditor();
+                }],
                 ResolveData: ['Article', '$q', '$route', '$location', function(Article, $q, $route, $location) {
                     var deferred = $q.defer();
                     Article.get($route.current.params.id)
@@ -220,12 +206,20 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
         })
         .when('/editor/users', {
             templateUrl: '/views/userslist',
-            controller: 'UsersList'
+            controller: 'UsersList',
+            resolve: {
+                authorized: ['RouteSecurity', function(RouteSecurity) {
+                    return RouteSecurity.secureEditor();
+                }]
+            }
         })
         .when('/editor/users/:id', {
             templateUrl: '/views/useredit',
             controller: 'UserEditor',
             resolve: {
+                authorized: ['RouteSecurity', function(RouteSecurity) {
+                    return RouteSecurity.secureEditor();
+                }],
                 ResolveData: ['User', '$q', '$route', '$location', function(User, $q, $route, $location) {
                     var deferred = $q.defer();
                     User.get($route.current.params.id)
