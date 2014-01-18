@@ -122,7 +122,8 @@ var SocketHandler = Class.extend({
                 type: 'welcome',
                 user: {
                     id: unit.id,
-                    name: unit.name
+                    name: unit.name,
+					rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
                 },
                 online: socketHandler.onlinePlayers
             });

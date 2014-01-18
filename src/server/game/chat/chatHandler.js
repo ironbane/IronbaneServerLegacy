@@ -247,7 +247,7 @@ module.exports = function(units, worldHandler) {
                 type: status,
                 user: {
                     name: unit.name,
-                    rank: unit.editor ? 'gm' : 'user'
+					rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
                 }
             };
 

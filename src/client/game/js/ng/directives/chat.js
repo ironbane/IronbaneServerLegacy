@@ -102,7 +102,7 @@ IronbaneApp
 .directive('chatMessage', ['$log', '$compile', 'DEATH_MESSAGES', '$filter', function($log, $compile, DEATH_MESSAGES, $filter) {
     // logic for all of the different types of messages that are supported
     var templates = {
-        welcome: '<div style="color:#46fc52;"><span>Hey there, {{ data.user.name }}</span><br>Players online: <span ng-repeat="user in data.online" class="name {{user.rank}}" ng-class="{delim: !$last}">{{ user.name }}</span><br>Use /help for all keys and commands.</div>',
+        welcome: '<div style="color:#46fc52;"><span>Hey there, </span><span class="name {{ data.user.rank }}">{{ data.user.name }}</span><br>Players online: <span ng-repeat="user in data.online" class="name {{user.rank}}" ng-class="{delim: !$last}">{{ user.name }}</span><br>Use /help for all keys and commands.</div>',
         join: '<div><span class="name {{ data.user.rank }}">{{ data.user.name }}</span> has joined the game!</div>',
         died: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by <span class="name {{ data.killer.rank }}">{{ data.killer.name }}.</span>',
         diedspecial: '<div><span class="name {{ data.victim.rank }}">{{ data.victim.name }}</span> was {{ deathMessage }} by {{ data.cause }}.',

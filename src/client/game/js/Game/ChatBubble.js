@@ -104,12 +104,15 @@ var ChatBubble = PhysicsObject.extend({
     tick: function(dTime) {
         // Count the amount of bubbles that are on top of the player
         var me = this;
+        var foundOurselves = false;
         var count = ironbane.getUnitList().findUnits(function(unit){
-            return unit instanceof ChatBubble && unit != me && unit.unit == me.unit; 
+            if ( unit === me ) foundOurselves = true;
+            if ( !foundOurselves ) return false;
+            return unit instanceof ChatBubble &&
+            unit.unit === me.unit;
         }).length;
 
-          
-        var offset = ((this.unit == ironbane.player || this.unit.id < 0) ? 1.5 : 2.0) + (count * 0.6);
+        var offset = ((this.unit === ironbane.player || this.unit.id < 0) ? 1.5 : 2.0) + (count * 0.6);
 
         this.object3D.position = this.unit.position.clone().add(new THREE.Vector3(0, offset, 0));
 
