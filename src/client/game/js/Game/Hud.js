@@ -109,7 +109,7 @@ var HUDHandler = Class.extend({
                     window.open('http://iewebgl.com/', 'iewebgl');
                     //window.open('http://www.khronos.org/webgl/wiki_1_15/index.php/Getting_a_WebGL_Implementation','bs')
                 });
-            } else if (startdata.using_safari) {                  
+            } else if (startdata.using_safari) {
                 $('#webglsolution').html(SAFARI_TEXT+'<div class="spacersmall"></div><div class="insideInfo" style="width:280px;">' + SAFARI_SOLUTION + '</div>');
 
                 $('#getiewebgl').click(function() {
@@ -1264,12 +1264,6 @@ var HUDHandler = Class.extend({
         }
 
         $('#charSelect').html(charSelect);
-
-        if (startdata.loggedIn) {
-            $('#charSelect').css("height", "321px");
-        } else {
-            $('#charSelect').css("height", "");
-        }
 
         $('#btnPrevChar').click(function() {
             if (window.chars && window.chars.length === 0) {
