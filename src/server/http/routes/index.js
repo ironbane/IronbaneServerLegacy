@@ -15,6 +15,7 @@ module.exports = function(app, db) {
     require('./items')(app,db);
     require('./units')(app, db);
     require('./messages')(app,db);
+    require('./discussions')(app, db);
 
     if(config.get('github').enabled) {
         require('./github')(app);

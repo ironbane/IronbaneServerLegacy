@@ -94,7 +94,7 @@ module.exports = function(db) {
                     topic_id: topicId,
                     content: params.content,
                     time: params.time,
-                    
+
                     user: params.user
                 };
 
@@ -112,13 +112,15 @@ module.exports = function(db) {
     };
 
     Topic.getPostsView = function(topicId, mintime) {
-        var deferred = Q.defer();
-        var minimumtime = parseInt(mintime,10) || 0;
+        var deferred = Q.defer(),
+            minimumtime = parseInt(mintime,10) || 0,
+            gravatar = require('nodejs-gravatar');
+
         log("getting view for " + topicId + " with minimumtime "  + minimumtime);
 
         var postsQ = ' (select count(id) from forum_posts where user = us.id) as postcount, ';
         var likesQ = ' (select name from forum_posts_likes  INNER JOIN bcs_users on bcs_users.id = forum_posts_likes.from_user where to_post = fp.id) as likes, ';
-        db.query('SELECT ' + postsQ + likesQ + 'fp.content, fp.id, fp.time, us.name, us.forum_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
+        db.query('SELECT ' + postsQ + likesQ + 'fp.content, fp.id, fp.time, us.name, us.gravatar_email, us.character_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
             if (err) {
                 log(err);
                 deferred.reject(err);
@@ -133,11 +135,19 @@ module.exports = function(db) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
                 });
-                p.user = {name: p.name, avatar : p.forum_avatar, sig:p.forum_sig, postcount: p.postcount};
+                p.user = {name: p.name, sig:p.forum_sig, postcount: p.postcount};
+                if(p.character_avatar !== 0) {
+                    // get character based avatar
+                    p.user.avatarUrl = "";
+                } else {
+                    // do gravatar based
+                    p.user.avatarUrl = gravatar.imageUrl(p.gravatar_email || "404", {"size": "80", "d": "retro"});
+                }
                 delete p.postcount;
                 delete p.name;
                 delete p.forum_sig;
-                delete p.forum_avatar;
+                delete p.gravatar_email;
+                delete p.character_avatar;
             });
             db.query('UPDATE forum_topics set views = views + 1 where id = ?', [topicId], function(results) {
 
