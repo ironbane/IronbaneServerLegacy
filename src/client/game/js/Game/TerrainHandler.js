@@ -179,7 +179,6 @@ var TerrainHandler = Class.extend({
         };
 
         this.GetCellByWorldPosition = function(position) {
-            console.log(position);
             var cp = WorldToCellCoordinates(position.x, position.z, cellSize);
 
             return this.GetCellByGridPosition(cp.x, cp.z);
@@ -188,8 +187,6 @@ var TerrainHandler = Class.extend({
             var id = x + '-' + z;
 
             if (_.isUndefined(this.cells[id])) {
-                console.log(this.cells);
-                console.log(x + "," + z);
                 this.cells[id] = new Cell(x, z);
             }
 

@@ -322,11 +322,11 @@ module.exports = function(grunt) {
             html: {
                 files: 'src/client/**/*.html',
                 tasks: ['game', 'website', 'beep']
+            },
+            js: {
+                files: 'src/client/**/*.js',
+                tasks: ['game', 'website', 'beep']
             }
-            // js: {
-            //     files: 'src/client/**/*.js',
-            //     tasks: ['game', 'website', 'beep']
-            // },
             // assets: {
             //     files: '<%= cfg.get("assetDir") %>**/*',
             //     tasks: ['assets', 'beep']

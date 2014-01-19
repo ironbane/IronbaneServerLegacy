@@ -18,15 +18,15 @@ var Ticker = (function() {
         started = false;
 
     /**
-     * @method add - Add a cell to be ticked. 
-     * Start ticking if no there are currently no cells to tick. 
+     * @method add - Add a cell to be ticked.
+     * Start ticking if no there are currently no cells to tick.
      * @param cell {CellHandler}
      **/
-    function add(cell) { 
+    function add(cell) {
 
         if(!_.contains(cells, cell)) {
 
-            cells.push(cell); 
+            cells.push(cell);
 
         }
 
@@ -58,17 +58,17 @@ var Ticker = (function() {
 
             cell.tick(elapsed).then(function() {
                 callback(null);
-            }).fail(function(err) { 
-                console.error('Ticker.start', err);
+            }).fail(function(err) {
+                console.error('Ticker.start', err.stack);
                 callback(err);
-            }); 
+            });
 
         };
 
         var tickAll = _.throttle(function(elapsed) {
 
             if(cells.length === 0) {
-                started = false; 
+                started = false;
                 return;
             }
 
@@ -80,7 +80,7 @@ var Ticker = (function() {
 
                 var nextElapsed = Math.min(secondsBetween,  Date.now() - begin);
 
-                tickAll(nextElapsed); 
+                tickAll(nextElapsed);
 
             });
 

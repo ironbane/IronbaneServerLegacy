@@ -25,13 +25,13 @@ var Q = require('q'),
 
 /**
   * @class Snapshots
-  * Hosts a collection of static methods, 
-  * faciliating the broadcasting of snapshots once per 
-  * server tick. 
-**/ 
-var Snapshots = (function() { 
+  * Hosts a collection of static methods,
+  * faciliating the broadcasting of snapshots once per
+  * server tick.
+**/
+var Snapshots = (function() {
 
-    /** 
+    /**
      * @method send
      * Builds and sends a snapshot to one player.
      * @param {Function} cached - The memoized, toPacket function, for snapshot caching.
@@ -46,13 +46,13 @@ var Snapshots = (function() {
                return ud.id !== unit.id;
            })
            .filter(function(ud) {
-               return (ud.template.type && 
+               return _.isUndefined(ud.template) ||
+                      (ud.template.type &&
                        ud.template.type !== UnitTypeEnum.MOVINGOBSTACLE &&
-                       ud.template.type !== UnitTypeEnum.ToggleableObstacle) ||
-                   _.isUndefined(ud.template);
+                       ud.template.type !== UnitTypeEnum.ToggleableObstacle);
            })
            .map(function(ud) {
-             
+
                if (!(ud instanceof Player) && (ud instanceof Fighter)) {
 
                     // Quickly make a rotation number for NPC's (since they only use heading vector while the client uses degrees)
@@ -70,7 +70,7 @@ var Snapshots = (function() {
 
            })
            .map(cached)
-           .tap(function(snapshot) { 
+           .tap(function(snapshot) {
 
              if (snapshot.length > 0) {
 
@@ -82,23 +82,23 @@ var Snapshots = (function() {
 
     };
 
-    /** 
+    /**
      * @method toPacket
-     * Transform a unit into an element 
+     * Transform a unit into an element
      * for a collection of packets, a snapshot,
      * to be sent to a player.
      * @param {Unit} ud - The unit to transform.
-     * @return {Object} - The packet. 
+     * @return {Object} - The packet.
      **/
-    function toPacket(ud) { 
+    function toPacket(ud) {
 
        var id = ud.id;
-       var packet = {}; 
-   
+       var packet = {};
+
        var pos = ud.position.Round(2);
 
        packet.id = id;
-       
+
        packet.p = pos;
 
        if (ud.standingOnUnitId) {
@@ -121,41 +121,41 @@ var Snapshots = (function() {
            packet.rz = ud.rotation.z.Round(2);
        }
 
-       
+
        return packet;
 
    };
 
-   /** 
-    * @method hash 
+   /**
+    * @method hash
     * The hash function to lookup an
-    * already computed result for one of 
+    * already computed result for one of
     * a snapshot's packets.
-    * @param {Unit} - A unit to create a bucket for. 
+    * @param {Unit} - A unit to create a bucket for.
     * @return {Number} - The unit's unique id.
-    **/ 
-   function hash(ud) { 
+    **/
+   function hash(ud) {
       return ud.id;
    };
 
-   /** 
-    * @method cache 
+   /**
+    * @method cache
     * Makes a new cache function, to be used once per tick
-    * when snapshots are broadcasted to player. 
-    * Use the cache function as toPacket normally would 
-    * be used. Increases the performance of computing 
+    * when snapshots are broadcasted to player.
+    * Use the cache function as toPacket normally would
+    * be used. Increases the performance of computing
     * snapshot packets.
-    * @return {Function} 
+    * @return {Function}
     **/
    function cache() {
       return _.memoize(toPacket, hash);
    };
 
-   /** 
-    * @method broadcast 
+   /**
+    * @method broadcast
     * @param {Array} players - All players to broadcast
     * snapshots to once per tick.
-    * @param {Object} - A promise. 
+    * @param {Object} - A promise.
     **/
    function broadcast(players) {
 
@@ -164,7 +164,7 @@ var Snapshots = (function() {
       var cached = cache();
       var sender = send.bind(this, cached);
 
-      var iterator = function(unit, callback) { 
+      var iterator = function(unit, callback) {
           sender(unit);
           callback(null);
       };
