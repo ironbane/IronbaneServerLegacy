@@ -98,7 +98,7 @@
         "cloudLevel": 45,
         "skyboxShader": "world",
         "lightSystem": IB.LightSystemEnum.DAYANDNIGHT,
-        "music": ["music/IRONBANE 2", "music/IRONBANE 4", "music/IRONBANE 5"]
+        "music": ["music/ironbane2", "music/ironbane4", "music/ironbane5"]
     };
 
     IB.zoneTypeConfig[IB.ZoneTypeEnum.DUNGEON] = {
