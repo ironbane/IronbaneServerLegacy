@@ -144,7 +144,11 @@ angular.module('User') // separate module for sharing with website
             s8HO5oYe: email,
             url: 'shibby'
         }).then(function(response) {
-            return new User(response.data);
+            // automatically sign them in
+            return User.getCurrentUser().then(function(user) {
+                $rootScope.currentUser = user;
+                return user;
+            });
         }, function(response) {
             return $q.reject(response.data);
         });

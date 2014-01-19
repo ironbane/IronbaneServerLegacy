@@ -24,6 +24,11 @@ module.exports = function(db) {
     var Post = Class.extend({
         init: function(json) {
             _.extend(this, json || {});
+
+            // replies dont get titles
+            if(!this.title) {
+                this.title = '';
+            }
         }
     });
 
@@ -31,7 +36,7 @@ module.exports = function(db) {
         var deferred = Q.defer(),
             post = this;
             post.time = parseInt((new Date()).valueOf() / 1000,10); // convert to mysql unix_timestamp
-                    
+
 
         if(post.id) {
             // update post
