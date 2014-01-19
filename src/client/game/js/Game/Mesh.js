@@ -187,8 +187,6 @@ var Mesh = Unit.extend({
 
   },
   UpdateLighting: function() {
-      console.log("update lighting for " );
-      console.log(this);
       var cell = terrainHandler.GetCellByWorldPosition(this.position);
 
       setTimeout(function() {

@@ -20,7 +20,7 @@ IronbaneApp
                     scope.$watch('posts', function() {
                         // give it a millisecond to render...
                         $timeout(function() {
-                            $log.log('news scroller init');
+                            // $log.log('news scroller init');
                             scroller.reinitialise();
                         });
                     }, true);

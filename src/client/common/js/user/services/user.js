@@ -82,7 +82,7 @@ angular.module('User') // separate module for sharing with website
             .then(function(response) {
                 return response;
             }, function(err) {
-                $log.error('error retreiving user', err);
+                $log.error('error retrieving user', err);
 
                 return $q.reject('error retreiving user', err);
             });
@@ -94,7 +94,7 @@ angular.module('User') // separate module for sharing with website
 
         return $http.get('/api/session/user')
             .then(function(response) {
-                $log.log('get user success', response);
+                // $log.log('get user success', response);
 
                 var user = new User(response.data);
                 user.authenticated = true; // todo: move to server?

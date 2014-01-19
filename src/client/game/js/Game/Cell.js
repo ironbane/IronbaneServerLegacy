@@ -27,7 +27,7 @@ var Cell = Class.extend({
 
         this.cellX = cellX;
         this.cellZ = cellZ;
-        console.log("making: " + cellX + "," + cellZ);
+        // console.log("making: " + cellX + "," + cellZ);
 
         var tempVec = CellToWorldCoordinates(this.cellX, this.cellZ, cellSize);
         this.worldPosition = new THREE.Vector3(tempVec.x, 0, tempVec.z);
@@ -88,7 +88,7 @@ var Cell = Class.extend({
           }).always(function(){
            me.filesToLoad--;
            me.FinishLoad();
-       
+
         });
 
 
@@ -103,7 +103,7 @@ var Cell = Class.extend({
             console.warn('No graph found: '+graphFile);
             }).always(function(){
             me.filesToLoad--;
-             me.FinishLoad();         
+             me.FinishLoad();
           });
         }
 
