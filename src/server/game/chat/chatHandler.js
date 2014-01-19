@@ -176,14 +176,9 @@ module.exports = function(units, worldHandler) {
                 unit.Say(message);
             }
 
-	    var unitRank = unit.editor ? 'gm' : 'user';
-	    if (unit.chDevNinja === true) unitRank = 'user';
             var messageData = {
                 type: messageType,
-                user: {
-                    name: unit.name,
-                    rank: unitRank
-                },
+                user: unit.getNameAndRank(),
                 message: message
             };
 
@@ -245,10 +240,7 @@ module.exports = function(units, worldHandler) {
 
             var messageData = {
                 type: status,
-                user: {
-                    name: unit.name,
-					rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
-                }
+                user: unit.getNameAndRank()
             };
 
             this.io.sockets.emit("chatMessage", messageData);
@@ -260,14 +252,8 @@ module.exports = function(units, worldHandler) {
 
             var messageData = {
                 type: 'died',
-                killer: {
-                    name: killerName,
-                    rank: killer.id > 0 ? (killer.editor ? 'gm' : 'user') : 'npc'
-                },
-                victim: {
-                    name: unit.name,
-                    rank: unit.editor ? 'gm' : 'user'
-                }
+                killer: killer.getNameAndRank(),
+                victim: unit.getNameAndRank()
             };
 
             this.io.sockets.emit("chatMessage", messageData);
@@ -278,10 +264,7 @@ module.exports = function(units, worldHandler) {
             var messageData = {
                 type: 'diedspecial',
                 cause: cause,
-                victim: {
-                    name: unit.name,
-                    rank: unit.editor ? 'gm' : 'user'
-                }
+                victim: unit.getNameAndRank()
             };
 
             this.io.sockets.emit("chatMessage", messageData);
