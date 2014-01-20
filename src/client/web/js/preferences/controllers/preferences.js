@@ -1,7 +1,7 @@
 // preferences.js
 angular.module('IronbaneApp')
-    .controller('PreferencesCtrl', ['User', '$scope', '$http', '$log', '$rootScope',
-        function(User, $scope, $http, $log, $rootScope) {
+    .controller('PreferencesCtrl', ['User', '$scope', '$http', '$log', '$rootScope', '$anchorScroll',
+        function(User, $scope, $http, $log, $rootScope, $anchorScroll) {
             $scope.user = angular.copy($rootScope.currentUser);
             $scope.genderOptions = [{
                 gender: "male"
@@ -11,14 +11,18 @@ angular.module('IronbaneApp')
 
             $scope.togglePW = false;
             $scope.saveError = false;
+            $scope.saveSuccess = false;
 
             $scope.save = function() {
                 $log.debug("save user: ", $scope.user);
+                $scope.saveError = false;
+                $scope.saveSuccess = false;
 
                 if($scope.user.password_new) {
                     if(!$scope.user.password_old) {
                         $scope.saveError = true;
                         $scope.saveErrorMsg = "You must enter your old password to set a new one.";
+                        $anchorScroll();
                         return;
                     }
                 }
@@ -29,12 +33,9 @@ angular.module('IronbaneApp')
                             .then(function(user) {
                                 angular.copy(user, $rootScope.currentUser);
                             });
-                        $scope.message = "Update succesful!";
-                        setTimeout(function() {
-                            $("body").animate({
-                                scrollTop: 0
-                            }, "slow");
-                        }, 1);
+                        $scope.saveSuccess = true;
+                        $scope.saveSuccessMsg = "Update succesful!";
+                        $anchorScroll();
                     })
                     .error(function(response) {
                         $log.warn('update error', response);
