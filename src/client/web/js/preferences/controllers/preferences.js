@@ -1,7 +1,7 @@
-// board.js
+// preferences.js
 angular.module('IronbaneApp')
-    .controller('PreferencesCtrl', ['User', '$scope', '$location', '$http', '$log', '$rootScope',
-        function(User, $scope, $location, $http, $log, $rootScope) {
+    .controller('PreferencesCtrl', ['User', '$scope', '$http', '$log', '$rootScope',
+        function(User, $scope, $http, $log, $rootScope) {
             $scope.user = angular.copy($rootScope.currentUser);
             $scope.genderOptions = [{
                 gender: "male"
@@ -9,7 +9,20 @@ angular.module('IronbaneApp')
                 gender: "female"
             }];
 
+            $scope.togglePW = false;
+            $scope.saveError = false;
+
             $scope.save = function() {
+                $log.debug("save user: ", $scope.user);
+
+                if($scope.user.password_new) {
+                    if(!$scope.user.password_old) {
+                        $scope.saveError = true;
+                        $scope.saveErrorMsg = "You must enter your old password to set a new one.";
+                        return;
+                    }
+                }
+
                 $http.post('/api/user/preferences', $scope.user)
                     .success(function(response) {
                         User.getCurrentUser()

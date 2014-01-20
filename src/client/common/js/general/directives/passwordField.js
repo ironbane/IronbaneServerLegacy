@@ -24,7 +24,7 @@ angular.module('IBCommon')
         return {
             require: 'ngModel',
             restrict: 'EA',
-            template: '<div><input type="text" /><input type="password" /></div>',
+            template: '<div><input class="form-control" type="text" /><input class="form-control" type="password" /></div>',
             replace: true,
             compile: function(tElement, tAttrs) {
                 // forward some directives to inner inputs
@@ -34,6 +34,7 @@ angular.module('IBCommon')
                     }
                     if (tAttrs.ngClass) {
                         $(input).attr('ng-class', tAttrs.ngClass);
+                        tElement.removeAttr('ng-class');
                     }
                     // pass placeholder along
                     if(tAttrs.placeholder) {

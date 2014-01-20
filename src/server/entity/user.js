@@ -35,6 +35,7 @@ module.exports = function(db) {
             var crypto = require('crypto'),
                 pHash = crypto.createHash('md5'),
                 cryptSalt = config.get('cryptSalt');
+
             this.email = parameters.email;
             this.info_realname = parameters.info_realname;
             this.info_country = parameters.info_country;
@@ -51,9 +52,10 @@ module.exports = function(db) {
             this.info_gender = parameters.info_gender;
 
 
-            pHash.update(cryptSalt + parameters.passwordnewconfirm);
-            this.pass = pHash.digest('hex');
-
+            if(parameters.password_new) {
+                pHash.update(cryptSalt + parameters.password_new);
+                this.pass = pHash.digest('hex');
+            }
         },
 
         $save: function() {
@@ -69,7 +71,7 @@ module.exports = function(db) {
                 // then this is an update
                 // TODO: perform update (currently update done on php site)
                 delete self.roles;
-                db.query("UPDATE bcs_users set ? where id = ?", [self,self.id], function(err, result){
+                db.query("UPDATE bcs_users set ? where id = ?", [self, self.id], function(err, result){
                     if(err){
                         log(err);
                         log(JSON.stringify(self));
