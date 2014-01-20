@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-md-10">
                     <article class="postcontent">
-                        <p ng-bind-html="post.content | unsafe"></p>
+                        <p ng-bind-html="post.mContent | unsafe"></p>
                         <hr ng-show="post.user.sig">
                         <span ng-show="post.user.sig" class="signature">
                             {{post.user.sig}}
