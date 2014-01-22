@@ -3,6 +3,8 @@ angular.module('IronbaneApp')
     .controller('PreferencesCtrl', ['User', '$scope', '$http', '$log', '$rootScope', '$anchorScroll',
         function(User, $scope, $http, $log, $rootScope, $anchorScroll) {
             $scope.user = angular.copy($rootScope.currentUser);
+            $rootScope.currentUser.info_gender === 0 ? $scope.user.info_gender = 'male' : $scope.user.info_gender = 'female';
+            $log.log($scope.user);
             $scope.genderOptions = [{
                 gender: "male"
             }, {

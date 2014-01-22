@@ -139,6 +139,7 @@ module.exports = function(app, db) {
     app.post('/api/user/preferences', app.ensureAuthenticated, function(req, res) {
         var updateUser = function() {
             //update the server user instance with the parameters in the req.body
+            req.body.info_gender === 'male' ? req.body.info_gender = 0 : req.body.info_gender = 1;
             req.user.$update(req.body);
             //save it. 2 options:
             // 1) save is ok, server user instance is updated and returned to client
