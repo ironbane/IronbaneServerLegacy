@@ -120,20 +120,14 @@ var SocketHandler = Class.extend({
             // announce the others already online
             req.io.emit('chatMessage', {
                 type: 'welcome',
-                user: {
-                    id: unit.id,
-                    name: unit.name,
-					rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
-                },
+                user: unit.getNameAndRank(),
                 online: socketHandler.onlinePlayers
             });
 
             // add us to the online player list
-            socketHandler.onlinePlayers.push({
-                id: unit.id,
-                name: unit.name,
-                rank: unit.isGuest ? 'guest' : (unit.editor ? 'gm' : 'user')
-            });
+            socketHandler.onlinePlayers.push(
+                unit.getNameAndRank()
+            );
         }
 
         // and another temp method...
