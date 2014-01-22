@@ -26,6 +26,7 @@ nconf.defaults({
 
     cryptSalt: '',
     isProduction: false,
+    log_level: 5, // for production use 0
     use_nodetime: false,
     nodetime: {
         accountKey: '1234FOO',

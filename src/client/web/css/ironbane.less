@@ -34,6 +34,36 @@ body {
     }
 }
 
+.social {
+    a {
+        background-size: 32px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        border-radius: 19px;
+        background-clip: padding-box;
+        background-color: rgba(4, 48, 59, 1);
+        box-shadow: inset 0 0 2px #1b1c1e;
+        display: block;
+        width: 39px;
+        height: 39px;
+        -webkit-transition: all .4s;
+        -moz-transition: all .4s;
+        -o-transition: all .4s;
+        transition: all .4s;
+        float: left;
+        margin: 4px;
+        &:hover {
+            background-color: #000;
+        }
+        &.twitter {
+            background-image: url('../images/twitter.png');
+        }
+        &.github {
+            background-image: url('../images/github.png');
+        }
+    }
+}
+
 .big-logo-wrapper {
 
     background-image: url('../images/logo_isolated.png');

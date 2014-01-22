@@ -113,6 +113,7 @@ module.exports = function(db) {
 
     Topic.getPostsView = function(topicId, mintime) {
         var deferred = Q.defer(),
+            marked = require('marked'),
             minimumtime = parseInt(mintime,10) || 0,
             gravatar = require('nodejs-gravatar');
 
@@ -135,6 +136,7 @@ module.exports = function(db) {
                 bbcode.parse(p.content, function(html) {
                     p.content = html;
                 });
+                p.mContent = marked(p.content);
                 p.user = {name: p.name, sig:p.forum_sig, postcount: p.postcount};
                 if(p.character_avatar !== 0) {
                     // get character based avatar

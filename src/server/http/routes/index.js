@@ -12,12 +12,12 @@ module.exports = function(app, db) {
     require('./books')(app, db);
     require('./forum')(app, db);
     require('./articles')(app, db);
-    require('./items')(app,db);
+    require('./items')(app, db);
     require('./units')(app, db);
-    require('./messages')(app,db);
+    require('./messages')(app, db);
     require('./discussions')(app, db);
 
-    if(config.get('github').enabled) {
+    if (config.get('github').enabled) {
         require('./github')(app);
     }
 
@@ -61,16 +61,22 @@ module.exports = function(app, db) {
             });
 
             return zones;
-        }, function(err) { return Q.reject(err); }));
+        }, function(err) {
+            return Q.reject(err);
+        }));
 
-        tasks.push(UnitTemplate.get({$fields: ['id', 'name', 'type', 'health', 'armor', 'param', 'size', 'special', 'weaponoffsetmultiplier', 'friendly']}).then(function(templates) {
+        tasks.push(UnitTemplate.get({
+            $fields: ['id', 'name', 'type', 'health', 'armor', 'param', 'size', 'special', 'weaponoffsetmultiplier', 'friendly']
+        }).then(function(templates) {
             _.each(templates, function(t) {
                 gameModel.units[t.id] = t;
                 gameModel.unitTemplates[t.name] = t.id;
             });
 
             return templates;
-        }, function(err) { return Q.reject(err); }));
+        }, function(err) {
+            return Q.reject(err);
+        }));
 
         tasks.push(ItemTemplateService.getAll().then(function(templates) {
             // front end is expecting a map
@@ -80,21 +86,29 @@ module.exports = function(app, db) {
             });
 
             return templates;
-        }, function(err) { return Q.reject(err); }));
+        }, function(err) {
+            return Q.reject(err);
+        }));
 
-        tasks.push(Mesh.get({$orderBy: ['category', 'name']}).then(function(meshes) {
+        tasks.push(Mesh.get({
+            $orderBy: ['category', 'name']
+        }).then(function(meshes) {
             _.each(meshes, function(mesh) {
                 gameModel.preMeshes[mesh.id] = mesh;
                 gameModel.modelEnum[mesh.category + ': ' + mesh.name] = mesh.id;
             });
 
             return meshes;
-        }, function(err) { return Q.reject(err); }));
+        }, function(err) {
+            return Q.reject(err);
+        }));
 
         tasks.push(Q.nfcall(fs.readFile, 'src/client/game/shaders.html', 'utf-8').then(function(contents) {
             gameModel.shaderFile = contents;
             return contents;
-        }, function(err) { return Q.reject('error loading sharder file', err); }));
+        }, function(err) {
+            return Q.reject('error loading sharder file', err);
+        }));
 
         return Q.all(tasks);
     };
@@ -131,31 +145,32 @@ module.exports = function(app, db) {
     };
 
     var websiteCallback = function(req, res) {
-       log('requesting web template: ' + req.path);
+        log('requesting web template: ' + req.path);
         res.render('web' + req.path);
     };
 
     app.get('/game*', gameCallBack);
-   // app.get('/game/*', gameCallBack);
+    // app.get('/game/*', gameCallBack);
 
     // templates for website
     app.get('/views/*', websiteCallback);
     app.get('/partials/*', websiteCallback);
 
-
-
-
     // catchall - no 404 as angular will handle
     app.use(function(req, res) {
         var path = require('path');
         // if we are requesting a specific resource it is likely an image or something, don't do angular
-        if(path.extname(req.path) !== '') {
+        if (path.extname(req.path) !== '') {
             res.send(404);
             return;
         }
 
         // todo: use config for subfolder
         log('no server route (web index redirect): ' + req.path);
+
+        res.locals = {
+            log_level: config.get('log_level')
+        };
         res.render('web/index');
     });
 };

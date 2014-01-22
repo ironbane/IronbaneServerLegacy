@@ -38,6 +38,7 @@ module.exports = function(grunt) {
                 src: [
                     // common modules must be loaded before app.js as they are dependencies
                     "src/client/common/js/general/module.js",
+                    "src/client/common/js/general/log.js",
                     "src/client/common/js/general/directives/passwordField.js",
                     "src/client/common/js/general/directives/checkboxCustom.js",
                     "src/client/common/js/general/filters/unsafe.js",
