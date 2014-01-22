@@ -10,7 +10,7 @@ var Article = function(json) {
     Article.getFrontPage = function(){
         return $http.get('/api/frontpage')
              .then(function(response){
-                var posts = []
+                var posts = [];
                angular.forEach(response.data, function(post){
                     posts.push(new Post(post));
                 });

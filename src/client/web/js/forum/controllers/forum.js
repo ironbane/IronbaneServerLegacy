@@ -2,15 +2,15 @@
 angular.module('IronbaneApp')
 .controller('ForumCtrl', ['$scope', 'Forum','$log', function($scope, Forum,$log) {
     Forum.getAllWithBoards().then(function(forum) { 
-	    $scope.cats = forum;
-	}, function(error) {
-		 $log.log(error);
-		});
-    	
+        $scope.cats = forum;
+    }, function(error) {
+         $log.log(error);
+        });
+        
     Forum.getLatestOnlineUsers().then(function(users){
-    	$scope.users = users;
+        $scope.users = users;
     }, function(error) { 
-    	$log.log(error);
+        $log.log(error);
     });
 
     Forum.getStatistics().then(function(statistics) {

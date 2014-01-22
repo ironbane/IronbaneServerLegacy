@@ -33,12 +33,12 @@ angular.module('IronbaneApp')
 
       $scope.selectPrevious = function() {
         if ( !$scope.noPrevious() ) {
-          $scope.currentPage-=1
+          $scope.currentPage-=1;
         }
       };
       $scope.selectNext = function() {
         if ( !$scope.noNext() ) {
-          $scope.currentPage+=1
+          $scope.currentPage+=1;
         }
       };
     }]
