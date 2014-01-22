@@ -119,7 +119,7 @@ module.exports = function(app, db) {
     app.get('/api/profile/:username', function(req, res) {
         User.getUserByNameView(req.params.username).then(function(user) {
             res.send(user);
-        }, function(error){
+        }, function(error) {
             log("oops");
             res.send(error, 500);
         });
@@ -136,22 +136,32 @@ module.exports = function(app, db) {
             });
     });
 
-    //currently still stubbed
     app.post('/api/user/preferences', app.ensureAuthenticated, function(req, res) {
+        var updateUser = function() {
+            //update the server user instance with the parameters in the req.body
+            req.user.$update(req.body);
+            //save it. 2 options:
+            // 1) save is ok, server user instance is updated and returned to client
+            // 2) save is not ok, server user instance is rolled back and returned to the client
 
-        //update the server user instance with the parameters in the req.body
-        req.user.$update(req.body);
-        //save it. 2 options:
-        // 1) save is ok, server user instance is updated and returned to client
-        // 2) save is not ok, server user instance is rolled back and returned to the client
+            req.user.$save()
+                .then(function(user) {
+                    res.send(user);
+                }, function(err){
+                    res.send(500, err);
+                });
+        };
 
-        req.user.$save()
-            .then(function(user){
-                res.send(user);
-            }, function(err){
-                res.send(500, err);
-            });
-
+        if(req.body.password_old && req.body.password_new) {
+            User.updatePassword(req.user.id, req.body.password_old, req.body.password_new)
+                .then(function() {
+                    updateUser();
+                }, function(err) {
+                    res.send(500, err);
+                });
+        } else {
+            updateUser();
+        }
     });
 
     app.post('/api/user/:id', function(req, res) {

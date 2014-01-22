@@ -1,7 +1,7 @@
 <div class="row">
      <div class="col-md-12 box">
         <div class="alert alert-success" ng-show="saveSuccess">{{ saveSuccessMsg }}</div>
-        <div class="alert alert-danger" ng-show="saveError">{{ saveErrorMsg }}</div>
+        <div class="alert alert-danger" ng-show="saveError"><strong>Update failed!</strong> {{ saveErrorMsg }}</div>
 
         <form class="form-horizontal" role="form">
 
@@ -19,7 +19,7 @@
           <div class="form-group">
             <label for="newPassword" class="col-sm-4 control-label">New password</label>
             <div class="col-sm-8">
-                <password-field id="newPassword" name="newPassword" toggle="togglePW" ng-model="user.password_new" placeholder="password"></password-field>
+                <password-field id="newPassword" name="newPassword" toggle="togglePW" ng-model="user.password_new"></password-field>
                 <div class="checkbox">
                     <input type="checkbox" id="hidePassToggle" name="hidePassToggle" ng-model="togglePW" ng-checked="togglePW" />hide password
                 </div>

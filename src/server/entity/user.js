@@ -30,6 +30,7 @@ module.exports = function(db) {
 
         },
 
+        // NOTE: password should never be updated in here, see updatePassword
         $update: function(parameters) {
             //validate
             var crypto = require('crypto'),
@@ -50,12 +51,6 @@ module.exports = function(db) {
             this.character_avatar = parameters.character_avatar || 0;
             this.forum_sig = parameters.forum_sig;
             this.info_gender = parameters.info_gender;
-
-
-            if(parameters.password_new) {
-                pHash.update(cryptSalt + parameters.password_new);
-                this.pass = pHash.digest('hex');
-            }
         },
 
         $save: function() {
@@ -71,6 +66,8 @@ module.exports = function(db) {
                 // then this is an update
                 // TODO: perform update (currently update done on php site)
                 delete self.roles;
+                delete self.pass;
+
                 db.query("UPDATE bcs_users set ? where id = ?", [self, self.id], function(err, result){
                     if(err){
                         log(err);
@@ -300,6 +297,39 @@ module.exports = function(db) {
                 // add in security roles
                 user.$initRoles();
                 deferred.resolve(user);
+            }
+        });
+
+        return deferred.promise;
+    };
+
+    User.updatePassword = function(userId, oldPassword, newPassword) {
+        var deferred = Q.defer(),
+            crypto = require('crypto'),
+            shasum = crypto.createHash('md5'),
+            cryptSalt = config.get('cryptSalt');
+
+        shasum.update(cryptSalt + oldPassword);
+        var hashedPw = shasum.digest('hex');
+
+        db.query('select pass from bcs_users where id = ?', [userId], function(err, results) {
+            if (err) {
+                return deferred.reject(err);
+            }
+
+            if (hashedPw !== results[0].pass) {
+                deferred.reject("Invalid password.");
+            } else {
+                var newsum = crypto.createHash('md5');
+                newsum.update(cryptSalt + newPassword);
+                var npHash = newsum.digest('hex');
+                db.query('update bcs_users set pass = ? WHERE id = ?', [npHash, userId], function(err, result) {
+                    if(err) {
+                        return deferred.reject(err);
+                    }
+
+                    deferred.resolve("Password successfully updated.");
+                });
             }
         });
 

@@ -35,10 +35,18 @@ angular.module('IronbaneApp')
                             });
                         $scope.saveSuccess = true;
                         $scope.saveSuccessMsg = "Update succesful!";
+
+                        // clear values for further submissions
+                        delete $scope.user.password_old;
+                        delete $scope.user.password_new;
+
                         $anchorScroll();
                     })
                     .error(function(response) {
                         $log.warn('update error', response);
+                        $scope.saveError = true;
+                        $scope.saveErrorMsg = response;
+                        $anchorScroll();
                     });
             };
         }
