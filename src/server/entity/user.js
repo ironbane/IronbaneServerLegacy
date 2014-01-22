@@ -358,7 +358,7 @@ module.exports = function(db) {
                     deferred.reject(err);
                     return;
                 }
-                user.totalpost = totalpostcount[0].totalpost;
+                user.totalposts = totalpostcount[0].totalpost;
                 if(user.show_email===0){
                     delete user.email;
                     delete user.show_email;
