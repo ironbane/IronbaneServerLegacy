@@ -66,5 +66,9 @@
 
     <!-- todo: get this from grunt replace -->
     <script src="js/@@appName-@@appVersion.js"></script>
+    <script>
+        angular.module('IronbaneApp')
+            .value('LOG_LEVEL', <%& log_level %>);
+    </script>
 </body>
 </html>
