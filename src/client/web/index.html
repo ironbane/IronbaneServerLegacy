@@ -19,26 +19,30 @@
 
 
     <header class="navbar navbar-inverse navbar-fixed-top" style="padding-left:60px;">
-     <nav>
-        <div class="navbar-header" style="padding-top: 8px; padding-right: 20px;">
-            <div class="small-logo-wrapper">
-                <a href="/"><img class="small-logo" src="images/mascot_small.png"></a>
+         <nav>
+            <div class="navbar-header" style="padding-top: 8px; padding-right: 20px;">
+                <div class="small-logo-wrapper">
+                    <a href="/"><img class="small-logo" src="images/mascot_small.png"></a>
+                </div>
             </div>
+            <ul class="nav navbar-nav">
+                <li><a href="/?scrollTo=news">News</a></li>
+                <li><a href="/forum">Forum</a></li>
+                <li><a href="/game" target="_self">Play!</a></li>
+                <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
+    <!--             <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
+                <li><a href="/article/faq">FAQ</a></li> -->
+                <li>
+                    <a href="/login" ng-hide="currentUser.authenticated">Log In</a>
+                    <a href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a>
+                </li>
+    <!--             <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li> -->
+            </ul>
+        </nav>
+        <div class="social pull-right">
+            <a class="twitter" href="https://twitter.com/IronbaneMMO" target="_blank"></a>
+            <a class="github" href="https://github.com/ironbane" target="_blank"></a>
         </div>
-        <ul class="nav navbar-nav">
-            <li><a href="/?scrollTo=news">News</a></li>
-            <li><a href="/forum">Forum</a></li>
-            <li><a href="/game" target="_self">Play!</a></li>
-            <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
-<!--             <li><a href="/messages" ng-show="currentUser.authenticated">Messages</a></li>
-            <li><a href="/article/faq">FAQ</a></li> -->
-            <li>
-                <a href="/login" ng-hide="currentUser.authenticated">Log In</a>
-                <a href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a>
-            </li>
-<!--             <li ng-show="currentUser.$hasRole('EDITOR')"><a href="/editor">Editor</a></li> -->
-        </ul>
-    </nav>
     </header>
 
     <div class="container">
