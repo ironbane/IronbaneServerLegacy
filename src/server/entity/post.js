@@ -18,17 +18,12 @@ var Class = require('../../common/class');
 
 module.exports = function(db) {
     var Q = require('q'),
-    log = require('util').log,
+        log = require('util').log,
         _ = require('underscore');
 
     var Post = Class.extend({
         init: function(json) {
             _.extend(this, json || {});
-
-            // replies dont get titles
-            if(!this.title) {
-                this.title = '';
-            }
         }
     });
 
@@ -41,13 +36,12 @@ module.exports = function(db) {
         if(post.id) {
             // update post
             var uObj = {
-                title: post.title,
                 content: post.content,
                 lastedit_time: post.lastedit_time,
                 lastedit_author: post.lastedit_author
             };
 
-            db.query('update forum_posts set title=?, content=?, lastedit_time=?, lastedit_count=lastedit_count+1, lastedit_author=? WHERE id=' + post.id, uObj, function(err, result) {
+            db.query('update forum_posts set content=?, lastedit_time=?, lastedit_count=lastedit_count+1, lastedit_author=? WHERE id=' + post.id, uObj, function(err, result) {
                 if(err) {
                     deferred.reject('error updating post: ' + err.code);
                     return;
