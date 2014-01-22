@@ -2,12 +2,9 @@
 angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
 .constant('DEFAULT_AVATAR', '/images/noavatar.png')
 .run(['User','$rootScope', '$log', '$location', function(User, $rootScope, $log, $location) {
-    $rootScope.currentUser = {};
 
-    User.getCurrentUser()
-        .then(function(user) {
-            angular.copy(user, $rootScope.currentUser);
-        });
+    // load it up for rootscope
+    User.getCurrentUser();
 
     $rootScope.logout = function() {
         User.logout().then(function() {
@@ -18,7 +15,7 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
     };
 
     $rootScope.$on("$routeChangeError", function(event, current, previous, rejection) {
-        //$log.debug('routeChangeError: ', arguments);
+        $log.debug('routeChangeError: ', arguments);
 
         if(previous && previous.path) {
             $location.path(previous.path);
@@ -27,17 +24,18 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
         }
     });
 }])
-.service('RouteSecurity', ['User', '$rootScope', '$q', '$log', function(User, $rootScope, $q, $log) {
+.service('RouteSecurity', ['User', '$q', '$log', function(User, $q, $log) {
     this.secureEditor = function() {
-        var deferred = $q.defer(),
-            user = $rootScope.currentUser;
+        var deferred = $q.defer();
 
-        //$log.debug('secured route attempt: ', user);
-        if(!user.authenticated || !user.$hasRole('EDITOR')) {
-            deferred.reject('not allowed');
-        } else {
-            deferred.resolve('proceed');
-        }
+        User.getCurrentUser().then(function(user) {
+            $log.debug('secured route attempt: ', user);
+            if(!user.authenticated || !user.$hasRole('EDITOR')) {
+                deferred.reject('not allowed');
+            } else {
+                deferred.resolve('proceed');
+            }
+        });
 
         return deferred.promise;
     };
@@ -176,6 +174,9 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
             resolve: {
                 authorized: ['RouteSecurity', function(RouteSecurity) {
                     return RouteSecurity.secureEditor();
+                }],
+                articles: ['Article', function(Article) {
+                    return Article.getAll();
                 }]
             }
         })
