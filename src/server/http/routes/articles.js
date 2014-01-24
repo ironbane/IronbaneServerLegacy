@@ -6,7 +6,9 @@ module.exports = function(app, db) {
 
     // get a list of articles, minus content
     app.get('/api/article', app.ensureAuthenticated, app.authorize('EDITOR'), function(req, res) {
-        Article.get({$fields: ['articleId', 'title', 'author', 'created', 'views']}).then(function(articles) {
+        Article.get({
+            $fields: ['articleId', 'title', 'author', 'created', 'views']
+        }).then(function(articles) {
             res.send(articles);
         }, function(err) {
             res.send(500, err);
@@ -23,22 +25,25 @@ module.exports = function(app, db) {
         });
     });
 
-    app.post('/api/article/:articleId', function(req, res){
-        Article.get(req.params.articleId).then(function(article){
-            console.log("retrieved article");
-            console.log(req.body);
-            article.update({title: req.body.title, body: req.body.body, articleId: req.body.articleId}).then(function(updatedarticle){
-                console.log("updated article");
-
-                res.send(updatedarticle);
-            }, function(error){
-                console.log(error);
-                res.send(500, error);
+    app.post('/api/article/:articleId', app.ensureAuthenticated, app.authorizeAny(['ADMIN', 'EDITOR']), function(req, res) {
+        Article.get(req.params.articleId)
+            .then(function(article) {
+                console.log("article get: ", article.articleId);
+                article.update({
+                    title: req.body.title,
+                    body: req.body.body,
+                    articleId: req.params.articleId
+                }).then(function(updatedarticle) {
+                    console.log("article update: ", updatedarticle.articleId);
+                    res.send(updatedarticle);
+                }, function(error) {
+                    console.log("article update fail: ", err);
+                    res.send(500, error);
+                });
+            }, function(err) {
+                console.log("article get fail: ", err);
+                res.send(500, err);
             });
-    }, function(err) {
-        console.log(err);
-        res.send(500, err);
-    });
     });
 
     // get specific article (public view)
@@ -46,7 +51,7 @@ module.exports = function(app, db) {
         Article.get(req.params.articleId).then(function(article) {
             res.send(article);
         }, function(err) {
-            if(err.code === 404) {
+            if (err.code === 404) {
                 res.send(err.code, err.msg);
             } else {
                 // unknown server error
