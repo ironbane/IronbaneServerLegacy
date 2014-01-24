@@ -1,8 +1,10 @@
-<div class="content-body editor">
-    <div class="article-wrap">
-<a href="/editor/users">back to userlist </a>    
-    <h2>{{ user.name }}</h2>
-    <form name="articleForm">
+<div class="col-md-12 box content-body editor">
+    <a ng-href="/editor/users"><h2>Back to User List</h2></a>
+
+    <div class="alert alert-success" ng-show="message">{{ message }}</div>
+
+    <h3>{{ user.name }}</h3>
+    <form name="userEditForm">
         <input id = "chkBan" type="checkbox" ng-model="user.banned" ng-checked="user.banned"/>
         <label for = "chkBan">Banned</label>
         <input id = "chkAdmin" type="checkbox" ng-model="user.admin" ng-checked="user.admin"/>
@@ -12,10 +14,6 @@
         <input id = "chkEdit" type="checkbox" ng-model="user.editor" ng-checked="user.editor"/>
         <label for = "chkEdit">Editor</label>
         <button ng-click="updateUser()">Update</button>
-      
-        
     </form>
     <button ng-click="resetPassword()">reset password</button>
-    {{message}}
-</div>
 </div>

@@ -1,9 +1,9 @@
-<div>
+<div class="col-md-12 box">
     <h2>{{ article.title }}</h2>
     <form name="articleForm">
         <input type="text" name="title" ng-model="article.title" required />
         <input type="text" name="articleId" ng-model="article.articleId" required />
-        <mark-it-up lang="markdown" ng-model="article.body"></mark-it-up>
+        <textarea ng-model="article.body"></textarea>
         <button ng-click="save()">Save</button>
     </form>
 </div>
