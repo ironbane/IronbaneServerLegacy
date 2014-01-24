@@ -91,30 +91,38 @@ angular.module('User') // separate module for sharing with website
 
     // get currently signed in user if exists or guest account
     User.getCurrentUser = function() {
+        if ($rootScope.currentUser) {
+            return $q.when($rootScope.currentUser);
+        } else {
+            return $http.get('/api/session/user')
+                .then(function(response) {
+                    $log.debug('get user success', response);
 
-        return $http.get('/api/session/user')
-            .then(function(response) {
-                // $log.log('get user success', response);
-
-                var user = new User(response.data);
-                user.authenticated = true; // todo: move to server?
-                return user;
-            }, function(err) {
-                if(err.status === 404) {
-                    // this just means not logged in
-                    var user = new User({
-                        id: 0,
-                        username: 'guest',
-                        authenticated: false
-                    });
-
+                    var user = new User(response.data);
+                    user.authenticated = true; // todo: move to server?
                     return user;
-                } else {
-                    //$log.error('error retreiving user session', err);
-                    $q.reject(err);
-                }
-            });
+                }, function(err) {
+                    if (err.status === 404) {
+                        // this just means not logged in
+                        var user = new User({
+                            id: 0,
+                            username: 'guest',
+                            authenticated: false
+                        });
 
+                        return user;
+                    } else {
+                        $log.error('error retreiving user session', err);
+                        return $q.reject(err);
+                    }
+                })
+                .then(function(user) {
+                    $rootScope.currentUser = user;
+                    return user;
+                }, function(err) {
+                    return $q.reject(err);
+                });
+        }
     };
 
     // criteria for valid username

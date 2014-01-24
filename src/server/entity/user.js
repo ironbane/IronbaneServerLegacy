@@ -340,7 +340,7 @@ module.exports = function(db) {
         var deferred = Q.defer(),
             gravatar = require('nodejs-gravatar');
 
-        db.query("select id, name, reg_date, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, show_email, email, gravatar_email, character_avatar from bcs_users where bcs_users.name = ?", [username], function(err, userview) {
+        db.query("select id, name, reg_date, info_website, info_interests, info_occupation, info_birthday, info_location, info_country, info_realname, info_gender, show_email, email, gravatar_email, character_avatar from bcs_users where bcs_users.name = ?", [username], function(err, userview) {
             if (err) {
                 deferred.reject(err);
                 return;
@@ -358,7 +358,7 @@ module.exports = function(db) {
                     deferred.reject(err);
                     return;
                 }
-                user.totalpost = totalpostcount[0].totalpost;
+                user.totalposts = totalpostcount[0].totalpost;
                 if(user.show_email===0){
                     delete user.email;
                     delete user.show_email;

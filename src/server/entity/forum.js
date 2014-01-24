@@ -19,9 +19,19 @@ var Class = require('../../common/class');
 module.exports = function(db) {
     var Q = require('q'),
         _ = require('underscore'),
-        
-        bbcode = require('bbcode'),
+        marked = require('marked'),
         log = require('util').log;
+
+    marked.setOptions({
+        renderer: new marked.Renderer(),
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: true,
+        smartLists: true,
+        smartypants: false
+    });
 
     var Forum = Class.extend({
         init: function(json) {
@@ -33,11 +43,11 @@ module.exports = function(db) {
         var deferred = Q.defer();
         var postQ = ' (select count(id) from forum_posts) as totalposts,',
             userQ = ' (select count(id) from bcs_users) as totalusers,';
-           
-        db.query('SELECT ' +postQ + userQ + 'name as lastregistered from bcs_users  ORDER BY reg_date DESC LIMIT 1', function(err, results) {
-            if(err){
+
+        db.query('SELECT ' + postQ + userQ + 'name as lastregistered from bcs_users  ORDER BY reg_date DESC LIMIT 1', function(err, results) {
+            if (err) {
                 return deferred.reject(err);
-                
+
             }
             deferred.resolve(results[0]);
         });
@@ -45,27 +55,23 @@ module.exports = function(db) {
     };
 
     Forum.getFrontPage = function() {
-
         var deferred = Q.defer();
-            db.query('SELECT topic.id, topic.title, post.content, users.name as username FROM forum_topics AS topic INNER JOIN forum_posts AS post ON post.`topic_id` = topic.`id` INNER JOIN bcs_users AS users ON users.id = post.user WHERE topic.board_id = 7 AND post.time = (SELECT MIN(forum_posts.time) FROM forum_posts WHERE forum_posts.`topic_id` = topic.id ) ORDER BY post.time DESC', function(err, results) {
-                if(err) {
-                    log('SQL error getting news: ' + err);
-                    return deferred.reject('Error getting news posts!');
-                    
-                }
-                _.each(results, function(p) {
-                bbcode.parse(p.content, function(html) {
-                    p.content = html;
-                });
-                deferred.resolve(results);
+
+        db.query('SELECT topic.id, topic.title, post.content, users.name as username FROM forum_topics AS topic INNER JOIN forum_posts AS post ON post.`topic_id` = topic.`id` INNER JOIN bcs_users AS users ON users.id = post.user WHERE topic.board_id = 7 AND post.time = (SELECT MIN(forum_posts.time) FROM forum_posts WHERE forum_posts.`topic_id` = topic.id ) ORDER BY post.time DESC', function(err, results) {
+            if (err) {
+                log('SQL error getting news: ' + err);
+                return deferred.reject('Error getting news posts!');
+
+            }
+            _.each(results, function(p) {
+                p.content = marked(p.content);
             });
 
-            });
-            return deferred.promise;
+            deferred.resolve(results);
+        });
 
+        return deferred.promise;
     };
-
-    
 
     Forum.getForumView = function() {
         var deferred = Q.defer();
@@ -73,16 +79,16 @@ module.exports = function(db) {
             postsQ = ' (select count(id) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ',
             boardsQ = ' fb.id, fb.name, fb.description, '
 
-        db.query('SELECT ' + topicQ + postsQ + boardsQ +' fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
+        db.query('SELECT ' + topicQ + postsQ + boardsQ + ' fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
             function(err, results) {
-            if (err) {
-                deferred.reject(err);
-                return;
-            }
-            deferred.resolve(results);
-        });
-        
-            return deferred.promise;
+                if (err) {
+                    deferred.reject(err);
+                    return;
+                }
+                deferred.resolve(results);
+            });
+
+        return deferred.promise;
     };
 
     return Forum;
