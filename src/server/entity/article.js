@@ -116,7 +116,7 @@ module.exports = function(db) {
             this.title = updateObj.title;
             this.body = updateObj.body;
 
-            deferred.resolve(this);
+            deferred.resolve(true);
         });
 
         return deferred.promise;
