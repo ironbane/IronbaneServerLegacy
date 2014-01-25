@@ -220,7 +220,8 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
                         ResolveData: ['Article', '$q', '$route', '$location',
                             function(Article, $q, $route, $location) {
                                 var deferred = $q.defer();
-                                Article.get($route.current.params.id)
+                                // don't get the rendered version, because we're editing
+                                Article.get($route.current.params.id, false)
                                     .then(function(article) {
                                         if (article.articleId === null) {
 

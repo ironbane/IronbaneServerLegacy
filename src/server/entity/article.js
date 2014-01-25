@@ -23,7 +23,7 @@ module.exports = function(db) {
         marked = require('marked'),
         User = require('./user');
 
-    var getById = function(articleId) {
+    var getById = function(articleId, rendered) {
         var deferred = Q.defer();
 
         db.query('select * from bcs_articles where articleId = ?', [articleId], function(err, result) {
@@ -42,8 +42,10 @@ module.exports = function(db) {
 
             // found it, return the json
             var article = new Article(result[0]);
-            // convert body into html
-            article.body = marked(article.body);
+            // render the markdown if requested (view mode)
+            if(rendered) {
+                article.body = marked(article.body);
+            }
             // convert dates to JS
             article.created *= 1000;
 
@@ -149,12 +151,13 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    Article.get = function(query) {
+    // rendered determines if body is converted from markdown or not
+    Article.get = function(query, rendered) {
         if (_.isString(query)) {
             // assume it's an ID
-            return getById(query);
+            return getById(query, rendered);
         } else {
-            return getAll(query);
+            return getAll(query, rendered);
         }
     };
 

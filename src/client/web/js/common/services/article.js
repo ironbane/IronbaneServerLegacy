@@ -45,8 +45,18 @@ angular.module('IronbaneApp')
                     });
             };
 
-            Article.get = function(id) {
-                return $http.get('/api/article/' + id)
+            Article.get = function(id, rendered) {
+                // default to getting the rendered version, editing shouldn't
+                if(rendered !== false) {
+                    rendered = true;
+                }
+
+                var params = {};
+                if(!rendered) {
+                    params.params = {rendered: false};
+                }
+
+                return $http.get('/api/article/' + id, params)
                     .then(function(response) {
                         var article = new Article(response.data);
                         // setup a cacheUrl for template include
