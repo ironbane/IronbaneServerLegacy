@@ -1,7 +1,7 @@
 // topic.js
 angular.module('IronbaneApp')
-    .controller('ArticleEditor', ['$scope', 'ResolveData', '$log',
-        function($scope, ResolveData, $log) {
+    .controller('ArticleEditor', ['$scope', 'ResolveData', '$log', '$location',
+        function($scope, ResolveData, $log, $location) {
             $scope.article = ResolveData.article;
 
             $scope.save = function() {
@@ -16,6 +16,11 @@ angular.module('IronbaneApp')
                         $scope.saveError = true;
                         $scope.saveErrorMsg = err;
                     });
+            };
+
+            $scope.cancel = function() {
+                // just return to article list
+                $location.path('/editor/article');
             };
         }
     ]);
