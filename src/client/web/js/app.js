@@ -193,7 +193,7 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
 
                 })
                 .when('/editor/article', {
-                    templateUrl: '/views/articlelist',
+                    templateUrl: '/views/articleList',
                     controller: 'ArticleList',
                     resolve: {
                         authorized: ['RouteSecurity',
@@ -209,7 +209,7 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
                     }
                 })
                 .when('/editor/article/:id', {
-                    templateUrl: '/views/articleedit',
+                    templateUrl: '/views/articleEdit',
                     controller: 'ArticleEditor',
                     resolve: {
                         authorized: ['RouteSecurity',
@@ -287,18 +287,21 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
                 });
         }
     ])
-    .run(function($rootScope, $location, $anchorScroll, $routeParams) {
-        //when the route is changed scroll to the proper element.
-        $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
-            // $location.hash($routeParams.scrollTo);
-            // $anchorScroll();
-            if ($routeParams.scrollTo) {
-                setTimeout(function() {
-                    // Scroll to the element minus the navbar height
-                    $("body").animate({
-                        scrollTop: $("#" + $routeParams.scrollTo).offset().top - 80
-                    }, "slow");
-                }, 1);
-            }
-        });
-    });
+    .run(['$rootScope', '$location', '$anchorScroll', '$routeParams', '$timeout',
+        function($rootScope, $location, $anchorScroll, $routeParams, $timeout) {
+            //when the route is changed scroll to the proper element.
+            $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
+                // $location.hash($routeParams.scrollTo);
+                // $anchorScroll();
+                if ($routeParams.scrollTo) {
+                    // TODO: this should be a directive
+                    $timeout(function() {
+                        // Scroll to the element minus the navbar height
+                        $("body").animate({
+                            scrollTop: $("#" + $routeParams.scrollTo).offset().top - 80
+                        }, "slow");
+                    }, 1);
+                }
+            });
+        }
+    ]);

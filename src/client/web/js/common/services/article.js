@@ -47,13 +47,15 @@ angular.module('IronbaneApp')
 
             Article.get = function(id, rendered) {
                 // default to getting the rendered version, editing shouldn't
-                if(rendered !== false) {
+                if (rendered !== false) {
                     rendered = true;
                 }
 
                 var params = {};
-                if(!rendered) {
-                    params.params = {rendered: false};
+                if (!rendered) {
+                    params.params = {
+                        rendered: false
+                    };
                 }
 
                 return $http.get('/api/article/' + id, params)

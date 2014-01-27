@@ -11,7 +11,7 @@ angular.module('IronbaneApp')
                 $scope.article.$save()
                     .then(function() {
                         $scope.saveSuccess = true;
-                        $scope.saveSuccessMsg = "Article updated."
+                        $scope.saveSuccessMsg = "Article updated.";
                     }, function(err) {
                         $scope.saveError = true;
                         $scope.saveErrorMsg = err;

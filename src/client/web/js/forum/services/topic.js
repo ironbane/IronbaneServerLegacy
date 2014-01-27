@@ -4,18 +4,15 @@ angular.module('IronbaneApp')
             var Topic = function(json) {
                 angular.copy(json || {}, this);
 
-                if(!this.icon) {
+                if (!this.icon) {
                     // todo: some fallback in the css?
-                    if ( this.locked ) {
+                    if (this.locked) {
                         this.$setIcon("lockedthread");
-                    }
-                    else if ( this.sticky ) {
+                    } else if (this.sticky) {
                         this.$setIcon("stickythread");
-                    }
-                    else if ( this.postcount >= 25 ) {
+                    } else if (this.postcount >= 25) {
                         this.$setIcon("hotthread");
-                    }
-                    else {
+                    } else {
                         // Todo: implement read/unread
                         this.$setIcon("unreadthread");
                     }
@@ -41,7 +38,7 @@ angular.module('IronbaneApp')
 
             };
 
-            Topic.unsticky = function(topicId){
+            Topic.unsticky = function(topicId) {
                 return $http.post('/api/forum/topics/' + topicId + '/unsticky')
                     .then(function(response) {
 
@@ -50,7 +47,7 @@ angular.module('IronbaneApp')
                     });
             };
 
-            Topic.sticky = function(topicId){
+            Topic.sticky = function(topicId) {
                 return $http.post('/api/forum/topics/' + topicId + '/sticky')
                     .then(function(response) {
 
@@ -59,7 +56,7 @@ angular.module('IronbaneApp')
                     });
             };
 
-            Topic.unlock = function(topicId){
+            Topic.unlock = function(topicId) {
                 return $http.post('/api/forum/topics/' + topicId + '/unlock')
                     .then(function(response) {
 
@@ -68,7 +65,7 @@ angular.module('IronbaneApp')
                     });
             };
 
-            Topic.lock = function(topicId){
+            Topic.lock = function(topicId) {
                 return $http.post('/api/forum/topics/' + topicId + '/lock')
                     .then(function(response) {
 
@@ -81,7 +78,7 @@ angular.module('IronbaneApp')
                 return $http.get('/api/forum/topics/' + topicId)
                     .then(function(response) {
                         return response;
-                    }, function(error){
+                    }, function(error) {
                         return $q.reject(error);
                     });
 
@@ -110,7 +107,7 @@ angular.module('IronbaneApp')
             Topic.prototype.$setIcon = function(icon) {
                 this.icon = icon;
                 this.iconStyle = {
-                    'background-image': 'url(/images/icons/topics/'+ icon + '.png)'
+                    'background-image': 'url(/images/icons/topics/' + icon + '.png)'
                 };
             };
 
