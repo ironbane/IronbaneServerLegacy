@@ -17,6 +17,5 @@ angular.module('IronbaneApp')
             }, function(err) {
                 $log.error('error getting news topics', err);
             });
-
-
-        }]);
+        }
+    ]);
