@@ -19,6 +19,15 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get('/api/search/:query', function(req, res){
+        Forum.search(req.params.query)
+            .then(function(response){
+                res.send(response);
+            }, function(error){
+                res.send(error, 500);
+            });
+    });
+
     app.post('/api/forum/likepost', function(req, res){
         log(req.body);
         Post.like(req.body.postId, req.user.id)

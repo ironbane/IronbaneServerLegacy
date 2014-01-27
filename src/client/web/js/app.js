@@ -1,8 +1,8 @@
 // app.js
 angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
     .constant('DEFAULT_AVATAR', '/images/noavatar.png')
-    .run(['User', '$rootScope', '$log', '$location',
-        function(User, $rootScope, $log, $location) {
+    .run(['User', '$rootScope', '$log', '$location', '$http',
+        function(User, $rootScope, $log, $location, $http) {
 
             // load it up for rootscope
             User.getCurrentUser();
@@ -12,6 +12,18 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
                     $location.path('/');
                 }, function(err) {
                     $log.error('Error logging out! ' + err);
+                });
+            };
+
+            $rootScope.search = function(){
+                $log.log("SEARCH");
+                $log.log($rootScope.searchWord);
+                $http.get('/api/search/xxx').then(function(results){
+                    $rootScope.searchResults = results;
+                    $log.log($rootScope.searchResults);
+                    $location.path('/search');
+                }, function(error){
+                    $log.log(error);
                 });
             };
 
@@ -61,6 +73,9 @@ angular.module('IronbaneApp', ['ngRoute', 'ui.utils', 'IBCommon', 'User'])
                 .when('/', {
                     templateUrl: '/views/home',
                     controller: 'HomeCtrl'
+                })
+                .when('/search', {
+                    templateUrl: '/views/search'
                 })
                 .when('/register', {
                     templateUrl: '/views/register',

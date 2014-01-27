@@ -73,6 +73,11 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
+    Forum.search = function(query){
+        var deferred = Q.defer();
+        deferred.resolve({title:"hi"});
+        return deferred.promise;
+    };
     Forum.getForumView = function() {
         var deferred = Q.defer();
         var topicQ = ' (select count(id) from forum_topics where board_id = fb.id) as topicCount, ',
