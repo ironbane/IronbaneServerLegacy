@@ -121,7 +121,7 @@ module.exports = function(db) {
 
         var postsQ = ' (select count(id) from forum_posts where user = us.id) as postcount, ';
         var likesQ = ' (select name from forum_posts_likes  INNER JOIN bcs_users on bcs_users.id = forum_posts_likes.from_user where to_post = fp.id) as likes, ';
-        db.query('SELECT ' + postsQ + likesQ + 'fp.content, fp.id, fp.time, us.name, us.gravatar_email, us.character_avatar, us.forum_sig FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
+        db.query('SELECT ' + postsQ + likesQ + 'fp.content, fp.id, fp.time, us.name, us.gravatar_email, us.character_avatar, us.forum_sig, us.reg_date, us.info_location FROM forum_posts AS fp  INNER JOIN bcs_users AS us ON us.id = fp.user WHERE fp.topic_id = ? and time >= ?', [topicId, minimumtime], function(err, results) {
             if (err) {
                 log(err);
                 deferred.reject(err);
@@ -137,7 +137,7 @@ module.exports = function(db) {
                     p.content = html;
                 });
                 p.mContent = marked(p.content);
-                p.user = {name: p.name, sig:p.forum_sig, postcount: p.postcount};
+                p.user = {name: p.name, sig:p.forum_sig, postcount: p.postcount, reg_date: p.reg_date, info_location: p.info_location};
                 if(p.character_avatar !== 0) {
                     // get character based avatar
                     p.user.avatarUrl = "";

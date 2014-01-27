@@ -1,7 +1,6 @@
 angular.module('IBCommon')
-
-.filter('unsafe', function($sce) {
+.filter('unsafe', ['$sce', function($sce) {
     return function(val) {
         return $sce.trustAsHtml(val);
     };
-});
+}]);

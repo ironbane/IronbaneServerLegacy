@@ -1,9 +1,8 @@
-<a ng-href="/editor">Back to editor menu</a>
-<table>
-		<th>articleId</th>
-			<th>title</th>
-		<tr ng-repeat="article in articles | filter:search" >
-		<td><a ng-href="/editor/article/{{article.articleId}}">{{article.articleId}}</a></td>
-		<td><a ng-href="/editor/article/{{article.articleId}}">{{article.title}}</a></td>
-</tr>
-</table>
+<div class="col-md-12 box">
+    <a ng-href="/editor"><h2>Back to Admin Menu</h2></a>
+    <ul>
+        <li ng-click="loadArticle(article)" ng-repeat="article in articles | filter:search">
+            {{ article.articleId }} - {{ article.title }}
+        </li>
+    </ul>
+</div>

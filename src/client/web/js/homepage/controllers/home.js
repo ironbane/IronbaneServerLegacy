@@ -4,7 +4,7 @@ angular.module('IronbaneApp')
         function($scope, Topic, $log, $location, $window) {
             $scope.navTo = function(path) {
                 // better way to do this?
-                if(path === '/game') {
+                if (path === '/game') {
                     $window.location.href = path;
                 } else {
                     $location.path(path);

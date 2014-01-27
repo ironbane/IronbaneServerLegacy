@@ -22,29 +22,34 @@ module.exports = function(db) {
         log = require('util').log,
         marked = require('marked'),
         User = require('./user');
-        
-    var getById = function(articleId) {
+
+    var getById = function(articleId, rendered) {
         var deferred = Q.defer();
 
         db.query('select * from bcs_articles where articleId = ?', [articleId], function(err, result) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
 
-            if(result.length === 0) {
-                deferred.reject({code: 404, msg: 'no article found with id ' + articleId});
+            if (result.length === 0) {
+                deferred.reject({
+                    code: 404,
+                    msg: 'no article found with id ' + articleId
+                });
                 return;
             }
 
             // found it, return the json
             var article = new Article(result[0]);
-            // convert body into html
-            article.body = marked(article.body);
+            // render the markdown if requested (view mode)
+            if(rendered) {
+                article.body = marked(article.body);
+            }
             // convert dates to JS
             article.created *= 1000;
 
-            if(article.author === 0) {
+            if (article.author === 0) {
                 // system author
                 article.authorName = 'Ironbane';
                 deferred.resolve(article);
@@ -70,7 +75,7 @@ module.exports = function(db) {
 
         // get all! todo: support where clause?
         db.query('select ' + (query.$fields ? query.$fields.join(',') : '*') + ' from bcs_articles', function(err, results) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
@@ -83,7 +88,7 @@ module.exports = function(db) {
 
         return deferred.promise;
     };
-/*
+    /*
 @class MyClass
 @constructor
 */
@@ -93,18 +98,23 @@ module.exports = function(db) {
         }
     });
 
-    Article.prototype.update = function(json){
-        var old_id = this.articleId;
-        console.log("JSON: "+JSON.stringify(json));
-        this.articleId = json.articleId;
-        this.title = json.title;
-        this.body = json.body;
-        var deferred = Q.defer();
-        db.query("UPDATE bcs_articles set ? where articleId = ?", [this.$schema(), old_id], function(err, results){
-        if(err) {
+    Article.prototype.update = function(data) {
+        var deferred = Q.defer(),
+            updateObj = {
+                articleId: data.articleId,
+                title: data.title,
+                body: data.body
+            };
+
+        db.query("UPDATE bcs_articles set ? where articleId = ?", [updateObj, this.articleId], function(err, results) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
+
+            this.articleId = updateObj.articleId;
+            this.title = updateObj.title;
+            this.body = updateObj.body;
 
             deferred.resolve(true);
         });
@@ -129,7 +139,7 @@ module.exports = function(db) {
             article = new Article(json);
 
         db.query('insert into bcs_articles set ?', article.$schema(), function(err, result) {
-            if(err) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
@@ -141,19 +151,20 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    Article.get = function(query) {
-        if(_.isString(query)) {
+    // rendered determines if body is converted from markdown or not
+    Article.get = function(query, rendered) {
+        if (_.isString(query)) {
             // assume it's an ID
-            return getById(query);
+            return getById(query, rendered);
         } else {
-            return getAll(query);
+            return getAll(query, rendered);
         }
     };
 
-    Article.getFrontPage = function(){
+    Article.getFrontPage = function() {
         var deferred = Q.defer();
-        db.query('Select * from forum_topics where board_id = 7 order by time desc', function(err, results){
-            if(err){
+        db.query('Select * from forum_topics where board_id = 7 order by time desc', function(err, results) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
