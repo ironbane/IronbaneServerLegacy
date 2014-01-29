@@ -113,6 +113,8 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
         units : []
     };
 
+    this.deferCount = 0;
+
     /**
      * @method getX
      * @return {Number} - This cell's x value in cell coordinates.

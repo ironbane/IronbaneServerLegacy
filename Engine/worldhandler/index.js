@@ -34,9 +34,13 @@ var WorldHandler = Class.extend({
     Init: function() {
 
         this.zones = new Zones();
+        this.deferCount = {getUnits:0, loadUnits:0, requireCell:0};
 
         this.switches = {};
-
+        var me = this;
+        setInterval(function(){
+            console.log("worldhandler: deferCount = " + JSON.stringify(me.deferCount));
+        }, 1000);
     },
 
     /**
@@ -87,13 +91,14 @@ var WorldHandler = Class.extend({
     getUnits : function() {
 
        var deferred = Q.defer();
-
+       this.deferCount["getUnits"]++;
        var allUnits = [];
-
+       var me = this;
        this.LoopUnits(function(unit) {
            allUnits.push(unit);
        }).then(function() {
-          deferred.resolve(allUnits);
+       this.deferCount["getUnits"]--;
+          me.deferCount--;
        });
 
        return deferred.promise;
@@ -263,16 +268,19 @@ var WorldHandler = Class.extend({
     requireCell : function(zoneId, cx, cz) {
 
        var deferred = Q.defer();
-
+       this.deferCount['requireCell']++;
+       var me = this;
        if(!this.CheckWorldStructure(zoneId, cx, cz)) {
 
            this.GenerateCell(zoneId, cx, cz).then(function() {
                deferred.resolve();
+        me.deferCount['requireCell']--;
            });
 
        } else {
 
            deferred.resolve();
+           this.deferCount--;
 
        }
 
@@ -406,6 +414,7 @@ var WorldHandler = Class.extend({
         var self = this;
 
         var deferred = Q.defer();
+        this.deferCount['loadUnits']++;
 
         var worldPos = Cells.toWorldCoordinates(cellX, cellZ);
 
@@ -424,6 +433,7 @@ var WorldHandler = Class.extend({
             if (err) {
                 console.error('WorldHandler: DB error loading units!', err);
                 deferred.reject(err);
+                self.deferCount['loadUnits']--;
             }
 
             Q.all(_.map(results, function(unitData) {
@@ -440,8 +450,10 @@ var WorldHandler = Class.extend({
 
             })).then(function(units) {
                 deferred.resolve(_.reject(units, _.isUndefined.bind(_)));
+                self.deferCount['loadUnits']--;
             }).fail(function(err) {
                 deferred.reject(err);
+                self.deferCount['loadUnits']--;
             });
 
         });
