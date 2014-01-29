@@ -40,6 +40,7 @@ var WorldHandler = Class.extend({
         var me = this;
         setInterval(function(){
             console.log("worldhandler: deferCount = " + JSON.stringify(me.deferCount));
+            console.log("zones: deferCount = " + JSON.stringify(me.zones.deferCount));
         }, 1000);
     },
 

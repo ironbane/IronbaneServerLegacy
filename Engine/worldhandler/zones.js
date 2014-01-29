@@ -656,6 +656,7 @@ var ZoneHandler = function(id) {
 var Zones = function() {
 
     this.table = {};
+    this.deferCount = {emit:0, selectAll:0, selectZone:0, createCell:0};
 
     /**
      * @method getCell
@@ -695,6 +696,8 @@ var Zones = function() {
         var args = Array.prototype.slice.call(arguments, 3);
 
         var deferred = Q.defer();
+        var me = this;
+        me.deferCount['emit']++;
 
         var point = [vec.x, vec.y, vec.z];
 
@@ -704,10 +707,12 @@ var Zones = function() {
         if(_.isUndefined(zoneId)) {
 
             deferred.reject(new Error('Zones', 'emit: zoneId is undefined!'));
+            me.deferCount['emit']--;
 
         } else if (_.isUndefined(this.table[zoneId])) {
 
             deferred.reject(new Error('Zones', 'emit: ' + zoneId + ' not found!'));
+            me.deferCount['emit']--;
 
         } else {
 
@@ -721,6 +726,7 @@ var Zones = function() {
             } else {
 
                deferred.reject(new Error('No listener for ' + name + ', ' + point));
+               me.deferCount['emit']--;
 
             }
 
@@ -789,8 +795,11 @@ var Zones = function() {
     function selectAll() {
 
        var deferred = Q.defer();
+       this.deferCount['selectAll']++;
 
        deferred.resolve(_.values(this.table));
+
+       this.deferCount['selectAll']--;
 
        return deferred.promise;
 
@@ -805,9 +814,14 @@ var Zones = function() {
 
         var deferred = Q.defer();
 
+       this.deferCount['selectZone']++;
+
         if (_.isUndefined(zoneId)) {
 
             deferred.reject(new Error('Zones: Failed to select undefined zone!'));
+                   this.deferCount['selectZone']--;
+
+
 
         } else {
 
@@ -818,6 +832,9 @@ var Zones = function() {
             }
 
             deferred.resolve(this.table[zoneId]);
+                   this.deferCount['selectZone']--;
+
+
 
         }
 
@@ -831,10 +848,12 @@ var Zones = function() {
      * @return {Promise}
      **/
     function createCell(zoneId, cellCoords) {
+        var me = this;
 
         return this.selectZone(zoneId).then(function(zone) {
 
                 var deferred = Q.defer();
+                me.deferCount['createCell']++;
 
                 var bbox = Cells.point(cellCoords);
 
@@ -851,6 +870,7 @@ var Zones = function() {
                     zone.cells.push(cell);
 
                     deferred.resolve(cell);
+                    me.deferCount['createCell']--;
 
                 } else { // Reject promise
 
