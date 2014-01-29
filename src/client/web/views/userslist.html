@@ -1,18 +1,4 @@
-<div class="col-md-12 box">
-    <a ng-href="/editor"><h2>Back to Admin Menu</h2></a>
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="user in data | filter:search">
-                <td><a ng-href="/editor/users/{{user.id}}">{{ user.id }}</a></td>
-                <td><a ng-href="/editor/users/{{user.id}}">{{ user.name }}</a></td>
-            </tr>
-        </tbody>
-    </table>
-    <pagination num-pages="noOfPages" current-page="currentPage" class="pagination-small"></pagination>
+<div class="col-md-12 box admin-user-list">
+    <h2>User Administration</h2>
+    <user-admin-panel ng-repeat="user in users" user="user"></user-admin-panel>
 </div>
