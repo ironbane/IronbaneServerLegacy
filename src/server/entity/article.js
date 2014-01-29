@@ -100,6 +100,7 @@ module.exports = function(db) {
 
     Article.prototype.update = function(data) {
         var deferred = Q.defer(),
+            article = this,
             updateObj = {
                 articleId: data.articleId,
                 title: data.title,
@@ -112,11 +113,11 @@ module.exports = function(db) {
                 return;
             }
 
-            this.articleId = updateObj.articleId;
-            this.title = updateObj.title;
-            this.body = updateObj.body;
+            article.articleId = updateObj.articleId;
+            article.title = updateObj.title;
+            article.body = updateObj.body;
 
-            deferred.resolve(true);
+            deferred.resolve(article);
         });
 
         return deferred.promise;
