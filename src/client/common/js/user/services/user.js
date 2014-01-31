@@ -17,6 +17,10 @@ angular.module('User') // separate module for sharing with website
         return this.roles.indexOf(role) >= 0;
     };
 
+    User.prototype.$isSiteAdmin = function() {
+        return this.$hasRole('ADMIN') || this.$hasRole('EDITOR');
+    };
+
      User.getProfile = function(username) {
         return $http.get('/api/profile/' + username)
             .then(function(response) {

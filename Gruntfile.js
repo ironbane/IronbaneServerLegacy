@@ -22,7 +22,9 @@ module.exports = function(grunt) {
             showAngularDocs: true
         },
         jshint: {
-            files: ['src/client/web/js/**/*.js', 'src/client/game/js/**/*.js']
+            web: {
+                src: ['src/client/common/js/**/*.js', 'src/client/web/js/**/*.js']
+            }
         },
         jasmine: {
             pivotal: {
@@ -197,7 +199,8 @@ module.exports = function(grunt) {
                         root: '<%= cfg.get("root") %>',
                         appName: '<%= pkg.name %>',
                         appVersion: '<%= pkg.version %>',
-                        gameVersion: 'v<%= pkg.version %> Alpha' //todo: have alpha/beta stored in config?
+                        gameVersion: 'v<%= pkg.version %> Alpha', //todo: have alpha/beta stored in config?
+                        minified: '<%= cfg.get("use_minified_source") %>'
                     }
                 },
                 files: [
@@ -405,7 +408,7 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('assets', ['three_obj', 'copy:assets']);
     grunt.registerTask('game', ['clean:game', 'concat:game', 'uglify:game', 'less:game', 'replace:game', 'copy:game']);
-    grunt.registerTask('website', ['clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
+    grunt.registerTask('website', ['jshint:web', 'clean:web', 'concat:web', 'uglify:web', 'less:web', 'replace:web', 'copy:web']);
     grunt.registerTask('full', ['dbupgrade', 'game', 'website', 'assets']);
     grunt.registerTask('detailmeshes', ['builddetailmeshes', 'three_obj']);
     grunt.registerTask('navnodes', ['three_obj', 'buildnavnodes']);

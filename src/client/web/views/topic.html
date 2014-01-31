@@ -14,10 +14,7 @@
     <div class="row" ng-repeat="post in posts">
         <div class="col-md-12 box">
             <div class="row">
-                <div class="col-md-2">
-                    <forumuserprofile user="post.user"/>
-                </div>
-                <div class="col-md-10">
+                <div class="col-md-8">
                     <article class="postcontent">
                         <p ng-bind-html="post.mContent | unsafe"></p>
                         <hr ng-show="post.user.sig">
@@ -25,6 +22,9 @@
                             {{post.user.sig}}
                         </span>
                     </article>
+                </div>
+                <div class="col-md-4">
+                    <forumuserprofile user="post.user"/>
                 </div>
 <!-- Post likes are bugged, so commenting this out for now -->
 <!--                 <div class="col-md-1">
@@ -56,48 +56,4 @@
             <post-editor board="board.id" topic="topic.id"></post-editor>
         </div>
     </div>
-<!--     <section class="forum-listing">
-        <section class="forum-group">
-
-        <a href = "/forum">Ironbane forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}
-            <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }} - {{ topic.title }}</h1>
-
-        </section>
-
-        <span ng-show="topic.locked">This topic is locked</span>
-            <ul class="board-list">
-                <li class="board" ng-repeat="post in posts">
-                    <header>
-                            <time class="thread-time" datetime="{{ post.time * 1000 | date }}">{{ post.time * 1000 | date:'medium' }}</time>
-
-                        <a class="thread-name" ng-href="{{ post.url }}">{{ post.title }}</a>
-                    </header>
-                    <forumuserprofile user="post.user"/>
-                    <article class="postcontent" ng-bind-html-unsafe="post.content">
-
-                     <span class="signature">{{post.user.sig}}</span>
-                     </article>
-                     <likebutton post="post.id" like="likePost(post.id)"/>
-                     <span ng-repeat="like in post.likes">{{like}}</span>
-
-                     <br class="clear">
-                </li>
-            </ul>
-    </section>
-    <br class="clear">
-    <div ng-show="currentUser.$hasRole('EDITOR')">
-    <button ng-show="!topic.locked" ng-click="lock()">Lock topic</button>
-    <button ng-show="topic.locked" ng-click="unlock()">Unlock topic</button>
-    <button ng-show="!topic.sticky" ng-click="sticky()">Sticky topic</button>
-    <button ng-show="topic.sticky" ng-click="unsticky()">Unsticky topic</button>
-</div>
-    <section ng-show="currentUser.authenticated && !topic.locked" class="new-topic-form">
-        <div ng-controller="CollapseControl">
-            <button class="btn" ng-click="isCollapsed = !isCollapsed">New Reply</button>
-            <hr>
-            <div collapse="isCollapsed">
-                <post-editor board="board.id" topic="topic.id"/>
-            </div>
-        </div>
-    </section> -->
 </div>

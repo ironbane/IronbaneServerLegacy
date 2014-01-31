@@ -1,5 +1,5 @@
-<div class="article-wrap">
-    <a ng-href="/editor">Back to editor menu</a>
+<div class="col-md-12 box">
+    <a ng-href="/editor"><h2>Back to Admin Menu</h2></a>
     <table>
         <thead>
             <tr>
@@ -9,8 +9,8 @@
         </thead>
         <tbody>
             <tr ng-repeat="user in data | filter:search">
-                <td><a ng-href="/editor/users/{{user.id}}">{{user.id}}</a></td>
-                <td><a ng-href="/editor/users/{{user.id}}">{{user.name}}</a></td>
+                <td><a ng-href="/editor/users/{{user.id}}">{{ user.id }}</a></td>
+                <td><a ng-href="/editor/users/{{user.id}}">{{ user.name }}</a></td>
             </tr>
         </tbody>
     </table>

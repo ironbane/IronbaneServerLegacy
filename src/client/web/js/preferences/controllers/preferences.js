@@ -3,7 +3,7 @@ angular.module('IronbaneApp')
     .controller('PreferencesCtrl', ['User', '$scope', '$http', '$log', '$rootScope', '$anchorScroll',
         function(User, $scope, $http, $log, $rootScope, $anchorScroll) {
             $scope.user = angular.copy($rootScope.currentUser);
-            $rootScope.currentUser.info_gender === 0 ? $scope.user.info_gender = 'male' : $scope.user.info_gender = 'female';
+            $scope.user.info_gender = $rootScope.currentUser.info_gender === 0 ? 'male' : 'female';
             $log.log($scope.user);
             $scope.genderOptions = [{
                 gender: "male"
@@ -20,8 +20,8 @@ angular.module('IronbaneApp')
                 $scope.saveError = false;
                 $scope.saveSuccess = false;
 
-                if($scope.user.password_new) {
-                    if(!$scope.user.password_old) {
+                if ($scope.user.password_new) {
+                    if (!$scope.user.password_old) {
                         $scope.saveError = true;
                         $scope.saveErrorMsg = "You must enter your old password to set a new one.";
                         $anchorScroll();

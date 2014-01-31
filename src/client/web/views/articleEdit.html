@@ -1,9 +1,40 @@
-<div>
-    <h2>{{ article.title }}</h2>
-    <form name="articleForm">
-        <input type="text" name="title" ng-model="article.title" required />
-        <input type="text" name="articleId" ng-model="article.articleId" required />
-        <mark-it-up lang="markdown" ng-model="article.body"></mark-it-up>
-        <button ng-click="save()">Save</button>
+<div class="col-md-12 box">
+<div class="alert alert-success" ng-show="saveSuccess"><strong>Success!</strong> {{ saveSuccessMsg }}</div>
+        <div class="alert alert-danger" ng-show="saveError"><strong>Error!</strong> {{ saveErrorMsg }}</div>
+    <form name="articleEditorForm" class="form-horizontal">
+        <fieldset>
+
+        <legend>Article Editor: {{ article.title }}</legend>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="article_id">ID</label>
+            <div class="col-md-8">
+                <input ng-model="article.articleId" id="article_id" name="article_id" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="article_title">Title</label>
+            <div class="col-md-8">
+                <input ng-model="article.title" id="article_title" name="article_title" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="article_body">Body (Markdown)</label>
+            <div class="col-md-8">
+                <textarea ng-model="article.body" rows="10" class="form-control" id="article_body" name="article_body"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="saveButton"></label>
+          <div class="col-md-8">
+            <button ng-click="save()" id="saveButton" name="saveButton" class="btn btn-success">Save</button>
+            <button ng-click="cancel()" id="cancelButton" name="cancelButton" class="btn btn-danger">Cancel</button>
+          </div>
+        </div>
+
+        </fieldset>
     </form>
 </div>
