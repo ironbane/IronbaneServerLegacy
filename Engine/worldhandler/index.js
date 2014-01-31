@@ -94,7 +94,10 @@ var WorldHandler = Class.extend({
            allUnits.push(unit);
        }).then(function() {
           deferred.resolve(allUnits);
-       });
+       }).fail(function(error){
+
+        deferred.reject();
+      });
 
        return deferred.promise;
     },
