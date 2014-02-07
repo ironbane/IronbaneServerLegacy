@@ -22,7 +22,7 @@ pathFinder.setPath(dataPath);
 
 var aabb = require('aabb-3d');
 
-// For when node modules are used: 
+// For when node modules are used:
 
 // var Q = require('q');
 // var THREE = require('three');
@@ -43,7 +43,7 @@ var WorldHandler = Class.extend({
      * @method getCells
      * @return {Array} - A list of promises, for all cells in all zones.
      **/
-    getCells : function() {
+    getCells: function() {
 
         var promises = [];
 
@@ -51,6 +51,8 @@ var WorldHandler = Class.extend({
             promises.push(cell);
         }).then(function() {
             return promises;
+        }, function(err) {
+            return Q.reject(err);
         });
 
     },
@@ -84,36 +86,37 @@ var WorldHandler = Class.extend({
      * @return {Array} All of the units
      * handled by all cells in the world handler.
      **/
-    getUnits : function() {
+    getUnits: function() {
 
-       var deferred = Q.defer();
+        var deferred = Q.defer();
 
-       var allUnits = [];
+        var allUnits = [];
 
-       this.LoopUnits(function(unit) {
-           allUnits.push(unit);
-       }).then(function() {
-          deferred.resolve(allUnits);
-       }).fail(function(error){
+        this.LoopUnits(function(unit) {
+            allUnits.push(unit);
+        }).then(function() {
+            deferred.resolve(allUnits);
+        }).fail(function(error) {
+            deferred.reject(error);
+        });
 
-        deferred.reject();
-      });
-
-       return deferred.promise;
+        return deferred.promise;
     },
     /**
      * @method getPlayers
      * @return {Array} - All of the units
      * that are an instance of player.
      **/
-    getPlayers : function() {
+    getPlayers: function() {
 
-       return this.getUnits()
-          .then(function(units) {
-             return _.filter(units, function(unit) {
-                return (unit instanceof Player);
-             });
-          });
+        return this.getUnits()
+            .then(function(units) {
+                return _.filter(units, function(unit) {
+                    return (unit instanceof Player);
+                });
+            }, function(err) {
+                return Q.reject(err);
+            });
 
     },
     /**
@@ -121,30 +124,33 @@ var WorldHandler = Class.extend({
      * @return {Array} - All of the units
      * that are not an instance of player.
      **/
-    getNPCs : function() {
+    getNPCs: function() {
 
-       return this.getUnits()
-          .then(function(units) {
-             return _.filter(units, function(unit) {
-                return !(unit instanceof Player);
-             });
-          });
+        return this.getUnits()
+            .then(function(units) {
+                return _.filter(units, function(unit) {
+                    return !(unit instanceof Player);
+                });
+            }, function(err) {
+                return Q.reject(err);
+            });
     },
     /**
      * @method autoSave
      * Auto-save all players currently managed by the world handler.
      **/
-    autoSave : function() {
+    autoSave: function() {
 
-       log('WorldHandler: Auto-saving all players.');
+        log('WorldHandler: Auto-saving all players.');
 
-       this.getPlayers().then(function(players) {
-
-           players.forEach(function(player) {
-              player.Save();
-           });
-
-       });
+        this.getPlayers().then(function(players) {
+            players.forEach(function(player) {
+                player.Save();
+            });
+        })
+            .fail(function(err) {
+                console.log(err.stack);
+            });
 
     },
     addUnitToCell: function(unit, newCellX, newCellZ) {
@@ -162,7 +168,7 @@ var WorldHandler = Class.extend({
 
         return Q().then(function() {
 
-            if(isPlayer && unit.editor) {
+            if (isPlayer && unit.editor) {
                 return self.requireCell(zone, x, z);
             }
 
@@ -172,7 +178,7 @@ var WorldHandler = Class.extend({
 
         }).then(function() {
 
-            if(isPlayer) {
+            if (isPlayer) {
 
                 return self.zones.emitNear(unit.zone, 'activate', cellCoords);
 
@@ -199,7 +205,7 @@ var WorldHandler = Class.extend({
 
         return self.zones.emit(unit.zone, 'removeUnit', cellCoords, unit).then(function() {
 
-            if(isPlayer) {
+            if (isPlayer) {
 
                 return self.zones.emitNear(unit.zone, 'deactivate', cellCoords);
             }
@@ -223,7 +229,10 @@ var WorldHandler = Class.extend({
 
             pathFinder.test();
 
-        });
+        })
+            .fail(function(err) {
+                console.error(err.stack);
+            });
 
     },
     SaveWorld: function() {
@@ -261,25 +270,27 @@ var WorldHandler = Class.extend({
         });
     },
     CheckWorldStructure: function(zoneId, cx, cz) {
-       return !(_.isUndefined(this.zones.getCell(zoneId, cx, cz)));
+        return !(_.isUndefined(this.zones.getCell(zoneId, cx, cz)));
     },
-    requireCell : function(zoneId, cx, cz) {
+    requireCell: function(zoneId, cx, cz) {
 
-       var deferred = Q.defer();
+        var deferred = Q.defer();
 
-       if(!this.CheckWorldStructure(zoneId, cx, cz)) {
+        if (!this.CheckWorldStructure(zoneId, cx, cz)) {
 
-           this.GenerateCell(zoneId, cx, cz).then(function() {
-               deferred.resolve();
-           });
+            this.GenerateCell(zoneId, cx, cz).then(function() {
+                deferred.resolve();
+            }, function(err) {
+                deferred.reject(err);
+            });
 
-       } else {
+        } else {
 
-           deferred.resolve();
+            deferred.resolve();
 
-       }
+        }
 
-       return deferred.promise;
+        return deferred.promise;
 
     },
     loadWorld: function() {
@@ -302,6 +313,8 @@ var WorldHandler = Class.extend({
 
                 }));
 
+            }, function(err) {
+                return Q.reject(err);
             });
         }).then(function() {
             return self.loadNavigationNodes();
@@ -318,14 +331,14 @@ var WorldHandler = Class.extend({
      * Applies fn to each unit in the
      * world handler.
      **/
-    LoopUnits : function(fn) {
-       return this.LoopCells(function(cell) {
-           if (!_.isUndefined(cell.fields.units)) {
-               _.each(cell.fields.units, function(unit) {
-                   fn(unit);
-               });
-           }
-       });
+    LoopUnits: function(fn) {
+        return this.LoopCells(function(cell) {
+            if (!_.isUndefined(cell.fields.units)) {
+                _.each(cell.fields.units, function(unit) {
+                    fn(unit);
+                });
+            }
+        });
     },
     LoopUnitsNear: function(zone, cellX, cellZ, fn, offset) {
         return this.LoopCellsNear(zone, cellX, cellZ, function(cell) {
@@ -343,11 +356,13 @@ var WorldHandler = Class.extend({
     LoopCells: function(fn) {
 
         return this.zones.selectAll()
-          .then(function(zones) {
-             _.each(zones, function(zone) {
-                _.each(zone.cells, fn);
-             });
-          });
+            .then(function(zones) {
+                _.each(zones, function(zone) {
+                    _.each(zone.cells, fn);
+                });
+            }, function(err) {
+                return Q.reject(err);
+            });
 
     },
     LoopCellsNear: function(zoneId, cellX, cellZ, fn, offset) {
@@ -363,30 +378,34 @@ var WorldHandler = Class.extend({
             .then(function(zone) {
 
                 _.chain(zone.cells)
-                .filter(function(cell) {
-                    return (
-                        cell.getX() >= minX &&
-                        cell.getX() <= maxX &&
-                        cell.getZ() >= minZ &&
-                        cell.getZ() <= maxZ
+                    .filter(function(cell) {
+                        return (
+                            cell.getX() >= minX &&
+                            cell.getX() <= maxX &&
+                            cell.getZ() >= minZ &&
+                            cell.getZ() <= maxZ
                         );
-                }).each(function(cell) {
-                    fn(cell);
-                });
+                    }).each(function(cell) {
+                        fn(cell);
+                    });
 
+            }, function(err) {
+                return Q.reject(err);
             });
     },
     LoopCellsWithIndex: function(fn) {
 
         return this.zones.selectAll()
             .then(function(zones) {
-               _.each(zones, function(zone) {
-                  _.each(zone.cells, function(cell) {
-                      fn(zone.id, cell.getX(), cell.getZ());
-                  });
+                _.each(zones, function(zone) {
+                    _.each(zone.cells, function(cell) {
+                        fn(zone.id, cell.getX(), cell.getZ());
+                    });
 
-               });
+                });
 
+            }, function(err) {
+                return Q.reject(err);
             });
     },
     LoadSwitches: function() {
@@ -426,14 +445,14 @@ var WorldHandler = Class.extend({
 
             if (err) {
                 console.error('WorldHandler: DB error loading units!', err);
-                deferred.reject(err);
+                return deferred.reject(err);
             }
 
             Q.all(_.map(results, function(unitData) {
 
                 var unit = self.MakeUnitFromData(unitData);
 
-                if(unit) {
+                if (unit) {
                     return unit.load().then(function() {
                         return unit;
                     });
@@ -612,6 +631,8 @@ var WorldHandler = Class.extend({
 
                 self.SaveCell(zone, cellX, cellZ, true, [], [], []);
 
+            }, function(err) {
+                return Q.reject(err);
             });
     },
     SaveCell: function(zoneId, cellX, cellZ, shouldClear, objects, changes, deletes) {
@@ -635,19 +656,21 @@ var WorldHandler = Class.extend({
         return this.getUnits()
             .then(function(units) {
 
-               // Reject promise when no unit is found
-               var err = new Error('WorldHandler: Unit ' + id + ' not found.');
+                // Reject promise when no unit is found
+                var err = new Error('WorldHandler: Unit ' + id + ' not found.');
 
-               var found = _.find(units, function(unit) {
-                  return unit.id === id;
-               });
+                var found = _.find(units, function(unit) {
+                    return unit.id === id;
+                });
 
-               if(!_.isUndefined(found)) {
-                   return found;
-               }
+                if (!_.isUndefined(found)) {
+                    return found;
+                }
 
-               throw err;
+                throw err;
 
+            }, function(err) {
+                return Q.reject(err);
             });
     },
 
@@ -657,18 +680,20 @@ var WorldHandler = Class.extend({
         return this.getNPCs()
             .then(function(npcs) {
                 return _.chain(npcs)
-                .filter(function(unit) {
-                    return !_.isUndefined(zoneId) ?
-                    unit.zone === zoneId : true;
-                })
-                .filter(function(unit) {
+                    .filter(function(unit) {
+                        return !_.isUndefined(zoneId) ?
+                            unit.zone === zoneId : true;
+                    })
+                    .filter(function(unit) {
 
-                    return unit.data &&
-                    unit.data.name &&
-                    unit.data.name === name;
+                        return unit.data &&
+                            unit.data.name &&
+                            unit.data.name === name;
 
-                })
-                .value();
+                    })
+                    .value();
+            }, function(err) {
+                return Q.reject(err);
             });
 
     },
@@ -677,39 +702,43 @@ var WorldHandler = Class.extend({
     findUnitByName: function(name, zoneId) {
 
         return this.getNPCs()
-           .then(function(npcs) {
-              return (_.chain(npcs)
-                 .filter(function(unit) {
-                     return !_.isUndefined(zoneId) ?
-                        unit.zone === zoneId : true;
-                })
-                .find(function(unit) {
+            .then(function(npcs) {
+                return (_.chain(npcs)
+                    .filter(function(unit) {
+                        return !_.isUndefined(zoneId) ?
+                            unit.zone === zoneId : true;
+                    })
+                    .find(function(unit) {
 
-                    return unit.data &&
-                    unit.data.name &&
-                    unit.data.name === name;
+                        return unit.data &&
+                            unit.data.name &&
+                            unit.data.name === name;
 
-                })
-                .value() || null);
-          });
+                    })
+                    .value() || null);
+            }, function(err) {
+                return Q.reject(err);
+            });
     },
 
     // Only for players!!!!
     FindPlayerByName: function(name) {
 
         return this.getPlayers()
-           .then(function(players) {
+            .then(function(players) {
 
-              return ( _.chain(players)
-                 .find(function(unit) {
+                return (_.chain(players)
+                    .find(function(unit) {
 
-                   return unit.name &&
-                   unit.name === name;
+                        return unit.name &&
+                            unit.name === name;
 
-                 })
-                 .value() || null);
+                    })
+                    .value() || null);
 
-           });
+            }, function(err) {
+                return Q.reject(err);
+            });
 
     },
 
@@ -722,15 +751,17 @@ var WorldHandler = Class.extend({
         var nearby = [];
 
         return this.LoopUnitsNear(zoneId, cx, cz, function(unit) {
-            if(unit.id === id) {
-               nearby.push(unit);
+            if (unit.id === id) {
+                nearby.push(unit);
             }
         }, 1)
-        .then(function() {
+            .then(function() {
 
-          return (_.first(nearby) || null);
+                return (_.first(nearby) || null);
 
-        });
+            }, function(err) {
+                return Q.reject(err);
+            });
 
     },
 
@@ -740,26 +771,28 @@ var WorldHandler = Class.extend({
 
         var promises = _.map(list, function(number) {
 
-           return self.FindUnit(-number).then(function(unit) {
+            return self.FindUnit(-number).then(function(unit) {
 
-               // Passing by reference on purpose, for dynamic waypoints in the future
-               return {
-                   id: number,
-                   pos: unit.position
-               };
+                // Passing by reference on purpose, for dynamic waypoints in the future
+                return {
+                    id: number,
+                    pos: unit.position
+                };
 
-           }).fail(function(err) {
-              console.error('WorldHandler.BuildWaypointListFromUnitIds', err);
-               /** Unit not found **/
-           });
+            }).fail(function(err) {
+                console.error('WorldHandler.BuildWaypointListFromUnitIds', err);
+                /** Unit not found **/
+            });
 
         });
 
         return Q.all(promises).then(function(waypoints) {
             return _.reject(waypoints, function(waypoint) {
-               return !waypoint;
+                return !waypoint;
             });
-        });
+        }, function(err) {
+                return Q.reject(err);
+            });
     }
 
 });

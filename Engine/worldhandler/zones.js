@@ -252,10 +252,12 @@ var CellHandler = function(bbox, zoneId, cellCoords) {
                 unit.Tick(elapsed);
             }
 
-        })).then(function() { ;
+        })).then(function() {
 
             return Snapshots.broadcast(players);
 
+        }, function(err) {
+            return Q.reject(err);
         });
 
     }
@@ -715,6 +717,7 @@ var Zones = function() {
             if(s.listens(name, point)) {
 
                s.emit.apply(s, args);
+               deferred.resolve();
 
             } else {
 
@@ -852,7 +855,7 @@ var Zones = function() {
 
                 } else { // Reject promise
 
-                    throw new Error('Zones: Cell already exists!');
+                    deferred.reject(new Error('Zones: Cell already exists!'));
 
                 }
 
