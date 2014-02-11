@@ -60,7 +60,8 @@
     "aabb-3d": "~0.1.0",
     "assert-tap": "~0.1.4",
     "nodejs-gravatar": "~1.0.2",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "bluebird": "~1.0.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

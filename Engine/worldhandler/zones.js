@@ -868,6 +868,10 @@ var Zones = function() {
         // Add fail to the chain after returning to handle error messages.
     }
 
+    function getActiveZones(){
+        return Ticker.all();
+    }
+
 
     this.emit = emit;
     this.emitNear = emitNear;
@@ -875,6 +879,7 @@ var Zones = function() {
     this.selectZone = selectZone;
     this.createCell = createCell;
     this.getCell = getCell;
+    this.getActiveZones = getActiveZones;
 
 };
 

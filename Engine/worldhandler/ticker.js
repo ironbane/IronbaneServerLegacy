@@ -77,9 +77,14 @@ var Ticker = (function() {
         tickAll(0);
     }
 
+    function all(){
+        return cells;
+    }
+
     return {
         add: add,
-        remove: remove
+        remove: remove,
+        all: all
     };
 
 })();

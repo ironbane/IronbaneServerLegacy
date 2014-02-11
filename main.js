@@ -89,6 +89,68 @@ var HttpServer,
 var io,
     ioApp;
 
+function roughSizeOfObject( object) {
+
+    var objectList = []
+    var stack = [ object ];
+    var bytes = 0;
+
+    while ( stack.length ) {
+        var value = stack.pop();
+
+        if ( typeof value === 'boolean' ) {
+            bytes += 4;
+        }
+        else if ( typeof value === 'string' ) {
+            bytes += value.length * 2;
+        }
+        else if ( typeof value === 'number' ) {
+            bytes += 8;
+        }
+        else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf( value ) === -1
+        )
+        {
+            objectList.push( value );
+
+            for( i in value ) {
+                try{
+                    stack.push( value[ i ] );
+                }
+                catch(e){
+                    console.log(e);
+                }
+            }
+        }
+    }
+    return bytes;
+} 
+
+var memCache = {}
+
+function printMemUsage(object, threshold) {
+    var size;
+    var at_least = (typeof threshold == 'undefined' ? 0 : threshold)
+
+    for (element in object) {
+        size = roughSizeOfObject(object[element]);
+        if(size > at_least) {
+            if(memCache[element]===undefined){
+                memCache[element] = size;
+            console.log(element + ":" + size);
+            }
+            else if(memCache[element]<size){
+                console.log(element + ":" + size);
+                console.log("FOUND AN INCREASE: " + element + " [===] old: " + memCache[element] + ", new: " + size);
+
+                memCache[element] = size;
+            }
+        }
+    }
+}
+
 // setup REPL for console server mgmt
 var startREPL = function() {
     if(config.get('use_repl') === true){ 
@@ -115,6 +177,10 @@ var startREPL = function() {
         // context variables get attached to "global" of this instance
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
+        serverREPL.context.engine = engine;
+        serverREPL.context.worldhandler = global.worldHandler;
+        serverREPL.context.printMemUsage = printMemUsage;
+        serverREPL.context.dataHandler = global.dataHandler;
     }
     if(config.get('use_netrepl') === true){ 
     	// Add UNIX socket to REPL for awesome realtime debugging
@@ -282,6 +348,8 @@ function start(scripts) {
 
             engine.start();
 
+
+
             // start it up, todo: only per config?
             startREPL();
 
@@ -290,6 +358,8 @@ function start(scripts) {
             setInterval(function() { 
                 worldHandler.autoSave();
             }, 60 * 1 * 1000);
+
+            
 
             // Schedule an auto-restart to prevent EM readfile errors
             // We can only prevent this by upgrading to a real dedicated server, which we will do

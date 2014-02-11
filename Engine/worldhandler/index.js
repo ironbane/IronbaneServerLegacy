@@ -651,6 +651,12 @@ var WorldHandler = Class.extend({
         });
 
     },
+    UnitCount: function(){
+        return this.getUnits()
+            .then(function(units){
+                console.log(units.length);
+            });
+    },
     FindUnit: function(id) {
 
         return this.getUnits()
@@ -670,6 +676,7 @@ var WorldHandler = Class.extend({
                 throw err;
 
             }, function(err) {
+                console.log(err);
                 return Q.reject(err);
             });
     },
