@@ -2,8 +2,7 @@
  * @module ticker
  **/
 
-var Q = require('q'),
-    async = require('q-async'),
+var Promise = require('bluebird'),
     _ = require('underscore');
 
 /**
@@ -23,11 +22,8 @@ var Ticker = (function() {
      * @param cell {CellHandler}
      **/
     function add(cell) {
-
-        if(!_.contains(cells, cell)) {
-
+        if (!_.contains(cells, cell)) {
             cells.push(cell);
-
         }
 
         start();
@@ -38,36 +34,30 @@ var Ticker = (function() {
      * @param cell {CellHandler}
      **/
     function remove(cell) {
-
-       cells = _.without(cells, cell);
-
+        cells = _.without(cells, cell);
     }
 
     /**
      * @method start
      **/
     function start() {
-
-        if(started) {
+        if (started) {
             return;
         }
 
         started = true;
 
         var iterator = function(elapsed, cell, callback) {
-
             cell.tick(elapsed).then(function() {
                 callback(null);
             }).fail(function(err) {
                 console.error('Ticker.start', err.stack);
                 callback(err);
             });
-
         };
 
         var tickAll = _.throttle(function(elapsed) {
-
-            if(cells.length === 0) {
+            if (cells.length === 0) {
                 started = false;
                 return;
             }
@@ -78,21 +68,18 @@ var Ticker = (function() {
 
             async.eachLimit(cells, limit, _.partial(iterator, elapsed)).then(function() {
 
-                var nextElapsed = Math.min(secondsBetween,  Date.now() - begin);
+                var nextElapsed = Math.min(secondsBetween, Date.now() - begin);
 
                 tickAll(nextElapsed);
-
             });
-
         }, millisecondsBetween);
 
         tickAll(0);
-
     }
 
     return {
-        add : add,
-        remove : remove
+        add: add,
+        remove: remove
     };
 
 })();
