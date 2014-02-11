@@ -6,7 +6,7 @@ angular.module('IronbaneApp')
                 scope: {
                     name: "@"
                 },
-                template: '<a href="/user/profile/{{ name }}">{{ name }}</a>'
+                template: '<a class="user-link" href="/user/profile/{{ name }}">{{ name }}</a>'
             };
         }
     ]);

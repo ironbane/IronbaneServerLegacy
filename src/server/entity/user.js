@@ -5,11 +5,16 @@ var Class = require('../../common/class'),
 
 module.exports = function(db) {
     var Q = require('q'),
-        _ = require('underscore');
+        _ = require('underscore'),
+        gravatar = require('nodejs-gravatar');
 
     var User = Class.extend({
         init: function(json) {
             _.extend(this, json || {});
+
+            this.$initRoles();
+
+            this.avatarUrl = gravatar.imageUrl(this.gravatar_email || "404", {"size": "80", "d": "retro"});
         },
 
         $adminUpdate: function(parameters){
@@ -252,15 +257,19 @@ module.exports = function(db) {
         return deferred.promise;
     };
 
-    User.getAll = function(){
+    // TODO: implement paging
+    User.getAll = function() {
         var deferred = Q.defer();
-        db.query('select id, name from bcs_users', function(err, results){
-            if(err){
+        db.query('select * from bcs_users', function(err, results) {
+            if (err) {
                 deferred.reject(err);
                 return;
             }
-            deferred.resolve(results);
 
+            _.each(results, function(row, i) {
+                results[i] = new User(row);
+            });
+            deferred.resolve(results);
         });
         return deferred.promise;
     };

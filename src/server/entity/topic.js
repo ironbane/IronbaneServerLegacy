@@ -133,9 +133,9 @@ module.exports = function(db) {
                 return;
             }
             _.each(results, function(p) {
-                bbcode.parse(p.content, function(html) {
+                /*bbcode.parse(p.content, function(html) {
                     p.content = html;
-                });
+                });*/
                 p.mContent = marked(p.content);
                 p.user = {name: p.name, sig:p.forum_sig, postcount: p.postcount, reg_date: p.reg_date, info_location: p.info_location};
                 if(p.character_avatar !== 0) {

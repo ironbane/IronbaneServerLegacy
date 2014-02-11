@@ -30,12 +30,12 @@ module.exports = function(app, db) {
 
     app.io.route('logout', function(req) {
         // http only
-        if(req.logout) {
+        if (req.logout) {
             // how to disconnect the associated socket?
             req.logout();
         }
 
-        if(req.io.disconnect) {
+        if (req.io.disconnect) {
             console.log('from socket', req.io.socket);
             // req.io.disconnect();
             // can't do this yet because the client relies on connection
@@ -51,7 +51,7 @@ module.exports = function(app, db) {
 
     // get currently signed in user object
     app.get('/api/session/user', function(req, res) {
-        if(req.user) {
+        if (req.user) {
             // send only needed info for UI, NOT password
             var clone = _.clone(req.user);
             delete clone.pass;
@@ -78,7 +78,7 @@ module.exports = function(app, db) {
 
     // create new user registration
     app.post('/api/user', function(req, res) {
-        if(req.isAuthenticated() && req.user.admin !== 1) {
+        if (req.isAuthenticated() && req.user.admin !== 1) {
             res.send(500, "Can't register when you are signed in.");
             return;
         }
@@ -148,12 +148,12 @@ module.exports = function(app, db) {
             req.user.$save()
                 .then(function(user) {
                     res.send(user);
-                }, function(err){
+                }, function(err) {
                     res.send(500, err);
                 });
         };
 
-        if(req.body.password_old && req.body.password_new) {
+        if (req.body.password_old && req.body.password_new) {
             User.updatePassword(req.user.id, req.body.password_old, req.body.password_new)
                 .then(function() {
                     updateUser();
@@ -167,28 +167,28 @@ module.exports = function(app, db) {
 
     app.post('/api/user/:id', function(req, res) {
         User.getById(req.params.id)
-        .then(function(updateUser){
-            updateUser.$adminUpdate(req.body);
-            updateUser.$save()
-                .then(function(user){
-                    res.send(user);
-                }, function(error){
-                    res.send(500, error);
-                });
+            .then(function(updateUser) {
+                updateUser.$adminUpdate(req.body);
+                updateUser.$save()
+                    .then(function(user) {
+                        res.send(user);
+                    }, function(error) {
+                        res.send(500, error);
+                    });
             });
     });
 
-    app.post('/api/user/admin/resetpassword/:id', function(req, res){
+    app.post('/api/user/admin/resetpassword/:id', function(req, res) {
         User.getById(req.params.id)
-        .then(function(updateUser){
+            .then(function(updateUser) {
 
-            updateUser.$adminResetPassword();
-            updateUser.$save()
-                .then(function(user){
-                    res.send(user);
-                }, function(error){
-                    res.send(500, error);
-                });
+                updateUser.$adminResetPassword();
+                updateUser.$save()
+                    .then(function(user) {
+                        res.send(user);
+                    }, function(error) {
+                        res.send(500, error);
+                    });
             });
     });
 
@@ -206,18 +206,18 @@ module.exports = function(app, db) {
             });
     });
 
-    app.get('/api/users/:id', function(req, res){
-        User.getById(req.params.id).then(function(user){
+    app.get('/api/users/:id', app.ensureAuthenticated, app.authorizeAny(['ADMIN', 'EDITOR']), function(req, res) {
+        User.getById(req.params.id).then(function(user) {
             res.send(user);
-        }, function(error){
+        }, function(error) {
             res.send(error, 500);
         });
     });
 
-    app.get('/api/users', function(req, res){
-        User.getAll().then(function(users){
+    app.get('/api/users', app.ensureAuthenticated, app.authorizeAny(['ADMIN', 'EDITOR']), function(req, res) {
+        User.getAll().then(function(users) {
             res.send(users);
-        }, function(error){
+        }, function(error) {
             res.send(error, 500);
         });
     });

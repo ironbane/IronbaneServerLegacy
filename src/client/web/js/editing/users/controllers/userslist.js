@@ -5,12 +5,12 @@ angular.module('IronbaneApp')
 
                 var numPerPage = 25;
                 $scope.currentPage = 1;
-                $scope.allData = _data;
+                $scope.users = _data;
 
                 $scope.noOfPages = Math.ceil(_data.length / numPerPage);
 
                 $scope.$watch('currentPage', function() {
-                    $scope.data = utilities.paginator($scope.allData, $scope.currentPage, numPerPage);
+                    $scope.data = utilities.paginator($scope.users, $scope.currentPage, numPerPage);
                 });
 
             });
