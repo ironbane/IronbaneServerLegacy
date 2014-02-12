@@ -813,8 +813,6 @@ var Fighter = Actor.extend({
 
                         return unit; // resolve target
 
-                } else {
-                    throw new Error('Fighter: nearest target not found.');
                 }
         });
     },
@@ -825,7 +823,7 @@ var Fighter = Actor.extend({
         var rank = 'npc';
         if (this.id > 0) {
             rank = this.isGuest ? 'guest' : (this.editor ? 'gm' : 'user');
-            if (this.chDevNinja === true) { 
+            if (this.chDevNinja === true) {
                 rank = 'user';
             }
         }
@@ -833,7 +831,7 @@ var Fighter = Actor.extend({
         var rv= {};
         if (this.id > 0) {
             rv.id = this.id
-        } 
+        }
         rv.name = name;
         rv.rank = rank;
         return rv;

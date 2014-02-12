@@ -3,6 +3,7 @@
  **/
 
 var Promise = require('bluebird'),
+    async = require('q-async'),
     _ = require('underscore');
 
 /**

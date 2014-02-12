@@ -91,9 +91,9 @@ var io,
 
 // setup REPL for console server mgmt
 var startREPL = function() {
-    if(config.get('use_repl') === true){ 
+    if(config.get('use_repl') === true){
         var repl = require('repl');
-   
+
         // Not game stuff, this is for the server executable
         process.stdin.setEncoding('utf8');
 
@@ -106,8 +106,8 @@ var startREPL = function() {
 
         serverREPL.on('exit', function() {
            // todo: other shutdown stuff, like stop db, etc.
-          
-           
+
+
            process.exit();
 
         });
@@ -116,13 +116,13 @@ var startREPL = function() {
         serverREPL.context.version = pkg.version;
         serverREPL.context.httpServer = httpServer;
     }
-    if(config.get('use_netrepl') === true){ 
+    if(config.get('use_netrepl') === true){
     	// Add UNIX socket to REPL for awesome realtime debugging
     	// We take the sweetest auto-complete with colors available module
     	var repl = require('net-repl');
 
     	var options = {
-    	    prompt: 'ironbane> ', 
+    	    prompt: 'ironbane> ',
     	    deleteSocketOnStart: true,
     	    useGlobal: true,
     	    useColors: true
@@ -205,7 +205,7 @@ var LoadActorScripts = function() {
 };
 
 function start(scripts) {
-  
+
     // create express.io server
     HttpServer = require('./src/server/http/server').Server;
     httpServer = new HttpServer({
@@ -260,24 +260,25 @@ function start(scripts) {
             // All set! Tell WorldHandler to load
             return worldHandler.loadWorld();
 
-        }).then(function() { 
+        }).then(function() {
 
             return worldHandler.Awake(); // Awaken units after loading
 
-        }).then(function() { 
+        }).then(function() {
 
             // create game server, do it first so that the other 2 "servers" can query it
             engine = new GameEngine();
 
-            engine.on('start', function() { 
+            engine.on('start', function() {
                 engine.tick();
             });
 
 
             engine.on('tick', function(elapsed) {
-
-                server.tick(elapsed).delay(100).then(engine.tick.bind(engine));
-
+                server.tick(elapsed);
+                setTimeout(function() {
+                    engine.tick.bind(engine);
+                }, 100 );
             });
 
             engine.start();
@@ -287,7 +288,7 @@ function start(scripts) {
 
             setInterval(keepAlive, 10000);
 
-            setInterval(function() { 
+            setInterval(function() {
                 worldHandler.autoSave();
             }, 60 * 1 * 1000);
 
