@@ -149,7 +149,7 @@ module.exports = function(app, db) {
                 .then(function(user) {
                     res.send(user);
                 }, function(err) {
-                    res.send(500, err);
+                    res.send(500, err.stack);
                 });
         };
 
@@ -158,7 +158,7 @@ module.exports = function(app, db) {
                 .then(function() {
                     updateUser();
                 }, function(err) {
-                    res.send(500, err);
+                    res.send(500, err.stack);
                 });
         } else {
             updateUser();

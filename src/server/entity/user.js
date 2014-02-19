@@ -72,6 +72,7 @@ module.exports = function(db) {
                 // TODO: perform update (currently update done on php site)
                 delete self.roles;
                 delete self.pass;
+                delete self.avatarUrl;
 
                 db.query("UPDATE bcs_users set ? where id = ?", [self, self.id], function(err, result){
                     if(err){
