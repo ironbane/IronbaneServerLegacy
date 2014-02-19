@@ -14,7 +14,7 @@
             <h2><a ng-href="/forum/7/topics/{{ post.id }}">{{post.title}}</a></h2>
         </div>
         <div class="col-md-2 text-right">
-            <b>by {{ post.username }}</b>
+            <b>by <userlink name="{{ post.username }}"></userlink></b>
         </div>
     </div>
     <article ng-bind-html="post.content | unsafe"></article>
