@@ -13,13 +13,17 @@
     </div>
     <div class="row" ng-repeat="post in posts">
         <div class="col-md-12 box">
-            <forumuserprofile user="post.user"></forumuserprofile>
-            <article class="postcontent">
-                <p ng-bind-html="post.mContent | unsafe"></p>
-                <div ng-show="post.user.sig" class="signature">
-                    {{post.user.sig}}
-                </div>
-            </article>
+            <div class="col-md-2">
+                <forumuserprofile user="post.user"></forumuserprofile>
+            </div>
+            <div class="col-md-10">
+                <article class="postcontent">
+                    <p ng-bind-html="post.mContent | unsafe"></p>
+                    <div ng-show="post.user.sig" class="signature">
+                        {{post.user.sig}}
+                    </div>
+                </article>
+            </div>
         </div>
     </div>
     <div class="row">

@@ -4,9 +4,8 @@
         <img class="media-object dp img-circle" ng-src="{{ user.avatarUrl }}" style="width: 100px;height:100px;">
     </a>
     <div class="media-body">
-        <h4><small> {{ user.info_location }}</small></h4>
-        <h5>Joined: {{ user.reg_date * 1000 | date:'shortDate' }}</h5>
-        <hr style="margin:8px auto">
+        <h4 ng-if="user.info_location"><small>{{ user.info_location }}</small></h4>
+        <h5>Joined {{ user.reg_date * 1000 | date:'shortDate' }}</h5>
         <span class="label label-primary">{{user.postcount}} Posts</span>
     </div>
 </div>
