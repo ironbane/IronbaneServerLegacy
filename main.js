@@ -58,6 +58,7 @@ var NameGen = require('./External/namegen.js');
 var wrench = require('wrench');
 var crypto = require('crypto');
 
+var util = require('./Engine/ibutil.js');
 var fsi = require('./External/fsi.js');
 
 // https://github.com/chriso/node-validator
