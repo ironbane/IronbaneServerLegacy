@@ -1,4 +1,9 @@
-<div class="col-md-12 box admin-user-list">
+<div class="col-md-6 box admin-user-list">
     <h2>User Administration</h2>
-    <user-admin-panel ng-repeat="user in users" user="user"></user-admin-panel>
+	  <div class="row">
+	    <div class="col-sm-12">
+	      <input type="text" class="form-control" ng-model="userquery" placeholder="Search user">
+	    </div>
+	  </div>
+    <user-admin-panel ng-repeat="user in users | filter:userquery | limitTo:5" user="user"></user-admin-panel>
 </div>
