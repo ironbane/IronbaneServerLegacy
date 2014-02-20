@@ -1,14 +1,7 @@
 <div class="content-body">
     <div class="row">
         <div class="col-md-12 box">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4><a href = "/forum">Forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}</h4>
-                </div>
-                <div class="col-md-4 text-right">
-                    <button ng-show="currentUser.authenticated && !topic.locked" ng-click="showReplyForm()" class="btn btn-default">Reply to this topic</button>
-                </div>
-            </div>
+            <ib-forum-topic-breadcrumbs>
         </div>
     </div>
     <div class="row" ng-repeat="post in posts">
@@ -28,14 +21,7 @@
     </div>
     <div class="row">
         <div class="col-md-12 box">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4><a href = "/forum">Forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}</h4>
-                </div>
-                <div class="col-md-4 text-right">
-                    <button ng-show="currentUser.authenticated && !topic.locked" ng-click="showReplyForm()" class="btn btn-default">Reply to this topic</button>
-                </div>
-            </div>
+            <ib-forum-topic-breadcrumbs>
         </div>
     </div>
     <div class="row" ng-show="isShowingReplyForm">
