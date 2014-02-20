@@ -104,7 +104,7 @@ module.exports = function(app, db) {
 
         Topic.newPost(post)
             .then(function(posttime) {
-                Board.getView(req.params.boardId, posttime).then(function(done){ 
+                Board.getView(req.params.boardId, posttime).then(function(done){
                 res.send(done);
             }, function(error){
                 log(error);
@@ -148,6 +148,14 @@ module.exports = function(app, db) {
        });
     });
 
+    app.post('/api/forum/topics/:topicId/delete', function(req, res) {
+        Topic.delete(req.params.topicId).then(function(result) {
+            res.send(result);
+        }).fail(function(err) {
+            res.send(500, err);
+        });
+    });
+
     // get all posts for topic
     app.get('/api/forum/topics/:topicId/posts', function(req, res) {
         Topic.getPostsView(req.params.topicId).then(function(results) {
@@ -180,7 +188,7 @@ module.exports = function(app, db) {
             bbcode.parse(result.content, function(html) {
                 result.content = html;
             });
-            Topic.getPostsView(result.topic_id, result.time).then(function(done){ 
+            Topic.getPostsView(result.topic_id, result.time).then(function(done){
                 res.send(done);
             }, function(error){
                 log(error);

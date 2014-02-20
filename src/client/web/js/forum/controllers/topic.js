@@ -42,7 +42,6 @@ angular.module('IronbaneApp')
             };
 
             $scope.lock = function() {
-
                 Topic.lock($scope.topic.id)
                     .then(function(succes) {
                         $log.log('topic locked');
@@ -53,7 +52,6 @@ angular.module('IronbaneApp')
             };
 
             $scope.unlock = function() {
-
                 Topic.unlock($scope.topic.id)
                     .then(function(succes) {
                         $log.log('topic unlocked');
@@ -64,7 +62,6 @@ angular.module('IronbaneApp')
             };
 
             $scope.sticky = function() {
-
                 Topic.sticky($scope.topic.id)
                     .then(function(succes) {
                         $log.log('topic sticky');
@@ -75,7 +72,6 @@ angular.module('IronbaneApp')
             };
 
             $scope.unsticky = function() {
-
                 Topic.unsticky($scope.topic.id)
                     .then(function(succes) {
                         $log.log('topic unsticky');
@@ -83,6 +79,19 @@ angular.module('IronbaneApp')
                     }, function(error) {
                         $log.log('error while unstickying topic');
                     });
+            };
+
+            $scope.delete = function() {
+                if (window.confirm("Are you sure you wish to delete this topic?")) {
+                    Topic.delete($scope.topic.id)
+                        .then(function(succes) {
+                            $log.log('topic delete');
+                            window.location.href = 'forum/' + $scope.board.id;
+                        }, function(error) {
+                            $log.log('error while deleting topic');
+                        });
+                }
+
             };
 
             $scope.isShowingReplyForm = false;

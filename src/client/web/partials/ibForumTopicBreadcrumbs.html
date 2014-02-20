@@ -1,8 +1,21 @@
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-6">
         <h4><a href = "/forum">Forum</a> - <a href= "/forum/{{board.id}}">{{board.name}}</a> - {{topic.title}}</h4>
     </div>
-    <div class="col-md-4 text-right">
-        <button ng-show="currentUser.authenticated && !topic.locked" ng-click="showReplyForm()" class="btn btn-default">Reply to this topic</button>
+    <div class="col-md-6 text-right">
+    	<button ng-show="currentUser.$isSiteModerator()" ng-click="
+        delete()" class="btn btn-danger">Delete</button>
+    	<button ng-show="currentUser.$isSiteModerator() && !topic.locked" ng-click="
+        lock()" class="btn btn-danger">Lock</button>
+    	<button ng-show="currentUser.$isSiteModerator() && topic.locked" ng-click="
+        unlock()" class="btn btn-success">Unlock</button>
+    	<button ng-show="currentUser.$isSiteModerator() && !topic.sticky" ng-click="
+        sticky()" class="btn btn-warning">Sticky</button>
+    	<button ng-show="currentUser.$isSiteModerator() && topic.sticky" ng-click="
+        unsticky()" class="btn btn-info">Unsticky</button>
+        <button ng-show="currentUser.authenticated && !topic.locked" ng-click="
+        showReplyForm()" class="btn btn-default">Reply to this topic</button>
+
+        <a ng-show="currentUser.$isSiteAdmin()" class="admin_menu" ng-href="/editor"></a>
     </div>
 </div>

@@ -4,6 +4,8 @@
             <ib-forum-topic-breadcrumbs>
         </div>
     </div>
+    <div class="alert alert-info" ng-if="topic.sticky">This thread is sticky!</div>
+    <div class="alert alert-danger" ng-if="topic.locked">This thread is locked. Replies can no longer be made.</div>
     <div class="row" ng-repeat="post in posts">
         <div class="col-md-12 box">
             <div class="col-md-2">

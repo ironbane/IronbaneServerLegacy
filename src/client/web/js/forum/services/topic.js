@@ -74,6 +74,15 @@ angular.module('IronbaneApp')
                     });
             };
 
+            Topic.delete = function(topicId) {
+                return $http.post('/api/forum/topics/' + topicId + '/delete')
+                    .then(function(response) {
+                        return response;
+                    }, function(error) {
+                        return $q.reject(error);
+                    });
+            };
+
             Topic.get = function(topicId) {
                 return $http.get('/api/forum/topics/' + topicId)
                     .then(function(response) {
