@@ -91,6 +91,8 @@ module.exports = function(db) {
 
                 aHash.update(cryptSalt + self.reg_date);
                 self.activationkey = aHash.digest('hex');
+                delete self.roles;
+                delete self.avatarUrl;
 
                 db.query('insert into bcs_users set ?', self, function(err, result) {
                     if (err) {
