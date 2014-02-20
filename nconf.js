@@ -27,7 +27,6 @@ nconf.defaults({
     cryptSalt: '',
     isProduction: false,
     log_level: 0, // 5 is highest
-    use_minified_source: '.min', // blank to use full sources
     use_nodetime: false,
     nodetime: {
         accountKey: '1234FOO',

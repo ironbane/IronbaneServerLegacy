@@ -200,7 +200,7 @@ module.exports = function(grunt) {
                         appName: '<%= pkg.name %>',
                         appVersion: '<%= pkg.version %>',
                         gameVersion: 'v<%= pkg.version %> Alpha', //todo: have alpha/beta stored in config?
-                        minified: '<%= cfg.get("use_minified_source") %>'
+                        minified: '<%= cfg.get("isProduction") ? ".min" : "" %>'
                     }
                 },
                 files: [
