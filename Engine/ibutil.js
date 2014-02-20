@@ -16,6 +16,7 @@
 */
 
 var fs = require('fs');
+var Q = require('q');
 
 var me = {
   walk: function(dir, done) {
@@ -48,6 +49,24 @@ var me = {
     var shasum = crypto.createHash('md5');
     shasum.update(cryptSalt+password);
     return shasum.digest('hex');
+  },
+  deferredQuery: function(db, query) {
+    var deferred = Q.defer();
+
+    var mainArguments = Array.prototype.slice.call(arguments);
+    mainArguments.shift();
+    mainArguments.push(function(err, results) {
+        if (err) {
+            deferred.reject('error with query: ' + err);
+            return;
+        }
+
+        deferred.resolve(results);
+    });
+
+    db.query.apply(db, mainArguments);
+
+    return deferred.promise;
   }
 };
 

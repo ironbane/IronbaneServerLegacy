@@ -21,6 +21,7 @@ module.exports = function(db) {
         _ = require('underscore'),
         Post = require('./post'),
         bbcode = require('bbcode'),
+        ibutil = require('../../../Engine/ibutil.js');
         log = require('util').log;
 
     var Topic = Class.extend({
@@ -76,6 +77,13 @@ module.exports = function(db) {
             deferred.resolve(Topic.get(topicId));
         });
         return deferred.promise;
+    };
+
+    Topic.delete = function(topicId) {
+        return ibutil.deferredQuery(db, "DELETE FROM forum_topics WHERE id = ? ", topicId)
+        .then(function(result) {
+            return ibutil.deferredQuery(db, "DELETE FROM forum_posts WHERE topic_id = ? ", topicId);
+        });
     };
 
     Topic.newPost = function(params) {

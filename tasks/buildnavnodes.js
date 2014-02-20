@@ -3,7 +3,6 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var THREE = require('../src/client/game/lib/three/three.js');
-var util = require('../Engine/util.js');
 var ProgressBar = require('progress')
 
     function roundNumber(number, decimals) {

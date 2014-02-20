@@ -56,10 +56,7 @@ var window = {};
 // Custom
 var NameGen = require('./External/namegen.js');
 var wrench = require('wrench');
-var util = require('util');
 var crypto = require('crypto');
-
-var util = require('./Engine/util.js');
 
 var fsi = require('./External/fsi.js');
 

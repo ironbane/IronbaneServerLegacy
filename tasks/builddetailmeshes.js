@@ -4,7 +4,7 @@ var path = require('path');
 var Q = require('q');
 var _ = require('underscore');
 var THREE = require('../src/client/game/lib/three/three.js');
-var util = require('../Engine/util.js');
+var ibutil = require('../Engine/ibutil.js');
 
 var nodeIdCount = 1;
 var polygonId = 1;
@@ -107,7 +107,7 @@ module.exports = function(grunt) {
                     });
 
                     // Now we need to merge all the objects found in the JSON files with the level mesh
-                    util.walk(options.assetDir + "data/" + zone, function(err, results) {
+                    ibutil.walk(options.assetDir + "data/" + zone, function(err, results) {
 
                         if (err) throw err;
 
