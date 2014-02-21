@@ -26,11 +26,9 @@
                 <li><a href="/forum">Forum</a></li>
                 <li><a href="/game" target="_self">Play!</a></li>
                 <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
-                <li>
-                    <a href="/login" ng-hide="currentUser.authenticated">Log In</a>
-                    <li><a href="/register" ng-hide="currentUser.authenticated">Register</a></li>
-                    <li><a href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a>
-                </li>
+                <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a></li>
+                <li><a href="/register" ng-hide="currentUser.authenticated">Register</a></li>
+                <li><a href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a></li>
             </ul>
         </nav>
         <div class="social pull-right">
