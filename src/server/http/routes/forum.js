@@ -66,6 +66,15 @@ module.exports = function(app, db) {
         });
     });
 
+    // get all recent topics
+    app.get('/api/forum/recent', function(req, res) {
+        Board.getRecent().then(function(results) {
+            res.send(results);
+        }, function(error) {
+            res.send(error, 500);
+        });
+    });
+
     // get a single board
     app.get('/api/forum/:boardId', function(req, res) {
         Board.get(req.params.boardId).then(function(results) {

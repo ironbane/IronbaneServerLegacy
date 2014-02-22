@@ -1,85 +1,90 @@
-<div>
-    <div class="row">
-        <div class="col-md-12 box">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
-                </div>
-                <div class="col-md-4 text-right">
-                    <button ng-show="currentUser.authenticated" ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
+<div class="row">
+    <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-12 box">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <button ng-show="currentUser.authenticated" ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row thread-listing">
-         <div class="col-md-12 box">
-            <div ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
-                <div class="row thread">
-                    <div class="col-md-1">
-                        <div class="icon" ng-style="topic.iconStyle"></div>
+        <div class="row thread-listing">
+             <div class="col-md-12 box">
+                <div ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
+                    <div class="row thread">
+                        <div class="col-md-1">
+                            <div class="icon" ng-style="topic.iconStyle"></div>
+                        </div>
+                        <div class="col-md-9">
+                            <h4><a ng-href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a></h4>
+                            <p class="thread-descr">
+                                Started by <userlink name={{topic.username}}/>
+                                on <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
+                                    <time datetime="{{ topic.firstposttime * 1000 | date }}">{{ topic.firstposttime * 1000 | date:'medium' }}</time>
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            {{ topic.postcount | number }} Posts<br>{{ topic.viewcount | number }} Views
+                        </div>
                     </div>
-                    <div class="col-md-9">
-                        <h4><a ng-href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a></h4>
-                        <p class="thread-descr">
+                </div>
+             </div>
+        </div>
+        <section ng-show="currentUser.authenticated && isShowingNewPostForm" class="new-topic-form">
+            <div class="row">
+                <div class="col-md-12 box">
+                    <post-editor board="board.id"></post-editor>
+                </div>
+            </div>
+        </section>
+        <div class="row">
+            <div class="col-md-12 box">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <button  ng-show="currentUser.authenticated" ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--         <section  class="forum-group">
+                <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
+
+                        <tr ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
+
+                            <td><a href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a><br>
                             Started by <userlink name={{topic.username}}/>
                             on <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
                                 <time datetime="{{ topic.firstposttime * 1000 | date }}">{{ topic.firstposttime * 1000 | date:'medium' }}</time>
                             </a>
-                        </p>
-                    </div>
-                    <div class="col-md-2 text-right">
-                        {{ topic.postcount | number }} Posts<br>{{ topic.viewcount | number }} Views
-                    </div>
-                </div>
-            </div>
-         </div>
-    </div>
-    <section ng-show="currentUser.authenticated && isShowingNewPostForm" class="new-topic-form">
-        <div class="row">
-            <div class="col-md-12 box">
-                <post-editor board="board.id"></post-editor>
-            </div>
-        </div>
-    </section>
-    <div class="row">
-        <div class="col-md-12 box">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4><a href="/forum">Forum</a> - {{board.name}}</h4>
-                </div>
-                <div class="col-md-4 text-right">
-                    <button  ng-show="currentUser.authenticated" ng-click="showNewPostForm()" class="btn btn-default">New topic</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<!--         <section  class="forum-group">
-            <h1 class="board-title {{ board.icon }}" ng-style="board.iconStyle">{{ board.name }}</h1>
+                            </td>
+                            <td>
+                            {{topic.postcount}}</td>
+                            <td>
+                            {{topic.viewcount}}</td>
 
-                    <tr ng-repeat="topic in topics | orderBy:['-sticky','-lastposttime']">
-
-                        <td><a href="/forum/{{board.id}}/topics/{{ topic.id }}">{{ topic.title }}</a><br>
-                        Started by <userlink name={{topic.username}}/>
-                        on <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
-                            <time datetime="{{ topic.firstposttime * 1000 | date }}">{{ topic.firstposttime * 1000 | date:'medium' }}</time>
-                        </a>
-                        </td>
-                        <td>
-                        {{topic.postcount}}</td>
-                        <td>
-                        {{topic.viewcount}}</td>
-
-                        <td> <userlink name={{topic.lastuser}}/> <br>
-                        <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
-                            <time datetime="{{ topic.lastposttime * 1000 | date }}">{{ topic.lastposttime * 1000 | date:'medium' }}</time>
-                        </a>
-                        </td>
-                    </tr>
-                </li>
-            </ul>
+                            <td> <userlink name={{topic.lastuser}}/> <br>
+                            <a href="/forum/{{board.id}}/topics/{{ topic.id }}">
+                                <time datetime="{{ topic.lastposttime * 1000 | date }}">{{ topic.lastposttime * 1000 | date:'medium' }}</time>
+                            </a>
+                            </td>
+                        </tr>
+                    </li>
+                </ul>
+            </section>
         </section>
-    </section>
-    <section ng-show="currentUser.authenticated" class="new-topic-form">
-        <post-editor board="board.id"></post-editor>
-    </section> -->
+        <section ng-show="currentUser.authenticated" class="new-topic-form">
+            <post-editor board="board.id"></post-editor>
+        </section> -->
+    </div>
+    <div class="col-md-4">
+        <recent-topics />
+    </div>
 </div>

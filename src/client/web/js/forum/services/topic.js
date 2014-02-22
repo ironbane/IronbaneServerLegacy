@@ -110,6 +110,25 @@ angular.module('IronbaneApp')
                     }, function(error) {
                         return $q.reject(error);
                     });
+            };
+
+            Topic.getRecentTopics = function(boardId) {
+                $log.log("getting topics for " + boardId);
+                return $http.get('/api/forum/recent/')
+                    .then(function(response) {
+                        var topics = [];
+
+                        // upgrade objects
+                        angular.forEach(response.data, function(topic) {
+                            //post.author = new User(post.author);
+                            topic.board_id = boardId; // for news section...
+                            topics.push(new Topic(topic));
+                        });
+                        return topics;
+
+                    }, function(error) {
+                        return $q.reject(error);
+                    });
 
             };
 

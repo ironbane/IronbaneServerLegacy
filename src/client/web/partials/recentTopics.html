@@ -1,0 +1,42 @@
+<div class="col-md-12 box">
+    <div class="row">
+        <h2>Recent topics</h2>
+
+        <div ng-repeat="topic in recentTopics | limitTo: topicsLimit">
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="/forum/{{topic.board_id}}/topics/{{topic.id}}">{{topic.title}}</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {{ topic.lastposttime * 1000 | timeago}} by <userlink name="{{topic.lastuser}}"/>
+                </div>
+            </div>
+        </div>
+        <div class="row voffset2" ng-if="topicsLimit < recentTopics.length">
+            <div class="col-md-12">
+                <button ng-click="increase()" class="btn btn-primary btn-lg center-block">Show more</button>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="!recentTopics.length">
+        <div class="col-md-12">
+            No recent topics found!
+        </div>
+    </div>
+</div>
+
+<!-- board_id: undefined
+firstposttime: 1352645040
+icon: "unreadthread"
+iconStyle: Object
+id: 369
+lastposttime: 1375919268
+lastuser: "Atlantis"
+locked: 0
+postcount: 9
+sticky: 0
+title: "Pixel's Ask Me Anything!"
+username: "Ayillon"
+viewcount: 234 -->
