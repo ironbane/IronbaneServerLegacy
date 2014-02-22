@@ -215,7 +215,8 @@ module.exports = function(grunt) {
                         port: '<%= cfg.get("server_port") %>',
                         appName: '<%= pkg.name %>',
                         appVersion: '<%= pkg.version %>',
-                        gameVersion: 'v<%= pkg.version %> Alpha' //todo: have alpha/beta stored in config?
+                        gameVersion: 'v<%= pkg.version %> Alpha', //todo: have alpha/beta stored in config?
+                        minified: '<%= cfg.get("isProduction") ? ".min" : "" %>'
                     }
                 },
                 files: [

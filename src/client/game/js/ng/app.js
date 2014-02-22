@@ -9,7 +9,9 @@ IronbaneApp
             $rootScope.currentUser = {};
             User.getCurrentUser()
                 .then(function(user) {
-                    angular.copy(user, $rootScope.currentUser);
+                    if (user !== $rootScope.currentUser) {
+                        angular.copy(user, $rootScope.currentUser);
+                    }
                 });
         }
     ])
