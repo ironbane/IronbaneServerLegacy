@@ -1,4 +1,5 @@
-<div class="content-body forum-listing">
+<loading ng-if="!cats.length"/>
+<div class="content-body forum-listing" ng-if="cats.length">
     <div class="row" ng-repeat="cat in cats">
          <div class="col-md-12 box">
             <h2>{{ cat.name }}</h2>
