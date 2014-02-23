@@ -5,7 +5,7 @@ angular.module('IronbaneApp')
                 restrict: "E",
                 scope: {},
                 templateUrl: '/partials/recentTopics.html',
-                controller: function($scope, $element) {
+                controller: ['$scope', '$element', function($scope, $element) {
                     $scope.topicsLimit = 10;
 
                     // todo: config boardId and/or config via server
@@ -22,7 +22,7 @@ angular.module('IronbaneApp')
                     $scope.decrease = function() {
                         $scope.topicsLimit -= 10;
                     };
-                }
+                }]
             };
         }
     ]);
