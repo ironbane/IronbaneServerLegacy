@@ -12,6 +12,8 @@
                 <forumuserprofile user="post.user"></forumuserprofile>
             </div>
             <div class="col-md-10">
+                posted on: {{post.time * 1000| date:'medium'}}
+                <hr/>
                 <article class="postcontent">
                     <p ng-bind-html="post.mContent | unsafe"></p>
                     <div ng-show="post.user.sig" class="signature">
