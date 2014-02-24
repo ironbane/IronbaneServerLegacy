@@ -76,7 +76,7 @@ module.exports = function(db) {
     Forum.getForumView = function() {
         var deferred = Q.defer();
         var topicQ = ' (select count(id) from forum_topics where board_id = fb.id) as topicCount, ',
-            postsQ = ' (select count(id) from forum_posts where topic_id in (select id from forum_topics where board_id = fb.id)) as postCount, ',
+            postsQ = ' (SELECT COUNT(forum_posts.id) FROM forum_posts INNER JOIN forum_topics ON forum_topics.id = topic_id WHERE board_id = fb.id ) AS postCount, ',
             boardsQ = ' fb.id, fb.name, fb.description, '
 
         db.query('SELECT ' + topicQ + postsQ + boardsQ + ' fc.name as category FROM forum_boards fb left join forum_cats fc on fb.forumcat=fc.id order by fc.order, fb.order',
