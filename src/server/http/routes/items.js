@@ -1,5 +1,5 @@
 // forum.js
-module.exports = function(app, db) {
+module.exports = function(app) {
     var log = require('util').log,
         ItemTemplateService = require('../../services/itemTemplate');
 

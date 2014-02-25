@@ -1,6 +1,6 @@
 
-module.exports = function(app, db) {
-    var Book = require('../../entity/book')(db),
+module.exports = function(app) {
+    var Book = require('../../entity/book'),
         log = require('util').log;
 
     // get a list of articles, minus content

@@ -1,7 +1,7 @@
 // menu.js
-var Class = require('../../common/class');
-
-module.exports = function(db) {
+var Class = require('../../common/class'),
+    db = require('../db');
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore');
 

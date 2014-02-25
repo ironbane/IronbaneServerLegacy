@@ -1,6 +1,6 @@
 // user.js - routes concerning users, login, registration, etc.
-module.exports = function(app, db) {
-    var User = require('../../entity/user')(db),
+module.exports = function(app) {
+    var User = require('../../entity/user')(),
         _ = require('underscore'),
         log = require('util').log;
 

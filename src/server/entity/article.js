@@ -14,9 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-var Class = require('../../common/class');
+var Class = require('../../common/class'),
+    db = require('../db');
 
-module.exports = function(db) {
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore'),
         log = require('util').log,

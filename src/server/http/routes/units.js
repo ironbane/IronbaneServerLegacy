@@ -1,6 +1,6 @@
 // units.js - ajax calls for units (instances) & unit templates
 
-module.exports = function(app, db) {
+module.exports = function(app) {
     var log = require('util').log,
         _ = require('underscore'),
         UnitTemplateSvc = require('../../services/unitTemplate'),

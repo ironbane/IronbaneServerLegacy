@@ -16,8 +16,9 @@
 */
 var Class = require('../../common/class');
 var logger = require('../logging/winston');
+var db = require('../db');
 
-module.exports = function(db) {
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore'),
         log = require('util').log,

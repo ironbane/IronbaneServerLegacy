@@ -1,21 +1,21 @@
 // index.js
-module.exports = function(app, db) {
+module.exports = function(app) {
     var config = require('../../../../nconf'),
         Q = require('q'),
         _ = require('underscore'),
         log = require('util').log,
         fs = require('fs');
 
-    require('./main')(app, db);
-    require('./user')(app, db);
-    require('./characters')(app, db);
-    require('./books')(app, db);
-    require('./forum')(app, db);
-    require('./articles')(app, db);
-    require('./items')(app, db);
-    require('./units')(app, db);
-    require('./messages')(app, db);
-    require('./discussions')(app, db);
+    require('./main')(app);
+    require('./user')(app);
+    require('./characters')(app);
+    require('./books')(app);
+    require('./forum')(app);
+    require('./articles')(app);
+    require('./items')(app);
+    require('./units')(app);
+    require('./messages')(app);
+    require('./discussions')(app);
 
     if (config.get('github').enabled) {
         require('./github')(app);
@@ -45,10 +45,10 @@ module.exports = function(app, db) {
     // some async badassery
     var getGameModel = function() {
         var tasks = [],
-            Zone = require('../../entity/zone')(db),
-            UnitTemplate = require('../../entity/unitTemplate')(db),
+            Zone = require('../../entity/zone'),
+            UnitTemplate = require('../../entity/unitTemplate'),
             ItemTemplateService = require('../../services/itemTemplate'),
-            Mesh = require('../../entity/mesh')(db);
+            Mesh = require('../../entity/mesh');
 
         tasks.push(Zone.getAll().then(function(zones) {
             _.each(zones, function(zone) {

@@ -1,13 +1,13 @@
 // forum.js
-module.exports = function(app, db) {
+module.exports = function(app) {
     var log = require('util').log,
         _ = require('underscore'),
-        Forum = require('../../entity/forum')(db),
-        Board = require('../../entity/board')(db),
-        User = require('../../entity/user')(db),
-        Topic = require('../../entity/topic')(db),
-        Article = require('../../entity/article')(db),
-        Post = require('../../entity/post')(db),
+        Forum = require('../../entity/forum')(),
+        Board = require('../../entity/board')(),
+        User = require('../../entity/user')(),
+        Topic = require('../../entity/topic')(),
+        Article = require('../../entity/article')(),
+        Post = require('../../entity/post')(),
         bbcode = require('bbcode'),
         winston = require('../../logging/winston');
 

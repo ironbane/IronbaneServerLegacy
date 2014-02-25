@@ -15,8 +15,10 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 var Class = require('../../common/class');
+var db = require('../db.js');
 
-module.exports = function(db) {
+
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore'),
         marked = require('marked'),

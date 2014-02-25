@@ -19,15 +19,14 @@
 var config = require('../../../nconf'),
     path = require('path'),
     Class = require('../../common/class'),
-    log = require('util').log; // built in timestampped logger
+    log = require('util').log,
+    db = require('../db.js');
 
 var logger = require('../logging/winston');
 
 var Server = Class.extend({
     init: function(config) {
         config = config || {};
-
-        this.db = config.db;
 
         // this will allow us to choose whether or not the http server is used,
         // say from cmdline or config
@@ -40,14 +39,13 @@ var Server = Class.extend({
         log('starting http server...');
 
         logger.info("Starting http server");
-        var db = this.db;
 
         // create http api server
         var express = require('express.io');
         var MySQLStore = require('connect-mysql')(express);
         var passport = require('passport');
         var LocalStrategy = require('passport-local').Strategy;
-        var User = require('../entity/user')(db);
+        var User = require('../entity/user')();
 
         passport.serializeUser(function(user, done) {
             done(null, user.id);
@@ -84,7 +82,9 @@ var Server = Class.extend({
         app.passport = passport; // convienience
 
         app.configure(function() {
-            var sessionStore = new MySQLStore({client: db});
+            var options = {config: {user: db.config.user,password: db.config.password,database:db.config.database}};
+            console.log(options)
+            var sessionStore = new MySQLStore(options);
 
             app.use(express.favicon(config.get('buildTarget') + "game/favicon.ico")); // todo: move to common
             app.use(express.compress());
@@ -191,7 +191,7 @@ var Server = Class.extend({
         });
 
         // load routes
-        require('./routes')(app, db);
+        require('./routes')(app);
 
         this.server = app;
 

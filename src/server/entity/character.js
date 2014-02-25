@@ -17,8 +17,8 @@
 var Class = require('../../common/class'),
     getName = require('../../common/namegen'),
     log = require('util').log,
-    ItemService = require('../services/item');
-
+    ItemService = require('../services/item'),
+    db = require('../db');
 // for now just sticking this here, todo: get from config or something
 var skinIdMaleStart = 1000;
 var skinIdMaleEnd = 1004;
@@ -45,7 +45,7 @@ function rnd(minv, maxv) {
     return Math.floor(Math.random() * (maxv - minv + 1)) + minv;
 }
 
-module.exports = function(db) {
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore');
 

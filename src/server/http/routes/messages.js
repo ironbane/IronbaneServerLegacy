@@ -1,9 +1,9 @@
 // messages.js 
 
     var log = require('util').log;
-module.exports = function(app, db) {
+module.exports = function(app) {
 
-    var Message = require('../../entity/message')(db);
+    var Message = require('../../entity/message');
 // create message
     app.post('/api/message', function(req, res) {
         var message = {

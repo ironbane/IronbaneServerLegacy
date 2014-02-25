@@ -1,8 +1,8 @@
 // article.js - dynamic web pages, stored in markdown
 var util = require('util');
 
-module.exports = function(app, db) {
-    var Article = require('../../entity/article')(db);
+module.exports = function(app) {
+    var Article = require('../../entity/article');
 
     // get a list of articles, minus content
     app.get('/api/article', app.ensureAuthenticated, app.authorizeAny(['ADMIN', 'EDITOR']), function(req, res) {

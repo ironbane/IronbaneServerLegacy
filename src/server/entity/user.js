@@ -1,9 +1,10 @@
 // user.js - backend user entity / service
 var Class = require('../../common/class'),
     config = require('../../../nconf'),
-    log = require('util').log;
+    log = require('util').log,
+    db = require('../db');
 
-module.exports = function(db) {
+module.exports = function() {
     var Q = require('q'),
         _ = require('underscore'),
         gravatar = require('nodejs-gravatar');
@@ -357,8 +358,12 @@ module.exports = function(db) {
                 deferred.reject(err);
                 return;
             }
+            if(userview.length<1){
+                deferred.reject("user not found");
+                return;
+            }
             var user = userview[0];
-            if(user.character_avatar !== 0) {
+            if(user.character_avatar && user.character_avatar !== 0) {
                 // get character based avatar
                 user.avatarUrl = "";
             } else {
