@@ -99,10 +99,7 @@ angular.module('User') // separate module for sharing with website
 
     // get currently signed in user if exists or guest account
     User.getCurrentUser = function() {
-        if ($rootScope.currentUser) {
-            return $q.when($rootScope.currentUser);
-        } else {
-            return $http.get('/api/session/user')
+        return $http.get('/api/session/user')
                 .then(function(response) {
                     $log.debug('get user success', response);
 
@@ -130,7 +127,7 @@ angular.module('User') // separate module for sharing with website
                 }, function(err) {
                     return $q.reject(err);
                 });
-        }
+        
     };
 
     // criteria for valid username
