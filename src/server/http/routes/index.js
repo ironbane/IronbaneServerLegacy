@@ -45,10 +45,10 @@ module.exports = function(app) {
     // some async badassery
     var getGameModel = function() {
         var tasks = [],
-            Zone = require('../../entity/zone'),
-            UnitTemplate = require('../../entity/unitTemplate'),
+            Zone = require('../../entity/zone')(),
+            UnitTemplate = require('../../entity/unitTemplate')(),
             ItemTemplateService = require('../../services/itemTemplate'),
-            Mesh = require('../../entity/mesh');
+            Mesh = require('../../entity/mesh')();
 
         tasks.push(Zone.getAll().then(function(zones) {
             _.each(zones, function(zone) {

@@ -1,6 +1,6 @@
 // characters.js
 module.exports = function(app) {
-    var Character = require('../../entity/character');
+    var Character = require('../../entity/character')();
 
     // all characters for a user
     // todo: remove 0 as there is another url
