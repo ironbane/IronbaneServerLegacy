@@ -10,31 +10,30 @@
     <!-- we need to base at other than root -->
     <base href="@@root/" />
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/ironbane.css" />
+    <link rel = "stylesheet" href="/css/ironbane.css" />
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top" style="padding-left:60px;">
          <nav>
             <div class="navbar-header" style="padding-top: 8px; padding-right: 20px;">
                 <div class="small-logo-wrapper">
-                    <a href="/"><img class="small-logo" src="images/mascot_small.png"></a>
+                    <a href="/"><img class="small-logo" src="images/mascot_small.png" alt="small logo"></a>
                 </div>
             </div>
             <ul class="nav navbar-nav">
-                <li><a href="/?scrollTo=news">News</a></li>
-                <li><a href="/forum">Forum</a></li>
-                <li><a href="/game" target="_self">Play!</a></li>
-                <li><a href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
-                <li><a href="/login" ng-hide="currentUser.authenticated">Log In</a></li>
-                <li><a href="/register" ng-hide="currentUser.authenticated">Register</a></li>
-                <li><a href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a></li>
+                <li><a title="news" href="/?scrollTo=news">News</a></li>
+                <li><a title="forum" href="/forum">Forum</a></li>
+                <li><a title="play the game" href="/game">Play!</a></li>
+                <li><a title="user preferences" href="/profile" ng-show="currentUser.authenticated">Preferences</a></li>
+                <li><a title="login" href="/login" ng-hide="currentUser.authenticated">Log In</a></li>
+                <li><a title="register" href="/register" ng-hide="currentUser.authenticated">Register</a></li>
+                <li><a title="logout" href="" ng-click="logout()" ng-show="currentUser.authenticated">Log Out</a></li>
             </ul>
         </nav>
         <div class="social pull-right">
-            <a class="twitter" href="https://twitter.com/IronbaneMMO" target="_blank"></a>
-            <a class="github" href="https://github.com/ironbane" target="_blank"></a>
-            <a ng-show="currentUser.$isSiteAdmin()" class="admin_menu" ng-href="/editor"></a>
+            <a class="twitter" title="twitter link" href="https://twitter.com/IronbaneMMO" target="_blank"></a>
+            <a class="github" title="github link" href="https://github.com/ironbane" target="_blank"></a>
+            <a title="administration" ng-show="currentUser.$isSiteAdmin()" class="admin_menu" ng-href="/editor"></a>
         </div>
     </header>
 
@@ -44,16 +43,15 @@
         <footer class="row">
             <div class="col-md-12 box text-center">
                 <p>&copy; Ironbane 2014</p>
-                <p><a href="article/terms">Terms of Use</a> - <a href="article/privacy">Privacy Policy</a></p>
+                <p><a title="article/terms" href="article/terms">Terms of Use</a> - <a title="article/privacy" href="article/privacy">Privacy Policy</a></p>
             </div>
         </footer>
     </div>
-
-    <script src="/lib/jquery-2.0.3.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular@@minified.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-route@@minified.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-sanitize@@minified.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular-animate@@minified.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular@@minified.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-route@@minified.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-sanitize@@minified.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-animate@@minified.js"></script>
     <script src="/lib/angular-ui/ui-utils.js"></script>
     <script src="/lib/markitup/jquery.markitup.js"></script>
     <script src="/lib/markitup/sets/bbcode/set.js"></script>
