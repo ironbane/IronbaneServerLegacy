@@ -4,7 +4,6 @@ angular.module('IronbaneApp')
         function(User, $scope, $http, $log, $rootScope, $anchorScroll) {
             $scope.user = angular.copy($rootScope.currentUser);
             $scope.user.info_gender = $rootScope.currentUser.info_gender === 0 ? 'male' : 'female';
-            $log.log($scope.user);
             $scope.genderOptions = [{
                 gender: "male"
             }, {
@@ -31,10 +30,8 @@ angular.module('IronbaneApp')
 
                 $http.post('/api/user/preferences', $scope.user)
                     .success(function(response) {
-                        User.getCurrentUser()
-                            .then(function(user) {
-                                angular.copy(user, $rootScope.currentUser);
-                            });
+                        User.getCurrentUser();
+                            
                         $scope.saveSuccess = true;
                         $scope.saveSuccessMsg = "Update succesful!";
 
