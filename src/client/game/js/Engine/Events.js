@@ -69,63 +69,66 @@ $(document).keydown(function(event) {
     if (event.keyCode === 27) {
 
         if (!cinema.IsPlaying()) {
-            hudHandler.messageAlert("Back to the Main Menu?", "question", function() {
-                socketHandler.readyToReceiveUnits = false;
-                socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
-                    if (!_.isUndefined(reply.errmsg)) {
-                        hudHandler.messageAlert(reply.errmsg);
-                        return;
-                    }
+            if(!$('#alertBox').is(':visible')){
+                hudHandler.messageAlert("Back to the Main Menu?", "question", function() {
+                    socketHandler.readyToReceiveUnits = false;
+                    socketHandler.socket.emit('backToMainMenu', {}, function(reply) {
+                        if (!_.isUndefined(reply.errmsg)) {
+                            hudHandler.messageAlert(reply.errmsg);
+                            return;
+                        }
 
-                    $('#gameFrame').animate({
-                        opacity: 0.00
-                    }, 1000, function() {
+                        $('#gameFrame').animate({
+                            opacity: 0.00
+                        }, 1000, function() {
 
-                        setTimeout(function() {
-                            ironbane.showingGame = false;
-                        }, 100);
+                            setTimeout(function() {
+                                ironbane.showingGame = false;
+                            }, 100);
 
-                        socketHandler.inGame = false;
+                            socketHandler.inGame = false;
 
-                        socketHandler.readyToReceiveUnits = false;
+                            socketHandler.readyToReceiveUnits = false;
 
-                        ironbane.getUnitList().destroy();
+                            ironbane.getUnitList().destroy();
 
-                        ironbane.getUnitList().clear();
+                            ironbane.getUnitList().clear();
 
-                        terrainHandler.Destroy();
+                            terrainHandler.Destroy();
 
-                        terrainHandler.status = terrainHandlerStatusEnum.INIT;
+                            terrainHandler.status = terrainHandlerStatusEnum.INIT;
 
-                        ironbane.player.Destroy();
+                            ironbane.player.Destroy();
 
-                        ironbane.player = null;
+                            ironbane.player = null;
 
-                        socketHandler.loggedIn = false;
+                            socketHandler.loggedIn = false;
 
-                        $('div[id^="li"]').remove();
-                        $('div[id^="ii"]').remove();
+                            $('div[id^="li"]').remove();
+                            $('div[id^="ii"]').remove();
 
-                        // is startdata right here? check session user instead?
-                        $.get('/api/user/' + startdata.user + '/characters')
-                            .done(function(data) {
-                                window.chars = data;
-                                window.charCount = window.chars.length;
+                            // is startdata right here? check session user instead?
+                            $.get('/api/user/' + startdata.user + '/characters')
+                                .done(function(data) {
+                                    window.chars = data;
+                                    window.charCount = window.chars.length;
 
-                                startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
+                                    startdata.characterUsed = hudHandler.GetLastCharacterPlayed();
 
-                                hudHandler.ShowMenuScreen();
-                                hudHandler.MakeCharSelectionScreen();
-                            })
-                            .fail(function(err) {
-                                console.error('error getting chars...', err);
-                            });
+                                    hudHandler.ShowMenuScreen();
+                                    hudHandler.MakeCharSelectionScreen();
+                                })
+                                .fail(function(err) {
+                                    console.error('error getting chars...', err);
+                                });
+                        });
                     });
+                }, function() {
+
                 });
-            }, function() {
-
-            });
-
+            } else if {
+                $('#btnNo').click()
+            }
         } else {
             hudHandler.messageAlert("Skip Cutscene?", "question", function() {
                 ironbane.player.canMove = true;
