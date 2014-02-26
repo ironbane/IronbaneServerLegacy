@@ -38,12 +38,7 @@ var eyesIdMaleEnd = 1009;
 var eyesIdFemaleStart = 1010;
 var eyesIdFemaleEnd = 1019;
 
-function rnd(minv, maxv) {
-    if (maxv < minv) {
-        return 0;
-    }
-    return Math.floor(Math.random() * (maxv - minv + 1)) + minv;
-}
+
 
 module.exports = function(db) {
     var Q = require('q'),
@@ -340,16 +335,16 @@ module.exports = function(db) {
             });
 
         // boy or girl
-        if(rnd(1, 100) > 50) {
+        if(_.random(1, 100) > 50) {
             // boy
-            character.skin = rnd(skinIdMaleStart, skinIdMaleEnd);
-            character.eyes = rnd(eyesIdMaleStart, eyesIdMaleEnd);
-            character.hair = rnd(hairIdMaleStart, hairIdMaleEnd);
+            character.skin = _.random(skinIdMaleStart, skinIdMaleEnd);
+            character.eyes = _.random(eyesIdMaleStart, eyesIdMaleEnd);
+            character.hair = _.random(hairIdMaleStart, hairIdMaleEnd);
         } else {
             // girl
-            character.skin = rnd(skinIdFemaleStart, skinIdFemaleEnd);
-            character.eyes = rnd(eyesIdFemaleStart, eyesIdFemaleEnd);
-            character.hair = rnd(hairIdFemaleStart, hairIdFemaleEnd);
+            character.skin = _.random(skinIdFemaleStart, skinIdFemaleEnd);
+            character.eyes = _.random(eyesIdFemaleStart, eyesIdFemaleEnd);
+            character.hair = _.random(hairIdFemaleStart, hairIdFemaleEnd);
         }
 
         // save to db to get ID
