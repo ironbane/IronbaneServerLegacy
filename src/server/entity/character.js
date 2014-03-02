@@ -131,10 +131,16 @@ module.exports = function(db) {
     function checkBadName(name) {
         var deferred = Q.defer();
         var ironbot = require(APP_ROOT_PATH + '/src/server/game/ironbot/ironbot');
+        var validator = require('validator');
         if(ironbot.detectBadwords(name)) {
             deferred.reject('Choose a better name.');
 	} else {
+        if(validator.isAlpha(name)){
             deferred.resolve();
+        }
+        else{
+            deferred.reject('Only alphabetical characters are allowed');
+        }
         }
         return deferred.promise;
     }
