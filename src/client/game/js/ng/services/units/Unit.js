@@ -27,7 +27,7 @@ var sizeScalingSpeed = 2;
 
 IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject, $injector){
   var Unit = function(position, rotation, id, name, param, size) {
-    PhysicsObject.apply(this,arguments);
+    PhysicsObject.apply(this,[position]);
     this.timers = {};
     // Used for network units
     this.fakeVelocity = new THREE.Vector3();
@@ -187,7 +187,7 @@ IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject
         this.renderNameMesh(this.name);
     }
 
-    this.addShadow();
+    Unit.prototype.addShadow.apply(this);
   };
   Unit.prototype.isPlayer= function(){
     // This only checks if units are networked players
@@ -379,13 +379,13 @@ IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject
 
       var cp = WorldToCellCoordinates(this.position.x, this.position.z, cellSize);
 
-      var cellStandingOn = !_.isUndefined(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
+      var cellStandingOn = angular.isDefined(terrainHandler.cells[cp.x+"-"+cp.z]) ? terrainHandler.cells[cp.x+"-"+cp.z] : null;
 
       if ( this.enableGravity ) {
 
         var grav = gravity.clone();
 
-        if ( getZoneConfig("enableFluid") && this.position.y < getZoneConfig('fluidLevel')-0.5 ) {
+        if ( ZoneConstants.getZoneConfig("enableFluid") && this.position.y < ZoneConstants.getZoneConfig('fluidLevel')-0.5 ) {
           grav.multiplyScalar(-1);
           if ( this.velocity.y < -0.5 ) {
             this.velocity.add(new THREE.Vector3(0, dTime*15, 0));
@@ -396,18 +396,18 @@ IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject
             }
           }
         }
-        if ( TerrainHandler.getZoneConfig("enableFluid") && this.position.y < TerrainHandler.getZoneConfig('fluidLevel') ) {
+        if ( ZoneConstants.getZoneConfig("enableFluid") && this.position.y < ZoneConstants.getZoneConfig('fluidLevel') ) {
           if ( this.timers.waterSplashTimeout >= 0 ) this.timers.waterSplashTimeout -= dTime;
           else {
             this.waterSplashTimeout = 0.1;
-            particleHandler.Add(getZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
+            particleHandler.Add(ZoneConstants.getZoneConfig("fluidType") === "lava" ? ParticleTypeEnum.LAVABURN : ParticleTypeEnum.SPLASH, {
               position:this.position.clone()
             });
           }
         }
 
-        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < getZoneConfig('fluidLevel')) ) {
-          if ( !TerrainHandler.getZoneConfig("enableFluid") || this.position.y < TerrainHandler.getZoneConfig('fluidLevel')-0.6 || this.position.y > TerrainHandler.getZoneConfig('fluidLevel')-0.4 ) {
+        if ( !(this instanceof Fighter && this.timers.lastJumpTimer > 0 && this.position.y < ZoneConstants.getZoneConfig('fluidLevel')) ) {
+          if ( !TerrainHandler.getZoneConfig("enableFluid") || this.position.y < ZoneConstants.getZoneConfig('fluidLevel')-0.6 || this.position.y > TerrainHandler.getZoneConfig('fluidLevel')-0.4 ) {
             this.velocity.add(grav.clone().multiplyScalar(dTime));
           }
           else {
@@ -623,7 +623,7 @@ IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject
 
     // Additional offset for special units (hacky...)
 
-    if ( !(this.isPlayer()) && this.name == "Ghost" ) offset.y += 0.5;
+    if ( !(Unit.prototype.isPlayer.apply(this)) && this.name == "Ghost" ) offset.y += 0.5;
 
 
     var renderPosition = this.position.clone().add(offset);

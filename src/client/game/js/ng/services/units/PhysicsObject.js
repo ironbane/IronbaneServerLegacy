@@ -33,9 +33,9 @@ IronbaneApp.factory('PhysicsObject', ['$injector',function($injector){
         // These values are global, not local and are READ-ONLY!
         // They will be written by the object3D world matrix
         // To change these change the values of the object3D member
-        this.position = _.clone(position || new THREE.Vector3(0.0, 0.0, 0.0));
+        this.position = _.clone(position) || new THREE.Vector3(0.0, 0.0, 0.0);
         this.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
-        this.scale = _.clone(scale || new THREE.Vector3(1.0, 1.0, 1.0));
+        this.scale = _.clone(scale) || new THREE.Vector3(1.0, 1.0, 1.0);
 
 
         // Keep track of old velocities so we can calculate the velocity
@@ -59,9 +59,9 @@ IronbaneApp.factory('PhysicsObject', ['$injector',function($injector){
 
 
         // Can be written to!
-        this.object3D.position = _.clone(position || new THREE.Vector3(0.0, 0.0, 0.0));
+        this.object3D.position = _.clone(position) || new THREE.Vector3(0.0, 0.0, 0.0);
         this.object3D.rotation = rotation || new THREE.Euler(0.0, 0.0, 0.0);
-        this.object3D.scale = _.clone(scale || new THREE.Vector3(1.0, 1.0, 1.0));
+        this.object3D.scale = _.clone(scale) || new THREE.Vector3(1.0, 1.0, 1.0);
 
         // Pre-calculate to avoid arrows being stuck in the ground
         this.object3D.updateMatrixWorld();
@@ -72,7 +72,7 @@ IronbaneApp.factory('PhysicsObject', ['$injector',function($injector){
         this.acceleration = new THREE.Vector3();
 
         // Only applies to the local position!
-        this.velocity = _.clone(velocity || new THREE.Vector3(0.0, 0.0, 0.0));
+        this.velocity = _.clone(velocity) || new THREE.Vector3(0.0, 0.0, 0.0);
 
         this.steeringForce = new THREE.Vector3();
 

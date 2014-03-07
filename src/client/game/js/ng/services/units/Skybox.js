@@ -91,7 +91,7 @@ IronbaneApp.factory("Skybox", ["PhysicsObject","$injector","ZoneConstants","Text
 
     this.isLoaded = false;
 
-    PhysicsObject.apply(this,p);
+    PhysicsObject.apply(this,[p]);
   };
   Skybox.prototype.BuildMesh = function(geometry, jsonMaterials) {
 

@@ -116,7 +116,7 @@ IronbaneApp.service('UnitList', function(){
         **/
         this.tick = function(dTime){
             
-            this.iterate(function(unit){ unit.tick()});
+            this.iterate(function(unit){ unit.tick(dTime)});
         };
 
 });
