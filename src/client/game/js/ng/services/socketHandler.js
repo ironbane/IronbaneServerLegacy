@@ -15,7 +15,7 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 IronbaneApp
-    .factory('socketHandler', ['$log', 'socket', function($log, socket) {
+    .service('socketHandler', ['$log', 'socket','UnitList','TerrainHandler','ParticleHandler', function($log, socket, UnitList, TerrainHandler, ParticleHandler) {
         // this factory function should be a singleton, the returned object however wouldn't be
         socket.on('chatMessage', function(data) {
             hudHandler.AddChatMessage(data);
@@ -33,15 +33,15 @@ IronbaneApp
             var unit = FindUnit(data.id);
 
             if (unit) {
-                ironbane.getUnitList().addUnit(new ChatBubble(unit, data.message));
+                UnitList.addUnit(new ChatBubble(unit, data.message));
             }
         });
 
         socket.on('disconnect', function() {
             //socketHandler.socket.disconnect();
             
-            ironbane.getUnitList().destroy();
-            terrainHandler.Destroy();
+            UnitList.destroy();
+            TerrainHandler.Destroy();
             ironbane.player = null;
             //socketHandler.loggedIn = false;
 
@@ -59,7 +59,7 @@ IronbaneApp
         socket.on('toggle', function(data) {
             var unit = FindUnit(data.id);
             if (unit && unit instanceof ToggleableObstacle) {
-                unit.Toggle(data['on']);
+                unit.Toggle(data.on);
             }
         });
 
@@ -68,16 +68,16 @@ IronbaneApp
 
             if (angular.isDefined(data.fu)) {
                 unit = FindUnit(data.fu);
-                particleHandler.Add(ParticleTypeEnum[data.p], {
+                ParticleHandler.Add(ParticleTypeEnum[data.p], {
                     followUnit: unit
                 });
             } else if (angular.isDefined(data.pfu)) {
                 unit = FindUnit(data.pfu);
-                particleHandler.Add(ParticleTypeEnum[data.p], {
+                ParticleHandler.Add(ParticleTypeEnum[data.p], {
                     particleFollowUnit: unit
                 });
             } else if (angular.isDefined(data.pos)) {
-                particleHandler.Add(ParticleTypeEnum[data.p], {
+                ParticleHandler.Add(ParticleTypeEnum[data.p], {
                     position: ConvertVector3(data.pos)
                 });
             }
@@ -104,7 +104,7 @@ IronbaneApp
             var particle = new Projectile(ConvertVector3(data.s), target, unit, data.w);
             particle.velocity.add(unit.fakeVelocity);
 
-            ironbane.getUnitList().addUnit(particle);
+            UnitList.addUnit(particle);
         });
 
         socket.on('updateClothes', function(data) {
@@ -124,16 +124,16 @@ IronbaneApp
 
         socket.on('receiveItem', function(data) {
             // todo: reference this...
-            socketHandler.playerData.items.push(data);
+            me.playerData.items.push(data);
 
-            hudHandler.ReloadInventory();
+            HudHandler.ReloadInventory();
         });
 
         socket.on('lootFromBag', function(data) {
             // occurs when someone nearby loots from a bag
             // refresh the bag
             //$log.log('lootFromBag REPLY:', data);
-            hudHandler.ReloadInventory();
+            HudHandler.ReloadInventory();
             if (ironbane.player.canLoot) {
                 ironbane.player.lootItems = data.loot;
             }
@@ -147,25 +147,25 @@ IronbaneApp
                 unit.object3D.position.copy(ConvertVector3(data.p));
 
                 if (unit === ironbane.player) {
-                    terrainHandler.transitionState = transitionStateEnum.START;
+                    TerrainHandler.transitionState = transitionStateEnum.START;
 
                     $('#gameFrame').animate({
                         opacity: 0.00
                     }, 1000, function() {
-                        terrainHandler.transitionState = transitionStateEnum.MIDDLE;
+                        TerrainHandler.transitionState = transitionStateEnum.MIDDLE;
 
                         setTimeout(function() {
                             ironbane.showingGame = false;
                         }, 100);
 
-                        socketHandler.readyToReceiveUnits = false;
-                        terrainHandler.ChangeZone(data.z);
+                        me.readyToReceiveUnits = false;
+                        TerrainHandler.ChangeZone(data.z);
                         ironbane.player.unitStandingOn = null;
 
-                        hudHandler.ShowHUD();
-                        hudHandler.makeHealthBar(true);
+                        HudHandler.ShowHUD();
+                        HudHandler.makeHealthBar(true);
 
-                        hudHandler.ReloadInventory();
+                        HudHandler.ReloadInventory();
                     });
                 }
 
@@ -191,7 +191,7 @@ IronbaneApp
                     //unit.armor = data['a'];
                     unit.setArmor(data.a, data.np);
                     if (unit === ironbane.player) {
-                        hudHandler.makeArmorBar(true);
+                        HudHandler.makeArmorBar(true);
                     }
                 }
                 if (data.s === 'hm') {
@@ -203,7 +203,7 @@ IronbaneApp
                 if (data.s === 'am') {
                     unit.armorMax = data.am;
                     if (unit === ironbane.player) {
-                        hudHandler.makeArmorBar(true);
+                        HudHandler.makeArmorBar(true);
                     }
                 }
             }
@@ -220,12 +220,12 @@ IronbaneApp
                 }, 100);
 
                 setTimeout(function() {
-                    terrainHandler.transitionState = transitionStateEnum.MIDDLE;
+                    TerrainHandler.transitionState = transitionStateEnum.MIDDLE;
                 }, 100);
 
-                socketHandler.readyToReceiveUnits = false;
+                me.readyToReceiveUnits = false;
 
-                terrainHandler.ChangeZone(data.zone);
+                TerrainHandler.ChangeZone(data.zone);
 
                 ironbane.player.object3D.position.copy(data.pos);
                 ironbane.player.unitStandingOn = null;
@@ -262,7 +262,7 @@ IronbaneApp
 
         socket.on('removeUnit', function(data) {
             
-            ironbane.getUnitList().removeUnit({id:data.id});
+            UnitList.removeUnit({id:data.id});
         });
 
         socket.on('addModel', function(data) {
@@ -295,7 +295,7 @@ IronbaneApp
             } else {
                 cellPos = WorldToCellCoordinates(data.pos.x, data.pos.z, cellSize);
 
-                _.each(terrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z).objectData, function(obj) {
+                _.each(TerrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z).objectData, function(obj) {
                     if (_.isEmpty(data.metadata)) {
                         delete obj.metadata;
                     }
@@ -306,7 +306,7 @@ IronbaneApp
                     }
                 });
 
-                _.each(terrainHandler.cells, function(cell) {
+                _.each(TerrainHandler.cells, function(cell) {
                     _.each(cell.objects, function(obj) {
                         if (obj.position.clone().Round(2).equals(data.pos)) {
                             var rotation = obj.rotation.clone();
@@ -319,7 +319,7 @@ IronbaneApp
 
                             setTimeout(function() {
                                 var unit = new Mesh(ConvertVector3(data.pos), rotation, 0, param, data.metadata);
-                                ironbane.getUnitList().addUnit(unit);
+                                UnitList.addUnit(unit);
                                 cell.objects.push(unit);
                             }, 1);
                         }
@@ -343,9 +343,8 @@ IronbaneApp
                         });
 
                         if (objInList) {
-                            var temp = terrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z).objectData;
-                            temp =
-                                _.without(temp, objInList);
+                            var temp = TerrainHandler.GetCellByGridPosition(cellPos.x, cellPos.z).objectData;
+                            temp = _.without(temp, objInList);
                         }
 
                         obj.Destroy();
@@ -364,10 +363,10 @@ IronbaneApp
             });
 
             if (!le("globalEnable")) {
-                terrainHandler.GetCellByWorldPosition(pos).Reload();
+                TerrainHandler.GetCellByWorldPosition(pos).Reload();
             }
 
-            terrainHandler.RebuildOctree();
+            TerrainHandler.RebuildOctree();
         });
 
         // Pathfinding
@@ -398,7 +397,7 @@ IronbaneApp
         socket.on('snapshot', function(snapshot) {
             for (var x = 0; x < snapshot.length; x++) {
                 var unitdata = snapshot[x];
-                var unit = ironbane.getUnitList.findUnit(unitdata.id);
+                var unit = UnitList.findUnit(unitdata.id);
                 if (unit) {
                     if (unit !== ironbane.player) {
                         if (angular.isDefined(unitdata.p)) {
@@ -433,8 +432,6 @@ IronbaneApp
             }
         });
 
-        // here is where we actually send the class
-        var SocketHandler = function() {
             this.serverOnline = false;
             this.loggedIn = false;
             this.spawnLocation = null;
@@ -442,9 +439,9 @@ IronbaneApp
             this.playerData = null;
             this.readyToReceiveUnits = false;
             this.inGame = false;
-        };
+            var me = this;
 
-        SocketHandler.prototype.connect = function() {
+        this.connect = function() {
             socket.connect();
 
             socket.emit('getStartData', {}, function(reply) {
@@ -452,7 +449,7 @@ IronbaneApp
             });
         };
 
-        SocketHandler.prototype.joinGame = function() {
+        this.joinGame = function() {
             var self = this,
                 data = {
                     id: startdata.user,
@@ -478,7 +475,7 @@ IronbaneApp
                     ironbane.showingGame = false;
                 }, 100);
 
-                terrainHandler.ChangeZone(reply.zone);
+                TerrainHandler.ChangeZone(reply.zone);
 
                 self.inGame = true;
 
@@ -487,9 +484,7 @@ IronbaneApp
                     levelEditor.Start();
                 }
 
-                hudHandler.MakeSlotItems(false);
+                HudHandler.MakeSlotItems(false);
             });
         };
-
-        return SocketHandler;
     }]);

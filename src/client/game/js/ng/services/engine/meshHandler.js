@@ -15,16 +15,10 @@
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-IronbaneApp.factory('MeshHandler', function(){
-var MeshHandler = Class.extend({
-  Init: function() {
-
+IronbaneApp.service('MeshHandler', ["TextureHandler",function(TextureHandler){
 
     this.geometries = {};
-
-
-  },
-  Load: function(model, readyFunc, clone) {
+    this.Load = function(model, readyFunc, clone) {
     var me = this;
     if ( this.geometries[model] ) {
       setTimeout(function() {
@@ -34,8 +28,6 @@ var MeshHandler = Class.extend({
       }, 1);
       return;
     }
-
-
     var jsonLoader = new THREE.JSONLoader();
 
 
@@ -51,11 +43,8 @@ var MeshHandler = Class.extend({
       readyFunc(val, me.geometries[model].jsonMaterials);
       // readyFunc(geometry);
     }, null);
-
-
-
-  },
-  ProcessMesh: function(options) {
+  };
+  this.ProcessMesh = function(options) {
 
     var geometry = options.geometry;
     var jsonMaterials = options.jsonMaterials;
@@ -69,7 +58,7 @@ var MeshHandler = Class.extend({
     var meshData = options.meshData || {};
 
     // Rotate geometry
-    _.each(geometry.vertices, function(v) {
+    angular.forEach(geometry.vertices, function(v) {
       v.applyEuler(rotation);
     });
 
@@ -84,11 +73,11 @@ var MeshHandler = Class.extend({
       var tileIndex = i+1;
       var tile = "tiles/1";
 
-      if ( !_.isUndefined(meshData["t"+tileIndex]) ) {
+      if ( angular.isDefined(meshData["t"+tileIndex]) ) {
         tile = meshData["t"+tileIndex];
       }
-      if ( !_.isUndefined(metadata["t"+tileIndex]) ) {
-        if ( !_.isNaN(parseInt(metadata["t"+tileIndex],10)) ) {
+      if ( angular.isDefined(metadata["t"+tileIndex]) ) {
+        if ( angular.isNumber(parseInt(metadata["t"+tileIndex],10)) ) {
           tile = "tiles/"+metadata["t"+tileIndex];
         }
         else {
@@ -97,12 +86,12 @@ var MeshHandler = Class.extend({
       }
 
       // Check if there's a map inside the material, and if it contains a sourceFile
-      if ( !_.isUndefined(jsonMaterials[i]["mapDiffuse"]) && tile === "tiles/1" ) {
+      if ( angular.isDefined(jsonMaterials[i].mapDiffuse) && tile === "tiles/1" ) {
         // Extract the tile!
-        var texture = jsonMaterials[i]["mapDiffuse"].split(/[\\/]/);
+        var texture = jsonMaterials[i].mapDiffuse.split(/[\\/]/);
         texture = texture[texture.length-1].split(".")[0];
 
-        if ( !_.isNaN(parseInt(texture,10)) ) {
+        if ( angular.isNumber(parseInt(texture,10)) ) {
           tile = "tiles/"+texture;
         }
         else {
@@ -115,11 +104,11 @@ var MeshHandler = Class.extend({
 
     var uvscale = [];
     for(var x=1;x<=10;x++){
-      if ( !_.isUndefined(metadata["ts"+x]) ) {
+      if ( angular.isDefined(metadata["ts"+x]) ) {
         uvscale.push(new THREE.Vector2(
           parseFloat(metadata["ts"+x]),parseFloat(metadata["ts"+x])));
       }
-      else if ( !_.isUndefined(meshData["ts"+x]) ) {
+      else if ( angular.isDefined(meshData["ts"+x]) ) {
         uvscale.push(new THREE.Vector2(
           parseFloat(meshData["ts"+x]),parseFloat(meshData["ts"+x])));
       }
@@ -144,8 +133,8 @@ var MeshHandler = Class.extend({
       //   }));
       // }
       // else {
-        materials.push(ironbane.textureHandler.getTexture('images/'+tiles[i] + '.png', false, {
-          transparent:meshData["transparent"] && meshData["transparent"] === 1,
+        materials.push(TextureHandler.getTexture('images/'+tiles[i] + '.png', false, {
+          transparent:meshData.transparent && meshData.transparent === 1,
           alphaTest:0.1,
           useLighting:true
         }));
@@ -159,16 +148,14 @@ var MeshHandler = Class.extend({
       geometry: geometry,
       materials: materials
     };
-  },
-  BuildMesh: function(geometry, meshData) {
+  };
+  this.BuildMesh = function(geometry, meshData) {
 
 
-  },
-  tick: function(dTime) {
+  };
+  this.tick = function(dTime) {
 
 
 
-  }
-});
-return MeshHandler;
-});
+  };
+}]);

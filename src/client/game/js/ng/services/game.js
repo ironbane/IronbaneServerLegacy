@@ -1,22 +1,21 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler', 'Snow',
-    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, Snow) { // using $window to reveal the globals
-        // make this private so that it can't be called directly
+    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler','UnitList','TerrainHandler',"ParticleHandler",
+    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, UnitList, TerrainHandler,ParticleHandler) { 
 
 
         var Game = function() {
             // cheap hack to get mouthwash on the chat bubble
             this.mouthwash = $filter('mouthwash');
 
-            // hacked in until injection day
+            /*// hacked in until injection day
             this.textureHandler = TextureHandler;
-            this.meshHandler = new MeshHandler();
+            this.meshHandler = MeshHandler;
 
             //temporary global fix, will remove tonight
             $window.textureHandler = this.textureHandler;
             $window.meshHandler = this.meshHandler;
-
+*/
             // adjustable framerate
             this._lastFrameTime = 0;
             this._maxFrameTime = 0.03;
@@ -29,11 +28,6 @@ IronbaneApp
             this.projector = null;
             this.player = null;
             this.newLevelEditor = null;
-            var unitList = new UnitList();
-            this.getUnitList = function(){
-                return unitList;
-            };
-            
             
             this.showingGame = false;
 
@@ -174,7 +168,7 @@ IronbaneApp
                         $window.startdata.characterUsed = $window.hudHandler.GetLastCharacterPlayed();
 
                         $window.hudHandler.MakeCharSelectionScreen();
-                        $window.terrainHandler.tick(0.1);
+                        TerrainHandler.tick(0.1);
 
                         game.isRunning = true;
                         game.startTime = window.performance.now(); // shimmed!
@@ -226,22 +220,22 @@ IronbaneApp
                     game.camera.lookAt($window.previewLocation);
                 }
 
-                $window.terrainHandler.tick(dTime);
+                TerrainHandler.tick(dTime);
 
                 if ($window.socketHandler.loggedIn) {
                     // Add the player once we have terrain we can walk on
 
-                    if ($window.terrainHandler.status === $window.terrainHandlerStatusEnum.LOADED &&
-                        !$window.terrainHandler.IsLoadingCells()) {
+                    if (TerrainHandler.status === TerrainHandlerStatusEnum.LOADED &&
+                        !TerrainHandler.IsLoadingCells()) {
                         if (!game.player) {
                             game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.getPlayerData().id, $window.socketHandler.getPlayerData().name);
                         }
                     }
                 }
 
-                $window.particleHandler.tick(dTime);
+                ParticleHandler.tick(dTime);
 
-                this.getUnitList().tick(dTime);
+                UnitList.tick(dTime);
 
                 if ( game.player ) {
                     if ( le("globalEnable") && game.newLevelEditor ) {
@@ -266,11 +260,11 @@ IronbaneApp
 
                 if ( !$window.isProduction ) game.currentLoadingMessage = "All set";
 
-                if ( $window.terrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
+                if ( TerrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
                     doneLoading = false;
                     if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Terrain";
                 }
-                else if ( $window.terrainHandler.IsLoadingCells() ) {
+                else if ( TerrainHandler.IsLoadingCells() ) {
                     doneLoading = false;
                     if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Cells";
                 }

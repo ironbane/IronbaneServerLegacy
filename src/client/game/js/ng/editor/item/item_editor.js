@@ -1,5 +1,5 @@
 IronbaneApp
-.directive('itemEditor', ['$log', function($log) {
+.directive('itemEditor', ['$log', 'ProjectileTypeEnum',function($log, ProjectileTypeEnum) {
     return {
         scope: true,
         templateUrl: '/game/templates/item_editor.html',
@@ -13,7 +13,7 @@ IronbaneApp
             $scope.item_types = _.keys(ITEM_TYPE_ENUM);
             $scope.item_subtypes = ITEM_TYPE_ENUM[$scope.item_types[0]];
             // since these are the only choices
-            $scope.projectile_types = _.keys($window.ProjectileTypeEnum);
+            $scope.projectile_types = _.keys(ProjectileTypeEnum);
 
             $scope.$watch('item.type', function(type) {
                 if(!type) {

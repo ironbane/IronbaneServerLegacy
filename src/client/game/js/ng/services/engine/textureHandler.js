@@ -14,9 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-IronbaneApp
-    .service('TextureHandler', ['$log', '$window',
-        function($log, $window) {
+IronbaneApp.service('TextureHandler', ['$log', '$window', function($log, $window) {
             var _textureCache = {};
 
             function loadTexture(path, textureOnly, options) {
