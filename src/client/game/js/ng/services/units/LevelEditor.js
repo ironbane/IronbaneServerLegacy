@@ -454,8 +454,8 @@ var disableArrowKeys = function(e) {
 
 
 
-var LevelEditor = Class.extend({
-  Init: function() {
+IronbaneApp.factory("LevelEditor", function(){
+  var LevelEditor = function() {
 
     this.isShowingTileIDs = false;
     this.isPaddingTileIDs = true;
@@ -485,8 +485,8 @@ var LevelEditor = Class.extend({
 
     this.selectedNode = null;
 
-  },
-  BuildPreviewBuildMesh: function() {
+  };
+  LevelEditor.prototype.BuildPreviewBuildMesh = function() {
 
     if ( this.previewBuildMesh ) {
         releaseMesh(this.previewBuildMesh);
@@ -502,8 +502,8 @@ var LevelEditor = Class.extend({
 
     ironbane.scene.add(this.previewBuildMesh);
 
-  },
-  AddPreviewSquareToMesh: function(x, z, h, absoluteheight, color) {
+  };
+  LevelEditor.prototype.AddPreviewSquareToMesh = function(x, z, h, absoluteheight, color) {
 
     var lineGeoX = new THREE.Geometry();
     lineGeoX.vertices.push( v(-0.5*worldScale, 0.01, -0.5*worldScale), v(-0.5*worldScale, 0.01, 0.5*worldScale));
@@ -524,8 +524,8 @@ var LevelEditor = Class.extend({
     line.position.y = (absoluteheight ? h : line.position.y + h)+0.1;
 
     this.previewBuildMesh.add(line);
-  },
-  AddPreviewCircleToMesh: function(x, z, radius, color) {
+  };
+  LevelEditor.prototype.AddPreviewCircleToMesh = function(x, z, radius, color) {
 
     var lineGeoX = new THREE.CircleGeometry(radius, 16);
     var lineMatX = new THREE.LineBasicMaterial({
@@ -541,8 +541,8 @@ var LevelEditor = Class.extend({
     line.position.y = 0.1;
 
     this.previewBuildMesh.add(line);
-  },
-  SetPreviewMesh: function(id) {
+  };
+  LevelEditor.prototype.SetPreviewMesh = function(id) {
 
       levelEditor.editorGUI.mpRotX = 0;
       levelEditor.editorGUI.mpRotY = 0;
@@ -562,8 +562,8 @@ var LevelEditor = Class.extend({
 
 
 
-  },
-  ShowSelectionScreen: function(show) {
+  };
+  LevelEditor.prototype.ShowSelectionScreen = function(show) {
     if ( show ) {
       $('#tileSelectBox').show();
 
@@ -577,12 +577,12 @@ var LevelEditor = Class.extend({
     else {
       $('#tileSelectBox').hide();
     }
-  },
-  PaddingTileIDs: function() {
+  };
+  LevelEditor.prototype.PaddingTileIDs = function() {
     this.isPaddingTileIDs = !this.isPaddingTileIDs;
     this.LoadCat(this.currentCat);
-  },
-  ShowTileIDs: function() {
+  };
+  LevelEditor.prototype.ShowTileIDs = function() {
     this.isShowingTileIDs = !this.isShowingTileIDs;
     if ( this.isShowingTileIDs ) {
       $('.tileid').show();
@@ -590,8 +590,8 @@ var LevelEditor = Class.extend({
     else {
       $('.tileid').hide();
     }
-  },
-  LoadCat: function(theCat) {
+  };
+  LevelEditor.prototype.LoadCat = function(theCat) {
     if(theCat === 0){
       this.currentCat = "Tiles";
     }
@@ -661,8 +661,8 @@ var LevelEditor = Class.extend({
 
     this.SetTile(first);
 
-  },
-  SetTile: function(tile) {
+  };
+  LevelEditor.prototype.SetTile = function(tile) {
     var tileList = this.cats[this.currentCat].tilelist;    
 
     for (var j = 0; j < tileList.length; j++) {
@@ -671,8 +671,8 @@ var LevelEditor = Class.extend({
     $('#tiletype'+tile).css('outline-style', 'solid');
 
     levelEditor.editorGUI.selectedTile = tile;
-  },
-  UpdateCatLinks: function() {
+  };
+  LevelEditor.prototype.UpdateCatLinks = function() {
 
     $('#selectRange').html('');
     $('#selectRange').append('Choose a category:<br>');
@@ -690,8 +690,8 @@ var LevelEditor = Class.extend({
     }, this);
     $('#selectRange').append('<hr>');
 
-  },
-  Start: function() {
+  };
+  LevelEditor.prototype.Start = function() {
 
 
     this.ready = true;
@@ -1052,8 +1052,8 @@ var LevelEditor = Class.extend({
     this.transformControls = new THREE.TransformControls(ironbane.camera);
 
   //this.SetTile(levelEditor.editorGUI.selectedTile);
-  },
-  PlaceModel: function(position, rotX, rotY, rotZ, id, metadata) {
+  };
+  LevelEditor.prototype.PlaceModel = function(position, rotX, rotY, rotZ, id, metadata) {
 
     position = position.Round(2);
 
@@ -1096,8 +1096,8 @@ var LevelEditor = Class.extend({
 
     terrainHandler.RebuildOctree();
 
-  },
-  tick: function(dTime) {
+  };
+  LevelEditor.prototype.tick = function(dTime) {
 
 
 
@@ -1176,4 +1176,3 @@ var LevelEditor = Class.extend({
   }
 });
 
-var levelEditor = new LevelEditor();

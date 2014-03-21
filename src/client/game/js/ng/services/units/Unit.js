@@ -350,7 +350,7 @@ IronbaneApp.factory('Unit', ["PhysicsObject","$injector", function(PhysicsObject
         }
       }
     }
-
+    var socketHandler = $injector.get("socketHandler");
     if ( this.dynamic
       && socketHandler.readyToReceiveUnits
       && !(this instanceof Mesh)) {

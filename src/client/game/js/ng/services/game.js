@@ -1,7 +1,7 @@
 
 IronbaneApp
-    .factory('Game', ['$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler','UnitList','TerrainHandler',"ParticleHandler",
-    function($log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, UnitList, TerrainHandler,ParticleHandler) { 
+    .factory('Game', ['$rootScope','$log', '$window', '$http', '$timeout', '$filter', 'TextureHandler','MeshHandler','UnitList','TerrainHandler',"ParticleHandler","socketHandler","HUDHandler","TerrainHandlerStatusEnum",
+    function($rootScope,$log, $window, $http, $timeout, $filter, TextureHandler, MeshHandler, UnitList, TerrainHandler,ParticleHandler,socketHandler, HUDHandler, TerrainHandlerStatusEnum) { 
 
 
         var Game = function() {
@@ -68,11 +68,12 @@ IronbaneApp
             // Used for dynamically added objects
             this.waypointOffset = -1000000;
         
+                $rootScope.currentPlayer = socketHandler.playerData;
             this.start = function() {
                 var game = this;
 
                 if (!$window.Detector.webgl) {
-                    $window.hudHandler.ResizeFrame();
+                    HUDHandler.ResizeFrame();
                     return;
                 }
 
@@ -122,7 +123,7 @@ IronbaneApp
                     $('#gameFrame').append(this.stats.domElement);
                 }
 
-                $window.hudHandler.ResizeFrame();
+                HUDHandler.ResizeFrame();
 
                 var charUrl = '';
                 if ($window.startdata.user === 0) {
@@ -165,9 +166,9 @@ IronbaneApp
                     })
                     .then(function() {
 
-                        $window.startdata.characterUsed = $window.hudHandler.GetLastCharacterPlayed();
+                        $window.startdata.characterUsed = HUDHandler.GetLastCharacterPlayed();
 
-                        $window.hudHandler.MakeCharSelectionScreen();
+                        HUDHandler.MakeCharSelectionScreen();
                         TerrainHandler.tick(0.1);
 
                         game.isRunning = true;
@@ -209,11 +210,11 @@ IronbaneApp
                     $window.levelEditor.tick(dTime);
                 }
 
-                $window.hudHandler.tick(dTime);
+                HUDHandler.tick(dTime);
 
                 //this.snow.tick(this._elapsedTime);
 
-                if (!$window.socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
+                if (!socketHandler.loggedIn && !$window.cinema.IsPlaying()) {
                     game.camera.position.x = $window.previewLocation.x + (Math.cos(new Date().getTime() / 20000) * $window.previewDistance) - 0;
                     game.camera.position.y = $window.previewLocation.y + $window.previewHeight;
                     game.camera.position.z = $window.previewLocation.z + (Math.sin(new Date().getTime() / 20000) * $window.previewDistance) - 0;
@@ -222,13 +223,13 @@ IronbaneApp
 
                 TerrainHandler.tick(dTime);
 
-                if ($window.socketHandler.loggedIn) {
+                if (socketHandler.loggedIn) {
                     // Add the player once we have terrain we can walk on
 
                     if (TerrainHandler.status === TerrainHandlerStatusEnum.LOADED &&
                         !TerrainHandler.IsLoadingCells()) {
                         if (!game.player) {
-                            game.player = new $window.Player($window.socketHandler.spawnLocation, new $window.THREE.Euler(0, $window.socketHandler.spawnRotation, 0), $window.socketHandler.getPlayerData().id, $window.socketHandler.getPlayerData().name);
+                            game.player = new $window.Player(socketHandler.spawnLocation, new $window.THREE.Euler(0, socketHandler.spawnRotation, 0), socketHandler.getPlayerData().id, socketHandler.getPlayerData().name);
                         }
                     }
                 }
@@ -260,7 +261,7 @@ IronbaneApp
 
                 if ( !$window.isProduction ) game.currentLoadingMessage = "All set";
 
-                if ( TerrainHandler.status !== $window.terrainHandlerStatusEnum.LOADED ) {
+                if ( TerrainHandler.status !== TerrainHandlerStatusEnum.LOADED ) {
                     doneLoading = false;
                     if ( !$window.isProduction ) game.currentLoadingMessage = "Loading Terrain";
                 }
@@ -274,8 +275,8 @@ IronbaneApp
                 }
 
                 if ( !game.showingGame && doneLoading ) {
-                    if (!$window.socketHandler.inGame) {
-                        $window.hudHandler.MakeSoundButton();
+                    if (!socketHandler.inGame) {
+                        HUDHandler.MakeSoundButton();
                     }
 
                     game.showingGame = true;

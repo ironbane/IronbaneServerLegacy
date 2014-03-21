@@ -53,14 +53,14 @@ var SAFARI_SOLUTION = 'In Safari, open the <b>Safari menu</b> and select <b>Pref
 
 var messageFadeTime = 0.2;
 
-var BigMessage = Class.extend({
-    Init: function(message, duration) {
+IronbaneApp.factory("BigMessage", function(){
+    var BigMessage = function(message, duration) {
         this.message = message;
         this.duration = duration;
         this.timeLeft = duration;
         this.opacity = 1;
-    },
-    tick: function(dTime) {
+    };
+    BigMessage.prototype.tick = function(dTime) {
         this.timeLeft -= dTime;
 
         var opac = 0;
@@ -75,17 +75,17 @@ var BigMessage = Class.extend({
         }
 
         this.opacity = opac;
-    }
+    };
+    return BigMessage;
 });
 
-var HUDHandler = Class.extend({
-    bigMessages: [],
-    alertBoxActive: false,
-    screenshotMode: false,
-    Init: function() {
+IronbaneApp.service("HUDHandler", ['socketHandler',function(socketHandler){
+    this.bigMessages = [];
+    this.alertBoxActive = false;
+    this.screenshotMode = false;
         var HUD = this;
 
-        this.allowSound = !_.isUndefined(localStorage.allowSound) ? (localStorage.allowSound === 'true') : true;
+        this.allowSound = angular.isDefined(localStorage.allowSound) ? (localStorage.allowSound === 'true') : true;
 
         if (Detector.webgl) {
             if (socketHandler.serverOnline) {
@@ -93,7 +93,7 @@ var HUDHandler = Class.extend({
                 $('#chatContent').hide().trigger('hide');
             } else {
                 setTimeout(function() {
-                    hudHandler.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
+                    HUD.messageAlert('The server is currently offline. Please try again later.', 'nobutton');
                 }, 1000);
             }
         } else {
@@ -162,8 +162,7 @@ var HUDHandler = Class.extend({
         setTimeout(function() {
             handleClick(true);
         }, 1000);
-    },
-    toggleScreenShotMode: function(){
+    this.toggleScreenShotMode = function(){
         this.screenshotMode = !this.screenshotMode;
         if(this.screenshotMode === true){
             $('#statBar').hide();
@@ -190,8 +189,9 @@ var HUDHandler = Class.extend({
         $('#chatContent').scope().$apply(function(scope) {
             scope.showChatWindow = !me.screenshotMode;
         });
-    },
-    MakeSoundButton: function() {
+    };
+    this.MakeSoundButton = function() {
+        var hudHandler = this;
         var checkSoundToggle = function(value) {
 
             if (!gotFlashInstalled) {
@@ -222,11 +222,11 @@ var HUDHandler = Class.extend({
         $("#btnToggleSound").click(function() {
             checkSoundToggle(!hudHandler.allowSound);
         });
-    },
-    ShowMainMenuHUD: function() {
+    };
+    this.ShowMainMenuHUD = function() {
         $("#versionNumber, #devNews, #logo, #loadingBar").show();
-    },
-    makeInventorySlots: function(num) {
+    };
+    this.makeInventorySlots = function(num) {
         var HUD = this,
             container = $('#itemBar'),
             spaces = num;
@@ -263,8 +263,8 @@ var HUDHandler = Class.extend({
             });
             slot.click(clickFunction);
         }
-    },
-    fillInvSlot: function(item) {
+    };
+    this.fillInvSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -294,11 +294,11 @@ var HUDHandler = Class.extend({
                 ui.helper.data('item', item);
             }
         });
-    },
-    clearInvSlot: function(slotNum) {
+    };
+    this.clearInvSlot = function(slotNum) {
         $('#is' + slotNum).empty().removeClass('occupied equipped used').droppable({accept: '*'});
-    },
-    updateInvSlotStatus: function(slotNum, status) {
+    };
+    this.updateInvSlotStatus = function(slotNum, status) {
         var $slot = $('#is' + slotNum);
 
         if (status === 'equipped') {
@@ -314,28 +314,30 @@ var HUDHandler = Class.extend({
                 $slot.removeClass('used');
             }, 500);
         }
-    },
-    showInv: function(data) {
+    };
+    this.showInv = function(data) {
         var HUD = this;
         HUD.makeInventorySlots(data.slots);
         $('#itemBar').show();
 
-        _.each(data.items, function(invItem) {
+        angular.forEach(data.items, function(invItem) {
             HUD.fillInvSlot(invItem);
         });
 
         // any time we show the inventory, we should update the gold
         HUD.makeCoinBar();
-    },
-    hideInv: function() {
+    };
+    this.hideInv = function() {
         $('#itemBar').removeData().empty().hide();
-    },
-    onInvSlotDrop: function(e, ui, HUD) {
+    };
+    this.onInvSlotDrop = function(e, ui, HUD) {
         // we can drop onto inventory from a vendor, loot, or bank (currently) OR itself
         var slot = $(e.target),
             dropped = $(e.toElement),
             item = dropped.data('item'),
-            occupied = slot.children().data('item');
+            occupied = slot.children().data('item'),
+            hudHandler = this;
+
 
         function revert() {
             // prolly a more elegant way to write this...
@@ -507,8 +509,8 @@ var HUDHandler = Class.extend({
                 // otherwise we're successful and we dont care
             });
         }
-    },
-    makeLootSlots: function(num) {
+    };
+    this.makeLootSlots = function(num) {
         var HUD = this,
             container = $('#lootBar'),
             spaces = num;
@@ -524,8 +526,8 @@ var HUDHandler = Class.extend({
             // loot is NOT droppable! you may only take it
             slot.click(clickFunction);
         }
-    },
-    fillLootSlot: function(item) {
+    };
+    this.fillLootSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -540,12 +542,12 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    clearLootSlot: function(slotNum) {
+    };
+    this.clearLootSlot = function(slotNum) {
         $('#ls' + slotNum).empty();
-    },
+    };
     // this happens when someone else nearby loots an item from something you might have open
-    updateLoot: function(data) {
+    this.updateLoot = function(data) {
         var HUD = this,
             bag = $('#lootBar').data('bag');
 
@@ -556,23 +558,23 @@ var HUDHandler = Class.extend({
         if (ironbane.player.canLoot) {
             ironbane.player.lootItems = data.loot;
         }
-    },
-    showLoot: function(data) {
+    };
+    this.showLoot = function(data) {
         //console.log('showLoot', data);
         var HUD = this;
         HUD.makeLootSlots(data.slots);
         $('#lootBar').data('bag', data).show();
 
-        _.each(data.items, function(invItem, index) {
+        angular.forEach(data.items, function(invItem, index) {
             // set the slot so that it's not the one we dropped it from
             invItem.slot = index;
             HUD.fillLootSlot(invItem);
         });
-    },
-    hideLoot: function() {
+    };
+    this.hideLoot = function() {
         $('#lootBar').removeData().empty().hide();
-    },
-    makeVendorSlots: function(num) {
+    };
+    this.makeVendorSlots = function(num) {
         var HUD = this,
             container = $('#vendorBar'),
             spaces = num;
@@ -597,8 +599,8 @@ var HUDHandler = Class.extend({
             });
             slot.on('dblclick', dblClickFunction);
         }
-    },
-    fillVendorSlot: function(item) {
+    };
+    this.fillVendorSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -613,23 +615,23 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    showVendor: function(data) {
+    };
+    this.showVendor = function(data) {
         var HUD = this;
         HUD.makeVendorSlots(data.slots);
         $('#vendorBar').data('vendor', data).show();
 
-        _.each(data.items, function(item) {
+        angular.forEach(data.items, function(item) {
             HUD.fillVendorSlot(item);
         });
-    },
-    hideVendor: function() {
+    };
+    this.hideVendor = function() {
         $('#vendorBar').removeData().empty().hide();
-    },
-    clearVendorSlot: function(slotNum) {
+    };
+    this.clearVendorSlot = function(slotNum) {
         $('#vs' + slotNum).empty().droppable('enable');
-    },
-    updateVendor: function(data) {
+    };
+    this.updateVendor = function(data) {
         var HUD = this,
             vendor = $('#vendorBar').data('vendor');
 
@@ -645,8 +647,8 @@ var HUDHandler = Class.extend({
         if(ironbane.player.canLoot) {
             ironbane.player.lootItems = data.loot;
         }
-    },
-    onVendorSlotDrop: function(e, ui, HUD) {
+    };
+    this.onVendorSlotDrop=  function(e, ui, HUD) {
         // this should be when we are trying to sell something only
         var slot = $(e.target),
             dropped = $(e.toElement),
@@ -700,8 +702,8 @@ var HUDHandler = Class.extend({
                 HUD.makeCoinBar(true);
             }
         });
-    },
-    makeBankSlots: function(num) {
+    };
+    this.makeBankSlots = function(num) {
         var HUD = this,
             container = $('#bankBar'),
             spaces = num;
@@ -726,8 +728,8 @@ var HUDHandler = Class.extend({
             });
             slot.click(slotClickFunction);
         }
-    },
-    fillBankSlot: function(item) {
+    };
+    this.fillBankSlot = function(item) {
         var HUD = this,
             imageUrl = getImageUrlForItem(item);
 
@@ -742,23 +744,23 @@ var HUDHandler = Class.extend({
             containment: '#gameFrame',
             revert: 'invalid'
         });
-    },
-    showBank: function(data) {
+    };
+    this.showBank = function(data) {
         var HUD = this;
         HUD.makeBankSlots(data.slots);
         $('#bankBar').data('bank', data).show();
 
-        _.each(data.items, function(vaultItem) {
+        angular.forEach(data.items, function(vaultItem) {
             HUD.fillBankSlot(vaultItem);
         });
-    },
-    hideBank: function() {
+    };
+    this.hideBank = function() {
         $('#bankBar').removeData().empty().hide();
-    },
-    clearBankSlot: function(slotNum) {
+    };
+    this.clearBankSlot = function(slotNum) {
         $('#bs' + slotNum).empty().droppable('enable');
-    },
-    onBankSlotDrop: function(e, ui, HUD) {
+    };
+    this.onBankSlotDrop = function(e, ui, HUD) {
         var slot = $(e.target),
             dropped = $(e.toElement),
             item = dropped.data('item'),
@@ -790,9 +792,9 @@ var HUDHandler = Class.extend({
                 }
             }
         });
-    },
+    };
     // when you drop an item on the ground / gameFrame
-    onDropItem: function(e, ui, HUD) {
+    this.onDropItem = function(e, ui, HUD) {
         var dropped = $(e.toElement),
             item = dropped.data('item');
 
@@ -810,8 +812,8 @@ var HUDHandler = Class.extend({
         if(item.type === 'cash') {
             HUD.makeCoinBar(true);
         }
-    },
-    makeItemHover: function(targetEl, item) {
+    };
+    this.makeItemHover = function(targetEl, item) {
         var template = items[item.template],
             content = '',
             itemUrl = getImageUrlForItem(item, 24, 24),
@@ -889,8 +891,8 @@ var HUDHandler = Class.extend({
             .on('mouseleave', function(e) {
                 $("#tooltip").hide();
             });
-    },
-    ResizeFrame: function() {
+    };
+    this.ResizeFrame = function() {
         frameWidth = $(window).width();
         frameHeight = $(window).height();
         $('#gameFrame').css('width', frameWidth);
@@ -901,8 +903,8 @@ var HUDHandler = Class.extend({
         if (ironbane.stats && ironbane.stats.domElement) {
             ironbane.stats.domElement.style.top = ($(window).height() - 55) + 'px';
         }
-    },
-    PositionHud: function() {
+    };
+    this.PositionHud = function() {
         var halfWidth = frameWidth * 0.5,
             halfHeight = frameHeight * 0.5;
 
@@ -949,8 +951,8 @@ var HUDHandler = Class.extend({
 
         $('#devNews').css('left', (halfWidth + 200) + 'px');
         $('#devNews').css('top', (halfHeight - 57) + 'px');
-    },
-    GetStatContent: function(amount, prefix, fullStat, onlyFull, noMarginSpace) {
+    };
+    this.GetStatContent = function(amount, prefix, fullStat, onlyFull, noMarginSpace) {
         var content = '',
             x = 0;
 
@@ -990,8 +992,8 @@ var HUDHandler = Class.extend({
         }
 
         return content;
-    },
-    makeCoinBar: function(flash) {
+    };
+    this.makeCoinBar = function(flash) {
         var self = this,
             el = $('#coinBar'),
             coins = ironbane.player.getTotalCoins(),
@@ -1013,8 +1015,8 @@ var HUDHandler = Class.extend({
                 self.makeCoinBar(false);
             }, 50);
         }
-    },
-    makeHealthBar: function(doFlash) {
+    };
+    this.makeHealthBar = function(doFlash) {
         var HUD = this;
         doFlash = doFlash || false;
         var content = this.GetStatContent(ironbane.player.health, doFlash ? 'misc/heart_medium_flash' : 'misc/heart_medium', ironbane.player.healthMax);
@@ -1025,8 +1027,8 @@ var HUDHandler = Class.extend({
                 HUD.makeHealthBar();
             }, 50);
         }
-    },
-    makeArmorBar: function(doFlash) {
+    };
+    this.makeArmorBar = function(doFlash) {
         var HUD = this;
 
         doFlash = doFlash || false;
@@ -1037,8 +1039,8 @@ var HUDHandler = Class.extend({
                 HUD.makeArmorBar();
             }, 50);
         }
-    },
-    hideAlert: function() {
+    };
+    this.hideAlert = function() {
         var HUD = this;
         $('#alertBox').hide();
         HUD.alertBoxActive = false;
@@ -1049,10 +1051,10 @@ var HUDHandler = Class.extend({
         if (!_.isUndefined(HUD.doNo)) {
             HUD.doNo = undefined;
         }
-    },
-    messageAlert: function(message, options, doYes, doNo) {
-
-        var options = options || null;
+    };
+    this.messageAlert = function(message, options, doYes, doNo) {
+        var hudHandler = this;
+        options = options || null;
 
         this.doYes = doYes;
         this.doNo = doNo;
@@ -1104,14 +1106,14 @@ var HUDHandler = Class.extend({
 
             hudHandler.doNo = undefined;
         });
-    },
-    DisableButtons: function(buttons) {
+    };
+    this.DisableButtons = function(buttons) {
         for (var b = 0; b < buttons.length; b++) {
             this.oldButtonClasses[buttons[b]] = $('#' + buttons[b]).attr('class');
             $('#' + buttons[b]).attr('class', 'ibutton_disabled');
         }
-    },
-    EnableButtons: function(buttons) {
+    };
+    this.EnableButtons = function(buttons) {
         for (var b = 0; b < buttons.length; b++) {
             if (!_.isUndefined(this.oldButtonClasses[buttons[b]])) {
                 $('#' + buttons[b]).attr('class', this.oldButtonClasses[buttons[b]]);
@@ -1119,28 +1121,29 @@ var HUDHandler = Class.extend({
                 $('#' + buttons[b]).attr('class', 'ibutton');
             }
         }
-    },
-    hideHUD: function() {
+    };
+    this.hideHUD = function() {
         this.hideInv();
 
         $("#coinBar").hide();
         $("#statBar").hide();
-    },
-    ShowHUD: function() {
+    };
+    this.ShowHUD = function() {
+
         this.showInv({
             slots: 10,
             items: socketHandler.getPlayerData().items
         });
-        hudHandler.makeHealthBar(true);
+        this.makeHealthBar(true);
         $("#coinBar").show();
         $("#statBar").show();
         $('#chatContent').show().trigger('show');
-    },
-    HideMenuScreen: function() {
+    };
+    this.HideMenuScreen = function() {
         $('#loginBox, #devNews, #sideMenu, #soundToggleBox').hide();
         soundHandler.FadeOut("music/maintheme", 5000);
-    },
-    ShowMenuScreen: function() {
+    };
+    this.ShowMenuScreen = function() {
         $('#sideMenu, #loginBox, #devNews, #soundToggleBox').show();
         $('.dragon-bar, #coinBar, #statBar').hide();
         $('#chatContent').hide().trigger('hide');
@@ -1148,21 +1151,21 @@ var HUDHandler = Class.extend({
             scope.messages = [];
         });
         soundHandler.FadeIn("music/maintheme", 5000);
-    },
-    GetLastCharacterPlayed: function() {
+    };
+    this.GetLastCharacterPlayed = function() {
         var lastChar = 0;
         var lastTimeFound = 0;
-        _.each(chars, function(character) {
+        angular.forEach(chars, function(character) {
             if (character.lastplayed > lastTimeFound) {
                 lastTimeFound = character.lastplayed;
                 lastChar = character.id;
             }
         });
         return lastChar;
-    },
-    MakeCharSelectionScreen: function() {
+    };
+    this.MakeCharSelectionScreen = function() {
         var slotsLeft = slotsAvailable - charCount;
-
+        var self = this;
         var text = '';
         text += '<div id="charSelect" class="dialog"></div>';
 
@@ -1285,7 +1288,7 @@ var HUDHandler = Class.extend({
                     }
                 }
             }
-            hudHandler.MakeCharSelectionScreen();
+            self.MakeCharSelectionScreen();
         });
 
         $('#btnNextChar').click(function() {
@@ -1309,7 +1312,7 @@ var HUDHandler = Class.extend({
                 }
             }
 
-            hudHandler.MakeCharSelectionScreen();
+            self.MakeCharSelectionScreen();
         });
 
         var enterChar = function() {
@@ -1317,12 +1320,12 @@ var HUDHandler = Class.extend({
                 return;
             }
 
-            hudHandler.DisableButtons(['btnLogOut', 'btnEnterChar',
+            self.DisableButtons(['btnLogOut', 'btnEnterChar',
                 'btnNextChar', 'btnPrevChar', 'btnDelChar'
             ]);
 
             function abortConnect() {
-                hudHandler.EnableButtons(['btnLogOut', 'btnEnterChar',
+                self.EnableButtons(['btnLogOut', 'btnEnterChar',
                     'btnNextChar', 'btnPrevChar', 'btnDelChar'
                 ]);
                 $('#gameFrame').animate({
@@ -1334,10 +1337,10 @@ var HUDHandler = Class.extend({
             $('#gameFrame').animate({
                 opacity: 0.00
             }, 1000, function() {
-                hudHandler.HideMenuScreen();
+                self.HideMenuScreen();
 
                 var tryConnect = function() {
-                    socketHandler.Connect(abortConnect);
+                    socketHandler.connect(abortConnect);
                 };
                 $('#chatContent').show();
                 if (startdata.loggedIn) {
@@ -1361,7 +1364,7 @@ var HUDHandler = Class.extend({
         $('#btnEnterChar').click(enterChar);
 
         $('#btnLogOut').click(function() {
-            hudHandler.DisableButtons(['btnLogOut']);
+            self.DisableButtons(['btnLogOut']);
 
             $.get('/logout')
                 .done(function(response) {
@@ -1370,10 +1373,10 @@ var HUDHandler = Class.extend({
                         startdata.loggedIn = false;
                         startdata.characterUsed = 0;
 
-                        hudHandler.MakeCharSelectionScreen();
+                        self.MakeCharSelectionScreen();
                     } else {
-                        hudHandler.EnableButtons(['btnLogOut']);
-                        hudHandler.messageAlert(response);
+                        self.EnableButtons(['btnLogOut']);
+                        self.messageAlert(response);
                     }
                 });
         });
@@ -1396,12 +1399,12 @@ var HUDHandler = Class.extend({
             });
 
             var confirmDeletion = function() {
-                hudHandler.DisableButtons(['btnConfirmDeletion', 'btnBack']);
+                self.DisableButtons(['btnConfirmDeletion', 'btnBack']);
 
                 var confirm = $('#charName').val();
                 if (confirm !== delChar.name) {
-                    hudHandler.messageAlert('Name does not match character name!');
-                    hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
+                    self.messageAlert('Name does not match character name!');
+                    self.EnableButtons(['btnConfirmDeletion', 'btnBack']);
                 } else {
                     $.ajax({
                         url: '/api/user/' + startdata.user + '/characters/' + startdata.characterUsed,
@@ -1410,17 +1413,17 @@ var HUDHandler = Class.extend({
                         startdata.characterUsed = 0;
                         window.chars = _.without(window.chars, delChar);
                         window.charCount = window.chars.length;
-                        hudHandler.MakeCharSelectionScreen();
+                        self.MakeCharSelectionScreen();
                     }).fail(function(error) {
                         //console.error('error deleting character!', error);
-                        hudHandler.messageAlert(error.responseText);
-                        hudHandler.EnableButtons(['btnConfirmDeletion', 'btnBack']);
+                        self.messageAlert(error.responseText);
+                        self.EnableButtons(['btnConfirmDeletion', 'btnBack']);
                     });
                 }
             };
 
             $('#charSelect').keydown(function(event) {
-                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                if (event.keyCode === 13 && !self.alertBoxActive) {
                     confirmDeletion();
                 }
             });
@@ -1428,7 +1431,7 @@ var HUDHandler = Class.extend({
             $('#btnConfirmDeletion').click(confirmDeletion);
 
             $('#btnBack').click(function() {
-                hudHandler.MakeCharSelectionScreen();
+                self.MakeCharSelectionScreen();
             });
         });
 
@@ -1446,7 +1449,7 @@ var HUDHandler = Class.extend({
                 var username = $('#username').val();
                 var password = $('#password').val();
 
-                hudHandler.DisableButtons(['btnConfirmLogin', 'btnBack']);
+                self.DisableButtons(['btnConfirmLogin', 'btnBack']);
 
                 $.post('/login', {
                     username: username,
@@ -1473,8 +1476,8 @@ var HUDHandler = Class.extend({
                             });
                     })
                     .fail(function(err) {
-                        hudHandler.messageAlert(err.responseText);
-                        hudHandler.EnableButtons(['btnConfirmLogin', 'btnBack']);
+                        self.messageAlert(err.responseText);
+                        self.EnableButtons(['btnConfirmLogin', 'btnBack']);
                         if (err.responseText === "Invalid username or password!") {
                             $('#password').val("");
                         }
@@ -1483,7 +1486,7 @@ var HUDHandler = Class.extend({
 
             (function(doLogin) {
                 $('#charSelect').keydown(function(event) {
-                    if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                    if (event.keyCode === 13 && !self.alertBoxActive) {
                         doLogin();
                     }
                 });
@@ -1492,7 +1495,7 @@ var HUDHandler = Class.extend({
             $('#btnConfirmLogin').click(doLogin);
 
             $('#btnBack').click(function() {
-                hudHandler.MakeCharSelectionScreen();
+                self.MakeCharSelectionScreen();
             });
         });
 
@@ -1528,7 +1531,7 @@ var HUDHandler = Class.extend({
                 var email = $('#email').val();
                 var url = $('#url').val();
 
-                hudHandler.DisableButtons(['btnConfirmRegister', 'btnBack']);
+                self.DisableButtons(['btnConfirmRegister', 'btnBack']);
 
                 $.post('/api/user', {
                     Ux466hj8: username,
@@ -1537,7 +1540,7 @@ var HUDHandler = Class.extend({
                     url: url
                 })
                     .done(function(response) {
-                        hudHandler.messageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function() {
+                        self.messageAlert('Registration successful! Please check your e-mail and click the activation link inside so we know you are a real human!', {}, function() {
                             location.reload();
                         });
 
@@ -1554,20 +1557,20 @@ var HUDHandler = Class.extend({
 
                     })
                     .fail(function(err) {
-                        hudHandler.EnableButtons(['btnConfirmRegister', 'btnBack']);
-                        hudHandler.messageAlert(err.responseText);
+                        self.EnableButtons(['btnConfirmRegister', 'btnBack']);
+                        self.messageAlert(err.responseText);
                     });
             });
 
             $('#charSelect').keydown(function(event) {
-                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                if (event.keyCode === 13 && !self.alertBoxActive) {
                     confirmRegister();
                 }
             });
             $('#btnConfirmRegister').click(confirmRegister);
 
             $('#btnBack').click(function() {
-                hudHandler.MakeCharSelectionScreen();
+                self.MakeCharSelectionScreen();
             });
         });
 
@@ -1724,7 +1727,7 @@ var HUDHandler = Class.extend({
             refreshChar();
 
             var confirmNewChar = (function() {
-                hudHandler.DisableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
+                self.DisableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
 
                 var ncname = $('#ncname').val();
 
@@ -1745,27 +1748,27 @@ var HUDHandler = Class.extend({
                         charCount = chars.length;
                         startdata.characterUsed = response.id;
 
-                        hudHandler.MakeCharSelectionScreen();
+                        self.MakeCharSelectionScreen();
                     })
                     .fail(function(err) {
-                        hudHandler.messageAlert(err.responseText);
-                        hudHandler.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
+                        self.messageAlert(err.responseText);
+                        self.EnableButtons(['btnConfirmNewChar', 'btnBackMainChar']);
                     });
             });
 
             $('#charSelect').keydown(function(event) {
-                if (event.keyCode === 13 && !hudHandler.alertBoxActive) {
+                if (event.keyCode === 13 && !self.alertBoxActive) {
                     confirmNewChar();
                 }
             });
             $('#btnConfirmNewChar').click(confirmNewChar);
 
             $('#btnBackMainChar').click(function() {
-                hudHandler.MakeCharSelectionScreen();
+                self.MakeCharSelectionScreen();
             });
         });
-    },
-    tick: function(dTime) {
+    };
+    this.tick = function(dTime) {
         var output = '';
 
         for (var m = 0; m < this.bigMessages.length; m++) {
@@ -1781,18 +1784,18 @@ var HUDHandler = Class.extend({
         }
 
         $('#bigMessagesBox').html(output);
-    },
-    AddBigMessage: function(msg, duration) {
+    };
+    this.AddBigMessage = function(msg, duration) {
         this.bigMessages.push(new BigMessage(msg, duration));
-    },
-    showMap: function() {
+    };
+    this.showMap = function() {
         $("#map").css("background-image", "url(data/" + terrainHandler.zone + "/map.png" + (isEditor ? "?" + (new Date()).getTime() : "") + ")");
         $("#map").show();
-    },
-    hideMap: function() {
+    };
+    this.hideMap = function() {
         $("#map").hide();
-    },
-    showBook: function(text, page) {
+    };
+    this.showBook = function(text, page) {
 
         //<button id="bookPrevPage" class="ibutton_book" style="width:150px">Previous Page</button>
         //<button id="bookNextPage" class="ibutton_book" style="width:150px">Next Page</button>
@@ -1803,39 +1806,39 @@ var HUDHandler = Class.extend({
 
         textArray = text.split("|");
 
-        if (!_.isUndefined(textArray[page])) {
+        if (angular.isDefined(textArray[page])) {
             $("#bookPageLeft").html(textArray[page]);
         } else {
             $("#bookPageLeft").empty();
         }
-        if (!_.isUndefined(textArray[page + 1])) {
+        if (angular.isDefined(textArray[page + 1])) {
             $("#bookPageRight").html(textArray[page + 1]);
         } else {
             $("#bookPageRight").empty();
         }
 
 
-        if (!_.isUndefined(textArray[page - 2])) {
+        if (angular.isDefined(textArray[page - 2])) {
             $("#bookFooterLeft").html('<button id="bookPrevPage" class="ibutton_book" style="width:150px">Previous Page</button>');
             $("#bookPrevPage").click(function() {
-                hudHandler.showBook(text, page - 2);
+                this.showBook(text, page - 2);
             });
         } else {
             $("#bookFooterLeft").empty();
         }
-        if (!_.isUndefined(textArray[page + 2])) {
+        if (angular.isDefined(textArray[page + 2])) {
             $("#bookFooterRight").html('<button id="bookNextPage" class="ibutton_book" style="width:150px">Next Page</button>');
             $("#bookNextPage").click(function() {
-                hudHandler.showBook(text, page + 2);
+                this.showBook(text, page + 2);
             });
         } else {
             $("#bookFooterRight").empty();
         }
-    },
-    hideBook: function() {
+    };
+    this.hideBook = function() {
         $("#book").hide();
-    },
-    AddChatMessage: function(msg) {
+    };
+    this.AddChatMessage = function(msg) {
         if (typeof msg === 'string') {
             // wrap it in an object for the template
             msg = {
@@ -1843,11 +1846,9 @@ var HUDHandler = Class.extend({
             };
         }
         $('#chatContent').trigger('onMessage', msg);
-    }
-});
+    };
+}]);
 
 
 
 //setTimeout(function(){hudHandler.ShowBook('Saturn is the sixth planet from the Sun and the second largest planet in the Solar System, after Jupiter. Named after the Roman god Saturn, its astronomical symbol (?) represents the god\'s sickle.|Saturn is a gas giant with an average radius about nine times that of Earth.[12][13] While only one-eighth the average density of Earth, with its larger volume Saturn is just over 95 times as massive as Earth.[14][15][16] Saturn\'s interior is probably composed of a core of iron, nickel and rock (silicon and oxygen compounds), surrounded by a deep layer of metallic hydrogen, an intermediate layer of liquid hydrogen and liquid helium and an outer gaseous layer.[17]| The planet exhibits a pale yellow hue due to ammonia crystals in its upper atmosphere. Electrical current within the metallic hydrogen layer is thought to give rise to Saturn\'s planetary magnetic field, which is slightly weaker than Earth\'s and around one-twentieth the strength of Jupiter\'s.[18]| The outer atmosphere is generally bland and lacking in contrast, although long-lived features can appear. Wind speeds on Saturn can reach 1,800 km/h (1,100 mph), faster than on Jupiter, but not as fast as those on Neptune.[19] Saturn has a prominent ring system that consists of nine continuous main rings and three discontinuous arcs, composed mostly of ice particles with a smaller amount of rocky debris and dust. |Sixty-two[20] known moons orbit the planet; fifty-three are officially named. This does not include the hundreds of "moonlets" within the rings.| Titan, Saturn\'s largest and the Solar System\'s second largest moon, is larger than the planet Mercury and is the only moon in the Solar System to retain a substantial atmosphere.[21]')}, 1000);
-
-var hudHandler = new HUDHandler();

@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with Ironbane MMO.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+IronbaneApp.service("Events", ["$window", function($window){
+    console.log("starting service events");
 // Disable right-click
 $(function() {
     $(this).bind('contextmenu', function(e) {
@@ -159,8 +160,8 @@ $(document).keydown(function(event) {
 
 })(jQuery);
 
-var mouse = new THREE.Vector2();
-var lastMouse = new THREE.Vector2();
+$window.mouse = new THREE.Vector2();
+$window.lastMouse = new THREE.Vector2();
 var relativeMouse = new THREE.Vector2();
 
 
@@ -232,7 +233,7 @@ var mouseClickFunction = function(event) {
                 if (npc) {
                     socketHandler.socket.emit('deleteNPC', npc.id);
                 } else {
-                    ironbane.getUnitList().iterate(function(unit) {
+                    UnitList.iterate(function(unit) {
 
                         if (unit.id < 0) {
 
@@ -327,3 +328,4 @@ var mouseIntervalFunction = function(event) {
     }
 
 };
+}]);

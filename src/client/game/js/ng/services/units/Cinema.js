@@ -17,15 +17,10 @@
 
 
 
-var Cinema = Class.extend({
-    Init: function() {
-
-
+IronbaneApp.service("Cinema", function(){
+    
         this.queue = [];
-
-
-    },
-    PlayCutscene: function(id) {
+    this.PlayCutscene = function(id) {
         $("#chatBox").css("opacity", 0);
         hudHandler.hideHUD();
     $('#black-bar-top,#black-bar-bottom').animate({
@@ -39,8 +34,8 @@ var Cinema = Class.extend({
             hasStarted: false
         });
 
-    },
-    EndCutscene: function() {
+    };
+    this.EndCutscene = function() {
 
     $('#black-bar-top,#black-bar-bottom').animate({
         height: 0
@@ -51,8 +46,8 @@ var Cinema = Class.extend({
 
         this.queue.shift();
 
-    },
-    Clear: function() {
+    };
+    this.Clear = function() {
 
         $('#black-bar-top,#black-bar-bottom').animate({
             height: 0
@@ -64,11 +59,11 @@ var Cinema = Class.extend({
 
         TWEEN.removeAll();
 
-    },
-    IsPlaying: function() {
+    };
+    this.IsPlaying = function() {
         return this.queue.length !== 0;
-    },
-    tick: function(dTime) {
+    };
+    this.tick= function(dTime) {
 
         if ( this.queue.length === 0 ) return;
 
@@ -82,12 +77,7 @@ var Cinema = Class.extend({
             Cutscenes[scene].start();
         }
 
-
         Cutscenes[scene].tick(dTime);
 
-    }
+    };
 });
-
-
-
-var cinema = new Cinema();

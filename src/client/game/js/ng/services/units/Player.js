@@ -255,7 +255,7 @@ IronbaneApp.factory("Player",["Fighter",function(Fighter){
     Player.prototype.checkForLoot =  function() {
         var player = this;
 
-        return ironbane.getUnitList().findUnit(function(unit) {
+        return UnitList.findUnit(function(unit) {
             if (unit instanceof LootBag || unit instanceof LootableMesh || (unit instanceof Fighter && !unit.isPlayer() && unit.template && unit.template.type === UnitTypeEnum.VENDOR)) {
                 var range = (unit instanceof LootableMesh) ? 2 : 1;
                 if (player.inRangeOfUnit(unit, range)) {
@@ -270,7 +270,7 @@ IronbaneApp.factory("Player",["Fighter",function(Fighter){
 
 
         debug.setWatch("timercount from player.js: ", _.keys(this.timers).length);
-        debug.setWatch("unitlist size", ironbane.getUnitList().size() ? ironbane.getUnitList().size() : 0);
+        debug.setWatch("unitlist size", UnitList.size() ? UnitList.size() : 0);
         debug.setWatch("bytes received",socketHandler.bytesReceived);
 
 

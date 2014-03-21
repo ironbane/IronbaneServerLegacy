@@ -16,17 +16,18 @@
 */
 
 
-var Cutscene = Class.extend({
-    init: function() {
+IronbaneApp.factory("Cutscene" , function(){
+    var Cutscene = function() {
 
 
 
-    },
-    tick: function(dTime) {
+    };
+    Cutscene.prototype.tick = function(dTime) {
 
 
-    },
-    end: function() {
+    };
+    Cutscene.prototype.end = function() {
 
-    }
+    };
+    return Cutscene;
 });

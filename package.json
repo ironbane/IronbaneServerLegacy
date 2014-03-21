@@ -73,6 +73,7 @@
     "grunt-replace": "~0.5.1",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-beep": "~0.3.0",
-    "bluebird": "~1.0.5"
+    "bluebird": "~1.0.5",
+    "karma-junit-reporter": "~0.2.1"
   }
 }

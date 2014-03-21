@@ -19,19 +19,13 @@
 var REBUILD_OCTREE_THRESHOLD = 100;
 
 // Must be dividable by 2
-var cellLoadRange = cellSize + 16;
 
 var previewLocation = new THREE.Vector3(15, 13, 54);
 
 var previewDistance = 15;
 var previewHeight = 5;
 
-var terrainHandlerStatusEnum = {
-    INIT: 0,
-    LOADING: 1,
-    LOADED: 2,
-    DESTROYED: 3
-};
+
 
 var transitionStateEnum = {
     START: 0,
@@ -43,11 +37,13 @@ var transitionStateEnum = {
 //  Send a Destroy signal to cells that are out of range
 //
 //
-IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHandler','ZoneConstants','ParticleTypeEnum',"Skybox","Cell",
-    function(TextureHandler, UnitList,ParticleHandler,ZoneConstants,ParticleTypeEnum, Skybox,Cell){
+IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHandler','ZoneConstants','ParticleTypeEnum',"Skybox","Cell","TerrainHandlerStatusEnum","$injector",
+    function(TextureHandler, UnitList,ParticleHandler,ZoneConstants,ParticleTypeEnum, Skybox,Cell,TerrainHandlerStatusEnum, $injector){
     console.log("service terrainhandler");
         // Multidimensional array per x/z cell
         this.cells = {};
+
+var cellLoadRange = ZoneConstants.cellSize + 16;
 
         this.previewZone = 1;
         ZoneConstants.zone = this.previewZone;
@@ -55,7 +51,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
         this.waterMesh = null;
         this.skybox = null;
 
-        this.status = terrainHandlerStatusEnum.INIT;
+        this.status = TerrainHandlerStatusEnum.INIT;
 
         this.lastOctreeBuildPosition = new THREE.Vector3(0, 1000000000, 0);
 
@@ -82,7 +78,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
 
             ParticleHandler.RemoveAll();
 
-            this.terrainHandlerStatusEnum = this.DESTROYED;
+            this.TerrainHandlerStatusEnum = this.DESTROYED;
         };
 
         
@@ -175,7 +171,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
 
             var me = this;
             this.skybox = new Skybox(function() {
-                me.status = terrainHandlerStatusEnum.LOADED;
+                me.status = TerrainHandlerStatusEnum.LOADED;
             });
 
 
@@ -205,7 +201,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
         };
         this.GetReferenceLocationNoClone = function() {
             var p;
-
+            var socketHandler = $injector.get("socketHandler");
             if (le("globalEnable")) {
                 p = ironbane.camera.position;
             }
@@ -226,7 +222,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
             if (ZoneConstants.zone != newZone) {
                 this.Destroy();
                 ZoneConstants.zone = newZone;
-                this.status = terrainHandlerStatusEnum.INIT;
+                this.status = TerrainHandlerStatusEnum.INIT;
                 bm(zones[ZoneConstants.zone].name);
             }
 
@@ -234,7 +230,7 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
                 ironbane.player.onChangeZone(newZone);
             }
 
-
+            var socketHandler = $injector.get("socketHandler");
             if (socketHandler.loggedIn) {
                 this.targetMusic = _.sample(ZoneConstants.getZoneConfig("music"));
             }
@@ -427,16 +423,16 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
 
             }
 
-            if (this.transitionState === transitionStateEnum.MIDDLE && this.status === terrainHandlerStatusEnum.LOADED && !this.IsLoadingCells()) {
+            if (this.transitionState === transitionStateEnum.MIDDLE && this.status === TerrainHandlerStatusEnum.LOADED && !this.IsLoadingCells()) {
                 var me = this;
                 this.transitionState = -1;
                 setTimeout(function() {
                     me.transitionState = transitionStateEnum.END;
                 }, 100);
             }
-
+            var socketHandler = $injector.get("socketHandler");
             if (!socketHandler.readyToReceiveUnits &&
-                this.status === terrainHandlerStatusEnum.LOADED &&
+                this.status === TerrainHandlerStatusEnum.LOADED &&
                 socketHandler.loggedIn) {
 
                 // soundHandler.Play("enterGame");
@@ -461,14 +457,14 @@ IronbaneApp.service('TerrainHandler', ['TextureHandler','UnitList', 'ParticleHan
             debug.setWatch('Player Cell Z', cp.z);
 
             switch (this.status) {
-                case terrainHandlerStatusEnum.INIT:
+                case TerrainHandlerStatusEnum.INIT:
                     this.Awake();
-                    this.status = terrainHandlerStatusEnum.LOADING;
+                    this.status = TerrainHandlerStatusEnum.LOADING;
                     break;
-                case terrainHandlerStatusEnum.LOADING:
+                case TerrainHandlerStatusEnum.LOADING:
 
                     break;
-                case terrainHandlerStatusEnum.LOADED:
+                case TerrainHandlerStatusEnum.LOADED:
                     for (var x = cp.x - 2; x <= cp.x + 2; x += 1) {
                         for (var z = cp.z - 2; z <= cp.z + 2; z += 1) {
                             var coords = CellToWorldCoordinates(x, z, cellSize);

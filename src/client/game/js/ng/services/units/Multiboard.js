@@ -21,8 +21,8 @@
 
 var multiboardSpritePath = 'images/multiboards/';
 
-var Multiboard = Unit.extend({
-    Init: function(position, rotY, id, param) {
+IronbaneApp.factory("Multiboard", ["Unit", function(Unit){
+    var Multiboard = function(position, rotY, id, param) {
         this._super(position, rotY, id, 'Multiboard', param);
 
         //        this.targetPosition.x = 1.0;
@@ -32,19 +32,18 @@ var Multiboard = Unit.extend({
         this.enableGravity = false;
 
 
-    },
-	Add: function () {
+    };
+	Multiboard.prototype.Add = function () {
 
 
 
-	},
-    tick: function(dTime) {
+	};
+    Multiboard.prototype.tick = function(dTime) {
 
         this._super(dTime);
 
 		//this.displayUVFrame(0, this.getDirectionSpriteIndex(), 1, 8);
 
-    }
-});
-
-
+    };
+    return Multiboard;
+}]);

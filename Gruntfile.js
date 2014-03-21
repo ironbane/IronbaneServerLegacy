@@ -74,11 +74,23 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/ng/app.js", // load angular app first
                     //"<%= gameScriptPath %>/ng/states.js", // do not load this yet
                     "<%= gameScriptPath %>/ng/services/game.js",
-                    "<%= gameScriptPath %>/ng/services/socket.js",
+                    //"<%= gameScriptPath %>/ng/services/socket.js",
                     "<%= gameScriptPath %>/ng/services/character.js",
                     "<%= gameScriptPath %>/ng/services/timer.js",
                     "<%= gameScriptPath %>/ng/services/news.js",
                     "<%= gameScriptPath %>/ng/services/alerts.js",
+
+                    // ENUMS
+
+                    "<%= gameScriptPath %>/ng/services/units/TerrainHandlerStatusEnum.js",
+                    // ENGINE
+
+                    // DIRECTIVES
+
+                    // UNITS
+
+                    "<%= gameScriptPath %>/ng/services/socketHandler.js",
+                    "<%= gameScriptPath %>/ng/services/units/Hud.js",
 
                     "<%= gameScriptPath %>/ng/services/units/ParticleTypes.js",
 
@@ -125,13 +137,12 @@ module.exports = function(grunt) {
                     "<%= gameScriptPath %>/Engine/Debug.js",
                     "<%= gameScriptPath %>/Engine/Events.js",
                     "<%= gameScriptPath %>/Engine/Input.js",
-                    "<%= gameScriptPath %>/Engine/SocketHandler.js",
+                    //"<%= gameScriptPath %>/Engine/SocketHandler.js",
                     "<%= gameScriptPath %>/Engine/SoundHandler.js",
                     //"<%= gameScriptPath %>/Engine/TextureHandler.js",
                     //"<%= gameScriptPath %>/Engine/MeshHandler.js",
                     "<%= gameScriptPath %>/Engine/Shaders/PixelationShader.js",
                     "<%= gameScriptPath %>/ng/services/units/unitlist.js",
-                    "<%= gameScriptPath %>/ng/services/units/Hud.js",
                     "<%= gameScriptPath %>/ng/services/units/PhysicsObject.js",
                     "<%= gameScriptPath %>/ng/services/units/Unit.js",
                     //"<%= gameScriptPath %>/ng/services/units/NewLevelEditor.js",

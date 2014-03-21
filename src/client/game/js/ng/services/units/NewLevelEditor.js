@@ -1,7 +1,7 @@
 
 
-var NewLevelEditor = PhysicsObject.extend({
-    Init: function() {
+IronbaneApp.factory("NewLevelEditor", ["PhysicsObject", function(PhysicsObject){
+    var NewLevelEditor = function() {
 
         this.editorControls = new THREE.EditorControls( ironbane.camera );
         this.editorControls.enabled = false;
@@ -182,8 +182,8 @@ var NewLevelEditor = PhysicsObject.extend({
         // Enable dynamic shadow maps because they are cool
         ironbane.renderer.shadowMapAutoUpdate = true;
 
-    },
-    Destroy: function(){
+    };
+    NewLevelEditor.prototype.Destroy = function(){
 
         this.editorControls.clearListeners();
 
@@ -195,8 +195,8 @@ var NewLevelEditor = PhysicsObject.extend({
 
         this._super();
 
-    },
-    Undo: function() {
+    };
+    NewLevelEditor.prototype.Undo = function() {
 
         if ( !this.selectedObject ) return;
 
@@ -205,8 +205,8 @@ var NewLevelEditor = PhysicsObject.extend({
         this.selectedObject.quaternion.setFromEuler(this.selectedObjectOldRotation);
         //this.selectedObject.rotation.copy(this.selectedObjectOldRotation);
 
-    },
-    Duplicate: function() {
+    };
+    NewLevelEditor.prototype.Duplicate = function() {
 
         if ( !this.selectedObject ) return;
 
@@ -243,8 +243,8 @@ var NewLevelEditor = PhysicsObject.extend({
 
         this.Undo();
 
-    },
-    DeleteSelectedObject: function() {
+    };
+    NewLevelEditor.prototype.DeleteSelectedObject = function() {
 
         var me = this;
 
@@ -260,8 +260,8 @@ var NewLevelEditor = PhysicsObject.extend({
         }
 
 
-    },
-    SetSelectedObject: function(mesh) {
+    };
+    NewLevelEditor.prototype.SetSelectedObject = function(mesh) {
 
         if ( this.selectedObject ) this.ClearSelectedObject();
 
@@ -286,8 +286,8 @@ var NewLevelEditor = PhysicsObject.extend({
             this.transformControls.attach(mesh.unit.object3D);
         }
 
-    },
-    ClearSelectedObject: function() {
+    };
+    NewLevelEditor.prototype.ClearSelectedObject = function() {
 
         if ( !this.selectedObject ) return;
 
@@ -351,8 +351,8 @@ var NewLevelEditor = PhysicsObject.extend({
 
         this.transformControls.detach();
         this.selectionBox.visible = false;
-    },
-    tick: function(dTime) {
+    };
+    NewLevelEditor.prototype.tick = function(dTime) {
 
 
 
@@ -398,5 +398,6 @@ var NewLevelEditor = PhysicsObject.extend({
             this.selectedObject.unit.changeRotationNextTick = true;
         }
 
-    }
-});
+    };
+    return NewLevelEditor;
+}]);

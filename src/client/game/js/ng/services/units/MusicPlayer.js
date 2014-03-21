@@ -19,8 +19,8 @@
  * and open the template in the editor.
  */
 
-var MusicPlayer = Billboard.extend({
-    Init: function(position, id, metadata) {
+IronbaneApp.factory("MusicPlayer", ["Billboard", function(Billboard){
+    var MusicPlayer = function(position, id, metadata) {
 
 
         this.metadata = metadata;
@@ -31,17 +31,10 @@ var MusicPlayer = Billboard.extend({
 
         this._super(position, 0, id, texture, true, id);
 
-    },
-    TIck: function(dTime) {
-
-
-        // if ( this.inRangeOfUnit(ironbane.player, this.metadata.range) ) {
-
-
-
-        // }
-
+    };
+    MusicPlayer.prototype.tick = function(dTime) {
 
         this._super(dTime);
-    }
-});
+    };
+    return MusicPlayer;
+}]);
