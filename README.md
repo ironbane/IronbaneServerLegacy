@@ -1,7 +1,10 @@
-Ironbane Server
-============================================
+DEPRECATED
+========================
+This repository is no longer maintained as the server for Ironbane is being rewritten.
+Please visit the [new server repository](https://github.com/ironbane/ironbane-server).
 
-![Ironbane Logo](http://www.ironbane.com/theme/images/logo_isolated.png)
+# Ironbane Server
+![Ironbane Logo](http://i.imgur.com/TD9UWO8.png)
 
 The server for Ironbane, the open source MMO.
 Play the game at <http://www.ironbane.com/>.
