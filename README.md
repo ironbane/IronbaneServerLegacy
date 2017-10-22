@@ -24,6 +24,12 @@ Play the game at <http://www.ironbane.com/>.
 ```
 
 * Install [GraphicsMagick](http://www.graphicsmagick.org/), make sure the binaries are in your PATH.
+**On Ubuntu**
+```
+    sudo add-apt-repository ppa:dhor/myway
+    sudo apt-get update
+    sudo apt-get install graphicsmagick
+```
 
 * Install [MySql](http://dev.mysql.com/downloads/mysql/)
 
