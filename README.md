@@ -30,6 +30,15 @@ Play the game at <http://www.ironbane.com/>.
     sudo apt-get update
     sudo apt-get install graphicsmagick
 ```
+**On Mac**
+I found that on macOS, GraphicsMagick has some errors, but I found that using ImageMagick instead fixes the problem.
+You can do
+```
+    brew install imagemagick --with-libtiff
+```
+Then you need to change a line in `/src/server/http/routes/main.js`
+Replace `gm = require('gm'),` with `gm = require('gm').subClass({imageMagick: true}),`.
+Everything should work.
 
 * Install [MySql](http://dev.mysql.com/downloads/mysql/)
 
