@@ -90,29 +90,13 @@ var io,
 // setup REPL for console server mgmt
 var startREPL = function() {
     if(config.get('use_repl') === true){
-        var repl = require('repl');
+        // Create a new instance of vantage.
+        var vantage = require("vantage")();
 
-        // Not game stuff, this is for the server executable
-        process.stdin.setEncoding('utf8');
-
-        // startup a full node repl for javascript awesomeness
-        var serverREPL = repl.start({
-           prompt: "ironbane> ",
-           input: process.stdin,
-           output: process.stdout
-        });
-
-        serverREPL.on('exit', function() {
-           // todo: other shutdown stuff, like stop db, etc.
-
-
-           process.exit();
-
-        });
-
-        // context variables get attached to "global" of this instance
-        serverREPL.context.version = pkg.version;
-        serverREPL.context.httpServer = httpServer;
+        vantage
+          .delimiter("ironbane>");
+          .listen(8081)
+          .show();
     }
     if(config.get('use_netrepl') === true){
     	// Add UNIX socket to REPL for awesome realtime debugging
