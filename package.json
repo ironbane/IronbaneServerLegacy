@@ -24,7 +24,7 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "socket.io": "~0.9.14",
-    "mysql": "~2.0.0-alpha9",
+    "mysql": "2.15.0",
     "wrench": "~1.5.1",
     "express": "~3.4.4",
     "underscore": "~1.5.2",
